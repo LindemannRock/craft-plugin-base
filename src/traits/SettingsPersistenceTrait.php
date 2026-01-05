@@ -84,6 +84,19 @@ trait SettingsPersistenceTrait
     }
 
     /**
+     * Get float field names for type conversion
+     *
+     * These fields will be cast to float when loading from database.
+     * Ensures fields are actual floats, not strings.
+     *
+     * @return array
+     */
+    protected static function floatFields(): array
+    {
+        return [];
+    }
+
+    /**
      * Get JSON array field names for encoding/decoding
      *
      * These fields will be JSON encoded when saving and decoded when loading.
@@ -164,6 +177,13 @@ trait SettingsPersistenceTrait
             foreach (static::integerFields() as $field) {
                 if (isset($row[$field])) {
                     $row[$field] = (int) $row[$field];
+                }
+            }
+
+            // Convert float fields (ensure actual float, not string)
+            foreach (static::floatFields() as $field) {
+                if (isset($row[$field])) {
+                    $row[$field] = (float) $row[$field];
                 }
             }
 
