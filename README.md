@@ -147,11 +147,6 @@ public function init(): void
 | `PluginHelper::bootstrap()` | Registers base module, Twig extension, and logging |
 | `PluginHelper::applyPluginNameFromConfig()` | Applies custom plugin name from config file |
 
-## Documentation
-
-- [docs/MIGRATION.md](docs/MIGRATION.md) - How to migrate existing plugins
-- [docs/TRAITS.md](docs/TRAITS.md) - Detailed trait documentation
-
 ## Support
 
 - **Documentation**: [https://github.com/LindemannRock/craft-plugin-base](https://github.com/LindemannRock/craft-plugin-base)
