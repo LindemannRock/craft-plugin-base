@@ -12,6 +12,7 @@ use Craft;
 use craft\base\PluginInterface;
 use lindemannrock\base\Base;
 use lindemannrock\base\twigextensions\PluginNameExtension;
+use lindemannrock\base\twigextensions\PluginNameHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 
 /**
@@ -64,9 +65,18 @@ class PluginHelper
         // Register base module (idempotent - safe to call multiple times)
         Base::register();
 
-        // Register plugin name Twig extension
-        Craft::$app->view->registerTwigExtension(
-            new PluginNameExtension($plugin, $helperVariableName)
+        // Register global variable directly via Twig (avoids extension class name conflicts)
+        \yii\base\Event::on(
+            \craft\web\View::class,
+            \craft\web\View::EVENT_BEFORE_RENDER_TEMPLATE,
+            function() use ($plugin, $helperVariableName) {
+                static $registered = [];
+                if (!isset($registered[$helperVariableName])) {
+                    $twig = Craft::$app->view->getTwig();
+                    $twig->addGlobal($helperVariableName, new PluginNameHelper($plugin));
+                    $registered[$helperVariableName] = true;
+                }
+            }
         );
 
         // Configure logging library (if available)
