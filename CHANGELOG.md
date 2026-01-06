@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.1.0...v5.2.0) (2026-01-06)
+
+
+### Features
+
+* register global variable directly via Twig in PluginHelper ([35e31b2](https://github.com/LindemannRock/craft-plugin-base/commit/35e31b2fcdacb90b1537ee48e150d9d3d8acc76c))
+
 ## [5.1.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.0.0...v5.1.0) (2026-01-05)
 
 
