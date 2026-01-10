@@ -13,8 +13,9 @@ This package provides shared functionality for all LindemannRock plugins:
 
 - **Traits** for Settings models (displayName, database persistence, config overrides)
 - **Twig Extensions** for plugin name helpers in templates
-- **Helpers** for common plugin initialization tasks
+- **Helpers** for common plugin initialization tasks and geographic utilities
 - **Templates** for shared components (plugin-credit, info-box, ip-salt-error)
+- **GeoHelper** for ISO 3166-1 country code lookups (249 countries)
 
 ## Requirements
 
@@ -146,6 +147,27 @@ public function init(): void
 |--------|---------|
 | `PluginHelper::bootstrap()` | Registers base module, Twig extension, and logging |
 | `PluginHelper::applyPluginNameFromConfig()` | Applies custom plugin name from config file |
+| `GeoHelper::getCountryName()` | Convert ISO 3166-1 alpha-2 country code to name |
+| `GeoHelper::getAllCountries()` | Get all 249 countries as code => name array |
+| `GeoHelper::isValidCountryCode()` | Validate a country code |
+
+### GeoHelper Usage
+
+```php
+use lindemannrock\base\helpers\GeoHelper;
+
+// Get country name from code
+$name = GeoHelper::getCountryName('US');  // "United States"
+$name = GeoHelper::getCountryName('GB');  // "United Kingdom"
+$name = GeoHelper::getCountryName('XX');  // "XX" (returns code if unknown)
+
+// Get all countries
+$countries = GeoHelper::getAllCountries();  // ['AD' => 'Andorra', 'AE' => 'United Arab Emirates', ...]
+
+// Validate country code
+$valid = GeoHelper::isValidCountryCode('US');  // true
+$valid = GeoHelper::isValidCountryCode('XX');  // false
+```
 
 ## Support
 
