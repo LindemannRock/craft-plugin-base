@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.3.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.2.0...v5.3.0) (2026-01-10)
+
+
+### Features
+
+* add GeoHelper for country code to name conversion ([d0ec0b1](https://github.com/LindemannRock/craft-plugin-base/commit/d0ec0b12bdae04b2042488a732c0e8882ad343ec))
+
+
+### Miscellaneous Chores
+
+* update README to include GeoHelper usage and functionality ([949d764](https://github.com/LindemannRock/craft-plugin-base/commit/949d764c767c5f02007828e21ce9fcc93c92b803))
+
 ## [5.2.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.1.0...v5.2.0) (2026-01-06)
 
 
