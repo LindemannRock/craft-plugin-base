@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.4.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.3.0...v5.4.0) (2026-01-12)
+
+
+### Features
+
+* enhance getDisplayName method to preserve acronyms during singularization ([f664813](https://github.com/LindemannRock/craft-plugin-base/commit/f66481306104ebb972e0701ccb1cef7b00cb4f7d))
+
 ## [5.3.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.2.0...v5.3.0) (2026-01-10)
 
 
