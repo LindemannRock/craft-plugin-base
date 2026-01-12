@@ -39,12 +39,14 @@ trait SettingsDisplayNameTrait
      * Get display name (singular, without "Manager")
      *
      * Strips "Manager" and singularizes the plugin name for use in UI labels.
+     * Acronyms (all-uppercase words) are not singularized.
      *
      * Examples:
      * - "Redirect Manager" -> "Redirect"
      * - "Short Links" -> "Short Link"
      * - "Search Manager" -> "Search"
      * - "Icons" -> "Icon"
+     * - "SMS Manager" -> "SMS" (acronym preserved)
      *
      * @return string
      */
@@ -54,9 +56,12 @@ trait SettingsDisplayNameTrait
         $name = trim(str_replace([' Manager', ' manager'], '', $this->pluginName));
 
         // Singularize by removing trailing 's' if present
-        // But only if the word is more than 2 characters (don't change "As" to "A")
-        // And not if it ends in 'ss' (e.g., "Class" should stay "Class")
-        if (strlen($name) > 2 && str_ends_with($name, 's') && !str_ends_with($name, 'ss')) {
+        // But only if:
+        // - The word is more than 2 characters (don't change "As" to "A")
+        // - Not if it ends in 'ss' (e.g., "Class" should stay "Class")
+        // - Not if it's all uppercase (acronyms like "SMS" should stay "SMS")
+        $isAcronym = strtoupper($name) === $name && strlen($name) > 1;
+        if (strlen($name) > 2 && str_ends_with($name, 's') && !str_ends_with($name, 'ss') && !$isAcronym) {
             $name = substr($name, 0, -1);
         }
 
