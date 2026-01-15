@@ -101,8 +101,8 @@ trait SettingsDisplayNameTrait
         // Strip "Manager" or "manager" from the name and trim whitespace
         $name = trim(str_replace([' Manager', ' manager'], '', $this->pluginName));
 
-        // Add 's' if not already ending in 's'
-        if (!str_ends_with($name, 's')) {
+        // Add 's' if not already ending in 's' (case-insensitive check)
+        if (!str_ends_with(strtolower($name), 's')) {
             $name .= 's';
         }
 
