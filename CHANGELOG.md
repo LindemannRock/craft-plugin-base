@@ -1,5 +1,26 @@
 # Changelog
 
+## [5.5.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.4.0...v5.5.0) (2026-01-16)
+
+
+### Features
+
+* add cache path helpers for plugin caching functionality ([9bcb720](https://github.com/LindemannRock/craft-plugin-base/commit/9bcb72040b12d8dc919b7a6778ef13a1f05b1133))
+* add cache path methods for plugin caching functionality ([6451dd9](https://github.com/LindemannRock/craft-plugin-base/commit/6451dd993d98ac70b99a21f4b2c9048f90a61d9e))
+* add EditionTrait for standardized plugin edition support ([166859d](https://github.com/LindemannRock/craft-plugin-base/commit/166859d1e3584b30014b71025cdf22e7995cb18e))
+* enhance README with detailed Edition Support usage and examples ([31ff490](https://github.com/LindemannRock/craft-plugin-base/commit/31ff490d38d13b2e79eb7a9b678c8da7644ce406))
+* update PluginHelper bootstrap method to include download permissions and improve logging configuration ([f01e89a](https://github.com/LindemannRock/craft-plugin-base/commit/f01e89a32037a04df2784ebe444e587ed8582169))
+
+
+### Bug Fixes
+
+* improve pluralization logic in getDisplayName method for case-insensitivity ([5f1be30](https://github.com/LindemannRock/craft-plugin-base/commit/5f1be30afbe48846c58ae3e6592462bd377260bf))
+
+
+### Miscellaneous Chores
+
+* add cache path helpers for consistent plugin caching structure ([a81696c](https://github.com/LindemannRock/craft-plugin-base/commit/a81696ccf2de86bbddd49c93acc208719ea1da54))
+
 ## [5.4.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.3.0...v5.4.0) (2026-01-12)
 
 
