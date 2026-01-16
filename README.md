@@ -11,6 +11,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 
 This package provides shared functionality for all LindemannRock plugins:
 
+- **Edition Support** for Craft Plugin Store licensing with standardized tiers (Standard/Lite/Pro)
 - **Traits** for Settings models (displayName, database persistence, config overrides)
 - **Twig Extensions** for plugin name helpers in templates
 - **Helpers** for common plugin initialization tasks and geographic utilities
@@ -39,6 +40,70 @@ ddev composer require lindemannrock/craft-plugin-base
 ```
 
 ## Usage
+
+### Edition Support in Plugin Class
+
+```php
+use lindemannrock\base\traits\EditionTrait;
+
+class MyPlugin extends Plugin
+{
+    use EditionTrait;
+
+    // Define your tier model (override default)
+    public static function editions(): array
+    {
+        return [
+            self::EDITION_LITE,  // Entry paid tier
+            self::EDITION_PRO,   // Full featured tier
+        ];
+    }
+}
+```
+
+**Available tier models:**
+
+| Model | Editions | Use Case |
+|-------|----------|----------|
+| Free-only | `[STANDARD]` | Free plugins (default) |
+| Two paid | `[LITE, PRO]` | Commercial plugins |
+| Free + paid | `[STANDARD, PRO]` | Freemium plugins |
+| Three tiers | `[STANDARD, LITE, PRO]` | Complex offerings |
+
+**Checking editions:**
+
+```php
+// In controllers - gate entire actions
+public function actionCloudBackup(): Response
+{
+    MyPlugin::getInstance()->requireEdition(MyPlugin::EDITION_PRO);
+    // ... pro-only code
+}
+
+// In services - conditional logic
+if (MyPlugin::getInstance()->isPro()) {
+    // Pro feature
+}
+
+if (MyPlugin::getInstance()->isAtLeast(MyPlugin::EDITION_LITE)) {
+    // Lite or Pro feature
+}
+```
+
+**In templates:**
+
+```twig
+{% set plugin = craft.app.plugins.getPlugin('my-plugin') %}
+
+{% if plugin.isPro() %}
+    {# Pro-only UI #}
+{% else %}
+    <a href="#">Upgrade to Pro</a>
+{% endif %}
+
+{# Show current edition #}
+<span class="edition-badge">{{ plugin.getEditionName() }}</span>
+```
 
 ### In Settings Model
 
@@ -129,6 +194,7 @@ public function init(): void
 
 | Trait | Methods Provided |
 |-------|------------------|
+| `EditionTrait` | `editions()`, `isStandard()`, `isLite()`, `isPro()`, `isAtLeast()`, `isBelow()`, `requireEdition()`, `getEditionName()`, `hasMultipleEditions()` |
 | `SettingsDisplayNameTrait` | `getDisplayName()`, `getFullName()`, `getPluralDisplayName()`, `getLowerDisplayName()`, `getPluralLowerDisplayName()` |
 | `SettingsPersistenceTrait` | `loadFromDatabase()`, `saveToDatabase()` |
 | `SettingsConfigTrait` | `isOverriddenByConfig()` |
