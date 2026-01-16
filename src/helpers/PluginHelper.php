@@ -31,7 +31,12 @@ use lindemannrock\logginglibrary\LoggingLibrary;
  *     self::$plugin = $this;
  *
  *     // One line replaces: base registration + twig extension + logging config
- *     PluginHelper::bootstrap($this, 'redirectHelper', ['redirectManager:viewLogs']);
+ *     PluginHelper::bootstrap(
+ *         $this,
+ *         'redirectHelper',
+ *         ['redirectManager:viewLogs'],
+ *         ['redirectManager:downloadLogs']
+ *     );
  *
  *     // Apply plugin name from config file
  *     PluginHelper::applyPluginNameFromConfig($this);
@@ -55,12 +60,14 @@ class PluginHelper
      *
      * @param PluginInterface $plugin The plugin instance
      * @param string $helperVariableName Twig global variable name (e.g., 'redirectHelper')
-     * @param array $loggingPermissions Permissions required to view logs (e.g., ['redirectManager:viewLogs'])
+     * @param array $viewPermissions Permissions required to view logs (e.g., ['redirectManager:viewLogs'])
+     * @param array $downloadPermissions Permissions required to download logs (e.g., ['redirectManager:downloadLogs'])
      */
     public static function bootstrap(
         PluginInterface $plugin,
         string $helperVariableName,
-        array $loggingPermissions = [],
+        array $viewPermissions = [],
+        array $downloadPermissions = [],
     ): void {
         // Register base module (idempotent - safe to call multiple times)
         Base::register();
@@ -79,8 +86,9 @@ class PluginHelper
             }
         );
 
-        // Configure logging library (if available)
-        if (class_exists(LoggingLibrary::class)) {
+        // Configure logging library (if available and viewPermissions provided)
+        // Only plugins that explicitly pass viewPermissions will have logging enabled
+        if (!empty($viewPermissions) && class_exists(LoggingLibrary::class)) {
             $settings = $plugin->getSettings();
 
             // Get settings values with fallbacks
@@ -93,7 +101,8 @@ class PluginHelper
                 'pluginName' => $pluginName,
                 'logLevel' => $logLevel,
                 'itemsPerPage' => $itemsPerPage,
-                'permissions' => $loggingPermissions,
+                'viewPermissions' => $viewPermissions,
+                'downloadPermissions' => $downloadPermissions,
             ]);
         }
     }
