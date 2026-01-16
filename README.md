@@ -147,9 +147,34 @@ public function init(): void
 |--------|---------|
 | `PluginHelper::bootstrap()` | Registers base module, Twig extension, and logging |
 | `PluginHelper::applyPluginNameFromConfig()` | Applies custom plugin name from config file |
+| `PluginHelper::registerTranslations()` | Register translation messages for a plugin |
+| `PluginHelper::getCacheBasePath()` | Get the cache base path for a plugin |
+| `PluginHelper::getCachePath()` | Get a specific cache type path for a plugin |
 | `GeoHelper::getCountryName()` | Convert ISO 3166-1 alpha-2 country code to name |
 | `GeoHelper::getAllCountries()` | Get all 249 countries as code => name array |
 | `GeoHelper::isValidCountryCode()` | Validate a country code |
+
+### Cache Path Helpers
+
+Provides consistent cache directory structure across plugins: `storage/runtime/{plugin-handle}/cache/{type}/`
+
+```php
+use lindemannrock\base\helpers\PluginHelper;
+
+// Get the base cache path for a plugin
+$basePath = PluginHelper::getCacheBasePath($plugin);
+// Returns: storage/runtime/my-plugin/cache/
+
+// Get a specific cache type path
+$searchCache = PluginHelper::getCachePath($plugin, 'search');
+// Returns: storage/runtime/my-plugin/cache/search/
+
+$autocompleteCache = PluginHelper::getCachePath($plugin, 'autocomplete');
+// Returns: storage/runtime/my-plugin/cache/autocomplete/
+
+$deviceCache = PluginHelper::getCachePath($plugin, 'device');
+// Returns: storage/runtime/my-plugin/cache/device/
+```
 
 ### GeoHelper Usage
 
