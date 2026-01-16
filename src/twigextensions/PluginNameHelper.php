@@ -115,6 +115,31 @@ class PluginNameHelper
     }
 
     /**
+     * Get cache base path for the plugin
+     *
+     * Returns the display path (relative): storage/runtime/{handle}/cache/
+     *
+     * @return string
+     */
+    public function getCacheBasePath(): string
+    {
+        return 'storage/runtime/' . $this->plugin->handle . '/cache/';
+    }
+
+    /**
+     * Get cache path for a specific type
+     *
+     * Returns the display path (relative): storage/runtime/{handle}/cache/{type}/
+     *
+     * @param string $type Cache type (e.g., 'device', 'qr', 'search')
+     * @return string
+     */
+    public function getCachePath(string $type): string
+    {
+        return $this->getCacheBasePath() . $type . '/';
+    }
+
+    /**
      * Magic getter to allow property-style access in Twig
      *
      * Enables: {{ helper.displayName }} instead of {{ helper.getDisplayName() }}
