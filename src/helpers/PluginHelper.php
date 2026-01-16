@@ -178,4 +178,35 @@ class PluginHelper
             'allowOverrides' => true,
         ];
     }
+
+    // =========================================================================
+    // CACHE PATH HELPERS
+    // =========================================================================
+
+    /**
+     * Get the cache base path for a plugin
+     *
+     * Returns: storage/runtime/{plugin-handle}/cache/
+     *
+     * @param PluginInterface $plugin The plugin instance
+     * @return string
+     */
+    public static function getCacheBasePath(PluginInterface $plugin): string
+    {
+        return Craft::$app->getPath()->getRuntimePath() . '/' . $plugin->handle . '/cache/';
+    }
+
+    /**
+     * Get a specific cache path for a plugin
+     *
+     * Returns: storage/runtime/{plugin-handle}/cache/{type}/
+     *
+     * @param PluginInterface $plugin The plugin instance
+     * @param string $type Cache type (e.g., 'search', 'autocomplete', 'device')
+     * @return string
+     */
+    public static function getCachePath(PluginInterface $plugin, string $type): string
+    {
+        return self::getCacheBasePath($plugin) . $type . '/';
+    }
 }
