@@ -6,7 +6,9 @@
   Usage:
   {% include 'lindemannrock-base/_components/info-box' with {
       message: 'Your message here',
-      type: 'info'  // 'info', 'success', 'warning'
+      type: 'info',   // 'info', 'success', 'warning'
+      margin: 'top',  // 'top' (default), 'both', 'none'
+      bg: 'gray'      // 'gray' (default), 'white'
   } %}
 
   @link      https://lindemannrock.com
@@ -14,8 +16,20 @@
 #}
 
 {% set iconType = type ?? 'info' %}
+{% set marginStyle = margin ?? 'top' %}
 
-<div style="margin-top: 1.5rem; padding: 1rem; background: #f3f4f6; border-radius: 4px;">
+{% set marginCss = '' %}
+{% if marginStyle == 'both' %}
+    {% set marginCss = 'margin-block: 1.5rem;' %}
+{% elseif marginStyle == 'none' %}
+    {% set marginCss = '' %}
+{% else %}
+    {% set marginCss = 'margin-top: 1.5rem;' %}
+{% endif %}
+
+{% set bgStyle = (bg ?? 'gray') == 'white' ? 'background: #ffffff;' : 'background: var(--pane-bg); background-color: var(--gray-050);' %}
+
+<div style="{{ marginCss }} padding: 1rem; {{ bgStyle }} border: 1px solid #e5e7eb; border-radius: 4px;">
     <p class="light" style="margin: 0; display: flex; align-items: flex-start; gap: 8px;">
         {% if iconType == 'success' %}
             {# Success checkmark icon #}
