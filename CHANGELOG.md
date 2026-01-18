@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.6.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.5.0...v5.6.0) (2026-01-18)
+
+
+### Features
+
+* add stretch option to info-box component for full-width display ([25570cb](https://github.com/LindemannRock/craft-plugin-base/commit/25570cbaaa20a700c5ad057ff3df0f938b870073))
+* enhance info-box component with margin and background options ([bf1eb6a](https://github.com/LindemannRock/craft-plugin-base/commit/bf1eb6aa9897dcc5b6d8a62996a5d20f7c4ce7a6))
+
 ## [5.5.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.4.0...v5.5.0) (2026-01-16)
 
 
