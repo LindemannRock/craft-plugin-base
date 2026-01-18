@@ -7,8 +7,9 @@
   {% include 'lindemannrock-base/_components/info-box' with {
       message: 'Your message here',
       type: 'info',   // 'info', 'success', 'warning'
-      margin: 'top',  // 'top' (default), 'both', 'none'
-      bg: 'gray'      // 'gray' (default), 'white'
+      margin: 'top',  // 'top' (default), 'bottom', 'both', 'none'
+      bg: 'gray',     // 'gray' (default), 'white'
+      stretch: false  // true = full width with margin-inline: calc(var(--padding) * -1 + 2px)
   } %}
 
   @link      https://lindemannrock.com
@@ -21,6 +22,8 @@
 {% set marginCss = '' %}
 {% if marginStyle == 'both' %}
     {% set marginCss = 'margin-block: 1.5rem;' %}
+{% elseif marginStyle == 'bottom' %}
+    {% set marginCss = 'margin-bottom: 1.5rem;' %}
 {% elseif marginStyle == 'none' %}
     {% set marginCss = '' %}
 {% else %}
@@ -28,8 +31,9 @@
 {% endif %}
 
 {% set bgStyle = (bg ?? 'gray') == 'white' ? 'background: #ffffff;' : 'background: var(--pane-bg); background-color: var(--gray-050);' %}
+{% set stretchCss = (stretch ?? false) ? 'margin-inline: calc(var(--padding) * -1 + 2px); margin-block: calc(var(--padding) * -1 + 2px);' : '' %}
 
-<div style="{{ marginCss }} padding: 1rem; {{ bgStyle }} border: 1px solid #e5e7eb; border-radius: 4px;">
+<div style="{{ marginCss }} {{ stretchCss }} padding: 1rem; {{ bgStyle }} border: 1px solid #e5e7eb; border-radius: 4px;">
     <p class="light" style="margin: 0; display: flex; align-items: flex-start; gap: 8px;">
         {% if iconType == 'success' %}
             {# Success checkmark icon #}
