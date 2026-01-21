@@ -1,0 +1,127 @@
+{#
+/**
+ * Geo Detection Provider Settings
+ *
+ * Include this partial in plugin settings pages that support geo detection.
+ *
+ * Required variables:
+ * - settings: Plugin settings model with geoProvider, geoApiKey
+ * - pluginHandle: Plugin handle for config override checking (e.g., 'search-manager')
+ *
+ * Usage:
+ * {% include 'lindemannrock-base/_partials/geo-settings' with {
+ *     settings: settings,
+ *     pluginHandle: 'search-manager'
+ * } %}
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{{ forms.selectField({
+    label: 'Geo Provider'|t('base'),
+    instructions: 'Select the geo IP lookup provider. HTTPS providers recommended for privacy.'|t('base'),
+    id: 'geoProvider',
+    name: 'settings[geoProvider]',
+    value: settings.geoProvider ?? 'ip-api.com',
+    options: {
+        'ip-api.com': 'ip-api.com (HTTP free, HTTPS paid)',
+        'ipapi.co': 'ipapi.co (HTTPS, 1k/day free)',
+        'ipinfo.io': 'ipinfo.io (HTTPS, 50k/month free)',
+    },
+    disabled: settings.isOverriddenByConfig('geoProvider'),
+    warning: settings.isOverriddenByConfig('geoProvider') ?
+        ("This is being overridden by the <code>geoProvider</code> setting in <code>config/" ~ pluginHandle ~ ".php</code>.")|t('base')|raw : null,
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'API Key'|t('base'),
+    instructions: 'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).'|t('base'),
+    tip: 'This can begin with an environment variable. <a href="https://craftcms.com/docs/5.x/configure.html#env" target="_blank" rel="noopener">Learn more</a>'|t('base'),
+    id: 'geoApiKey',
+    name: 'settings[geoApiKey]',
+    value: settings.geoApiKey,
+    suggestEnvVars: true,
+    placeholder: '$IP_API_KEY',
+    disabled: settings.isOverriddenByConfig('geoApiKey'),
+    warning: settings.isOverriddenByConfig('geoApiKey') ?
+        ("This is being overridden by the <code>geoApiKey</code> setting in <code>config/" ~ pluginHandle ~ ".php</code>.")|t('base')|raw : null,
+}) }}
+
+<div id="geo-http-warning" class="{{ (settings.geoProvider ?? 'ip-api.com') != 'ip-api.com' or settings.geoApiKey ? 'hidden' : '' }}" style="margin-top: 24px;">
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: '<span id="geo-warning-message">' ~ "ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io."|t('base') ~ '</span>',
+        type: 'warning',
+        margin: 'none'
+    } %}
+</div>
+
+<div id="geo-provider-info">
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: '<span id="geo-provider-info-message"><strong>ip-api.com:</strong> HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.</span>',
+        type: 'info',
+        margin: 'top'
+    } %}
+</div>
+
+{% js %}
+(function() {
+    const providerSelect = document.getElementById('geoProvider');
+    const apiKeyInput = document.getElementById('geoApiKey');
+    const httpWarning = document.getElementById('geo-http-warning');
+    const providerInfoMessage = document.getElementById('geo-provider-info-message');
+
+    const providerConfig = {
+        'ip-api.com': {
+            placeholder: '$IP_API_KEY',
+            info: '<strong>ip-api.com:</strong> HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.',
+            showHttpWarning: true
+        },
+        'ipapi.co': {
+            placeholder: '$IPAPI_CO_KEY',
+            info: '<strong>ipapi.co:</strong> HTTPS with 1,000 free requests/day. API key optional (increases rate limits).',
+            showHttpWarning: false
+        },
+        'ipinfo.io': {
+            placeholder: '$IPINFO_IO_KEY',
+            info: '<strong>ipinfo.io:</strong> HTTPS with 50,000 free requests/month. API key optional (increases rate limits).',
+            showHttpWarning: false
+        }
+    };
+
+    function updateUI() {
+        const provider = providerSelect.value;
+        const config = providerConfig[provider] || providerConfig['ip-api.com'];
+        const hasApiKey = apiKeyInput.value && apiKeyInput.value.trim() !== '';
+
+        // Update placeholder
+        apiKeyInput.placeholder = config.placeholder;
+
+        // Update provider info
+        if (providerInfoMessage) {
+            providerInfoMessage.innerHTML = config.info;
+        }
+
+        // Show/hide HTTP warning (only for ip-api.com without API key)
+        if (httpWarning) {
+            if (config.showHttpWarning && !hasApiKey) {
+                httpWarning.classList.remove('hidden');
+            } else {
+                httpWarning.classList.add('hidden');
+            }
+        }
+    }
+
+    // Initial update
+    updateUI();
+
+    // Listen for changes
+    if (providerSelect) {
+        providerSelect.addEventListener('change', updateUI);
+    }
+    if (apiKeyInput) {
+        apiKeyInput.addEventListener('input', updateUI);
+        apiKeyInput.addEventListener('change', updateUI);
+    }
+})();
+{% endjs %}

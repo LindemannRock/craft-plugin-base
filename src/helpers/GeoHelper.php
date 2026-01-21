@@ -660,16 +660,26 @@ class GeoHelper
     /**
      * Get countries with their dial codes for select options
      *
+     * @param bool $includeAll Whether to include an "All Countries" option at the top
      * @return array<array{label: string, value: string}> Array of options with label "Country Name (+code)" and value "XX"
      */
-    public static function getCountryDialCodeOptions(): array
+    public static function getCountryDialCodeOptions(bool $includeAll = false): array
     {
         $options = [];
 
+        // Add "All Countries" option if requested
+        if ($includeAll) {
+            $options[] = [
+                'label' => 'All Countries',
+                'value' => '*',
+            ];
+        }
+
+        $countryOptions = [];
         foreach (self::COUNTRIES as $code => $name) {
             $dialCode = self::DIAL_CODES[$code] ?? null;
             if ($dialCode) {
-                $options[] = [
+                $countryOptions[] = [
                     'label' => $name . ' (+' . $dialCode . ')',
                     'value' => $code,
                 ];
@@ -677,22 +687,27 @@ class GeoHelper
         }
 
         // Sort by label
-        usort($options, fn($a, $b) => strcmp($a['label'], $b['label']));
+        usort($countryOptions, fn($a, $b) => strcmp($a['label'], $b['label']));
 
-        return $options;
+        return array_merge($options, $countryOptions);
     }
 
     /**
      * Check if a phone number matches any of the allowed country codes
      *
      * @param string $phoneNumber Phone number (with or without +, just digits)
-     * @param array<string> $allowedCountryCodes Array of ISO 3166-1 alpha-2 codes (e.g., ['KW', 'SA'])
+     * @param array<string> $allowedCountryCodes Array of ISO 3166-1 alpha-2 codes (e.g., ['KW', 'SA']) or ['*'] for all
      * @return bool True if phone number starts with one of the allowed dial codes
      */
     public static function isPhoneNumberAllowed(string $phoneNumber, array $allowedCountryCodes): bool
     {
         if (empty($allowedCountryCodes)) {
             // No restrictions
+            return true;
+        }
+
+        // Check for "All Countries" wildcard
+        if (in_array('*', $allowedCountryCodes, true)) {
             return true;
         }
 
