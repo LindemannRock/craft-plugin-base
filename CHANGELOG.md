@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.7.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.6.0...v5.7.0) (2026-01-21)
+
+
+### Features
+
+* add phone dial code utilities to GeoHelper class ([80923af](https://github.com/LindemannRock/craft-plugin-base/commit/80923afce378445b3a2f7d629265605f7478bb6d))
+* enhance info-box component with additional options and styling ([855e1fc](https://github.com/LindemannRock/craft-plugin-base/commit/855e1fcd24b8d6d09bf224dbe0f7142a7fcad842))
+* implement geo IP lookup and provider configuration classes ([9ffc6a6](https://github.com/LindemannRock/craft-plugin-base/commit/9ffc6a63c6f42b3d9a3ca62da11fde66a38ca080))
+
 ## [5.6.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.5.0...v5.6.0) (2026-01-18)
 
 
