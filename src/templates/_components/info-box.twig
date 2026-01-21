@@ -6,10 +6,14 @@
   Usage:
   {% include 'lindemannrock-base/_components/info-box' with {
       message: 'Your message here',
-      type: 'info',   // 'info', 'success', 'warning'
-      margin: 'top',  // 'top' (default), 'bottom', 'both', 'none'
-      bg: 'gray',     // 'gray' (default), 'white'
-      stretch: false  // true = full width with margin-inline: calc(var(--padding) * -1 + 2px)
+      type: 'info',        // 'info', 'success', 'warning', 'error'
+      variant: 'subtle',   // 'subtle' (default - gray/white bg), 'colored' (colored bg based on type)
+      margin: 'top',       // 'top' (default), 'bottom', 'both', 'none'
+      bg: 'gray',          // 'gray' (default), 'white' - only applies when variant is 'subtle'
+      stretch: false,      // true = full width with margin-inline: calc(var(--padding) * -1 + 2px)
+      boxId: null,         // optional id for outer div (for JS targeting)
+      messageId: null,     // optional id for message span (for JS text updates)
+      hidden: false        // true = starts with display: none (for JS-driven show/hide)
   } %}
 
   @link      https://lindemannrock.com
@@ -17,6 +21,7 @@
 #}
 
 {% set iconType = type ?? 'info' %}
+{% set variantStyle = variant ?? 'subtle' %}
 {% set marginStyle = margin ?? 'top' %}
 
 {% set marginCss = '' %}
@@ -30,28 +35,61 @@
     {% set marginCss = 'margin-top: 1.5rem;' %}
 {% endif %}
 
-{% set bgStyle = (bg ?? 'gray') == 'white' ? 'background: #ffffff;' : 'background: var(--pane-bg); background-color: var(--gray-050);' %}
-{% set stretchCss = (stretch ?? false) ? 'margin-inline: calc(var(--padding) * -1 + 2px); margin-block: calc(var(--padding) * -1 + 2px);' : '' %}
+{# Background and border styles based on variant #}
+{% if variantStyle == 'colored' %}
+    {% if iconType == 'success' %}
+        {% set bgStyle = 'background: #e8f5e9;' %}
+        {% set borderStyle = 'border: 1px solid #a5d6a7;' %}
+        {% set iconColor = '#28a745' %}
+    {% elseif iconType == 'error' %}
+        {% set bgStyle = 'background: #fef2f2;' %}
+        {% set borderStyle = 'border: 1px solid #f5c2c7;' %}
+        {% set iconColor = '#dc3545' %}
+    {% elseif iconType == 'warning' %}
+        {% set bgStyle = 'background: #fffbeb;' %}
+        {% set borderStyle = 'border: 1px solid #fcd34d;' %}
+        {% set iconColor = '#f59e0b' %}
+    {% else %}
+        {# info (default) #}
+        {% set bgStyle = 'background: #e3f2fd;' %}
+        {% set borderStyle = 'border: 1px solid #90caf9;' %}
+        {% set iconColor = '#2196f3' %}
+    {% endif %}
+{% else %}
+    {# subtle variant (default) - existing behavior #}
+    {% set bgStyle = (bg ?? 'gray') == 'white' ? 'background: #ffffff;' : 'background: var(--pane-bg); background-color: var(--gray-050);' %}
+    {% set borderStyle = 'border: 1px solid #e5e7eb;' %}
+    {% set iconColor = iconType == 'success' ? '#10b981' : (iconType == 'warning' ? '#f59e0b' : (iconType == 'error' ? '#dc3545' : 'currentColor')) %}
+{% endif %}
 
-<div style="{{ marginCss }} {{ stretchCss }} padding: 1rem; {{ bgStyle }} border: 1px solid #e5e7eb; border-radius: 4px;">
-    <p class="light" style="margin: 0; display: flex; align-items: flex-start; gap: 8px;">
+{% set stretchCss = (stretch ?? false) ? 'margin-inline: calc(var(--padding) * -1 + 2px); margin-block: calc(var(--padding) * -1 + 2px);' : '' %}
+{% set hiddenCss = (hidden ?? false) ? 'display: none;' : '' %}
+
+<div{% if boxId is defined and boxId %} id={{ boxId }}{% endif %} style="{{ hiddenCss }} {{ marginCss }} {{ stretchCss }} padding: 1rem; {{ bgStyle }} {{ borderStyle }} border-radius: 4px;">
+    <p style="margin: 0; display: flex; align-items: flex-start; gap: 8px;">
         {% if iconType == 'success' %}
             {# Success checkmark icon #}
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px; color: #10b981;">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px; color: {{ iconColor }};">
                 <path fill="currentColor" d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm3.7 6.3l-4 4c-.2.2-.4.3-.7.3s-.5-.1-.7-.3l-2-2c-.4-.4-.4-1 0-1.4s1-.4 1.4 0l1.3 1.3 3.3-3.3c.4-.4 1-.4 1.4 0s.4 1 0 1.4z"/>
             </svg>
         {% elseif iconType == 'warning' %}
             {# Warning icon #}
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px; color: #f59e0b;">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px; color: {{ iconColor }};">
                 <path fill="currentColor" d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zm0-6H7V4h2v2z"/>
+            </svg>
+        {% elseif iconType == 'error' %}
+            {# Error icon #}
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px; color: {{ iconColor }};">
+                <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                <text x="8" y="12" text-anchor="middle" font-size="12" font-weight="bold" fill="white">!</text>
             </svg>
         {% else %}
             {# Info icon (default) #}
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px;">
-                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px; color: {{ iconColor }};">
+                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
                 <text x="8" y="12" text-anchor="middle" font-size="11" font-weight="bold" fill="currentColor">i</text>
             </svg>
         {% endif %}
-        <span>{{ message|raw }}</span>
+        <span{% if messageId is defined and messageId %} id={{ messageId }}{% endif %}>{{ message|raw }}</span>
     </p>
 </div>
