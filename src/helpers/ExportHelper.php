@@ -118,6 +118,53 @@ class ExportHelper
     }
 
     /**
+     * Get export format options for select fields
+     *
+     * Returns options in the format expected by Craft form select fields.
+     * Only enabled formats are returned. Order: Excel → CSV → JSON.
+     *
+     * Usage:
+     * ```php
+     * {{ forms.selectField({
+     *     label: 'Export Format',
+     *     name: 'format',
+     *     options: ExportHelper::getFormatOptions(),
+     * }) }}
+     * ```
+     *
+     * @return array Array of options with 'value' and 'label' keys
+     * @since 5.8.0
+     */
+    public static function getFormatOptions(): array
+    {
+        $allFormats = [
+            'xlsx' => 'Excel (.xlsx)',
+            'csv' => 'CSV (.csv)',
+            'json' => 'JSON (.json)',
+        ];
+
+        $formatMapping = [
+            'xlsx' => 'excel',
+            'csv' => 'csv',
+            'json' => 'json',
+        ];
+
+        $options = [];
+
+        foreach ($allFormats as $value => $label) {
+            $configKey = $formatMapping[$value];
+            if (self::isFormatEnabled($configKey)) {
+                $options[] = [
+                    'value' => $value,
+                    'label' => $label,
+                ];
+            }
+        }
+
+        return $options;
+    }
+
+    /**
      * Assert that data is not empty before exporting
      *
      * @param array $rows Data rows to check

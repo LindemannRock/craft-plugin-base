@@ -276,6 +276,34 @@ class ColorHelper
                 'warning' => self::PALETTE['orange'],
                 'error' => self::PALETTE['red'],
             ],
+
+            // =================================================================
+            // EXPORT/JOB STATUS - pending = orange, processing = blue, completed = teal, failed = red
+            // =================================================================
+            'exportStatus' => [
+                'pending' => self::PALETTE['orange'],
+                'processing' => self::PALETTE['blue'],
+                'completed' => self::PALETTE['teal'],
+                'failed' => self::PALETTE['red'],
+            ],
+
+            // =================================================================
+            // TRIGGER TYPE - manual = gray, scheduled = purple, api = indigo
+            // =================================================================
+            'triggerType' => [
+                'manual' => self::PALETTE['gray'],
+                'scheduled' => self::PALETTE['purple'],
+                'api' => self::PALETTE['indigo'],
+            ],
+
+            // =================================================================
+            // EXPORT FORMAT - xlsx = green, csv = cyan, json = amber
+            // =================================================================
+            'exportFormat' => [
+                'xlsx' => self::PALETTE['green'],
+                'csv' => self::PALETTE['cyan'],
+                'json' => self::PALETTE['amber'],
+            ],
         ];
 
         self::$initialized = true;

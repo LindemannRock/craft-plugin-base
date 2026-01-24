@@ -49,7 +49,7 @@
  # - {% block rowActions %} - Per-row action buttons
  # - {% block expandableRow %} - Expandable detail row (logs, etc.)
  # - {% block bulkActions %} - Bulk action buttons (shown when items selected)
- # - {% block sidebar %} - Right sidebar content
+ # - {% block sidebarContent %} - Right sidebar/details pane content
  # - {% block toolbarActions %} - Toolbar action buttons (export, etc.)
  # - {% block extraToolbar %} - Additional toolbar items inside toolbar
  # - {% block extraFooter %} - Additional footer content
@@ -702,9 +702,11 @@
 
 
 {# ============================================================================
-   SIDEBAR BLOCK
+   SIDEBAR/DETAILS BLOCK
+   Note: We use 'sidebarContent' instead of 'sidebar' to avoid collision
+   with Craft's left sidebar block in _layouts/cp
    ============================================================================ #}
 
 {% block details %}
-    {% block sidebar %}{% endblock %}
+    {% block sidebarContent %}{% endblock %}
 {% endblock %}

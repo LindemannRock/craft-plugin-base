@@ -758,6 +758,13 @@ return ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated'], [
         </a>
     {% endfor %}
 </div>
+
+{# Get format options for select fields (form dropdowns) #}
+{{ forms.selectField({
+    label: 'Export Format',
+    name: 'format',
+    options: lrExportFormatOptions(),
+}) }}
 ```
 
 ### Export Methods
@@ -769,7 +776,8 @@ return ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated'], [
 | `toExcel($rows, $headers, $filename, $dateColumns, $options)` | XLSX file | Professional reports |
 | `filename($prefix, $extension)` | Timestamped filename | Consistent naming |
 | `isFormatEnabled($format)` | boolean | Check availability |
-| `getEnabledFormats()` | array | List all enabled |
+| `getEnabledFormats()` | array | List all enabled formats |
+| `getFormatOptions()` | array | Options for select fields |
 | `formatDateColumns($rows, $dateColumns)` | Formatted rows | Database format dates |
 | `formatDateColumnsForApi($rows, $dateColumns)` | Formatted rows | ISO 8601 dates |
 
@@ -864,6 +872,7 @@ ColorHelper provides a unified `PALETTE` constant with all available colors. Thi
 | `priority` | low, normal, high, critical | Priority levels |
 | `httpStatus` | success, redirect, client_error, server_error | HTTP response types |
 | `logLevel` | debug, info, warning, error | Log severity levels |
+| `exportStatus` | pending, processing, completed, failed | Export/job status |
 
 ### PHP Usage
 
@@ -1468,12 +1477,12 @@ Add a "New" button to the toolbar:
 | `extraFooter` | Additional footer content |
 | `scripts` | Custom JavaScript for the page |
 
-### Sidebar
+### Sidebar Content
 
-To add a sidebar to your table page, use the `sidebar` block:
+To add content to the right sidebar (details pane), use the `sidebarContent` block:
 
 ```twig
-{% block sidebar %}
+{% block sidebarContent %}
     <div class="meta" style="padding: 12px;">
         <div class="data">
             <div class="heading">{{ "Summary"|t('app') }}</div>
@@ -1488,6 +1497,8 @@ To add a sidebar to your table page, use the `sidebar` block:
 ```
 
 The sidebar appears on the right side of the page using Craft's built-in details pane.
+
+> **Note**: We use `sidebarContent` instead of `sidebar` to avoid collision with Craft's left sidebar block in `_layouts/cp`.
 
 ### JavaScript Events
 

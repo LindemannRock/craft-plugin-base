@@ -28,6 +28,13 @@ use Twig\TwigFunction;
  * {% for format in lrExportFormats() %}
  *     <a href="{{ url('plugin/export', {format: format}) }}">{{ format|upper }}</a>
  * {% endfor %}
+ *
+ * {# Get format options for select fields #}
+ * {{ forms.selectField({
+ *     label: 'Export Format',
+ *     name: 'format',
+ *     options: lrExportFormatOptions(),
+ * }) }}
  * ```
  *
  * @author LindemannRock
@@ -51,6 +58,7 @@ class ExportExtension extends AbstractExtension
         return [
             new TwigFunction('lrExportEnabled', [ExportHelper::class, 'isFormatEnabled']),
             new TwigFunction('lrExportFormats', [ExportHelper::class, 'getEnabledFormats']),
+            new TwigFunction('lrExportFormatOptions', [ExportHelper::class, 'getFormatOptions']),
         ];
     }
 }
