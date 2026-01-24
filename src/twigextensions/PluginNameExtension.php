@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\twigextensions;
@@ -53,6 +53,7 @@ class PluginNameExtension extends AbstractExtension implements GlobalsInterface
      *
      * @param PluginInterface $plugin The plugin instance
      * @param string $variableName The Twig global variable name (e.g., 'redirectHelper')
+     * @since 5.0.0
      */
     public function __construct(PluginInterface $plugin, string $variableName)
     {

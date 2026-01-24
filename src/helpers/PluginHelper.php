@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\helpers;
@@ -57,17 +57,23 @@ class PluginHelper
      * - Base module registration
      * - Twig extension registration (PluginNameExtension)
      * - Logging library configuration (if available)
+     * - Color set registration for badges/filters
      *
      * @param PluginInterface $plugin The plugin instance
      * @param string $helperVariableName Twig global variable name (e.g., 'redirectHelper')
      * @param array $viewPermissions Permissions required to view logs (e.g., ['redirectManager:viewLogs'])
      * @param array $downloadPermissions Permissions required to download logs (e.g., ['redirectManager:downloadLogs'])
+     * @param array $options Additional options:
+     *   - 'colorSets': array of color sets to register for badges/filters
+     *     Example: ['myStatus' => ['active' => ['color' => '#10b981', 'rgb' => '16, 185, 129', 'text' => '#065f46']]]
+     * @since 5.0.0
      */
     public static function bootstrap(
         PluginInterface $plugin,
         string $helperVariableName,
         array $viewPermissions = [],
         array $downloadPermissions = [],
+        array $options = [],
     ): void {
         // Register base module (idempotent - safe to call multiple times)
         Base::register();
@@ -105,6 +111,15 @@ class PluginHelper
                 'downloadPermissions' => $downloadPermissions,
             ]);
         }
+
+        // Register plugin-specific color sets for badges/filters
+        if (!empty($options['colorSets']) && is_array($options['colorSets'])) {
+            foreach ($options['colorSets'] as $setName => $colors) {
+                if (is_string($setName) && is_array($colors)) {
+                    ColorHelper::registerColorSet($setName, $colors);
+                }
+            }
+        }
     }
 
     /**
@@ -130,6 +145,7 @@ class PluginHelper
      * ```
      *
      * @param PluginInterface $plugin The plugin instance
+     * @since 5.0.0
      */
     public static function applyPluginNameFromConfig(PluginInterface $plugin): void
     {
@@ -176,6 +192,7 @@ class PluginHelper
      *
      * @param string $handle Plugin handle (translation category)
      * @param string $basePath Path to translations directory
+     * @since 5.0.0
      */
     public static function registerTranslations(string $handle, string $basePath): void
     {
@@ -199,6 +216,7 @@ class PluginHelper
      *
      * @param PluginInterface $plugin The plugin instance
      * @return string
+     * @since 5.0.0
      */
     public static function getCacheBasePath(PluginInterface $plugin): string
     {
@@ -213,6 +231,7 @@ class PluginHelper
      * @param PluginInterface $plugin The plugin instance
      * @param string $type Cache type (e.g., 'search', 'autocomplete', 'device')
      * @return string
+     * @since 5.0.0
      */
     public static function getCachePath(PluginInterface $plugin, string $type): string
     {

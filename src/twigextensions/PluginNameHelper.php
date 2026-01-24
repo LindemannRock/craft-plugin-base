@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\twigextensions;
@@ -38,6 +38,7 @@ class PluginNameHelper
      * Constructor
      *
      * @param PluginInterface $plugin The plugin instance
+     * @since 5.0.0
      */
     public function __construct(PluginInterface $plugin)
     {
@@ -48,6 +49,7 @@ class PluginNameHelper
      * Get display name (singular, without "Manager")
      *
      * @return string
+     * @since 5.0.0
      */
     public function getDisplayName(): string
     {
@@ -62,6 +64,7 @@ class PluginNameHelper
      * Get plural display name (without "Manager")
      *
      * @return string
+     * @since 5.0.0
      */
     public function getPluralDisplayName(): string
     {
@@ -76,6 +79,7 @@ class PluginNameHelper
      * Get full plugin name (as configured)
      *
      * @return string
+     * @since 5.0.0
      */
     public function getFullName(): string
     {
@@ -90,6 +94,7 @@ class PluginNameHelper
      * Get lowercase display name (singular)
      *
      * @return string
+     * @since 5.0.0
      */
     public function getLowerDisplayName(): string
     {
@@ -104,6 +109,7 @@ class PluginNameHelper
      * Get lowercase plural display name
      *
      * @return string
+     * @since 5.0.0
      */
     public function getPluralLowerDisplayName(): string
     {
@@ -120,6 +126,7 @@ class PluginNameHelper
      * Returns the display path (relative): storage/runtime/{handle}/cache/
      *
      * @return string
+     * @since 5.5.0
      */
     public function getCacheBasePath(): string
     {
@@ -133,6 +140,7 @@ class PluginNameHelper
      *
      * @param string $type Cache type (e.g., 'device', 'qr', 'search')
      * @return string
+     * @since 5.5.0
      */
     public function getCachePath(string $type): string
     {
@@ -146,6 +154,7 @@ class PluginNameHelper
      *
      * @param string $name Property name
      * @return string|null
+     * @since 5.0.0
      */
     public function __get(string $name): ?string
     {

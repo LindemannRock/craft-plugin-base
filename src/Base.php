@@ -5,14 +5,18 @@
  * Common utilities and building blocks for LindemannRock Craft CMS plugins
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base;
 
 use Craft;
 use craft\events\RegisterTemplateRootsEvent;
+use craft\web\twig\Environment;
 use craft\web\View;
+use lindemannrock\base\twigextensions\ColorExtension;
+use lindemannrock\base\twigextensions\DateTimeExtension;
+use lindemannrock\base\twigextensions\ExportExtension;
 use yii\base\Event;
 use yii\base\Module;
 
@@ -22,7 +26,8 @@ use yii\base\Module;
  * Provides common utilities for LindemannRock plugins:
  * - Settings traits (displayName, persistence, config)
  * - Plugin helpers (bootstrap, config override)
- * - Twig extensions (plugin name helpers)
+ * - DateTime helper (centralized date/time formatting)
+ * - Twig extensions (plugin name helpers, datetime filters)
  * - Shared templates (plugin-credit, etc.)
  *
  * @author LindemannRock
@@ -66,6 +71,13 @@ class Base extends Module
                 $event->roots['lindemannrock-base'] = __DIR__ . '/templates';
             }
         );
+
+        // Register Twig extensions
+        if (Craft::$app->getView()->getTwig() instanceof Environment) {
+            Craft::$app->getView()->registerTwigExtension(new DateTimeExtension());
+            Craft::$app->getView()->registerTwigExtension(new ColorExtension());
+            Craft::$app->getView()->registerTwigExtension(new ExportExtension());
+        }
 
         self::$registered = true;
     }

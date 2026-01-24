@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\traits;
@@ -110,6 +110,7 @@ trait EditionTrait
      * - Three tiers: return [self::EDITION_STANDARD, self::EDITION_LITE, self::EDITION_PRO]
      *
      * @return string[]
+     * @since 5.0.0
      */
     public static function editions(): array
     {
@@ -123,6 +124,7 @@ trait EditionTrait
      * Check if the current edition is Standard (free tier)
      *
      * @return bool
+     * @since 5.0.0
      */
     public function isStandard(): bool
     {
@@ -133,6 +135,7 @@ trait EditionTrait
      * Check if the current edition is Lite
      *
      * @return bool
+     * @since 5.0.0
      */
     public function isLite(): bool
     {
@@ -143,6 +146,7 @@ trait EditionTrait
      * Check if the current edition is Pro
      *
      * @return bool
+     * @since 5.0.0
      */
     public function isPro(): bool
     {
@@ -158,6 +162,7 @@ trait EditionTrait
      *
      * @param string $edition The minimum required edition
      * @return bool
+     * @since 5.0.0
      */
     public function isAtLeast(string $edition): bool
     {
@@ -173,6 +178,7 @@ trait EditionTrait
      *
      * @param string $edition The edition to compare against
      * @return bool
+     * @since 5.0.0
      */
     public function isBelow(string $edition): bool
     {
@@ -194,6 +200,7 @@ trait EditionTrait
      * @param string $edition The minimum required edition
      * @param string|null $featureName Optional feature name for error message
      * @throws ForbiddenHttpException If the current edition is below the required edition
+     * @since 5.0.0
      */
     public function requireEdition(string $edition, ?string $featureName = null): void
     {
@@ -225,6 +232,7 @@ trait EditionTrait
      *
      * @param string|null $edition Edition constant, or null for current edition
      * @return string Capitalized edition name (e.g., "Standard", "Lite", "Pro")
+     * @since 5.0.0
      */
     public function getEditionName(?string $edition = null): string
     {
@@ -239,6 +247,7 @@ trait EditionTrait
      * Get the current edition handle
      *
      * @return string The current edition (e.g., 'standard', 'lite', 'pro')
+     * @since 5.0.0
      */
     public function getEditionHandle(): string
     {
@@ -251,6 +260,7 @@ trait EditionTrait
      * Useful for conditionally showing edition-related UI.
      *
      * @return bool True if more than one edition is available
+     * @since 5.0.0
      */
     public function hasMultipleEditions(): bool
     {
@@ -280,6 +290,7 @@ trait EditionTrait
      *
      * @param string $edition The edition to get features for
      * @return array<string, bool> Feature names mapped to availability
+     * @since 5.0.0
      */
     public function getEditionFeatures(string $edition): array
     {
@@ -294,6 +305,7 @@ trait EditionTrait
      *
      * @param string $featureName The feature to check
      * @return bool True if the feature is available
+     * @since 5.0.0
      */
     public function hasFeature(string $featureName): bool
     {

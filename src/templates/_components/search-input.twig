@@ -1,0 +1,37 @@
+{#
+ # Search Input Component
+ #
+ # Renders a search input field with clear button.
+ #
+ # Parameters:
+ # - placeholder: Search placeholder text
+ # - value: Current search value
+ # - filters: Array of filters (to include as hidden inputs)
+ # - currentSort: Current sort field
+ # - currentDir: Current sort direction
+ #}
+
+<div class="search-container texticon flex-grow">
+    <span class="texticon-icon search icon" aria-hidden="true"></span>
+    <input type="text"
+           class="clearable text fullwidth"
+           name="search"
+           value="{{ value }}"
+           placeholder="{{ placeholder }}"
+           autocomplete="off"
+           dir="ltr"
+           aria-label="{{ 'Search'|t('app') }}"
+           {% if value %}autofocus{% endif %}>
+    <button type="button"
+            class="clear-btn lr-clear-btn {{ value ? '' : 'hidden' }}"
+            title="{{ 'Clear'|t('app') }}"
+            role="button"
+            aria-label="{{ 'Clear search'|t('app') }}"></button>
+
+    {# Hidden inputs to maintain filter state #}
+    {% for filter in filters %}
+        <input type="hidden" name="{{ filter.param }}" value="{{ filter.current }}">
+    {% endfor %}
+    <input type="hidden" name="sort" value="{{ currentSort }}">
+    <input type="hidden" name="dir" value="{{ currentDir }}">
+</div>

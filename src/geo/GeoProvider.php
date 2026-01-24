@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\geo;
@@ -91,6 +91,7 @@ class GeoProvider
      *
      * @param string $name Provider name (e.g., 'ipapi.co', 'ipinfo.io', 'ip-api.com')
      * @return array<string, mixed>|null Provider configuration or null if not found
+     * @since 5.0.0
      */
     public static function getProvider(string $name): ?array
     {
@@ -101,6 +102,7 @@ class GeoProvider
      * Get all providers for dropdown
      *
      * @return array<string, string> Provider options with labels
+     * @since 5.0.0
      */
     public static function getProviderOptions(): array
     {

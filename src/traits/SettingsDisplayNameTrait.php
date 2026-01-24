@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\traits;
@@ -49,6 +49,7 @@ trait SettingsDisplayNameTrait
      * - "SMS Manager" -> "SMS" (acronym preserved)
      *
      * @return string
+     * @since 5.0.0
      */
     public function getDisplayName(): string
     {
@@ -78,6 +79,7 @@ trait SettingsDisplayNameTrait
      * - "Short Links" -> "Short Links"
      *
      * @return string
+     * @since 5.0.0
      */
     public function getFullName(): string
     {
@@ -95,6 +97,7 @@ trait SettingsDisplayNameTrait
      * - "Icon Manager" -> "Icons"
      *
      * @return string
+     * @since 5.0.0
      */
     public function getPluralDisplayName(): string
     {
@@ -119,6 +122,7 @@ trait SettingsDisplayNameTrait
      * - "Short Links" -> "short link"
      *
      * @return string
+     * @since 5.0.0
      */
     public function getLowerDisplayName(): string
     {
@@ -135,6 +139,7 @@ trait SettingsDisplayNameTrait
      * - "Short Links" -> "short links"
      *
      * @return string
+     * @since 5.0.0
      */
     public function getPluralLowerDisplayName(): string
     {

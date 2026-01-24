@@ -1,0 +1,218 @@
+{#
+ # Row Actions Component
+ #
+ # Renders action buttons/menus for table rows with permission handling.
+ #
+ # Usage:
+ # ┌──────────────────────────────────────────────────────────────────┐
+ # │ Simple delete button:                                           │
+ # │ {% include 'lindemannrock-base/_components/row-actions' with {  │
+ # │     item: redirect,                                             │
+ # │     actions: {                                                  │
+ # │         type: 'button',                                         │
+ # │         icon: 'delete',                                         │
+ # │         permission: 'pluginHandle:delete',                      │
+ # │         class: 'delete',                                        │
+ # │         jsAction: 'delete',                                     │
+ # │     },                                                          │
+ # │ } only %}                                                       │
+ # │                                                                  │
+ # │ Menu with multiple actions:                                     │
+ # │ {% include 'lindemannrock-base/_components/row-actions' with {  │
+ # │     item: stat,                                                 │
+ # │     actions: {                                                  │
+ # │         type: 'menu',                                           │
+ # │         icon: 'settings',                                       │
+ # │         permission: 'pluginHandle:anyAction', (column-level)    │
+ # │         items: [                                                │
+ # │             {                                                   │
+ # │                 label: 'Edit',                                  │
+ # │                 url: url('plugin/edit/' ~ item.id),             │
+ # │                 permission: 'plugin:edit',                      │
+ # │                 showIf: item.canEdit,  (boolean condition)      │
+ # │             },                                                  │
+ # │             {                                                   │
+ # │                 label: 'Create',                                │
+ # │                 url: url('plugin/new', {source: item.url}),     │
+ # │                 permission: 'plugin:create',                    │
+ # │                 hideIf: item.handled,                           │
+ # │             },                                                  │
+ # │             {type: 'divider'},                                  │
+ # │             {                                                   │
+ # │                 label: 'Delete',                                │
+ # │                 class: 'error',                                 │
+ # │                 permission: 'plugin:delete',                    │
+ # │                 jsAction: 'delete',                             │
+ # │                 confirm: 'Are you sure?',                       │
+ # │             },                                                  │
+ # │         ],                                                      │
+ # │     },                                                          │
+ # │ } only %}                                                       │
+ # └──────────────────────────────────────────────────────────────────┘
+ #
+ # Parameters:
+ # - item: The current row item (for data-id, conditions)
+ # - actions: Action configuration object
+ #   - type: 'button' | 'menu'
+ #   - icon: Icon name (delete, settings, etc.)
+ #   - permission: Column-level permission (hides entire column if not allowed)
+ #   - class: CSS class for button
+ #   - items: Array of menu items (for type: 'menu')
+ #     - label: Display text
+ #     - url: Link URL
+ #     - permission: Per-action permission
+ #     - showIf: Show only if this is true
+ #     - hideIf: Hide if this is true
+ #     - class: CSS class (e.g., 'error' for destructive)
+ #     - jsAction: JavaScript action name (triggers 'lr:rowAction' event)
+ #     - confirm: Confirmation message before action
+ #     - type: 'divider' for separator
+ #}
+
+{% set actions = actions ?? {} %}
+{% set item = item ?? {} %}
+
+{# Check column-level permission #}
+{% set hasColumnPermission = true %}
+{% if actions.permission is defined and actions.permission %}
+    {% set hasColumnPermission = currentUser.can(actions.permission) %}
+{% endif %}
+
+{# Don't render anything if no column permission #}
+{% if not hasColumnPermission %}
+    {# Return nothing - column header should also be hidden #}
+{% else %}
+
+    {# ========================================================================
+       SIMPLE BUTTON TYPE
+       ======================================================================== #}
+    {% if actions.type == 'button' %}
+        <td class="thin" style="text-align: right;">
+            <button type="button"
+                    class="btn {{ actions.icon ? 'icon ' ~ actions.icon : '' }} {{ actions.class ?? '' }}"
+                    title="{{ actions.label ?? actions.title ?? 'Action'|t('app') }}"
+                    aria-label="{{ actions.label ?? actions.title ?? 'Action'|t('app') }}"
+                    {% if actions.jsAction is defined and actions.jsAction %}
+                        data-action="{{ actions.jsAction }}"
+                        data-id="{{ item.id ?? '' }}"
+                    {% endif %}
+                    {% if actions.confirm is defined and actions.confirm %}
+                        data-confirm="{{ actions.confirm }}"
+                    {% endif %}>
+                {% if (actions.label is defined and actions.label) and not (actions.icon is defined and actions.icon) %}{{ actions.label }}{% endif %}
+            </button>
+        </td>
+
+    {# ========================================================================
+       MENU TYPE
+       ======================================================================== #}
+    {% elseif actions.type == 'menu' %}
+        {% set menuItems = actions.items ?? [] %}
+
+        {# Filter items based on permissions and conditions #}
+        {% set visibleItems = [] %}
+        {% for menuItem in menuItems %}
+            {% set showItem = true %}
+
+            {# Check permission #}
+            {% if menuItem.permission is defined and menuItem.permission %}
+                {% if not currentUser.can(menuItem.permission) %}
+                    {% set showItem = false %}
+                {% endif %}
+            {% endif %}
+
+            {# Check showIf condition #}
+            {% if showItem and menuItem.showIf is defined %}
+                {% if not menuItem.showIf %}
+                    {% set showItem = false %}
+                {% endif %}
+            {% endif %}
+
+            {# Check hideIf condition #}
+            {% if showItem and menuItem.hideIf is defined %}
+                {% if menuItem.hideIf %}
+                    {% set showItem = false %}
+                {% endif %}
+            {% endif %}
+
+            {# Dividers are always added (cleaned up later) #}
+            {% if (menuItem.type is defined) and menuItem.type == 'divider' %}
+                {% set visibleItems = visibleItems|merge([menuItem]) %}
+            {% elseif showItem %}
+                {% set visibleItems = visibleItems|merge([menuItem]) %}
+            {% endif %}
+        {% endfor %}
+
+        {# Clean up dividers (remove leading, trailing, and consecutive) #}
+        {% set cleanedItems = [] %}
+        {% set lastWasDivider = true %}
+        {% for menuItem in visibleItems %}
+            {% if (menuItem.type is defined) and menuItem.type == 'divider' %}
+                {% if not lastWasDivider %}
+                    {% set cleanedItems = cleanedItems|merge([menuItem]) %}
+                    {% set lastWasDivider = true %}
+                {% endif %}
+            {% else %}
+                {% set cleanedItems = cleanedItems|merge([menuItem]) %}
+                {% set lastWasDivider = false %}
+            {% endif %}
+        {% endfor %}
+
+        {# Remove trailing divider #}
+        {% if cleanedItems|length > 0 and (cleanedItems|last.type is defined) and cleanedItems|last.type == 'divider' %}
+            {% set cleanedItems = cleanedItems|slice(0, -1) %}
+        {% endif %}
+
+        {# Count non-divider items #}
+        {% set actionCount = 0 %}
+        {% for menuItem in cleanedItems %}
+            {% if (menuItem.type is not defined) or menuItem.type != 'divider' %}
+                {% set actionCount = actionCount + 1 %}
+            {% endif %}
+        {% endfor %}
+
+        {# Render cell #}
+        {% if actionCount > 0 %}
+            <td class="thin" style="text-align: right;">
+                <button type="button"
+                        class="btn menubtn"
+                        {% if actions.icon is defined and actions.icon %}data-icon="{{ actions.icon }}"{% endif %}
+                        title="{{ actions.title ?? 'Actions'|t('app') }}">
+                    {% if actions.label is defined and actions.label %}{{ actions.label }}{% endif %}
+                </button>
+                <div class="menu">
+                    <ul>
+                        {% for menuItem in cleanedItems %}
+                            {% if (menuItem.type is defined) and menuItem.type == 'divider' %}
+                                <li><hr class="padded"></li>
+                            {% else %}
+                                <li>
+                                    <a href="{{ menuItem.url ?? '#' }}"
+                                       {% if menuItem.class is defined and menuItem.class %}class="{{ menuItem.class }}"{% endif %}
+                                       {% if menuItem.jsAction is defined and menuItem.jsAction %}
+                                           data-action="{{ menuItem.jsAction }}"
+                                           data-id="{{ item.id ?? '' }}"
+                                       {% endif %}
+                                       {% if menuItem.confirm is defined and menuItem.confirm %}
+                                           data-confirm="{{ menuItem.confirm }}"
+                                       {% endif %}
+                                       {% if menuItem.title is defined and menuItem.title %}title="{{ menuItem.title }}"{% endif %}>
+                                        {{ menuItem.label ?? '' }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </td>
+        {% else %}
+            {# No visible actions for this row - show empty cell #}
+            <td class="thin"></td>
+        {% endif %}
+
+    {% else %}
+        {# Unknown type or no actions defined #}
+        <td class="thin"></td>
+    {% endif %}
+
+{% endif %}

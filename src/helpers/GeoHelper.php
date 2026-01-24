@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\helpers;
@@ -24,7 +24,7 @@ namespace lindemannrock\base\helpers;
  * ```
  *
  * @author LindemannRock
- * @since 5.0.0
+ * @since 5.3.0
  */
 class GeoHelper
 {
@@ -591,6 +591,7 @@ class GeoHelper
      *
      * @param string $countryCode Two-letter country code (e.g., 'US', 'GB')
      * @return string Country name, or the original code if not found
+     * @since 5.3.0
      */
     public static function getCountryName(string $countryCode): string
     {
@@ -607,6 +608,7 @@ class GeoHelper
      * Get all countries as an array
      *
      * @return array<string, string> Country codes mapped to names
+     * @since 5.3.0
      */
     public static function getAllCountries(): array
     {
@@ -618,6 +620,7 @@ class GeoHelper
      *
      * @param string $countryCode Two-letter country code
      * @return bool True if valid ISO 3166-1 alpha-2 code
+     * @since 5.3.0
      */
     public static function isValidCountryCode(string $countryCode): bool
     {
@@ -635,6 +638,7 @@ class GeoHelper
      *
      * @param string $countryCode Two-letter country code (e.g., 'KW', 'US')
      * @return string|null Dial code without + (e.g., '965'), or null if not found
+     * @since 5.7.0
      */
     public static function getDialCode(string $countryCode): ?string
     {
@@ -651,6 +655,7 @@ class GeoHelper
      * Get all dial codes as an array
      *
      * @return array<string, string> Country codes mapped to dial codes
+     * @since 5.7.0
      */
     public static function getAllDialCodes(): array
     {
@@ -662,6 +667,7 @@ class GeoHelper
      *
      * @param bool $includeAll Whether to include an "All Countries" option at the top
      * @return array<array{label: string, value: string}> Array of options with label "Country Name (+code)" and value "XX"
+     * @since 5.7.0
      */
     public static function getCountryDialCodeOptions(bool $includeAll = false): array
     {
@@ -698,6 +704,7 @@ class GeoHelper
      * @param string $phoneNumber Phone number (with or without +, just digits)
      * @param array<string> $allowedCountryCodes Array of ISO 3166-1 alpha-2 codes (e.g., ['KW', 'SA']) or ['*'] for all
      * @return bool True if phone number starts with one of the allowed dial codes
+     * @since 5.7.0
      */
     public static function isPhoneNumberAllowed(string $phoneNumber, array $allowedCountryCodes): bool
     {
@@ -745,6 +752,7 @@ class GeoHelper
      *
      * @param string $countryCode Two-letter country code
      * @return string Formatted string like "Kuwait (+965)" or empty if not found
+     * @since 5.7.0
      */
     public static function getCountryWithDialCode(string $countryCode): string
     {

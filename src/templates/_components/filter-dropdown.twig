@@ -1,0 +1,51 @@
+{#
+ # Generic Dropdown Filter Component
+ #
+ # Renders a simple dropdown filter without status indicators.
+ #
+ # Parameters:
+ # - filter: {
+ #     param: 'language',
+ #     current: 'all',
+ #     label: 'All Languages',
+ #     icon: 'language',  // Optional icon
+ #     options: [
+ #         {value: 'all', label: 'All Languages'},
+ #         {value: 'en', label: 'English'},
+ #         {value: 'ar', label: 'Arabic'},
+ #     ]
+ # }
+ # - urlParams: Current URL parameters to maintain
+ #}
+
+{% set currentOption = null %}
+{% for option in filter.options ?? [] %}
+    {% if option.value == filter.current %}
+        {% set currentOption = option %}
+    {% endif %}
+{% endfor %}
+
+<div class="btngroup">
+    <button type="button" class="btn menubtn">
+        {% if filter.icon ?? false %}
+            <span class="icon" data-icon="{{ filter.icon }}"></span>
+        {% endif %}
+        {{ currentOption.label ?? filter.label ?? 'All'|t('app') }}
+    </button>
+    <div class="menu" {% if filter.menuStyle ?? false %}style="{{ filter.menuStyle }}"{% endif %}>
+        <ul>
+            {% for option in filter.options ?? [] %}
+                <li>
+                    {% set optionParams = urlParams|merge({(filter.param): option.value, page: 1}) %}
+                    <a class="{{ filter.current == option.value ? 'sel' : '' }}"
+                       href="?{{ optionParams|url_encode }}">
+                        {{ option.label }}
+                        {% if option.extra ?? false %}
+                            <span style="color: #999;">{{ option.extra }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,710 @@
+{#
+ # CP Table Layout
+ #
+ # A reusable layout for Control Panel pages displaying tabular data.
+ # Provides unified toolbar, table, pagination, and optional AJAX refresh.
+ #
+ # Usage in plugin template:
+ # ┌──────────────────────────────────────────────────────────────────┐
+ # │ {% extends 'lindemannrock-base/_layouts/cp-table' %}            │
+ # │                                                                  │
+ # │ {% set tableConfig = {                                          │
+ # │     plugin: {                                                   │
+ # │         handle: 'sms-manager',                                  │
+ # │         name: smsHelper.fullName,                               │
+ # │     },                                                          │
+ # │     page: {                                                     │
+ # │         title: 'SMS Logs',                                      │
+ # │         subnav: 'sms-logs',                                     │
+ # │         crumbs: [...],                                          │
+ # │     },                                                          │
+ # │     filters: [...],                                             │
+ # │     search: {placeholder: 'Search logs...', value: search},     │
+ # │     table: {                                                    │
+ # │         columns: [...],                                         │
+ # │         items: logs,                                            │
+ # │         emptyMessage: 'No logs found.',                         │
+ # │         expandable: true,  // Enable click-to-expand rows       │
+ # │     },                                                          │
+ # │     pagination: {                                               │
+ # │         page: page,                                             │
+ # │         limit: settings.itemsPerPage,                           │
+ # │         totalCount: totalCount,                                 │
+ # │         itemLabel: {singular: 'log', plural: 'logs'},           │
+ # │     },                                                          │
+ # │     checkboxes: true,                                           │
+ # │     footerActions: [...],                                       │
+ # │     newButton: {url: '...', label: '...', permission: '...'},   │
+ # │     ajax: {                                                     │
+ # │         enabled: settings.refreshIntervalSecs > 0,              │
+ # │         interval: settings.refreshIntervalSecs,                 │
+ # │         endpoint: 'sms-manager/logs/get-data',                  │
+ # │     },                                                          │
+ # │ } %}                                                            │
+ # └──────────────────────────────────────────────────────────────────┘
+ #
+ # Overridable blocks:
+ # - {% block beforeTable %} - Content before table (warnings, info boxes)
+ # - {% block tableRow %} - Custom row rendering
+ # - {% block rowActions %} - Per-row action buttons
+ # - {% block expandableRow %} - Expandable detail row (logs, etc.)
+ # - {% block bulkActions %} - Bulk action buttons (shown when items selected)
+ # - {% block sidebar %} - Right sidebar content
+ # - {% block toolbarActions %} - Toolbar action buttons (export, etc.)
+ # - {% block extraToolbar %} - Additional toolbar items inside toolbar
+ # - {% block extraFooter %} - Additional footer content
+ # - {% block scripts %} - Additional JavaScript
+ #}
+
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{# ============================================================================
+   CONFIGURATION EXTRACTION
+   ============================================================================ #}
+
+{% set config = tableConfig ?? {} %}
+
+{# Plugin info #}
+{% set pluginConfig = config.plugin ?? {} %}
+{% set pluginHandle = pluginConfig.handle ?? '' %}
+{% set pluginName = pluginConfig.name ?? '' %}
+
+{# Page info #}
+{% set pageConfig = config.page ?? {} %}
+{% set title = pageConfig.title ?? 'Listing' %}
+{% set selectedSubnavItem = pageConfig.subnav ?? '' %}
+{% set crumbs = pageConfig.crumbs ?? [] %}
+{% set fullPageForm = pageConfig.fullPageForm ?? false %}
+
+{# Filters #}
+{% set filters = config.filters ?? [] %}
+
+{# Search #}
+{% set searchConfig = config.search ?? {} %}
+{% set searchPlaceholder = searchConfig.placeholder ?? 'Search...'|t('app') %}
+{% set searchValue = searchConfig.value ?? craft.app.request.getParam('search', '') %}
+
+{# Sorting - get from config or URL #}
+{% set sortConfig = config.sort ?? {} %}
+{% set currentSort = sortConfig.field ?? craft.app.request.getParam('sort', 'dateCreated') %}
+{% set currentDir = sortConfig.direction ?? craft.app.request.getParam('dir', 'desc') %}
+
+{# Table #}
+{% set tableConf = config.table ?? {} %}
+{% set columns = tableConf.columns ?? [] %}
+{% set items = tableConf.items ?? [] %}
+{% set emptyMessage = tableConf.emptyMessage ?? 'No items found.'|t('app') %}
+{% set expandableEnabled = tableConf.expandable ?? false %}
+
+{# Pagination #}
+{% set paginationConfig = config.pagination ?? {} %}
+{% set page = paginationConfig.page ?? 1 %}
+{% set limit = paginationConfig.limit ?? 50 %}
+{% set totalCount = paginationConfig.totalCount ?? 0 %}
+{% set offset = (page - 1) * limit %}
+{% set totalPages = totalCount > 0 ? (totalCount / limit)|round(0, 'ceil') : 1 %}
+{% set itemLabel = paginationConfig.itemLabel ?? {singular: 'item', plural: 'items'} %}
+
+{# Checkboxes #}
+{% set checkboxesEnabled = config.checkboxes ?? false %}
+
+{# Row Actions - set to false to hide actions column #}
+{% set rowActionsEnabled = config.rowActions ?? true %}
+
+{# Actions #}
+{% set footerActions = config.footerActions ?? [] %}
+{% set newButton = config.newButton ?? null %}
+
+{# AJAX refresh #}
+{% set ajaxConfig = config.ajax ?? {} %}
+{% set ajaxEnabled = ajaxConfig.enabled ?? false %}
+{% set ajaxInterval = ajaxConfig.interval ?? 0 %}
+{% set ajaxEndpoint = ajaxConfig.endpoint ?? '' %}
+
+{# Build URL params for filter/sort/pagination links #}
+{% set urlParams = {} %}
+{% for filter in filters %}
+    {% set urlParams = urlParams|merge({(filter.param): filter.current}) %}
+{% endfor %}
+{% set urlParams = urlParams|merge({
+    search: searchValue,
+    sort: currentSort,
+    dir: currentDir
+}) %}
+
+{# Count columns for colspan #}
+{% set colCount = columns|length + (checkboxesEnabled ? 1 : 0) %}
+
+
+{# ============================================================================
+   TOOLBAR BLOCK
+   ============================================================================ #}
+
+{% block toolbar %}
+    <div id="toolbar" class="flex" style="align-items: flex-end;">
+        <div class="flex-grow">
+            <form method="get" action="{{ url(pluginHandle ~ '/' ~ selectedSubnavItem) }}" id="lr-filter-form">
+                <div class="flex">
+                    {# Render each filter #}
+                    {% for filter in filters %}
+                        {% if filter.type == 'status' %}
+                            {% include 'lindemannrock-base/_components/filter-status' with {filter: filter, urlParams: urlParams} only %}
+                        {% elseif filter.type == 'dropdown' %}
+                            {% include 'lindemannrock-base/_components/filter-dropdown' with {filter: filter, urlParams: urlParams} only %}
+                        {% elseif filter.type == 'dateRange' %}
+                            {% include 'lindemannrock-base/_components/filter-daterange' with {filter: filter, urlParams: urlParams} only %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {# Extra toolbar items from plugin #}
+                    {% block extraToolbar %}{% endblock %}
+
+                    {# Search input #}
+                    {% include 'lindemannrock-base/_components/search-input' with {
+                        placeholder: searchPlaceholder,
+                        value: searchValue,
+                        filters: filters,
+                        currentSort: currentSort,
+                        currentDir: currentDir,
+                    } only %}
+                </div>
+            </form>
+        </div>
+
+        {# Toolbar actions (outside form, e.g., Export button) #}
+        {% block toolbarActions %}{% endblock %}
+
+        {# New button #}
+        {% if newButton and (not newButton.permission or currentUser.can(newButton.permission)) %}
+            <a href="{{ newButton.url }}" class="btn submit add icon" id="lr-new-btn">
+                <span class="lr-label-full">{{ newButton.label }}</span>
+                <span class="lr-label-short" style="display: none;">{{ 'New'|t('app') }}</span>
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+{# ============================================================================
+   CONTENT BLOCK
+   ============================================================================ #}
+
+{% block content %}
+    {# Inline styles for this layout #}
+    <style>
+        .lr-checkbox-cell { width: 40px !important; text-align: center; }
+        .page-info { margin: 0 12px; color: #596673; }
+        .status-label { white-space: nowrap; }
+        .pagination { gap: 4px; align-items: center; }
+        .lr-menu-header { font-size: 11px; text-transform: uppercase; color: #7c97b2; padding: 8px 14px 4px; font-weight: 600; letter-spacing: 0.5px; }
+        #toolbar.flex { flex-wrap: nowrap; gap: 8px; }
+        #toolbar .flex-grow { min-width: 0; flex-shrink: 1; }
+        .lr-clickable-row { cursor: pointer; transition: background 0.1s ease; }
+        .lr-clickable-row:hover { background: #f9fafb !important; }
+        .lr-context-row td { padding: 0 !important; }
+        .lr-context-row .lr-context-content { padding: 16px; background: #f9fafb; border-left: 3px solid #3498db; }
+        @media (max-width: 768px) {
+            #lr-new-btn .lr-label-full { display: none; }
+            #lr-new-btn .lr-label-short { display: inline !important; }
+            #lr-new-btn:before { margin-inline-end: 0 !important; }
+        }
+
+        /* Info box wrapper (for warnings/notices before tables) */
+        .info-box-table-wrapper { padding-bottom: 14px; }
+        @media (min-width: 769px) {
+            .info-box-table-wrapper { padding-bottom: 46px; }
+        }
+
+        /* Config info icon (shows tooltip on hover for config-defined items) */
+        .config-info-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-left: 5px;
+            border-radius: 50%;
+            background: #9aa5b1;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 16px;
+            vertical-align: middle;
+            cursor: help;
+        }
+        .config-info-icon::before { content: 'i'; }
+        .config-info-icon:hover { background: #7b8794; }
+
+        /* Config tooltip (shows PHP config code) */
+        .config-tooltip {
+            position: absolute;
+            background: #fff;
+            color: #3f4d5a;
+            padding: 12px 14px;
+            border-radius: 6px;
+            border: 1px solid #cdd8e4;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            max-width: 500px;
+            overflow-x: auto;
+        }
+    </style>
+
+    {# Content before table (warnings, info boxes, etc.) #}
+    {% block beforeTable %}{% endblock %}
+
+    <div id="lr-table-container" class="elements">
+        <div class="tableview tablepane">
+            <table class="data fullwidth" id="lr-data-table">
+                <thead>
+                    <tr>
+                        {# Checkbox header #}
+                        {% if checkboxesEnabled %}
+                            <th class="lr-checkbox-cell selectallcontainer">
+                                <div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="{{ 'Select all'|t('app') }}"></div>
+                            </th>
+                        {% endif %}
+
+                        {# Column headers #}
+                        {% for column in columns %}
+                            {% if column.sortable ?? false %}
+                                <th scope="col"
+                                    data-attribute="{{ column.key }}"
+                                    class="orderable {{ currentSort == column.key ? 'ordered ' ~ currentDir : '' }}"
+                                    {% if column.width ?? false %}style="width: {{ column.width }};"{% endif %}>
+                                    <button type="button" data-sort="{{ column.key }}">
+                                        {{ column.label }}
+                                    </button>
+                                </th>
+                            {% else %}
+                                <th scope="col" {% if column.width ?? false %}style="width: {{ column.width }};"{% endif %}>
+                                    {{ column.label }}
+                                </th>
+                            {% endif %}
+                        {% endfor %}
+
+                        {# Actions column header #}
+                        {% if rowActionsEnabled %}
+                            <th class="thin" style="width: 60px;">{{ 'Actions'|t('app') }}</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody id="lr-table-body">
+                    {% if items|length %}
+                        {% for item in items %}
+                            {# Main row #}
+                            <tr class="lr-data-row {% if expandableEnabled %}lr-clickable-row{% endif %}"
+                                data-id="{{ item.id ?? loop.index }}"
+                                data-entry-id="{{ loop.index }}">
+
+                                {# Checkbox cell #}
+                                {% if checkboxesEnabled %}
+                                    <td class="lr-checkbox-cell">
+                                        <div class="checkbox" title="{{ 'Select'|t('app') }}" tabindex="0" aria-checked="false" role="checkbox"></div>
+                                    </td>
+                                {% endif %}
+
+                                {# Data cells - can be overridden #}
+                                {% block tableRow %}
+                                    {% for column in columns %}
+                                        <td {% if column.nowrap ?? false %}class="nowrap"{% endif %}
+                                            {% if column.style ?? false %}style="{{ column.style }}"{% endif %}>
+                                            {% if column.template ?? false %}
+                                                {{ include(template_from_string(column.template)) }}
+                                            {% else %}
+                                                {{ attribute(item, column.key)|default('-') }}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                {% endblock %}
+
+                                {# Row actions (component outputs its own <td>) #}
+                                {% if rowActionsEnabled %}
+                                    {% block rowActions %}{% endblock %}
+                                {% endif %}
+                            </tr>
+
+                            {# Expandable detail row #}
+                            {% if expandableEnabled %}
+                                <tr class="lr-context-row" data-entry-id="{{ loop.index }}" style="display: none;">
+                                    <td colspan="{{ colCount + (rowActionsEnabled ? 1 : 0) }}">
+                                        <div class="lr-context-content">
+                                            {% block expandableRow %}{% endblock %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <tr class="lr-empty-row">
+                            <td colspan="{{ colCount + (rowActionsEnabled ? 1 : 0) }}" style="text-align: center; padding: 2em;">
+                                {{ emptyMessage }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# Footer #}
+    <div id="footer" class="flex flex-justify">
+        {# Pagination #}
+        <div class="light">
+            <div class="flex pagination">
+                <nav class="flex" aria-label="{{ itemLabel.plural }} pagination">
+                    <button type="button" class="page-link prev-page {{ page <= 1 ? 'disabled' : '' }}" {{ page <= 1 ? 'disabled' : '' }} title="{{ 'Previous Page'|t('app') }}"></button>
+                    <button type="button" class="page-link next-page {{ page >= totalPages ? 'disabled' : '' }}" {{ page >= totalPages ? 'disabled' : '' }} title="{{ 'Next Page'|t('app') }}"></button>
+                </nav>
+                <div class="page-info">
+                    {% set endRange = min(offset + limit, totalCount) %}
+                    {% if totalCount == 0 %}
+                        {{ 'no'|t('app') }} {{ itemLabel.plural }}
+                    {% else %}
+                        {{ (offset + 1)|number_format }} – {{ endRange|number_format }} {{ 'of'|t('app') }} {{ totalCount|number_format }} {{ totalCount == 1 ? itemLabel.singular : itemLabel.plural }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Bulk actions container (shown when items selected) #}
+        {% if checkboxesEnabled %}
+            <div id="lr-bulk-actions" class="flex" style="display: none;">
+                {% block bulkActions %}{% endblock %}
+            </div>
+        {% endif %}
+
+        {# Footer actions #}
+        {% if footerActions|length %}
+            <div class="flex flex-nowrap">
+                {% for action in footerActions %}
+                    {% if (action.permission is not defined) or (not action.permission) or currentUser.can(action.permission) %}
+                        {% if action.type == 'button' %}
+                            <button type="button"
+                                    class="btn {{ action.class ?? '' }}"
+                                    id="{{ action.id ?? '' }}"
+                                    {% if action.icon ?? false %}data-icon="{{ action.icon }}"{% endif %}>
+                                {{ action.label }}
+                            </button>
+                        {% elseif action.type == 'link' %}
+                            <a href="{{ action.url }}" class="btn {{ action.class ?? '' }}">
+                                {{ action.label }}
+                            </a>
+                        {% elseif action.type == 'menu' %}
+                            <div class="btngroup">
+                                <button type="button" class="btn menubtn" {% if action.icon ?? false %}data-icon="{{ action.icon }}"{% endif %}>
+                                    {{ action.label }}
+                                </button>
+                                <div class="menu" {% if action.align ?? false %}data-align="{{ action.align }}"{% endif %}>
+                                    <ul>
+                                        {% for menuItem in action.items %}
+                                            <li>
+                                                <a href="{{ menuItem.url ?? '#' }}"
+                                                   {% if menuItem.id ?? false %}id="{{ menuItem.id }}"{% endif %}
+                                                   {% if menuItem.class ?? false %}class="{{ menuItem.class }}"{% endif %}>
+                                                    {{ menuItem.label }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                {# Extra footer content from plugin #}
+                {% block extraFooter %}{% endblock %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# JavaScript #}
+    <script>
+    (function() {
+        const config = {
+            ajaxEnabled: {{ ajaxEnabled ? 'true' : 'false' }},
+            ajaxInterval: {{ ajaxInterval }},
+            ajaxEndpoint: '{{ ajaxEndpoint }}',
+            checkboxesEnabled: {{ checkboxesEnabled ? 'true' : 'false' }},
+            currentSort: '{{ currentSort }}',
+            currentDir: '{{ currentDir }}',
+            page: {{ page }},
+            totalPages: {{ totalPages }},
+            urlParams: {{ urlParams|json_encode|raw }},
+            baseUrl: '{{ url(pluginHandle ~ '/' ~ selectedSubnavItem) }}',
+        };
+
+        // Initialize menu buttons
+        document.querySelectorAll('.menubtn').forEach(btn => {
+            if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
+                new Craft.MenuBtn(btn);
+            } else if (typeof Garnish !== 'undefined' && Garnish.MenuBtn) {
+                new Garnish.MenuBtn(btn);
+            }
+        });
+
+        // Clear search
+        const clearBtn = document.querySelector('.lr-clear-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                const searchInput = document.querySelector('input[name="search"]');
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.form.submit();
+                }
+            });
+        }
+
+        // Search on Enter
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    this.form.submit();
+                }
+            });
+        }
+
+        // Build URL with params
+        function buildUrl(overrides = {}) {
+            const params = new URLSearchParams();
+            const merged = { ...config.urlParams, ...overrides };
+            for (const [key, value] of Object.entries(merged)) {
+                if (value !== null && value !== undefined && value !== '') {
+                    params.set(key, value);
+                }
+            }
+            return config.baseUrl + '?' + params.toString();
+        }
+
+        // Sort buttons
+        document.querySelectorAll('th.orderable button').forEach(button => {
+            button.addEventListener('click', function() {
+                const sortField = this.dataset.sort;
+                let newDir = 'asc';
+                if (sortField === config.currentSort) {
+                    newDir = config.currentDir === 'asc' ? 'desc' : 'asc';
+                }
+                window.location.href = buildUrl({ sort: sortField, dir: newDir, page: 1 });
+            });
+        });
+
+        // Pagination
+        document.querySelector('.prev-page:not(.disabled)')?.addEventListener('click', function() {
+            window.location.href = buildUrl({ page: config.page - 1 });
+        });
+        document.querySelector('.next-page:not(.disabled)')?.addEventListener('click', function() {
+            window.location.href = buildUrl({ page: config.page + 1 });
+        });
+
+        // Checkbox functionality
+        if (config.checkboxesEnabled) {
+            const selectAllCheckbox = document.querySelector('.selectallcontainer .checkbox');
+            const checkboxes = document.querySelectorAll('#lr-table-body .lr-data-row .checkbox');
+            let selectedIds = new Set();
+
+            function toggleCheckbox(checkbox, checked) {
+                if (checked) {
+                    checkbox.classList.add('checked');
+                    checkbox.setAttribute('aria-checked', 'true');
+                } else {
+                    checkbox.classList.remove('checked');
+                    checkbox.setAttribute('aria-checked', 'false');
+                }
+            }
+
+            function updateBulkActions() {
+                const bulkActions = document.getElementById('lr-bulk-actions');
+                if (bulkActions) {
+                    bulkActions.style.display = selectedIds.size > 0 ? '' : 'none';
+                }
+                // Dispatch custom event for plugins to listen to
+                document.dispatchEvent(new CustomEvent('lr:selectionChanged', {
+                    detail: { selectedIds: Array.from(selectedIds), count: selectedIds.size }
+                }));
+            }
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('click', function() {
+                    const isChecked = !this.classList.contains('checked');
+                    toggleCheckbox(this, isChecked);
+                    checkboxes.forEach(checkbox => {
+                        toggleCheckbox(checkbox, isChecked);
+                        const id = checkbox.closest('tr').dataset.id;
+                        if (isChecked) {
+                            selectedIds.add(id);
+                        } else {
+                            selectedIds.delete(id);
+                        }
+                    });
+                    updateBulkActions();
+                });
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Don't trigger row click
+                    const isChecked = !this.classList.contains('checked');
+                    toggleCheckbox(this, isChecked);
+                    const id = this.closest('tr').dataset.id;
+                    if (isChecked) {
+                        selectedIds.add(id);
+                    } else {
+                        selectedIds.delete(id);
+                    }
+                    updateBulkActions();
+                });
+            });
+
+            // Expose selection to global scope for plugins
+            window.lrTableSelection = {
+                getSelectedIds: () => Array.from(selectedIds),
+                getCount: () => selectedIds.size,
+                clear: () => {
+                    selectedIds.clear();
+                    document.querySelectorAll('.checkbox.checked').forEach(cb => toggleCheckbox(cb, false));
+                    updateBulkActions();
+                }
+            };
+        }
+
+        // Expandable rows
+        document.querySelectorAll('.lr-clickable-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (e.target.closest('.checkbox') || e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                    return;
+                }
+                const entryId = this.dataset.entryId;
+                const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
+                if (contextRow) {
+                    const isVisible = contextRow.style.display !== 'none';
+                    contextRow.style.display = isVisible ? 'none' : 'table-row';
+                    this.style.background = isVisible ? '' : '#f0f4f8';
+                }
+            });
+        });
+
+        // AJAX Auto-refresh
+        if (config.ajaxEnabled && config.ajaxInterval > 0) {
+            let refreshTimer;
+            let isRefreshing = false;
+
+            async function refresh() {
+                if (isRefreshing) return;
+                isRefreshing = true;
+
+                try {
+                    const params = new URLSearchParams(config.urlParams);
+                    params.set('page', config.page);
+                    const response = await fetch(config.ajaxEndpoint + '?' + params.toString(), {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (!response.ok) throw new Error('Network error');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Dispatch event for plugin to handle rendering
+                        document.dispatchEvent(new CustomEvent('lr:refresh', { detail: data }));
+                    }
+                } catch (error) {
+                    console.error('Refresh failed:', error);
+                } finally {
+                    isRefreshing = false;
+                }
+            }
+
+            function startAutoRefresh() {
+                refreshTimer = setInterval(refresh, config.ajaxInterval * 1000);
+            }
+
+            function stopAutoRefresh() {
+                if (refreshTimer) {
+                    clearInterval(refreshTimer);
+                    refreshTimer = null;
+                }
+            }
+
+            startAutoRefresh();
+
+            // Pause on interaction
+            let pauseTimeout;
+            function resetPause() {
+                stopAutoRefresh();
+                clearTimeout(pauseTimeout);
+                pauseTimeout = setTimeout(startAutoRefresh, 5000);
+            }
+
+            document.addEventListener('click', resetPause);
+            document.addEventListener('keydown', resetPause);
+            document.addEventListener('scroll', resetPause);
+        }
+
+        // Config tooltip for config-based items (shows PHP config code on hover)
+        let activeConfigTooltip = null;
+        document.querySelectorAll('.config-info-icon').forEach(icon => {
+            icon.addEventListener('mouseenter', function() {
+                const configData = this.dataset.config;
+                if (!configData) return;
+
+                // Remove any existing tooltip
+                if (activeConfigTooltip) {
+                    activeConfigTooltip.remove();
+                }
+
+                // Create tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'config-tooltip';
+                tooltip.textContent = configData;
+                document.body.appendChild(tooltip);
+                activeConfigTooltip = tooltip;
+
+                // Position tooltip
+                const rect = this.getBoundingClientRect();
+                const tooltipRect = tooltip.getBoundingClientRect();
+                let left = rect.left + window.scrollX;
+                let top = rect.bottom + window.scrollY + 8;
+
+                // Keep within viewport
+                if (left + tooltipRect.width > window.innerWidth - 20) {
+                    left = window.innerWidth - tooltipRect.width - 20;
+                }
+
+                tooltip.style.left = left + 'px';
+                tooltip.style.top = top + 'px';
+            });
+
+            icon.addEventListener('mouseleave', function() {
+                if (activeConfigTooltip) {
+                    activeConfigTooltip.remove();
+                    activeConfigTooltip = null;
+                }
+            });
+        });
+
+        // Expose config globally for plugins
+        window.lrTableConfig = config;
+        window.lrBuildUrl = buildUrl;
+    })();
+    </script>
+
+    {# Plugin-specific scripts #}
+    {% block scripts %}{% endblock %}
+{% endblock %}
+
+
+{# ============================================================================
+   SIDEBAR BLOCK
+   ============================================================================ #}
+
+{% block details %}
+    {% block sidebar %}{% endblock %}
+{% endblock %}

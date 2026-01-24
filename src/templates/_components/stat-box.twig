@@ -1,0 +1,37 @@
+{#
+ # Stat Box Component
+ #
+ # Displays a single statistic with value and label.
+ # Used in analytics dashboards for key metrics.
+ #
+ # Parameters:
+ #   - value: The numeric or text value to display
+ #   - label: Description label for the stat
+ #   - id: (optional) HTML id for dynamic updates
+ #   - color: (optional) Custom color for value (default: #0d78f2)
+ #   - suffix: (optional) Suffix to append (e.g., '%', 'ms')
+ #   - prefix: (optional) Prefix to prepend (e.g., '$')
+ #   - size: (optional) 'small' for compact version
+ #
+ # Example:
+ #   {% include 'lindemannrock-base/_components/stat-box' with {
+ #       value: 1234,
+ #       label: 'Total Messages',
+ #       suffix: '',
+ #   } only %}
+ #}
+
+{% set valueId = id ?? '' %}
+{% set valueColor = color ?? '#0d78f2' %}
+{% set valueSuffix = suffix ?? '' %}
+{% set valuePrefix = prefix ?? '' %}
+{% set isSmall = size ?? '' == 'small' %}
+
+<div class="lr-stat-box {% if isSmall %}lr-stat-box-small{% endif %}">
+    <div class="lr-stat-value"
+         {% if valueId %}id="{{ valueId }}"{% endif %}
+         {% if valueColor != '#0d78f2' %}style="color: {{ valueColor }};"{% endif %}>
+        {{ valuePrefix }}{{ value|number_format }}{{ valueSuffix }}
+    </div>
+    <div class="lr-stat-label">{{ label }}</div>
+</div>

@@ -1,0 +1,12 @@
+{
+  "name": "lindemannrock-base",
+  "version": "1.0.0",
+  "description": "Build tools for LindemannRock Plugin Base",
+  "scripts": {
+    "minify": "npm run minify:js",
+    "minify:js": "terser src/web/assets/analytics/analytics.js -o src/web/assets/analytics/analytics.min.js -c -m"
+  },
+  "devDependencies": {
+    "terser": "^5.31.6"
+  }
+}

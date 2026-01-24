@@ -1,0 +1,146 @@
+{#
+ # Grouped Filters Example
+ #
+ # Demonstrates grouped status filters - multiple filter parameters
+ # in a single dropdown with section headers.
+ #
+ # Use case: When you need to filter by multiple criteria (status, source, type)
+ # but want to save toolbar space with a single dropdown.
+ #}
+
+{% extends 'lindemannrock-base/_layouts/cp-table' %}
+
+{# Mock filter values #}
+{% set statusFilter = craft.app.request.getParam('status', 'all') %}
+{% set sourceFilter = craft.app.request.getParam('source', 'all') %}
+{% set typeFilter = craft.app.request.getParam('type', 'all') %}
+{% set providerFilter = craft.app.request.getParam('provider', 'all') %}
+
+{# Mock data #}
+{% set mockItems = [
+    {id: 1, name: 'Item One', status: 'enabled', source: 'config', type: 'production', provider: 'aws'},
+    {id: 2, name: 'Item Two', status: 'disabled', source: 'database', type: 'development', provider: 'gcp'},
+] %}
+
+{% set tableConfig = {
+    plugin: {
+        handle: 'my-plugin',
+        name: 'My Plugin',
+    },
+    page: {
+        title: 'Grouped Filters Example'|t('app'),
+        subnav: 'items',
+    },
+    filters: [
+        {
+            type: 'status',
+            param: 'status',
+            current: statusFilter,
+            label: 'Filters'|t('app'),
+            groups: [
+                {
+                    // First group - no header, uses filter-level param/current
+                    options: [
+                        {value: 'all', label: 'All Status'|t('app'), status: 'all'},
+                        {value: 'enabled', label: 'Enabled'|t('app'), status: 'green'},
+                        {value: 'disabled', label: 'Disabled'|t('app'), status: 'disabled'},
+                    ],
+                },
+                {
+                    header: 'Config Source'|t('app'),
+                    param: 'source',
+                    current: sourceFilter,
+                    colorSet: 'configSource',
+                    options: [
+                        {value: 'all', label: 'All Sources'|t('app'), status: 'all'},
+                        {value: 'config', label: 'Config File'|t('app'), colorKey: 'config'},
+                        {value: 'database', label: 'Database'|t('app'), colorKey: 'database'},
+                    ],
+                },
+                {
+                    header: 'Provider'|t('app'),
+                    param: 'provider',
+                    current: providerFilter,
+                    options: [
+                        {value: 'all', label: 'All Providers'|t('app'), status: 'all'},
+                        {value: 'aws', label: 'AWS'|t('app'), status: 'orange'},
+                        {value: 'gcp', label: 'Google Cloud'|t('app'), status: 'blue'},
+                        {value: 'azure', label: 'Azure'|t('app'), status: 'cyan'},
+                    ],
+                },
+                {
+                    header: 'Environment'|t('app'),
+                    param: 'type',
+                    current: typeFilter,
+                    colorSet: 'environmentType',
+                    options: [
+                        {value: 'all', label: 'All Types'|t('app'), status: 'all'},
+                        {value: 'production', label: 'Production'|t('app'), colorKey: 'production'},
+                        {value: 'staging', label: 'Staging'|t('app'), colorKey: 'staging'},
+                        {value: 'development', label: 'Development'|t('app'), colorKey: 'development'},
+                    ],
+                },
+            ],
+        },
+    ],
+    table: {
+        columns: [
+            {key: 'name', label: 'Name'|t('app')},
+            {key: 'status', label: 'Status'|t('app')},
+            {key: 'source', label: 'Source'|t('app')},
+            {key: 'type', label: 'Type'|t('app')},
+            {key: 'provider', label: 'Provider'|t('app')},
+        ],
+        items: mockItems,
+        emptyMessage: 'No items found.'|t('app'),
+    },
+    pagination: {
+        page: 1,
+        limit: 50,
+        totalCount: mockItems|length,
+    },
+    checkboxes: false,
+    rowActions: false,
+} %}
+
+{% block tableRow %}
+    <td><strong>{{ item.name }}</strong></td>
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.status|capitalize,
+            value: item.status,
+            colorSet: 'status',
+        } only %}
+    </td>
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.source|capitalize,
+            value: item.source,
+            colorSet: 'configSource',
+        } only %}
+    </td>
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.type|capitalize,
+            value: item.type,
+            colorSet: 'environmentType',
+        } only %}
+    </td>
+    <td>{{ item.provider|upper }}</td>
+{% endblock %}
+
+{% block sidebar %}
+    <div class="meta" style="padding: 12px;">
+        <h3 style="margin: 0 0 12px; font-size: 14px;">Grouped Filters</h3>
+        <p style="font-size: 12px; color: #6b7280; margin: 0;">
+            This example shows a single dropdown with 4 filter groups, each controlling a different URL parameter.
+        </p>
+        <hr style="margin: 12px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <div style="font-size: 11px; font-family: monospace; color: #6b7280;">
+            <div>status: {{ statusFilter }}</div>
+            <div>source: {{ sourceFilter }}</div>
+            <div>type: {{ typeFilter }}</div>
+            <div>provider: {{ providerFilter }}</div>
+        </div>
+    </div>
+{% endblock %}

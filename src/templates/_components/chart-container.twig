@@ -1,0 +1,44 @@
+{#
+ # Chart Container Component
+ #
+ # Wrapper for chart elements with consistent styling.
+ #
+ # Parameters:
+ #   - id: Canvas element ID (required for Chart.js)
+ #   - title: (optional) Chart title
+ #   - subtitle: (optional) Subtitle/description
+ #   - fullWidth: (optional) Span full grid width
+ #   - height: (optional) Custom canvas height (e.g., '200px')
+ #   - class: (optional) Additional CSS classes
+ #
+ # Example:
+ #   {% include 'lindemannrock-base/_components/chart-container' with {
+ #       id: 'daily-trend-chart',
+ #       title: 'Daily Trend',
+ #       fullWidth: true,
+ #   } only %}
+ #}
+
+{% set chartId = id ?? '' %}
+{% set chartTitle = title ?? '' %}
+{% set chartSubtitle = subtitle ?? '' %}
+{% set isFullWidth = fullWidth ?? false %}
+{% set canvasHeight = height ?? '' %}
+{% set extraClass = class ?? '' %}
+
+<div class="lr-chart-container {% if isFullWidth %}full-width{% endif %} {{ extraClass }}">
+    {% if chartTitle %}
+        <h3>{{ chartTitle }}</h3>
+    {% endif %}
+
+    {% if chartSubtitle %}
+        <p class="light" style="margin: -10px 0 15px; font-size: 12px;">{{ chartSubtitle }}</p>
+    {% endif %}
+
+    {% if chartId %}
+        <canvas id="{{ chartId }}" {% if canvasHeight %}style="max-height: {{ canvasHeight }} !important;"{% endif %}></canvas>
+    {% endif %}
+
+    {# Allow custom content inside #}
+    {{ block('chartContent') ?? '' }}
+</div>

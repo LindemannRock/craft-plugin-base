@@ -1,0 +1,305 @@
+{#
+ # Analytics Layout Example
+ #
+ # Demonstrates the cp-analytics layout with all features.
+ # Copy and adapt this template for your plugin's analytics pages.
+ #
+ # Features demonstrated:
+ # - Tabbed interface
+ # - Date range filter
+ # - Custom filters (provider, etc.)
+ # - Stat boxes
+ # - Chart containers
+ # - Data tables
+ # - Export (Excel/CSV/JSON - formats controlled via config/lindemannrock-base.php)
+ #
+ # Usage:
+ #   1. Copy to your plugin: templates/analytics/index.twig
+ #   2. Modify analyticsConfig for your data
+ #   3. Create _partials/ for each tab's content
+ #   4. Add chart initialization in scripts block
+ #}
+
+{% extends 'lindemannrock-base/_layouts/cp-analytics' %}
+
+{# ============================================================================
+   MOCK DATA (replace with your controller data)
+   ============================================================================ #}
+
+{% set dateRange = craft.app.request.getParam('dateRange', 'last7days') %}
+{% set siteId = craft.app.request.getParam('siteId', '') %}
+{% set categoryId = craft.app.request.getParam('category', 'all') %}
+{% set sites = craft.app.sites.allSites %}
+
+{# Mock categories for custom filter example #}
+{% set categories = [
+    { value: 'all', label: 'All Categories'|t('app') },
+    { value: 'news', label: 'News'|t('app') },
+    { value: 'products', label: 'Products'|t('app') },
+    { value: 'events', label: 'Events'|t('app') },
+] %}
+
+{# Mock summary stats #}
+{% set summaryStats = {
+    totalViews: 12540,
+    uniqueVisitors: 3842,
+    avgDuration: 185,
+    bounceRate: 42.5,
+} %}
+
+{# Mock chart data - normally from controller #}
+{% set dailyData = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    views: [1200, 1450, 1320, 1680, 1920, 890, 720],
+    visitors: [380, 420, 390, 510, 580, 290, 250],
+} %}
+
+{% set topPages = [
+    { title: 'Homepage', views: 3240, avgTime: 45 },
+    { title: 'About Us', views: 1890, avgTime: 120 },
+    { title: 'Products', views: 1540, avgTime: 180 },
+    { title: 'Contact', views: 890, avgTime: 90 },
+    { title: 'Blog', views: 780, avgTime: 240 },
+] %}
+
+
+{# ============================================================================
+   ANALYTICS CONFIGURATION
+   ============================================================================ #}
+
+{% set analyticsConfig = {
+    plugin: {
+        handle: 'my-plugin',
+        name: 'My Plugin',
+    },
+    page: {
+        title: 'Analytics'|t('app'),
+        subnav: 'analytics',
+        crumbs: [
+            { label: 'My Plugin', url: url('my-plugin') },
+            { label: 'Analytics'|t('app'), url: url('my-plugin/analytics') },
+        ],
+    },
+    tabs: {
+        overview: { label: 'Overview'|t('app') },
+        pages: { label: 'Pages'|t('app') },
+        traffic: { label: 'Traffic Sources'|t('app') },
+    },
+    filters: {
+        dateRange: {
+            default: 'last7days',
+            current: dateRange,
+        },
+        sites: {
+            enabled: true,
+            current: siteId,
+            sites: sites,
+        },
+        custom: [
+            {
+                param: 'category',
+                current: categoryId,
+                allLabel: 'All Categories'|t('app'),
+                options: categories,
+            },
+        ],
+    },
+    export: {
+        permission: 'myPlugin:exportAnalytics',
+        action: 'my-plugin/analytics/export',
+    },
+    charts: {
+        prefix: 'demo',
+        dataEndpoint: 'my-plugin/analytics/get-data',
+    },
+} %}
+
+
+{# ============================================================================
+   TAB CONTENT
+   ============================================================================ #}
+
+{% block tabs %}
+    {# Overview Tab #}
+    <div id="overview" class="lr-tab-content">
+        {# Summary Stats #}
+        <div class="lr-analytics-stats">
+            {% include 'lindemannrock-base/_components/stat-box' with {
+                value: summaryStats.totalViews,
+                label: 'Total Views'|t('app'),
+            } only %}
+
+            {% include 'lindemannrock-base/_components/stat-box' with {
+                value: summaryStats.uniqueVisitors,
+                label: 'Unique Visitors'|t('app'),
+                color: '#10b981',
+            } only %}
+
+            {% include 'lindemannrock-base/_components/stat-box' with {
+                value: summaryStats.avgDuration,
+                label: 'Avg. Duration'|t('app'),
+                suffix: 's',
+                color: '#8b5cf6',
+            } only %}
+
+            {% include 'lindemannrock-base/_components/stat-box' with {
+                value: summaryStats.bounceRate,
+                label: 'Bounce Rate'|t('app'),
+                suffix: '%',
+                color: '#f59e0b',
+            } only %}
+        </div>
+
+        {# Main Chart #}
+        <div class="lr-analytics-charts">
+            <div class="lr-chart-container full-width">
+                <h3>{{ 'Daily Traffic'|t('app') }}</h3>
+                <div style="height: 250px;">
+                    <canvas id="daily-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Two Column Charts #}
+        <div class="lr-analytics-charts two-columns">
+            <div class="lr-chart-container">
+                <h3>{{ 'Device Types'|t('app') }}</h3>
+                <canvas id="device-chart"></canvas>
+            </div>
+            <div class="lr-chart-container">
+                <h3>{{ 'Browser Distribution'|t('app') }}</h3>
+                <canvas id="browser-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {# Pages Tab #}
+    <div id="pages" class="lr-tab-content hidden">
+        <h2 class="lr-section-heading">{{ 'Top Pages'|t('app') }}</h2>
+
+        <div class="lr-chart-container">
+            <div class="lr-table-scroll">
+                <table class="data fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'Page'|t('app') }}</th>
+                            <th style="text-align: right;">{{ 'Views'|t('app') }}</th>
+                            <th style="text-align: right;">{{ 'Avg. Time'|t('app') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for page in topPages %}
+                            <tr>
+                                <td><strong>{{ page.title }}</strong></td>
+                                <td style="text-align: right;">{{ page.views|number_format }}</td>
+                                <td style="text-align: right;">{{ page.avgTime }}s</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# Traffic Sources Tab #}
+    <div id="traffic" class="lr-tab-content hidden">
+        <h2 class="lr-section-heading">{{ 'Traffic Sources'|t('app') }}</h2>
+
+        <div class="lr-analytics-charts two-columns">
+            <div class="lr-chart-container">
+                <h3>{{ 'Source Distribution'|t('app') }}</h3>
+                <canvas id="source-chart"></canvas>
+            </div>
+            <div class="lr-chart-container">
+                <h3>{{ 'Referrers'|t('app') }}</h3>
+                <canvas id="referrer-chart"></canvas>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{# ============================================================================
+   CHART INITIALIZATION
+   ============================================================================ #}
+
+{% block scripts %}
+<script>
+(function() {
+    'use strict';
+
+    const chartColors = window.lrChartColors;
+
+    // Initialize on analytics init event
+    document.addEventListener('lr:analyticsInit', function(e) {
+        initDemoCharts();
+    });
+
+    function initDemoCharts() {
+        // Daily chart - using mock data (normally via lrLoadChartData)
+        const dailyData = {{ dailyData|json_encode|raw }};
+
+        window.lrCreateChart('daily-chart', 'line', {
+            labels: dailyData.labels,
+            datasets: [
+                {
+                    label: '{{ "Views"|t('app')|e('js') }}',
+                    data: dailyData.views,
+                    borderColor: chartColors[0],
+                    backgroundColor: chartColors[0] + '20',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: '{{ "Visitors"|t('app')|e('js') }}',
+                    data: dailyData.visitors,
+                    borderColor: chartColors[1],
+                    backgroundColor: chartColors[1] + '20',
+                    tension: 0.3,
+                    fill: true
+                }
+            ]
+        }, {
+            maintainAspectRatio: false
+        });
+
+        // Device chart
+        window.lrCreateChart('device-chart', 'doughnut', {
+            labels: ['Desktop', 'Mobile', 'Tablet'],
+            datasets: [{
+                data: [58, 35, 7],
+                backgroundColor: chartColors.slice(0, 3)
+            }]
+        });
+
+        // Browser chart
+        window.lrCreateChart('browser-chart', 'doughnut', {
+            labels: ['Chrome', 'Safari', 'Firefox', 'Edge', 'Other'],
+            datasets: [{
+                data: [45, 28, 12, 10, 5],
+                backgroundColor: chartColors.slice(0, 5)
+            }]
+        });
+
+        // Source chart
+        window.lrCreateChart('source-chart', 'doughnut', {
+            labels: ['Direct', 'Search', 'Social', 'Referral'],
+            datasets: [{
+                data: [35, 40, 15, 10],
+                backgroundColor: chartColors.slice(0, 4)
+            }]
+        });
+
+        // Referrer chart
+        window.lrCreateChart('referrer-chart', 'bar', {
+            labels: ['google.com', 'facebook.com', 'twitter.com', 'linkedin.com'],
+            datasets: [{
+                label: '{{ "Visits"|t('app')|e('js') }}',
+                data: [1240, 580, 320, 180],
+                backgroundColor: chartColors[0]
+            }]
+        });
+    }
+})();
+</script>
+{% endblock %}

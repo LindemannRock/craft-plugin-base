@@ -1,0 +1,139 @@
+{#
+ # Badge Component
+ #
+ # Renders a colored badge with dot and text.
+ # Uses centralized ColorHelper for consistent colors across plugins.
+ # Supports both Craft CSS classes and custom inline styles.
+ #
+ # Usage:
+ # Using Craft's built-in status colors (via status parameter):
+ # {% include 'lindemannrock-base/_components/badge' with {
+ #     label: 'Enabled',
+ #     status: 'teal',
+ # } only %}
+ #
+ # Using predefined color set from ColorHelper (uses CSS class if available):
+ # {% include 'lindemannrock-base/_components/badge' with {
+ #     label: item.matchType|capitalize,
+ #     value: item.matchType,
+ #     colorSet: 'status',
+ # } only %}
+ #
+ # Using custom colors directly (inline styles):
+ # {% include 'lindemannrock-base/_components/badge' with {
+ #     label: 'Custom',
+ #     color: '#6366f1',
+ #     rgb: '99, 102, 241',
+ #     textColor: '#312e81',
+ # } only %}
+ #
+ # With link:
+ # {% include 'lindemannrock-base/_components/badge' with {
+ #     label: 'View',
+ #     status: 'teal',
+ #     url: '/some/url',
+ # } only %}
+ #
+ # Parameters:
+ # - label: Text to display
+ # - status: Craft's built-in status (teal, gray, orange, red, blue, pink, disabled)
+ # - value: Value to look up in colorSet
+ # - colorSet: Name of predefined color set from ColorHelper
+ # - color: Custom solid color (hex) - forces inline styles
+ # - rgb: Custom RGB for background (e.g., '99, 102, 241')
+ # - textColor: Custom text color (hex)
+ # - url: Optional link URL
+ # - title: Optional tooltip
+ #
+ # Available colorSets (from ColorHelper):
+ # - status: enabled, disabled, pending, expired, live, off
+ # - yesNo: yes, no, true, false
+ # - handled: yes, no, true, false
+ # - configSource: config, database
+ # - environmentType: development, staging, production
+ # - priority: low, normal, high, critical
+ # - httpStatus: success, redirect, client_error, server_error
+ #}
+
+{% set defaultColors = lrDefaultColor() %}
+
+{# Resolve colors based on input type #}
+{% set resolvedClass = null %}
+{% set resolvedDot = null %}
+{% set resolvedColor = null %}
+{% set resolvedRgb = null %}
+{% set resolvedText = null %}
+{% set useCraftStatus = false %}
+
+{# Option 1: Craft's built-in status (explicit) #}
+{% if status is defined and status %}
+    {% set useCraftStatus = true %}
+    {% set resolvedClass = status %}
+    {% set resolvedDot = status %}
+
+{# Option 2: Color set lookup using ColorHelper #}
+{% elseif colorSet is defined and value is defined %}
+    {% set valueColors = lrSetColor(colorSet, value) %}
+    {% if valueColors.color == defaultColors.color %}
+        {# Try lowercase value as fallback #}
+        {% set valueColors = lrColor(colorSet, value|lower) %}
+    {% endif %}
+
+    {# Check if color set has a CSS class defined #}
+    {% if valueColors.class is defined and valueColors.class %}
+        {% set useCraftStatus = true %}
+        {% set resolvedClass = valueColors.class %}
+        {# Use dot class if specified, otherwise fall back to class #}
+        {% set resolvedDot = valueColors.dot ?? valueColors.class %}
+    {% else %}
+        {# Use inline styles for custom colors #}
+        {% set resolvedColor = valueColors.color %}
+        {% set resolvedRgb = valueColors.rgb %}
+        {% set resolvedText = valueColors.text %}
+    {% endif %}
+
+{# Option 3: Custom colors passed directly #}
+{% elseif color is defined %}
+    {% set resolvedColor = color %}
+    {% set resolvedRgb = rgb ?? defaultColors.rgb %}
+    {% set resolvedText = textColor ?? defaultColors.text %}
+
+{# Fallback to defaults #}
+{% else %}
+    {% set resolvedColor = defaultColors.color %}
+    {% set resolvedRgb = defaultColors.rgb %}
+    {% set resolvedText = defaultColors.text %}
+{% endif %}
+
+
+{# Render the badge #}
+{% set badgeHtml %}
+    {% if useCraftStatus and resolvedClass %}
+        {# Use Craft's built-in status classes #}
+        {# dot class is for the inner status dot, defaults to resolvedClass if not specified #}
+        {% set dotClass = resolvedDot ?? resolvedClass %}
+        <span class="status-label {{ resolvedClass }}">
+            <span class="status {{ dotClass }}"></span>
+            <span class="status-label-text">{{ label }}</span>
+        </span>
+    {% else %}
+        {# Use custom colors with inline styles #}
+        <span class="status-label" style="background: rgba({{ resolvedRgb }}, 0.12);">
+            <span class="status" style="background: {{ resolvedColor }};"></span>
+            <span class="status-label-text" style="color: {{ resolvedText }};">{{ label }}</span>
+        </span>
+    {% endif %}
+{% endset %}
+
+{# Wrap in link if URL provided #}
+{% if url is defined and url %}
+    <a href="{{ url }}" style="text-decoration: none;"{% if title is defined %} title="{{ title }}"{% endif %}>
+        {{ badgeHtml }}
+    </a>
+{% else %}
+    {% if title is defined %}
+        <span title="{{ title }}">{{ badgeHtml }}</span>
+    {% else %}
+        {{ badgeHtml }}
+    {% endif %}
+{% endif %}

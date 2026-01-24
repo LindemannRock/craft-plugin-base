@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\traits;
@@ -130,6 +130,7 @@ trait SettingsPersistenceTrait
      *
      * @param static|null $settings Optional existing settings instance to populate
      * @return static Settings instance with values from database (or defaults)
+     * @since 5.0.0
      */
     public static function loadFromDatabase(?self $settings = null): self
     {
@@ -210,6 +211,7 @@ trait SettingsPersistenceTrait
      * Validates before saving. Excludes config-overridden fields.
      *
      * @return bool True on success, false on failure
+     * @since 5.0.0
      */
     public function saveToDatabase(): bool
     {

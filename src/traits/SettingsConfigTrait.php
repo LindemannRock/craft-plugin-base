@@ -3,7 +3,7 @@
  * LindemannRock Base Module for Craft CMS 5.x
  *
  * @link      https://lindemannrock.com
- * @copyright Copyright (c) 2025 LindemannRock
+ * @copyright Copyright (c) 2026 LindemannRock
  */
 
 namespace lindemannrock\base\traits;
@@ -74,6 +74,7 @@ trait SettingsConfigTrait
      *
      * @param string $attribute The setting attribute name or dot-notation path
      * @return bool True if the setting is defined in config file
+     * @since 5.0.0
      */
     public function isOverriddenByConfig(string $attribute): bool
     {
@@ -149,6 +150,7 @@ trait SettingsConfigTrait
      * @param string $attribute The attribute being validated
      * @param array|null $params Validation parameters
      * @param mixed $validator The validator instance
+     * @since 5.0.0
      */
     public function validateLogLevel($attribute, $params, $validator): void
     {

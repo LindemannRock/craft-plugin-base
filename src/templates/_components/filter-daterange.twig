@@ -1,0 +1,58 @@
+{#
+ # Date Range Filter Component
+ #
+ # Renders a dropdown filter for date range selection.
+ #
+ # Parameters:
+ # - filter: {
+ #     param: 'dateRange',
+ #     current: 'last30days',
+ #     label: 'Date Range',
+ #     options: [  // Optional custom options, defaults provided below
+ #         {value: 'today', label: 'Today'},
+ #         ...
+ #     ]
+ # }
+ # - urlParams: Current URL parameters to maintain
+ #}
+
+{# Default date range options if not provided #}
+{% set defaultOptions = [
+    {value: 'today', label: 'Today'|t('app')},
+    {value: 'yesterday', label: 'Yesterday'|t('app')},
+    {value: 'last7days', label: 'Last 7 days'|t('app')},
+    {value: 'last30days', label: 'Last 30 days'|t('app')},
+    {value: 'last90days', label: 'Last 90 days'|t('app')},
+    {value: 'all', label: 'All time'|t('app')},
+] %}
+
+{% set options = filter.options ?? defaultOptions %}
+
+{% set currentOption = null %}
+{% for option in options %}
+    {% if option.value == filter.current %}
+        {% set currentOption = option %}
+    {% endif %}
+{% endfor %}
+
+<div class="btngroup">
+    <button type="button" class="btn menubtn">
+        {% if filter.icon ?? false %}
+            <span class="icon" data-icon="{{ filter.icon }}"></span>
+        {% endif %}
+        {{ currentOption.label ?? filter.label ?? 'All time'|t('app') }}
+    </button>
+    <div class="menu">
+        <ul>
+            {% for option in options %}
+                <li>
+                    {% set optionParams = urlParams|merge({(filter.param): option.value, page: 1}) %}
+                    <a class="{{ filter.current == option.value ? 'sel' : '' }}"
+                       href="?{{ optionParams|url_encode }}">
+                        {{ option.label }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

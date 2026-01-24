@@ -1,0 +1,157 @@
+{#
+ # Status Filter Dropdown Component
+ #
+ # Renders a dropdown filter with colored status indicators.
+ # Supports Craft's built-in status classes, custom colors, and ColorHelper color sets.
+ #
+ # Parameters:
+ # - filter: {
+ #     param: 'status',
+ #     current: 'all',
+ #     label: 'All',
+ #     colorSet: 'smsStatus',  // Optional: use ColorHelper color set
+ #     options: [
+ #         {value: 'all', label: 'All', status: 'all'},
+ #         {value: 'sent', label: 'Sent', status: 'green'},      // Craft status class
+ #         {value: 'failed', label: 'Failed', colorKey: 'failed'}, // ColorHelper lookup
+ #         {value: 'custom', label: 'Custom', statusColor: '#6366f1'}, // Direct color
+ #     ],
+ #     groups: [  // Optional grouped options
+ #         {header: 'Status', options: [...]},
+ #         {header: 'Type', colorSet: 'backendType', options: [...]},
+ #     ]
+ # }
+ # - urlParams: Current URL parameters to maintain
+ #
+ # Color Resolution Priority:
+ # 1. statusColor (direct hex color)
+ # 2. colorKey + filter.colorSet or group.colorSet (ColorHelper lookup)
+ # 3. status (Craft's built-in classes: green, red, orange, blue, teal, gray, disabled, all)
+ #
+ # Filter Color Behavior:
+ # - Selected items show their actual color
+ # - Unselected items show neutral gray (#aab6c1)
+ #}
+
+{% set neutralColor = lrNeutralColor() %}
+
+{# Find current option for button display #}
+{% set currentOption = null %}
+{% set currentColorSet = filter.colorSet ?? null %}
+
+{% for option in filter.options ?? [] %}
+    {% if option.value == filter.current %}
+        {% set currentOption = option %}
+    {% endif %}
+{% endfor %}
+
+{% if filter.groups ?? false %}
+    {% for group in filter.groups %}
+        {% set groupCurrent = group.current ?? filter.current %}
+        {% for option in group.options %}
+            {% if option.value == groupCurrent %}
+                {# Only use first group's selection for button display #}
+                {% if not currentOption %}
+                    {% set currentOption = option %}
+                    {% set currentColorSet = group.colorSet ?? filter.colorSet ?? null %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+
+{# Resolve current button color #}
+{% set buttonStatusClass = '' %}
+{% set buttonStatusColor = '' %}
+{% if currentOption %}
+    {% if currentOption.statusColor ?? false %}
+        {% set buttonStatusColor = currentOption.statusColor %}
+    {% elseif (currentOption.colorKey ?? false) and currentColorSet %}
+        {% set colorData = lrSetColor(currentColorSet, currentOption.colorKey) %}
+        {% set buttonStatusColor = colorData.color %}
+    {% elseif currentOption.status ?? false %}
+        {% set buttonStatusClass = currentOption.status %}
+    {% endif %}
+{% endif %}
+
+<div class="btngroup">
+    <button type="button" class="btn menubtn statusmenubtn">
+        <span class="status {{ buttonStatusClass }}"{% if buttonStatusColor %} style="background: {{ buttonStatusColor }};"{% endif %}></span>
+        {{ currentOption.label ?? filter.label ?? 'All'|t('app') }}
+    </button>
+    <div class="menu">
+        <ul>
+            {# Simple options list #}
+            {% if filter.options ?? false %}
+                {% for option in filter.options %}
+                    <li>
+                        {% set optionParams = urlParams|merge({(filter.param): option.value, page: 1}) %}
+                        {% set isSelected = filter.current == option.value %}
+
+                        {# Resolve option color #}
+                        {% set optionStatusClass = '' %}
+                        {% set optionStatusColor = '' %}
+                        {% if option.statusColor ?? false %}
+                            {% set optionStatusColor = isSelected ? option.statusColor : neutralColor %}
+                        {% elseif (option.colorKey ?? false) and (filter.colorSet ?? false) %}
+                            {% set optionStatusColor = lrFilterColor(filter.colorSet, option.colorKey, isSelected ? option.colorKey : null) %}
+                        {% elseif option.status ?? false %}
+                            {% set optionStatusClass = option.status %}
+                        {% endif %}
+
+                        <a class="{{ isSelected ? 'sel' : '' }}"
+                           href="?{{ optionParams|url_encode }}">
+                            <span class="status {{ optionStatusClass }}"{% if optionStatusColor %} style="background: {{ optionStatusColor }};"{% endif %}></span>
+                            {{ option.label }}
+                            {% if option.count is defined %}({{ option.count|number_format }}){% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            {% endif %}
+
+            {# Grouped options #}
+            {% if filter.groups ?? false %}
+                {% for group in filter.groups %}
+                    {% if not loop.first %}
+                        <li><hr class="padded"></li>
+                    {% endif %}
+                    {% if group.header ?? false %}
+                        <li class="lr-menu-header">{{ group.header }}</li>
+                    {% endif %}
+
+                    {% set groupColorSet = group.colorSet ?? filter.colorSet ?? null %}
+                    {% set groupParam = group.param ?? filter.param %}
+                    {% set groupCurrent = group.current ?? filter.current %}
+
+                    {% for option in group.options %}
+                        <li>
+                            {% set optionParams = urlParams|merge({(groupParam): option.value, page: 1}) %}
+                            {% if option.extraParams ?? false %}
+                                {% set optionParams = optionParams|merge(option.extraParams) %}
+                            {% endif %}
+                            {% set isSelected = groupCurrent == option.value %}
+
+                            {# Resolve option color #}
+                            {% set optionStatusClass = '' %}
+                            {% set optionStatusColor = '' %}
+                            {% if option.statusColor ?? false %}
+                                {% set optionStatusColor = isSelected ? option.statusColor : neutralColor %}
+                            {% elseif (option.colorKey ?? false) and groupColorSet %}
+                                {% set optionStatusColor = lrFilterColor(groupColorSet, option.colorKey, isSelected ? option.colorKey : null) %}
+                            {% elseif option.status ?? false %}
+                                {% set optionStatusClass = option.status %}
+                            {% endif %}
+
+                            <a class="{{ isSelected ? 'sel' : '' }}"
+                               href="?{{ optionParams|url_encode }}">
+                                <span class="status {{ optionStatusClass }}"{% if optionStatusColor %} style="background: {{ optionStatusColor }};"{% endif %}></span>
+                                {{ option.label }}
+                                {% if option.count is defined %}({{ option.count|number_format }}){% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+</div>

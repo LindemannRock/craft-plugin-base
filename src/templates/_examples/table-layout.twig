@@ -1,0 +1,356 @@
+{#
+ # CP Table Layout Example
+ #
+ # Complete example showing all features of the cp-table layout.
+ # Copy and adapt this template for your plugin's index pages.
+ #
+ # Features demonstrated:
+ # - Status filter with colorSet
+ # - Dropdown filter
+ # - Date range filter
+ # - Grouped status filter
+ # - Sortable columns
+ # - Badges
+ # - Row actions
+ # - Bulk actions
+ # - Export menu (Excel/CSV/JSON via export-menu component)
+ # - Expandable rows
+ # - Sidebar
+ # - Pagination
+ #
+ # Usage:
+ #   1. Copy to your plugin: templates/items/index.twig
+ #   2. Modify tableConfig for your data
+ #   3. Update blocks for your columns
+ #}
+
+{% extends 'lindemannrock-base/_layouts/cp-table' %}
+
+{# ============================================================================
+   MOCK DATA (replace with your controller data)
+   ============================================================================ #}
+
+{% set mockItems = [
+    {id: 1, name: 'Item One', handle: 'item-one', status: 'enabled', type: 'production', source: 'database', dateCreated: now|date_modify('-2 days'), description: 'This is the first item with a longer description for the expandable row.'},
+    {id: 2, name: 'Item Two', handle: 'item-two', status: 'enabled', type: 'development', source: 'config', dateCreated: now|date_modify('-1 day'), description: 'Second item description here.'},
+    {id: 3, name: 'Item Three', handle: 'item-three', status: 'disabled', type: 'production', source: 'database', dateCreated: now, description: 'Third item is disabled.'},
+    {id: 4, name: 'Item Four', handle: 'item-four', status: 'pending', type: 'staging', source: 'database', dateCreated: now|date_modify('-5 days'), description: 'Pending item awaiting approval.'},
+] %}
+
+{# Get filter values from request (normally from controller) #}
+{% set statusFilter = craft.app.request.getParam('status', 'all') %}
+{% set sourceFilter = craft.app.request.getParam('source', 'all') %}
+{% set typeFilter = craft.app.request.getParam('type', 'all') %}
+{% set search = craft.app.request.getParam('search', '') %}
+{% set sort = craft.app.request.getParam('sort', 'dateCreated') %}
+{% set dir = craft.app.request.getParam('dir', 'desc') %}
+{% set page = craft.app.request.getParam('page', 1)|number_format %}
+{% set limit = 50 %}
+
+{# Filter items (normally done in controller) #}
+{% set filteredItems = mockItems %}
+{% if statusFilter != 'all' %}
+    {% set filteredItems = filteredItems|filter(i => i.status == statusFilter) %}
+{% endif %}
+{% if sourceFilter != 'all' %}
+    {% set filteredItems = filteredItems|filter(i => i.source == sourceFilter) %}
+{% endif %}
+{% if typeFilter != 'all' %}
+    {% set filteredItems = filteredItems|filter(i => i.type == typeFilter) %}
+{% endif %}
+
+{# Sort items #}
+{% if sort == 'name' %}
+    {% set filteredItems = filteredItems|sort((a, b) => dir == 'asc' ? a.name|lower <=> b.name|lower : b.name|lower <=> a.name|lower) %}
+{% elseif sort == 'dateCreated' %}
+    {% set filteredItems = filteredItems|sort((a, b) => dir == 'asc' ? a.dateCreated <=> b.dateCreated : b.dateCreated <=> a.dateCreated) %}
+{% endif %}
+
+{% set totalCount = filteredItems|length %}
+
+
+{# ============================================================================
+   TABLE CONFIGURATION
+   ============================================================================ #}
+
+{% set tableConfig = {
+    plugin: {
+        handle: 'my-plugin',
+        name: 'My Plugin',
+    },
+    page: {
+        title: 'Items'|t('app'),
+        subnav: 'items',
+        crumbs: [
+            { label: 'My Plugin', url: url('my-plugin') },
+            { label: 'Items'|t('app'), url: url('my-plugin/items') }
+        ],
+    },
+    filters: [
+        {
+            type: 'status',
+            param: 'status',
+            current: statusFilter,
+            label: 'All Status'|t('app'),
+            colorSet: 'status',
+            options: [
+                {value: 'all', label: 'All'|t('app'), status: 'all'},
+                {value: 'enabled', label: 'Enabled'|t('app'), colorKey: 'enabled'},
+                {value: 'disabled', label: 'Disabled'|t('app'), colorKey: 'disabled'},
+                {value: 'pending', label: 'Pending'|t('app'), colorKey: 'pending'},
+            ],
+        },
+        {
+            type: 'dropdown',
+            param: 'source',
+            current: sourceFilter,
+            label: 'All Sources'|t('app'),
+            options: [
+                {value: 'all', label: 'All Sources'|t('app')},
+                {value: 'config', label: 'Config'|t('app')},
+                {value: 'database', label: 'Database'|t('app')},
+            ],
+        },
+        {
+            type: 'dropdown',
+            param: 'type',
+            current: typeFilter,
+            label: 'All Types'|t('app'),
+            options: [
+                {value: 'all', label: 'All Types'|t('app')},
+                {value: 'production', label: 'Production'|t('app')},
+                {value: 'staging', label: 'Staging'|t('app')},
+                {value: 'development', label: 'Development'|t('app')},
+            ],
+        },
+    ],
+    search: {
+        placeholder: 'Search items...'|t('app'),
+        value: search,
+    },
+    sort: {
+        field: sort,
+        direction: dir,
+    },
+    table: {
+        columns: [
+            {key: 'name', label: 'Name'|t('app'), sortable: true},
+            {key: 'handle', label: 'Handle'|t('app')},
+            {key: 'status', label: 'Status'|t('app'), sortable: true},
+            {key: 'type', label: 'Type'|t('app')},
+            {key: 'source', label: 'Source'|t('app')},
+            {key: 'dateCreated', label: 'Created'|t('app'), sortable: true},
+        ],
+        items: filteredItems,
+        emptyMessage: 'No items found.'|t('app'),
+        expandable: true,
+    },
+    pagination: {
+        page: page,
+        limit: limit,
+        totalCount: totalCount,
+        itemLabel: {singular: 'item'|t('app'), plural: 'items'|t('app')},
+    },
+    checkboxes: true,
+    rowActions: true,
+    newButton: {
+        url: url('my-plugin/items/new'),
+        label: 'New Item'|t('app'),
+    },
+} %}
+
+
+{# ============================================================================
+   TOOLBAR ACTIONS (Export button using shared component)
+   ============================================================================ #}
+
+{% block toolbarActions %}
+    {% include 'lindemannrock-base/_components/export-menu' with {
+        action: 'my-plugin/items/export',
+        permission: 'myPlugin:exportItems',
+    } only %}
+{% endblock %}
+
+
+{# ============================================================================
+   BULK ACTIONS
+   ============================================================================ #}
+
+{% block bulkActions %}
+    <button type="button" class="btn" id="lr-bulk-enable-btn">
+        {{ 'Enable'|t('app') }}
+    </button>
+    <button type="button" class="btn" id="lr-bulk-disable-btn">
+        {{ 'Disable'|t('app') }}
+    </button>
+    <button type="button" class="btn secondary" id="lr-bulk-delete-btn">
+        {{ 'Delete'|t('app') }} (<span id="lr-selected-count">0</span>)
+    </button>
+{% endblock %}
+
+
+{# ============================================================================
+   ROW ACTIONS
+   ============================================================================ #}
+
+{% block rowActions %}
+    {% include 'lindemannrock-base/_components/row-actions' with {
+        item: item,
+        actions: {
+            type: 'menu',
+            icon: 'settings',
+            title: 'Actions'|t('app'),
+            items: [
+                {
+                    label: 'Edit'|t('app'),
+                    url: url('my-plugin/items/' ~ item.id),
+                },
+                {
+                    label: 'Duplicate'|t('app'),
+                    jsAction: 'duplicate',
+                },
+                {
+                    label: 'Delete'|t('app'),
+                    class: 'error',
+                    jsAction: 'delete',
+                },
+            ],
+        },
+    } only %}
+{% endblock %}
+
+
+{# ============================================================================
+   CUSTOM TABLE ROW RENDERING
+   ============================================================================ #}
+
+{% block tableRow %}
+    {# Name #}
+    <td>
+        <a href="{{ url('my-plugin/items/' ~ item.id) }}">
+            <strong>{{ item.name }}</strong>
+        </a>
+    </td>
+
+    {# Handle #}
+    <td><code>{{ item.handle }}</code></td>
+
+    {# Status badge #}
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.status|capitalize,
+            value: item.status,
+            colorSet: 'status',
+        } only %}
+    </td>
+
+    {# Type badge #}
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.type|capitalize,
+            value: item.type,
+            colorSet: 'environmentType',
+        } only %}
+    </td>
+
+    {# Source badge #}
+    <td>
+        {% include 'lindemannrock-base/_components/badge' with {
+            label: item.source|capitalize,
+            value: item.source,
+            colorSet: 'configSource',
+        } only %}
+    </td>
+
+    {# Date #}
+    <td class="light">{{ item.dateCreated|lrDatetime('medium') }}</td>
+{% endblock %}
+
+
+{# ============================================================================
+   EXPANDABLE ROW DETAILS
+   ============================================================================ #}
+
+{% block expandableRow %}
+    <div style="padding: 8px 0;">
+        <div style="font-size: 12px; color: #606d7b; font-weight: 600; margin-bottom: 8px;">
+            {{ 'Description'|t('app') }}
+        </div>
+        <div style="color: #374151;">
+            {{ item.description }}
+        </div>
+    </div>
+{% endblock %}
+
+
+{# ============================================================================
+   SIDEBAR
+   ============================================================================ #}
+
+{% block sidebar %}
+    <div class="meta" style="padding: 12px;">
+        <div class="data">
+            <div class="heading">{{ "Total Items"|t('app') }}</div>
+            <div class="value">{{ totalCount }}</div>
+        </div>
+        <div class="data">
+            <div class="heading">{{ "Enabled"|t('app') }}</div>
+            <div class="value">{{ mockItems|filter(i => i.status == 'enabled')|length }}</div>
+        </div>
+        <div class="data">
+            <div class="heading">{{ "Disabled"|t('app') }}</div>
+            <div class="value">{{ mockItems|filter(i => i.status == 'disabled')|length }}</div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{# ============================================================================
+   CUSTOM SCRIPTS
+   ============================================================================ #}
+
+{% block scripts %}
+    <script>
+    // Update selected count
+    document.addEventListener('lr:selectionChanged', function(e) {
+        const countSpan = document.getElementById('lr-selected-count');
+        if (countSpan) {
+            countSpan.textContent = e.detail.count;
+        }
+    });
+
+    // Bulk delete handler
+    const bulkDeleteBtn = document.getElementById('lr-bulk-delete-btn');
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const ids = window.lrTableSelection.getSelectedIds();
+            if (ids.length === 0) return;
+
+            if (confirm('Delete ' + ids.length + ' item(s)?')) {
+                // Craft.sendActionRequest('POST', 'my-plugin/items/bulk-delete', { data: { ids: ids } })
+                console.log('Would delete:', ids);
+            }
+        });
+    }
+
+    // Row action handlers
+    document.querySelectorAll('[data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.dataset.id;
+            if (confirm('Delete this item?')) {
+                console.log('Would delete:', id);
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-action="duplicate"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.dataset.id;
+            console.log('Would duplicate:', id);
+        });
+    });
+    </script>
+{% endblock %}

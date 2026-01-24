@@ -1,0 +1,67 @@
+{#
+ # Export Menu Component
+ #
+ # A reusable export dropdown menu that automatically shows only enabled formats.
+ # Uses ExportHelper configuration from config/lindemannrock-base.php.
+ #
+ # Parameters:
+ # - action: (required) The controller action URL (e.g., 'sms-manager/sms-logs/export')
+ # - permission: (optional) Permission required to show export button
+ # - dateRangeParam: (optional) Current date range parameter name (default: 'dateRange')
+ # - extraParams: (optional) Additional parameters to pass to export URL
+ #
+ # Usage:
+ #   {% include 'lindemannrock-base/_components/export-menu' with {
+ #       action: 'sms-manager/sms-logs/export',
+ #       permission: 'smsManager:downloadLogs',
+ #   } only %}
+ #
+ # With extra params:
+ #   {% include 'lindemannrock-base/_components/export-menu' with {
+ #       action: 'my-plugin/export',
+ #       permission: 'myPlugin:export',
+ #       extraParams: {status: statusFilter, provider: providerFilter},
+ #   } only %}
+ #}
+
+{% set action = action ?? '' %}
+{% set permission = permission ?? null %}
+{% set dateRangeParam = dateRangeParam ?? 'dateRange' %}
+{% set extraParams = extraParams ?? {} %}
+
+{# Check permission if specified #}
+{% set canExport = permission ? currentUser.can(permission) : true %}
+
+{% if canExport and action %}
+    {% set enabledFormats = lrExportFormats() %}
+    {% if enabledFormats|length > 0 %}
+        {# Get current dateRange from request #}
+        {% set currentDateRange = craft.app.request.getParam(dateRangeParam, 'last30days') %}
+
+        {# Build base params #}
+        {% set baseParams = {(dateRangeParam): currentDateRange}|merge(extraParams) %}
+
+        <div class="btngroup">
+            <button type="button" class="btn menubtn" data-icon="download">{{ "Export"|t('app') }}</button>
+            <div class="menu" data-align="right">
+                <ul>
+                    {% if lrExportEnabled('excel') %}
+                        <li>
+                            <a href="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}">{{ "Export as Excel"|t('app') }}</a>
+                        </li>
+                    {% endif %}
+                    {% if lrExportEnabled('csv') %}
+                        <li>
+                            <a href="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}">{{ "Export as CSV"|t('app') }}</a>
+                        </li>
+                    {% endif %}
+                    {% if lrExportEnabled('json') %}
+                        <li>
+                            <a href="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}">{{ "Export as JSON"|t('app') }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
