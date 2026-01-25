@@ -204,7 +204,7 @@ class ExportHelper
         fputcsv($output, $headers);
 
         foreach ($rows as $row) {
-            fputcsv($output, array_values($row));
+            fputcsv($output, self::sanitizeRow(array_values($row)));
         }
 
         rewind($output);
@@ -236,7 +236,11 @@ class ExportHelper
         }
 
         $flags = $pretty ? JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE : JSON_UNESCAPED_UNICODE;
-        $json = json_encode($data, $flags);
+        $json = json_encode($data, $flags | JSON_INVALID_UTF8_SUBSTITUTE);
+
+        if ($json === false) {
+            throw new BadRequestHttpException('Failed to encode data as JSON: ' . json_last_error_msg());
+        }
 
         return self::createResponse($json, $filename, 'application/json');
     }
@@ -297,11 +301,11 @@ class ExportHelper
             ],
         ]);
 
-        // Write data rows
+        // Write data rows (sanitized to prevent formula injection)
         $rowIndex = 2;
         foreach ($rows as $row) {
             $colIndex = 1;
-            foreach (array_values($row) as $value) {
+            foreach (self::sanitizeRow(array_values($row)) as $value) {
                 $cellRef = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
                 $sheet->setCellValue($cellRef, $value);
                 $colIndex++;
@@ -485,6 +489,63 @@ class ExportHelper
     }
 
     /**
+     * Sanitize a cell value to prevent formula injection
+     *
+     * Spreadsheet applications treat values starting with =, +, -, @, tab, or carriage return
+     * as formulas, which can be exploited for data exfiltration or code execution.
+     * This method prefixes such values with a single quote to prevent interpretation.
+     *
+     * @param mixed $value The cell value to sanitize
+     * @return mixed The sanitized value
+     * @since 5.9.0
+     */
+    private static function sanitizeCellValue(mixed $value): mixed
+    {
+        if (!is_string($value) || $value === '') {
+            return $value;
+        }
+
+        // Always dangerous - block regardless of what follows
+        $alwaysDangerous = ['=', '@', "\t", "\r", "\n"];
+
+        // Check first character for always-dangerous chars
+        if (in_array($value[0], $alwaysDangerous, true)) {
+            return "'" . $value;
+        }
+
+        // Check first non-whitespace for always-dangerous chars
+        $trimmed = ltrim($value);
+        if ($trimmed !== '' && in_array($trimmed[0], $alwaysDangerous, true)) {
+            return "'" . $value;
+        }
+
+        // Allow +/- only when followed by numeric pattern (phone numbers, negative numbers)
+        // Pattern: optional +/-, digits, optional decimal part with . or ,
+        if (preg_match('/^[+-]?\d+([.,]\d+)?$/', $trimmed)) {
+            return $value;
+        }
+
+        // Block +/- when NOT numeric (could be formula like +A1 or -A1)
+        if ($trimmed !== '' && in_array($trimmed[0], ['+', '-'], true)) {
+            return "'" . $value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Sanitize all values in a row for spreadsheet export
+     *
+     * @param array $row The row data
+     * @return array The sanitized row
+     * @since 5.9.0
+     */
+    private static function sanitizeRow(array $row): array
+    {
+        return array_map([self::class, 'sanitizeCellValue'], $row);
+    }
+
+    /**
      * Create a download response
      *
      * @param string $content File content
@@ -494,6 +555,12 @@ class ExportHelper
      */
     private static function createResponse(string $content, string $filename, string $contentType): Response
     {
+        // Sanitize filename to prevent header injection
+        // Remove path traversal, control characters, and problematic characters
+        $filename = basename($filename);
+        $filename = preg_replace('/[\x00-\x1f\x7f"\\\\]/', '', $filename);
+        $filename = $filename ?: 'export';
+
         $response = Craft::$app->getResponse();
         $response->headers->set('Content-Type', $contentType . '; charset=utf-8');
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');

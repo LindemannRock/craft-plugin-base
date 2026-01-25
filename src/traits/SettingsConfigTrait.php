@@ -94,19 +94,28 @@ trait SettingsConfigTrait
             return false;
         }
 
+        $env = Craft::$app->getConfig()->env;
+
         // Handle dot notation for nested config (e.g., 'backends.algolia.enabled')
         if (str_contains($attribute, '.')) {
             $parts = explode('.', $attribute);
-            $current = $rawConfig;
 
-            foreach ($parts as $part) {
-                if (!is_array($current) || !array_key_exists($part, $current)) {
-                    return false;
-                }
-                $current = $current[$part];
+            // Check root level
+            if (self::hasNestedKey($rawConfig, $parts)) {
+                return true;
             }
 
-            return true;
+            // Check environment-specific config
+            if ($env && is_array($rawConfig[$env] ?? null) && self::hasNestedKey($rawConfig[$env], $parts)) {
+                return true;
+            }
+
+            // Check wildcard config ('*')
+            if (is_array($rawConfig['*'] ?? null) && self::hasNestedKey($rawConfig['*'], $parts)) {
+                return true;
+            }
+
+            return false;
         }
 
         // Check root level (use array_key_exists to detect null values)
@@ -115,7 +124,6 @@ trait SettingsConfigTrait
         }
 
         // Check environment-specific config (e.g., 'production', 'dev')
-        $env = Craft::$app->getConfig()->env;
         if ($env && is_array($rawConfig[$env] ?? null) && array_key_exists($attribute, $rawConfig[$env])) {
             return true;
         }
@@ -126,6 +134,28 @@ trait SettingsConfigTrait
         }
 
         return false;
+    }
+
+    /**
+     * Check if a nested key exists in an array
+     *
+     * @param array $array The array to check
+     * @param array $parts The key parts (from exploding dot notation)
+     * @return bool True if the nested key exists
+     * @since 5.9.0
+     */
+    private static function hasNestedKey(array $array, array $parts): bool
+    {
+        $current = $array;
+
+        foreach ($parts as $part) {
+            if (!is_array($current) || !array_key_exists($part, $current)) {
+                return false;
+            }
+            $current = $current[$part];
+        }
+
+        return true;
     }
 
     /**

@@ -13,11 +13,12 @@
       stretch: false,      // true = full width with margin-inline: calc(var(--padding) * -1 + 2px)
       boxId: null,         // optional id for outer div (for JS targeting)
       messageId: null,     // optional id for message span (for JS text updates)
-      hidden: false        // true = starts with display: none (for JS-driven show/hide)
+      hidden: false,       // true = starts with display: none (for JS-driven show/hide)
+      allowHtml: true,     // default true for internal admin templates; set false for untrusted content
   } %}
 
   @link      https://lindemannrock.com
-  @copyright Copyright (c) 2025 LindemannRock
+  @copyright Copyright (c) 2026 LindemannRock
 #}
 
 {% set iconType = type ?? 'info' %}
@@ -90,6 +91,6 @@
                 <text x="8" y="12" text-anchor="middle" font-size="11" font-weight="bold" fill="currentColor">i</text>
             </svg>
         {% endif %}
-        <span{% if messageId is defined and messageId %} id={{ messageId }}{% endif %}>{{ message|raw }}</span>
+        <span{% if messageId is defined and messageId %} id="{{ messageId }}"{% endif %}>{{ (allowHtml ?? true) ? message|raw : message }}</span>
     </p>
 </div>
