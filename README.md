@@ -225,6 +225,9 @@ public function init(): void
 | `PluginHelper::registerTranslations()` | Register translation messages for a plugin |
 | `PluginHelper::getCacheBasePath()` | Get the cache base path for a plugin |
 | `PluginHelper::getCachePath()` | Get a specific cache type path for a plugin |
+| `PluginHelper::isPluginEnabled()` | Check if a plugin is installed and enabled |
+| `PluginHelper::isPluginInstalled()` | Check if a plugin is installed (may not be enabled) |
+| `PluginHelper::getPlugin()` | Get a plugin instance (null if not available) |
 | `GeoHelper::getCountryName()` | Convert ISO 3166-1 alpha-2 country code to name |
 | `GeoHelper::getAllCountries()` | Get all 249 countries as code => name array |
 | `GeoHelper::isValidCountryCode()` | Validate a country code |
@@ -266,6 +269,36 @@ $autocompleteCache = PluginHelper::getCachePath($plugin, 'autocomplete');
 $deviceCache = PluginHelper::getCachePath($plugin, 'device');
 // Returns: storage/runtime/my-plugin/cache/device/
 ```
+
+### Plugin Detection Helpers
+
+Check if other plugins are installed/enabled before using their APIs:
+
+```php
+use lindemannrock\base\helpers\PluginHelper;
+
+// Check if a plugin is installed AND enabled (most common)
+if (PluginHelper::isPluginEnabled('redirect-manager')) {
+    // Safe to use Redirect Manager's API
+}
+
+// Check if installed (regardless of enabled state)
+if (PluginHelper::isPluginInstalled('formie')) {
+    // Plugin files exist
+}
+
+// Get the plugin instance to access its services/settings
+$formie = PluginHelper::getPlugin('formie');
+if ($formie !== null) {
+    $settings = $formie->getSettings();
+}
+```
+
+| Method | Returns | Use Case |
+|--------|---------|----------|
+| `isPluginEnabled($handle)` | `bool` | Check before using plugin's API |
+| `isPluginInstalled($handle)` | `bool` | Check if files exist (may be disabled) |
+| `getPlugin($handle)` | `?PluginInterface` | Access plugin services/settings |
 
 ### GeoHelper Usage
 

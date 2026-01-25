@@ -237,4 +237,49 @@ class PluginHelper
     {
         return self::getCacheBasePath($plugin) . $type . '/';
     }
+
+    // =========================================================================
+    // PLUGIN DETECTION HELPERS
+    // =========================================================================
+
+    /**
+     * Check if a plugin is installed and enabled
+     *
+     * Use this to check for optional plugin dependencies before using their APIs.
+     *
+     * @param string $handle Plugin handle (e.g., 'redirect-manager', 'formie')
+     * @return bool True if plugin is installed and enabled
+     * @since 5.9.0
+     */
+    public static function isPluginEnabled(string $handle): bool
+    {
+        return Craft::$app->plugins->isPluginEnabled($handle);
+    }
+
+    /**
+     * Check if a plugin is installed (may not be enabled)
+     *
+     * @param string $handle Plugin handle
+     * @return bool True if plugin is installed (regardless of enabled state)
+     * @since 5.9.0
+     */
+    public static function isPluginInstalled(string $handle): bool
+    {
+        return Craft::$app->plugins->isPluginInstalled($handle);
+    }
+
+    /**
+     * Get a plugin instance
+     *
+     * Returns the plugin instance if installed and enabled, null otherwise.
+     * Useful when you need to access the plugin's services or settings.
+     *
+     * @param string $handle Plugin handle
+     * @return PluginInterface|null Plugin instance or null
+     * @since 5.9.0
+     */
+    public static function getPlugin(string $handle): ?PluginInterface
+    {
+        return Craft::$app->plugins->getPlugin($handle);
+    }
 }
