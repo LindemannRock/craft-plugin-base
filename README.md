@@ -1333,7 +1333,7 @@ A reusable layout for building consistent table/listing pages in the Control Pan
         columns: [
             {key: 'dateCreated', label: 'Created'|t('my-plugin'), sortable: true},
             {key: 'name', label: 'Name'|t('my-plugin'), sortable: true},
-            {key: 'status', label: 'Status'|t('my-plugin'), sortable: true},
+            {key: 'status', label: 'Status'|t('my-plugin'), sortable: true, hideable: true},
         ],
         items: items,
         emptyMessage: 'No items found.'|t('my-plugin'),
@@ -1415,7 +1415,7 @@ A reusable layout for building consistent table/listing pages in the Control Pan
 | `search.value` | string | `''` | Current search value |
 | `sort.field` | string | `'dateCreated'` | Current sort field |
 | `sort.direction` | string | `'desc'` | Sort direction (asc/desc) |
-| `table.columns` | array | `[]` | Column definitions with `key`, `label`, `sortable`, `width` |
+| `table.columns` | array | `[]` | Column definitions with `key`, `label`, `sortable`, `hideable`, `width` |
 | `table.items` | array | `[]` | Data items to display |
 | `table.emptyMessage` | string | `'No items found.'` | Message when no items |
 | `table.expandable` | bool | `false` | Enable click-to-expand rows |
@@ -1429,6 +1429,30 @@ A reusable layout for building consistent table/listing pages in the Control Pan
 | `ajax.enabled` | bool | `false` | Enable auto-refresh |
 | `ajax.interval` | int | `0` | Refresh interval in seconds |
 | `ajax.endpoint` | string | `''` | AJAX endpoint URL |
+
+### AJAX Auto-Refresh
+
+Enable automatic data refresh with a subtle countdown indicator in the footer:
+
+```twig
+{% set tableConfig = {
+    ajax: {
+        enabled: settings.refreshIntervalSecs > 0,
+        interval: settings.refreshIntervalSecs,  // seconds
+        endpoint: actionUrl('my-plugin/items/get-data'),
+    },
+} %}
+```
+
+When enabled, a refresh icon with countdown timer appears inline with the pagination (e.g., "1 – 10 of 26 items | ↻ 45s"). The icon animates green while refreshing.
+
+Listen for refresh data in your custom scripts:
+
+```javascript
+document.addEventListener('lr:refresh', function(e) {
+    console.log(e.detail);  // Refresh response data
+});
+```
 
 ### Expandable Rows
 
@@ -1447,6 +1471,31 @@ Enable click-to-expand rows for showing additional details:
     <pre>{{ item.context }}</pre>
 {% endblock %}
 ```
+
+### View Button (Column Visibility)
+
+When any column has `hideable: true`, a "View" button automatically appears in the toolbar allowing users to:
+
+- **Sort by**: Change sort field and direction (only shows visible sortable columns)
+- **Table Columns**: Show/hide columns via checkboxes
+- **Use defaults**: Reset to default column visibility
+- Settings persist in localStorage per plugin/page
+
+```twig
+table: {
+    columns: [
+        {key: 'name', label: 'Name', sortable: true},              // Always visible, sortable
+        {key: 'email', label: 'Email', sortable: true, hideable: true},  // Sortable + can be hidden
+        {key: 'status', label: 'Status', hideable: true},          // Can be hidden (not sortable)
+        {key: 'provider', label: 'Provider'},                      // Always visible, not sortable
+    ],
+}
+```
+
+**Column properties:**
+- `hideable: true` - Column appears in "Table Columns" section with checkbox
+- `sortable: true` - Column appears in "Sort by" dropdown (hidden columns are excluded)
+- Non-hideable columns (like primary name/ID) are always visible
 
 ### New Button
 

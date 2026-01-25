@@ -21,7 +21,11 @@
  # │     filters: [...],                                             │
  # │     search: {placeholder: 'Search logs...', value: search},     │
  # │     table: {                                                    │
- # │         columns: [...],                                         │
+ # │         columns: [                                              │
+ # │             {key: 'name', label: 'Name', sortable: true},       │
+ # │             {key: 'email', label: 'Email', hideable: true},     │
+ # │             {key: 'status', label: 'Status', hideable: true},   │
+ # │         ],                                                      │
  # │         items: logs,                                            │
  # │         emptyMessage: 'No logs found.',                         │
  # │         expandable: true,  // Enable click-to-expand rows       │
@@ -96,6 +100,12 @@
 {% set items = tableConf.items ?? [] %}
 {% set emptyMessage = tableConf.emptyMessage ?? 'No items found.'|t('app') %}
 {% set expandableEnabled = tableConf.expandable ?? false %}
+
+{# View button configuration - only enabled when there are hideable columns #}
+{% set hideableColumns = columns|filter(c => c.hideable ?? false) %}
+{% set sortableColumns = columns|filter(c => c.sortable ?? false) %}
+{% set viewEnabled = hideableColumns|length > 0 %}
+{% set viewStorageKey = 'lr-table-view-' ~ pluginHandle ~ '-' ~ selectedSubnavItem %}
 
 {# Pagination #}
 {% set paginationConfig = config.pagination ?? {} %}
@@ -175,6 +185,69 @@
         {# Toolbar actions (outside form, e.g., Export button) #}
         {% block toolbarActions %}{% endblock %}
 
+        {# View button (column visibility + sort) - using menubtn with disclosure-style content #}
+        {% if viewEnabled %}
+            <div class="btngroup">
+                <button type="button" class="btn menubtn" data-icon="sliders" id="lr-view-btn">
+                    {{ 'View'|t('app') }}
+                </button>
+                <div class="menu menu--disclosure lr-view-menu padded" id="lr-view-menu">
+                    <div class="meta">
+                        {# Sort By Section #}
+                        {% if sortableColumns|length > 0 %}
+                            <fieldset class="field sort-field">
+                                <legend class="visually-hidden" data-label="{{ 'Sort by'|t('app') }}">{{ 'Sort by'|t('app') }}</legend>
+                                <div class="heading"><legend>{{ 'Sort by'|t('app') }}</legend></div>
+                                <div class="input">
+                                    <div class="flex">
+                                        <div class="flex-grow">
+                                            <div class="select fullwidth">
+                                                <select id="lr-sort-field" aria-label="{{ 'Sort attribute'|t('app') }}">
+                                                    {% for col in sortableColumns %}
+                                                        <option value="{{ col.key }}" {{ currentSort == col.key ? 'selected' : '' }}>
+                                                            {{ col.label }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <section class="btngroup btngroup--exclusive" aria-label="{{ 'Sort direction'|t('app') }}">
+                                            <button type="button" class="btn {{ currentDir == 'asc' ? 'active' : '' }}" title="{{ 'Sort ascending'|t('app') }}" aria-label="{{ 'Sort ascending'|t('app') }}" aria-pressed="{{ currentDir == 'asc' ? 'true' : 'false' }}" data-icon="asc" data-dir="asc"></button>
+                                            <button type="button" class="btn {{ currentDir == 'desc' ? 'active' : '' }}" title="{{ 'Sort descending'|t('app') }}" aria-label="{{ 'Sort descending'|t('app') }}" aria-pressed="{{ currentDir == 'desc' ? 'true' : 'false' }}" data-icon="desc" data-dir="desc"></button>
+                                        </section>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        {% endif %}
+
+                        {# Table Columns Section #}
+                        {% if hideableColumns|length > 0 %}
+                            <fieldset class="field table-columns-field">
+                                <legend class="visually-hidden" data-label="{{ 'Table Columns'|t('app') }}">{{ 'Table Columns'|t('app') }}</legend>
+                                <div class="heading"><legend>{{ 'Table Columns'|t('app') }}</legend></div>
+                                <div class="input">
+                                    <div class="checkbox-select">
+                                        {% for col in hideableColumns %}
+                                            <div class="checkbox-select-item">
+                                                <input type="checkbox" value="{{ col.key }}" id="lr-col-{{ col.key }}" class="checkbox" checked>
+                                                <label for="lr-col-{{ col.key }}">{{ col.label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </fieldset>
+                        {% endif %}
+                    </div>
+                    <div class="flex menu-footer">
+                        <div class="flex-grow">
+                            <button type="button" class="light" id="lr-view-defaults">{{ 'Use defaults'|t('app') }}</button>
+                        </div>
+                        <button type="button" class="btn" id="lr-view-close">{{ 'Close'|t('app') }}</button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         {# New button #}
         {% if newButton and (not newButton.permission or currentUser.can(newButton.permission)) %}
             <a href="{{ newButton.url }}" class="btn submit add icon" id="lr-new-btn">
@@ -252,6 +325,37 @@
             max-width: 500px;
             overflow-x: auto;
         }
+
+        /* View menu */
+        .lr-view-menu { min-width: 280px; }
+
+        /* Column visibility */
+        .lr-column-hidden { display: none !important; }
+
+        /* AJAX refresh notice - inline minimal style */
+        .lr-refresh-notice {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid #e3e5e8;
+            cursor: default;
+        }
+        .lr-refresh-notice svg {
+            width: 12px;
+            height: 12px;
+            opacity: 0.5;
+        }
+        .lr-refresh-notice.is-refreshing svg {
+            opacity: 1;
+            stroke: #10b981;
+            animation: lr-spin 1s linear infinite;
+        }
+        @keyframes lr-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 
     {# Content before table (warnings, info boxes, etc.) #}
@@ -274,14 +378,18 @@
                             {% if column.sortable ?? false %}
                                 <th scope="col"
                                     data-attribute="{{ column.key }}"
-                                    class="orderable {{ currentSort == column.key ? 'ordered ' ~ currentDir : '' }}"
+                                    data-column="{{ column.key }}"
+                                    class="orderable {{ currentSort == column.key ? 'ordered ' ~ currentDir : '' }}{{ column.hideable ?? false ? ' lr-hideable-column' : '' }}"
                                     {% if column.width ?? false %}style="width: {{ column.width }};"{% endif %}>
                                     <button type="button" data-sort="{{ column.key }}">
                                         {{ column.label }}
                                     </button>
                                 </th>
                             {% else %}
-                                <th scope="col" {% if column.width ?? false %}style="width: {{ column.width }};"{% endif %}>
+                                <th scope="col"
+                                    data-column="{{ column.key }}"
+                                    class="{{ column.hideable ?? false ? 'lr-hideable-column' : '' }}"
+                                    {% if column.width ?? false %}style="width: {{ column.width }};"{% endif %}>
                                     {{ column.label }}
                                 </th>
                             {% endif %}
@@ -311,7 +419,8 @@
                                 {# Data cells - can be overridden #}
                                 {% block tableRow %}
                                     {% for column in columns %}
-                                        <td {% if column.nowrap ?? false %}class="nowrap"{% endif %}
+                                        <td data-column="{{ column.key }}"
+                                            class="{{ column.nowrap ?? false ? 'nowrap' : '' }}{{ column.hideable ?? false ? ' lr-hideable-column' : '' }}"
                                             {% if column.style ?? false %}style="{{ column.style }}"{% endif %}>
                                             {% if column.template ?? false %}
                                                 {{ include(template_from_string(column.template)) }}
@@ -366,6 +475,15 @@
                         {{ 'no'|t('app') }} {{ itemLabel.plural }}
                     {% else %}
                         {{ (offset + 1)|number_format }} – {{ endRange|number_format }} {{ 'of'|t('app') }} {{ totalCount|number_format }} {{ totalCount == 1 ? itemLabel.singular : itemLabel.plural }}
+                    {% endif %}
+                    {# AJAX refresh notice (inline with page info) #}
+                    {% if ajaxEnabled and ajaxInterval > 0 %}
+                        <span class="lr-refresh-notice" id="lr-refresh-notice" title="{{ 'Auto-refresh'|t('app') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M13.5 8a5.5 5.5 0 1 1-1.5-3.8M13.5 2v4h-4"/>
+                            </svg>
+                            <span class="lr-refresh-text"></span>
+                        </span>
                     {% endif %}
                 </div>
             </div>
@@ -437,7 +555,26 @@
             totalPages: {{ totalPages }},
             urlParams: {{ urlParams|json_encode|raw }},
             baseUrl: '{{ url(pluginHandle ~ '/' ~ selectedSubnavItem) }}',
+            viewEnabled: {{ viewEnabled ? 'true' : 'false' }},
+            viewStorageKey: '{{ viewStorageKey }}',
+            hideableColumns: {{ hideableColumns|map(c => c.key)|values|json_encode|raw }},
+            columnKeys: {{ columns|map(c => c.key)|values|json_encode|raw }},
         };
+
+        // Auto-assign data-column attributes based on column index
+        // This ensures View button works even with custom tableRow blocks
+        (function() {
+            const startIndex = config.checkboxesEnabled ? 1 : 0;
+            document.querySelectorAll('#lr-table-body .lr-data-row').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                config.columnKeys.forEach((key, i) => {
+                    const cell = cells[startIndex + i];
+                    if (cell && !cell.hasAttribute('data-column')) {
+                        cell.setAttribute('data-column', key);
+                    }
+                });
+            });
+        })();
 
         // Initialize menu buttons
         document.querySelectorAll('.menubtn').forEach(btn => {
@@ -472,14 +609,16 @@
 
         // Build URL with params
         function buildUrl(overrides = {}) {
-            const params = new URLSearchParams();
-            const merged = { ...config.urlParams, ...overrides };
-            for (const [key, value] of Object.entries(merged)) {
+            const params = new URLSearchParams(window.location.search);
+            // Apply overrides
+            for (const [key, value] of Object.entries(overrides)) {
                 if (value !== null && value !== undefined && value !== '') {
                     params.set(key, value);
+                } else {
+                    params.delete(key);
                 }
             }
-            return config.baseUrl + '?' + params.toString();
+            return window.location.pathname + '?' + params.toString();
         }
 
         // Sort buttons
@@ -589,14 +728,39 @@
             });
         });
 
-        // AJAX Auto-refresh
+        // AJAX Auto-refresh with subtle notice
         if (config.ajaxEnabled && config.ajaxInterval > 0) {
             let refreshTimer;
+            let countdownTimer;
+            let countdown = config.ajaxInterval;
             let isRefreshing = false;
+            const noticeEl = document.getElementById('lr-refresh-notice');
+            const textEl = noticeEl ? noticeEl.querySelector('.lr-refresh-text') : null;
+
+            function formatTime(seconds) {
+                if (seconds >= 60) {
+                    const mins = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    return secs > 0 ? mins + 'm ' + secs + 's' : mins + 'm';
+                }
+                return seconds + 's';
+            }
+
+            function updateNotice() {
+                if (!noticeEl || !textEl) return;
+                if (isRefreshing) {
+                    noticeEl.classList.add('is-refreshing');
+                    textEl.textContent = '{{ "Refreshing"|t("app") }}';
+                } else {
+                    noticeEl.classList.remove('is-refreshing');
+                    textEl.textContent = formatTime(countdown);
+                }
+            }
 
             async function refresh() {
                 if (isRefreshing) return;
                 isRefreshing = true;
+                updateNotice();
 
                 try {
                     const params = new URLSearchParams(config.urlParams);
@@ -612,40 +776,28 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        // Dispatch event for plugin to handle rendering
                         document.dispatchEvent(new CustomEvent('lr:refresh', { detail: data }));
                     }
                 } catch (error) {
                     console.error('Refresh failed:', error);
                 } finally {
                     isRefreshing = false;
+                    countdown = config.ajaxInterval;
+                    updateNotice();
                 }
             }
 
-            function startAutoRefresh() {
-                refreshTimer = setInterval(refresh, config.ajaxInterval * 1000);
-            }
-
-            function stopAutoRefresh() {
-                if (refreshTimer) {
-                    clearInterval(refreshTimer);
-                    refreshTimer = null;
+            function tickCountdown() {
+                if (!isRefreshing && countdown > 0) {
+                    countdown--;
+                    updateNotice();
                 }
             }
 
-            startAutoRefresh();
-
-            // Pause on interaction
-            let pauseTimeout;
-            function resetPause() {
-                stopAutoRefresh();
-                clearTimeout(pauseTimeout);
-                pauseTimeout = setTimeout(startAutoRefresh, 5000);
-            }
-
-            document.addEventListener('click', resetPause);
-            document.addEventListener('keydown', resetPause);
-            document.addEventListener('scroll', resetPause);
+            // Start auto-refresh
+            updateNotice();
+            refreshTimer = setInterval(refresh, config.ajaxInterval * 1000);
+            countdownTimer = setInterval(tickCountdown, 1000);
         }
 
         // Config tooltip for config-based items (shows PHP config code on hover)
@@ -689,6 +841,194 @@
                 }
             });
         });
+
+        // View button functionality (column visibility + sort from menu)
+        if (config.viewEnabled) {
+            const viewBtn = document.getElementById('lr-view-btn');
+            const viewMenu = document.getElementById('lr-view-menu');
+            const sortSelect = document.getElementById('lr-sort-field');
+
+            // After Garnish initializes, get the menu instance
+            let $menu = null;
+            setTimeout(function() {
+                if (viewBtn.menubtn && viewBtn.menubtn.$menu) {
+                    $menu = viewBtn.menubtn.$menu;
+
+                    // Prevent menu close when clicking inside the menu content area
+                    $menu.on('click mousedown', '.meta, .checkbox-select, .select, .btngroup, .field, select, option', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+            }, 100);
+
+            // Also handle select directly with native JS (backup)
+            if (sortSelect) {
+                sortSelect.addEventListener('mousedown', function(e) {
+                    e.stopPropagation();
+                });
+                sortSelect.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Close button
+            const closeBtn = document.getElementById('lr-view-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Dispatch escape key to close menu properly
+                    viewBtn.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', keyCode: 27, bubbles: true}));
+                });
+            }
+
+            // Use defaults button
+            const defaultsBtn = document.getElementById('lr-view-defaults');
+            if (defaultsBtn) {
+                defaultsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem(config.viewStorageKey);
+                    window.location.reload();
+                });
+            }
+
+            // Sort field select
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    window.location.href = buildUrl({ sort: this.value, dir: config.currentDir, page: 1 });
+                });
+            }
+
+            // Sort direction buttons
+            document.querySelectorAll('.lr-view-menu .btngroup--exclusive button[data-dir]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const newDir = this.dataset.dir;
+                    if (newDir !== config.currentDir) {
+                        window.location.href = buildUrl({ sort: config.currentSort, dir: newDir, page: 1 });
+                    }
+                });
+            });
+
+            // Update sort dropdown when columns are hidden/shown
+            function updateSortOptions() {
+                if (!sortSelect) return;
+                const hiddenColumns = getHiddenColumns();
+                sortSelect.querySelectorAll('option').forEach(option => {
+                    if (hiddenColumns.includes(option.value)) {
+                        option.disabled = true;
+                        option.style.display = 'none';
+                    } else {
+                        option.disabled = false;
+                        option.style.display = '';
+                    }
+                });
+                // If current sort column is now hidden, reset to first visible
+                if (hiddenColumns.includes(sortSelect.value)) {
+                    const firstVisible = sortSelect.querySelector('option:not([disabled])');
+                    if (firstVisible) {
+                        window.location.href = buildUrl({ sort: firstVisible.value, dir: config.currentDir, page: 1 });
+                    }
+                }
+            }
+            // Get stored view settings from localStorage
+            function getStoredViewSettings() {
+                try {
+                    const stored = localStorage.getItem(config.viewStorageKey);
+                    return stored ? JSON.parse(stored) : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            // Save view settings to localStorage
+            function saveViewSettings(settings) {
+                try {
+                    localStorage.setItem(config.viewStorageKey, JSON.stringify(settings));
+                } catch (e) {
+                    console.warn('Failed to save view settings:', e);
+                }
+            }
+
+            // Toggle column visibility
+            function toggleColumnVisibility(columnKey, visible) {
+                const cells = document.querySelectorAll('[data-column="' + columnKey + '"]');
+                cells.forEach(cell => {
+                    if (visible) {
+                        cell.classList.remove('lr-column-hidden');
+                    } else {
+                        cell.classList.add('lr-column-hidden');
+                    }
+                });
+            }
+
+            // Update colspan for empty row and expandable rows
+            function updateColspans() {
+                const visibleColumns = document.querySelectorAll('thead th:not(.lr-column-hidden)').length;
+                document.querySelectorAll('.lr-empty-row td, .lr-context-row td').forEach(td => {
+                    td.setAttribute('colspan', visibleColumns);
+                });
+            }
+
+            // Apply stored settings on load
+            function applyStoredSettings() {
+                const settings = getStoredViewSettings();
+                if (!settings) return;
+
+                // Apply hidden columns
+                if (settings.hiddenColumns && Array.isArray(settings.hiddenColumns)) {
+                    settings.hiddenColumns.forEach(columnKey => {
+                        toggleColumnVisibility(columnKey, false);
+                        // Uncheck the checkbox in the menu
+                        const checkbox = document.getElementById('lr-col-' + columnKey);
+                        if (checkbox) checkbox.checked = false;
+                    });
+                    updateColspans();
+                }
+            }
+
+            // Get current hidden columns from checkboxes
+            function getHiddenColumns() {
+                const hidden = [];
+                config.hideableColumns.forEach(columnKey => {
+                    const checkbox = document.getElementById('lr-col-' + columnKey);
+                    if (checkbox && !checkbox.checked) {
+                        hidden.push(columnKey);
+                    }
+                });
+                return hidden;
+            }
+
+            // Initialize column checkboxes (using Craft's checkbox-select-item class)
+            document.querySelectorAll('.lr-view-menu .checkbox-select-item input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const columnKey = this.value;
+                    const visible = this.checked;
+                    toggleColumnVisibility(columnKey, visible);
+                    updateColspans();
+                    updateSortOptions();
+
+                    // Save settings
+                    saveViewSettings({
+                        hiddenColumns: getHiddenColumns()
+                    });
+                });
+            });
+
+            // Apply stored settings on page load
+            applyStoredSettings();
+            updateSortOptions();
+
+            // Expose view functions globally
+            window.lrViewSettings = {
+                get: getStoredViewSettings,
+                save: saveViewSettings,
+                toggleColumn: toggleColumnVisibility,
+                getHiddenColumns: getHiddenColumns,
+                reset: function() {
+                    localStorage.removeItem(config.viewStorageKey);
+                    location.reload();
+                }
+            };
+        }
 
         // Expose config globally for plugins
         window.lrTableConfig = config;
