@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.10.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.0...v5.10.1) (2026-01-26)
+
+
+### Bug Fixes
+
+* remove premature getTwig call in Twig extension registration ([36f07f4](https://github.com/LindemannRock/craft-plugin-base/commit/36f07f458a1fabfce95e60b05dc2f1d1c4256972))
+
 ## [5.10.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.9.0...v5.10.0) (2026-01-26)
 
 
