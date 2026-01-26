@@ -17,6 +17,7 @@ use craft\web\View;
 use lindemannrock\base\twigextensions\ColorExtension;
 use lindemannrock\base\twigextensions\DateTimeExtension;
 use lindemannrock\base\twigextensions\ExportExtension;
+use lindemannrock\base\twigextensions\PluginExtension;
 use yii\base\Event;
 use yii\base\Module;
 
@@ -77,6 +78,7 @@ class Base extends Module
             Craft::$app->getView()->registerTwigExtension(new DateTimeExtension());
             Craft::$app->getView()->registerTwigExtension(new ColorExtension());
             Craft::$app->getView()->registerTwigExtension(new ExportExtension());
+            Craft::$app->getView()->registerTwigExtension(new PluginExtension());
         }
 
         self::$registered = true;
