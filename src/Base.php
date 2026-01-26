@@ -12,7 +12,6 @@ namespace lindemannrock\base;
 
 use Craft;
 use craft\events\RegisterTemplateRootsEvent;
-use craft\web\twig\Environment;
 use craft\web\View;
 use lindemannrock\base\twigextensions\ColorExtension;
 use lindemannrock\base\twigextensions\DateTimeExtension;
@@ -74,12 +73,11 @@ class Base extends Module
         );
 
         // Register Twig extensions
-        if (Craft::$app->getView()->getTwig() instanceof Environment) {
-            Craft::$app->getView()->registerTwigExtension(new DateTimeExtension());
-            Craft::$app->getView()->registerTwigExtension(new ColorExtension());
-            Craft::$app->getView()->registerTwigExtension(new ExportExtension());
-            Craft::$app->getView()->registerTwigExtension(new PluginExtension());
-        }
+        // Note: registerTwigExtension() queues extensions - no need to check if Twig exists
+        Craft::$app->getView()->registerTwigExtension(new DateTimeExtension());
+        Craft::$app->getView()->registerTwigExtension(new ColorExtension());
+        Craft::$app->getView()->registerTwigExtension(new ExportExtension());
+        Craft::$app->getView()->registerTwigExtension(new PluginExtension());
 
         self::$registered = true;
     }
