@@ -1,0 +1,60 @@
+{#
+ # Status Dot Component
+ #
+ # Renders just the status dot indicator (no label).
+ # Uses same color system as the badge component.
+ #
+ # Usage with colorSet:
+ # {% include 'lindemannrock-base/_components/status-dot' with {
+ #     value: 'active',
+ #     colorSet: 'pluginStatus',
+ # } only %}
+ #
+ # Usage with Craft status class:
+ # {% include 'lindemannrock-base/_components/status-dot' with {
+ #     status: 'enabled',
+ # } only %}
+ #
+ # With custom size:
+ # {% include 'lindemannrock-base/_components/status-dot' with {
+ #     value: 'active',
+ #     colorSet: 'pluginStatus',
+ #     size: 8,
+ # } only %}
+ #
+ # Parameters:
+ # - status: Craft's built-in status class (enabled, disabled, live, off, etc.)
+ # - value: Value to look up in colorSet
+ # - colorSet: Name of predefined color set from ColorHelper
+ # - size: Optional dot size in pixels (default: uses Craft's default)
+ # - title: Optional tooltip
+ #}
+
+{% set dotClass = '' %}
+{% set inlineStyle = '' %}
+
+{# Option 1: Direct status class #}
+{% if status is defined and status %}
+    {% set dotClass = status %}
+
+{# Option 2: Color set lookup #}
+{% elseif colorSet is defined and value is defined %}
+    {% set valueColors = lrSetColor(colorSet, value) %}
+
+    {# Use dot class if specified, otherwise use the color class #}
+    {% if valueColors.dot is defined and valueColors.dot %}
+        {% set dotClass = valueColors.dot %}
+    {% elseif valueColors.class is defined and valueColors.class %}
+        {% set dotClass = valueColors.class %}
+    {% else %}
+        {# Fallback to inline style #}
+        {% set inlineStyle = 'background: ' ~ valueColors.color ~ ';' %}
+    {% endif %}
+{% endif %}
+
+{# Size styling #}
+{% if size is defined and size %}
+    {% set inlineStyle = inlineStyle ~ ' width: ' ~ size ~ 'px; height: ' ~ size ~ 'px;' %}
+{% endif %}
+
+<span class="status {{ dotClass }}"{% if inlineStyle %} style="{{ inlineStyle }}"{% endif %}{% if title is defined and title %} title="{{ title }}"{% endif %}></span>
