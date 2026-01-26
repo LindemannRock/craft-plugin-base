@@ -282,4 +282,33 @@ class PluginHelper
     {
         return Craft::$app->plugins->getPlugin($handle);
     }
+
+    /**
+     * Get a plugin's display name (respects custom pluginName setting)
+     *
+     * Returns the plugin's display name, checking for a custom `pluginName`
+     * in settings first, then falling back to the default plugin name.
+     *
+     * @param string $handle Plugin handle
+     * @param string|null $fallback Fallback name if plugin not found (defaults to handle)
+     * @return string The plugin's display name
+     * @since 5.9.0
+     */
+    public static function getPluginName(string $handle, ?string $fallback = null): string
+    {
+        $plugin = self::getPlugin($handle);
+
+        if (!$plugin) {
+            return $fallback ?? $handle;
+        }
+
+        // Check for custom pluginName in settings
+        $settings = $plugin->getSettings();
+        if ($settings && property_exists($settings, 'pluginName') && !empty($settings->pluginName)) {
+            return $settings->pluginName;
+        }
+
+        // Fall back to default plugin name
+        return $plugin->name;
+    }
 }
