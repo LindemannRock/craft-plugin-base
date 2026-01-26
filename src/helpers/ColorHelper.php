@@ -279,11 +279,12 @@ class ColorHelper
 
             // =================================================================
             // PLUGIN STATUS - active = teal, disabled = gray, notInstalled = red
+            // dot uses Craft's semantic classes (enabled/disabled/off) not color names
             // =================================================================
             'pluginStatus' => [
-                'active' => self::PALETTE['teal'],
-                'disabled' => self::PALETTE['gray'],
-                'notInstalled' => self::PALETTE['red'],
+                'active' => array_merge(self::PALETTE['teal'], ['dot' => 'enabled']),
+                'disabled' => array_merge(self::PALETTE['gray'], ['dot' => 'disabled']),
+                'notInstalled' => array_merge(self::PALETTE['red'], ['dot' => 'off']),
             ],
 
             // =================================================================

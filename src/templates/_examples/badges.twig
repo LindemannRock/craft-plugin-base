@@ -226,6 +226,31 @@
         </div>
     </div>
 
+    {# PLUGIN STATUS #}
+    <div class="color-set-section">
+        <div class="color-set-title">pluginStatus</div>
+        <p class="color-set-desc">Plugin installation state: active = teal, disabled = gray, notInstalled = red</p>
+        <div class="badges-row">
+            {% for value in ['active', 'disabled', 'notInstalled'] %}
+                {% set colors = lrSetColor('pluginStatus', value) %}
+                <div class="badge-item">
+                    {% include 'lindemannrock-base/_components/badge' with {
+                        label: value,
+                        value: value,
+                        colorSet: 'pluginStatus',
+                    } only %}
+                    <span class="badge-value">{{ value }}</span>
+                    <span class="badge-class">dot: {{ colors.dot ?? 'none' }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="usage-code">{% verbatim %}{% include 'lindemannrock-base/_components/badge' with {
+    label: 'Installed & Active',
+    value: 'active',
+    colorSet: 'pluginStatus',
+} only %}{% endverbatim %}</div>
+    </div>
+
     {# DEFAULT/NEUTRAL COLORS #}
     <div class="color-set-section">
         <div class="color-set-title">Default & Neutral Colors</div>
