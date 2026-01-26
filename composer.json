@@ -2,7 +2,7 @@
     "name": "lindemannrock/craft-plugin-base",
     "description": "Common utilities and building blocks for LindemannRock Craft CMS plugins",
     "type": "yii2-module",
-    "version": "5.9.0",
+    "version": "5.10.0",
     "keywords": [
         "craft",
         "cms",
