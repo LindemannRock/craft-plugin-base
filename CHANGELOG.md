@@ -1,5 +1,23 @@
 # Changelog
 
+## [5.10.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.9.0...v5.10.0) (2026-01-26)
+
+
+### Features
+
+* add method to retrieve plugin display name with fallback option ([01965a2](https://github.com/LindemannRock/craft-plugin-base/commit/01965a2864d994b1155544198c24f2546a118383))
+* add plugin detection helpers for checking installation and enabled status ([bdfa720](https://github.com/LindemannRock/craft-plugin-base/commit/bdfa720c8b8ec559f76f4c5d13e3cf3129eb8da6))
+* add plugin status definitions with color coding for active, disabled, and not installed states ([be9440e](https://github.com/LindemannRock/craft-plugin-base/commit/be9440e2120c60df4572bfc665e8caf029dc0824))
+* add PluginExtension for plugin detection and name lookup in Twig ([579d1dc](https://github.com/LindemannRock/craft-plugin-base/commit/579d1dc6da8cd7b7cc343e7734d3a5c9b604a497))
+* add Status Dot Component for rendering status indicators with customizable options ([aaed810](https://github.com/LindemannRock/craft-plugin-base/commit/aaed81007b9282a462c645b0bc0b5a7297fc4563))
+* enhance table layout with view button for column visibility and sorting options ([66f1179](https://github.com/LindemannRock/craft-plugin-base/commit/66f11793b184f92206dbef75cb70d1bb775e1171))
+
+
+### Bug Fixes
+
+* plugin status colors with additional dot indicators for active, disabled, and not installed states ([9a41f7f](https://github.com/LindemannRock/craft-plugin-base/commit/9a41f7f31dada2aff2ffe1989d9cc0ce0ee06ca9))
+* **security:** address export and config vulnerabilities in base plugin ([1224bf0](https://github.com/LindemannRock/craft-plugin-base/commit/1224bf07e231a492491e2242883228c1db6be353))
+
 ## [5.9.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.8.0...v5.9.0) (2026-01-24)
 
 
