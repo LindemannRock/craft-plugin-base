@@ -292,6 +292,10 @@ $formie = PluginHelper::getPlugin('formie');
 if ($formie !== null) {
     $settings = $formie->getSettings();
 }
+
+// Get the plugin's display name (respects custom pluginName setting)
+$name = PluginHelper::getPluginName('redirect-manager');  // "Redirect Manager" or custom name
+$name = PluginHelper::getPluginName('missing-plugin', 'Fallback Name');  // "Fallback Name"
 ```
 
 | Method | Returns | Use Case |
@@ -299,6 +303,27 @@ if ($formie !== null) {
 | `isPluginEnabled($handle)` | `bool` | Check before using plugin's API |
 | `isPluginInstalled($handle)` | `bool` | Check if files exist (may be disabled) |
 | `getPlugin($handle)` | `?PluginInterface` | Access plugin services/settings |
+| `getPluginName($handle, $fallback)` | `string` | Get display name (respects custom names) |
+
+#### Twig Usage
+
+```twig
+{# Check if plugin is enabled #}
+{% if lrPluginEnabled('formie') %}
+    <p>Formie integration available</p>
+{% endif %}
+
+{# Get plugin display name (respects custom pluginName setting) #}
+{{ lrPluginName('redirect-manager') }}
+
+{# With fallback for dynamic/unknown plugins #}
+{{ lrPluginName(item.sourcePlugin, item.sourcePlugin|replace({'-': ' '})|title) }}
+```
+
+| Function | Returns | Use Case |
+|----------|---------|----------|
+| `lrPluginEnabled(handle)` | `bool` | Conditional plugin features |
+| `lrPluginName(handle, fallback)` | `string` | Display plugin names in UI |
 
 ### GeoHelper Usage
 
@@ -905,6 +930,7 @@ ColorHelper provides a unified `PALETTE` constant with all available colors. Thi
 | `priority` | low, normal, high, critical | Priority levels |
 | `httpStatus` | success, redirect, client_error, server_error | HTTP response types |
 | `logLevel` | debug, info, warning, error | Log severity levels |
+| `pluginStatus` | active, disabled, notInstalled | Plugin installation state |
 | `exportStatus` | pending, processing, completed, failed | Export/job status |
 
 ### PHP Usage

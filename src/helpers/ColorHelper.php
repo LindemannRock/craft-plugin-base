@@ -278,6 +278,15 @@ class ColorHelper
             ],
 
             // =================================================================
+            // PLUGIN STATUS - active = teal, disabled = gray, notInstalled = red
+            // =================================================================
+            'pluginStatus' => [
+                'active' => self::PALETTE['teal'],
+                'disabled' => self::PALETTE['gray'],
+                'notInstalled' => self::PALETTE['red'],
+            ],
+
+            // =================================================================
             // EXPORT/JOB STATUS - pending = orange, processing = blue, completed = teal, failed = red
             // =================================================================
             'exportStatus' => [
