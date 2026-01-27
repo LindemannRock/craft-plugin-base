@@ -314,6 +314,16 @@ class ColorHelper
                 'csv' => self::PALETTE['cyan'],
                 'json' => self::PALETTE['amber'],
             ],
+
+            // =================================================================
+            // MESSAGE STATUS - pending = orange, sent = teal, delivered = green, failed = red
+            // =================================================================
+            'messageStatus' => [
+                'pending' => array_merge(self::PALETTE['orange'], ['dot' => 'pending']),
+                'sent' => array_merge(self::PALETTE['teal'], ['dot' => 'enabled']),
+                'delivered' => array_merge(self::PALETTE['green'], ['dot' => 'on']),
+                'failed' => array_merge(self::PALETTE['red'], ['dot' => 'off']),
+            ],
         ];
 
         self::$initialized = true;
