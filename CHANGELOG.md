@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.11.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.1...v5.11.0) (2026-01-27)
+
+
+### Features
+
+* add message status colors to ColorHelper ([13a8bfc](https://github.com/LindemannRock/craft-plugin-base/commit/13a8bfc9bfe63b33ad123600e8ea64214b919626))
+
 ## [5.10.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.0...v5.10.1) (2026-01-26)
 
 
