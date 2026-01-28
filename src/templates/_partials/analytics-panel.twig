@@ -1,0 +1,310 @@
+{#
+ # Analytics Panel Component
+ #
+ # An embeddable analytics panel for tabs and partials.
+ # Unlike cp-analytics layout, this doesn't extend any layout - just embed it.
+ #
+ # Parameters:
+ # - config: Panel configuration object
+ #   - dateRange: { enabled: true, current: 'last30days', param: 'range', hash: 'analytics' }
+ #   - export: { action: 'my-plugin/export', permission: 'myPlugin:export', extraParams: {} }
+ #   - charts: { enabled: true }  // Load Chart.js (uses same asset as cp-analytics)
+ #
+ # Usage with embed (recommended):
+ #   {% embed 'lindemannrock-base/_partials/analytics-panel' with {
+ #       config: {
+ #           dateRange: { enabled: true, current: dateRange, param: 'range', hash: 'analytics' },
+ #           export: { action: 'my-plugin/analytics/export', permission: 'myPlugin:export', extraParams: {campaignId: campaign.id} },
+ #       }
+ #   } %}
+ #       {% block content %}
+ #           <div class="lr-analytics-stats">
+ #               {% include 'lindemannrock-base/_components/stat-box' with {...} %}
+ #           </div>
+ #           <div class="lr-analytics-charts two-columns">
+ #               <div class="lr-chart-container">
+ #                   <h3>Chart Title</h3>
+ #                   <canvas id="my-chart"></canvas>
+ #               </div>
+ #           </div>
+ #       {% endblock %}
+ #   {% endembed %}
+ #
+ # CSS Classes provided:
+ #   - .lr-analytics-panel: Main wrapper (automatic)
+ #   - .lr-analytics-header: Header with filters/export (automatic)
+ #   - .lr-analytics-stats: Stat boxes grid
+ #   - .lr-stat-box: Individual stat box (use stat-box component)
+ #   - .lr-analytics-charts: Charts grid
+ #   - .lr-analytics-charts.two-columns: Two-column chart layout
+ #   - .lr-chart-container: Chart wrapper
+ #   - .lr-chart-container.full-width: Full-width chart
+ #   - .lr-table-scroll: Scrollable table wrapper
+ #   - .lr-section-heading: Section heading
+ #   - .lr-analytics-empty: Empty state wrapper
+ #
+ # JavaScript (available after lr:panelChartsReady event):
+ #   - window.lrCreateChart(canvasId, type, data, options)
+ #   - window.lrChartColors: Array of chart colors
+ #
+ # Events:
+ #   - lr:panelChartsReady: Fired when Chart.js is loaded and ready
+ #}
+
+{% set config = config ?? {} %}
+
+{# Register AnalyticsAsset bundle - same as cp-analytics, Craft deduplicates automatically #}
+{% set chartsConfig = config.charts ?? {} %}
+{% if chartsConfig.enabled ?? true %}
+    {% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\analytics\\AnalyticsAsset') %}
+{% endif %}
+
+{# Date range config #}
+{% set dateRangeConfig = config.dateRange ?? {} %}
+{% set dateRangeEnabled = dateRangeConfig.enabled ?? false %}
+{% set dateRangeCurrent = dateRangeConfig.current ?? 'last30days' %}
+{% set dateRangeParam = dateRangeConfig.param ?? 'dateRange' %}
+{% set dateRangeHash = dateRangeConfig.hash ?? '' %}
+
+{# Export config #}
+{% set exportConfig = config.export ?? {} %}
+{% set exportAction = exportConfig.action ?? '' %}
+{% set exportPermission = exportConfig.permission ?? null %}
+{% set exportExtraParams = exportConfig.extraParams ?? {} %}
+{% set canExport = exportPermission ? currentUser.can(exportPermission) : (exportAction ? true : false) %}
+
+{# Date range options #}
+{% set dateRangeOptions = [
+    {value: 'today', label: 'Today'|t('app')},
+    {value: 'yesterday', label: 'Yesterday'|t('app')},
+    {value: 'last7days', label: 'Last 7 Days'|t('app')},
+    {value: 'last30days', label: 'Last 30 Days'|t('app')},
+    {value: 'last90days', label: 'Last 90 Days'|t('app')},
+    {value: 'all', label: 'All Time'|t('app')},
+] %}
+
+{# Styles - scoped to .lr-analytics-panel #}
+<style>
+    .lr-analytics-panel {
+        /* Panel wrapper */
+    }
+
+    .lr-analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .lr-analytics-header-filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    /* Stat boxes grid */
+    .lr-analytics-panel .lr-analytics-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    /* Individual stat box */
+    .lr-analytics-panel .lr-stat-box {
+        background: #f3f7fc;
+        padding: 24px;
+        border-radius: 4px;
+        text-align: center;
+        border: 1px solid var(--hairline-color, #e3e5e8);
+    }
+
+    .lr-analytics-panel .lr-stat-value {
+        font-size: 32px;
+        font-weight: 600;
+        color: #0d78f2;
+        margin-bottom: 8px;
+    }
+
+    .lr-analytics-panel .lr-stat-label {
+        font-size: 14px;
+        color: #596673;
+    }
+
+    .lr-analytics-panel .lr-stat-sublabel {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 4px;
+    }
+
+    /* Charts grid */
+    .lr-analytics-panel .lr-analytics-charts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .lr-analytics-panel .lr-analytics-charts.two-columns {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 900px) {
+        .lr-analytics-panel .lr-analytics-charts.two-columns {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Chart container */
+    .lr-analytics-panel .lr-chart-container {
+        background: #fff;
+        border: 1px solid #e3e5e8;
+        border-radius: 4px;
+        padding: 24px;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .lr-analytics-panel .lr-chart-container.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .lr-analytics-panel .lr-chart-container h3 {
+        margin: 0 0 20px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .lr-analytics-panel .lr-chart-container canvas {
+        max-height: 280px;
+        max-width: 100%;
+    }
+
+    /* Table scroll container */
+    .lr-analytics-panel .lr-table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .lr-analytics-panel .lr-table-scroll table {
+        min-width: 100%;
+    }
+
+    /* Section heading */
+    .lr-analytics-panel .lr-section-heading {
+        margin: 24px 0 16px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    /* Empty state */
+    .lr-analytics-panel .lr-analytics-empty {
+        text-align: center;
+        padding: 48px 24px;
+        color: #6b7280;
+    }
+
+    .lr-analytics-panel .lr-analytics-empty p {
+        margin: 0 0 8px;
+    }
+
+    .lr-analytics-panel .lr-analytics-empty p.light {
+        color: #9ca3af;
+    }
+</style>
+
+<div class="lr-analytics-panel">
+    {# Header with date filter and export #}
+    {% if dateRangeEnabled or (canExport and exportAction) %}
+        <div class="lr-analytics-header">
+            <div class="lr-analytics-header-filters">
+                {# Date range filter #}
+                {% if dateRangeEnabled %}
+                    <div class="btngroup">
+                        <button type="button" class="btn menubtn">
+                            {% for option in dateRangeOptions %}
+                                {% if option.value == dateRangeCurrent %}
+                                    {{ option.label }}
+                                {% endif %}
+                            {% endfor %}
+                        </button>
+                        <div class="menu">
+                            <ul>
+                                {% for option in dateRangeOptions %}
+                                    <li>
+                                        <a class="lr-panel-date-range {{ dateRangeCurrent == option.value ? 'sel' : '' }}"
+                                           href="#"
+                                           data-range="{{ option.value }}"
+                                           data-param="{{ dateRangeParam }}"
+                                           data-hash="{{ dateRangeHash }}">
+                                            {{ option.label }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Custom filters block #}
+                {% block filters %}{% endblock %}
+            </div>
+
+            {# Export button #}
+            {% if canExport and exportAction %}
+                {% include 'lindemannrock-base/_components/export-menu' with {
+                    action: exportAction,
+                    permission: exportPermission,
+                    extraParams: exportExtraParams|merge({(dateRangeParam): dateRangeCurrent}),
+                } only %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {# Content block - plugin fills this #}
+    {% block content %}{% endblock %}
+</div>
+
+{# JavaScript - Date range handler, Chart.js comes from AnalyticsAsset #}
+<script>
+(function() {
+    'use strict';
+
+    // Date range handler
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('.lr-panel-date-range');
+        if (link) {
+            e.preventDefault();
+            var range = link.dataset.range;
+            var param = link.dataset.param || 'dateRange';
+            var hash = link.dataset.hash || '';
+            var url = new URL(window.location);
+            url.searchParams.set(param, range);
+            if (hash) {
+                url.hash = hash;
+            }
+            window.location.href = url.toString();
+        }
+    });
+
+    // Dispatch ready event when Chart.js is available
+    document.addEventListener('DOMContentLoaded', function() {
+        // AnalyticsAsset loads Chart.js
+        if (typeof Chart !== 'undefined') {
+            document.dispatchEvent(new CustomEvent('lr:panelChartsReady'));
+        } else {
+            // Wait for assets to load
+            var checkInterval = setInterval(function() {
+                if (typeof Chart !== 'undefined') {
+                    clearInterval(checkInterval);
+                    document.dispatchEvent(new CustomEvent('lr:panelChartsReady'));
+                }
+            }, 50);
+            setTimeout(function() { clearInterval(checkInterval); }, 5000);
+        }
+    });
+})();
+</script>

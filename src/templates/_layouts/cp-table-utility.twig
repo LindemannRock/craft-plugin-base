@@ -60,7 +60,6 @@
  # - {% block scripts %} - Additional JavaScript
  #}
 
-{% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
 
 {# ============================================================================
@@ -100,7 +99,6 @@
 {% set items = tableConf.items ?? [] %}
 {% set emptyMessage = tableConf.emptyMessage ?? 'No items found.'|t('app') %}
 {% set expandableEnabled = tableConf.expandable ?? false %}
-{% set hasConfigItems = tableConf.hasConfigItems ?? false %}
 
 {# View button configuration - only enabled when there are hideable columns #}
 {% set hideableColumns = columns|filter(c => c.hideable ?? false) %}
@@ -119,9 +117,6 @@
 
 {# Checkboxes #}
 {% set checkboxesEnabled = config.checkboxes ?? false %}
-
-{# Bulk actions visibility - set to true to always show bulk action buttons #}
-{% set bulkActionsAlwaysVisible = config.bulkActionsAlwaysVisible ?? false %}
 
 {# Row Actions - set to false to hide actions column #}
 {% set rowActionsEnabled = config.rowActions ?? true %}
@@ -158,7 +153,8 @@
 {% block toolbar %}
     <div id="toolbar" class="flex" style="align-items: flex-end;">
         <div class="flex-grow">
-            <form method="get" action="{{ url(pluginHandle ~ '/' ~ selectedSubnavItem) }}" id="lr-filter-form">
+            {% set formAction = craft.app.request.getPathInfo() %}
+            <form method="get" action="{{ url(formAction) }}" id="lr-filter-form">
                 <div class="flex">
                     {# Render each filter #}
                     {% for filter in filters %}
@@ -270,12 +266,14 @@
 {% block content %}
     {# Inline styles for this layout #}
     <style>
+        .tableview { margin: 0 !important; }
+        .tablepane { margin: 0 !important; }
         .lr-checkbox-cell { width: 40px !important; text-align: center; }
         .page-info { margin: 0 12px; color: #596673; }
         .status-label { white-space: nowrap; }
         .pagination { gap: 4px; align-items: center; }
         .lr-menu-header { font-size: 11px; text-transform: uppercase; color: #7c97b2; padding: 8px 14px 4px; font-weight: 600; letter-spacing: 0.5px; }
-        #toolbar.flex { flex-wrap: nowrap; gap: 8px; }
+        #toolbar.flex { flex-wrap: nowrap; gap: 8px; margin-bottom: 16px; }
         #toolbar .flex-grow { min-width: 0; flex-shrink: 1; }
         .lr-clickable-row { cursor: pointer; transition: background 0.1s ease; }
         .lr-clickable-row:hover { background: #f9fafb !important; }
@@ -408,29 +406,15 @@
                 <tbody id="lr-table-body">
                     {% if items|length %}
                         {% for item in items %}
-                            {# Check if item is selectable (for bulk actions) #}
-                            {# Only check source property when hasConfigItems is enabled #}
-                            {# This avoids triggering ActiveRecord magic methods on items without source property #}
-                            {% if hasConfigItems %}
-                                {% set itemSelectable = item.source != 'config' %}
-                            {% else %}
-                                {% set itemSelectable = true %}
-                            {% endif %}
-
                             {# Main row #}
-                            <tr class="lr-data-row {% if expandableEnabled %}lr-clickable-row{% endif %}{% if not itemSelectable %} lr-not-selectable{% endif %}"
+                            <tr class="lr-data-row {% if expandableEnabled %}lr-clickable-row{% endif %}"
                                 data-id="{{ item.id ?? loop.index }}"
-                                data-entry-id="{{ loop.index }}"
-                                data-selectable="{{ itemSelectable ? 'true' : 'false' }}">
+                                data-entry-id="{{ loop.index }}">
 
                                 {# Checkbox cell #}
                                 {% if checkboxesEnabled %}
                                     <td class="lr-checkbox-cell">
-                                        {% if itemSelectable %}
-                                            <div class="checkbox" title="{{ 'Select'|t('app') }}" tabindex="0" aria-checked="false" role="checkbox"></div>
-                                        {% else %}
-                                            <div class="checkbox disabled" title="{{ 'Cannot modify config items'|t('app') }}" style="opacity: 0.3; cursor: not-allowed;"></div>
-                                        {% endif %}
+                                        <div class="checkbox" title="{{ 'Select'|t('app') }}" tabindex="0" aria-checked="false" role="checkbox"></div>
                                     </td>
                                 {% endif %}
 
@@ -507,17 +491,16 @@
             </div>
         </div>
 
-        {# Right side: bulk actions + footer actions + extra footer grouped together #}
-        <div class="flex flex-nowrap" style="gap: 8px;">
-            {# Bulk actions container (shown when items selected) #}
-            {% if checkboxesEnabled %}
-                <div id="lr-bulk-actions" class="flex" style="display: none; gap: 8px;">
-                    {% block bulkActions %}{% endblock %}
-                </div>
-            {% endif %}
+        {# Bulk actions container (shown when items selected) #}
+        {% if checkboxesEnabled %}
+            <div id="lr-bulk-actions" class="flex" style="display: none;">
+                {% block bulkActions %}{% endblock %}
+            </div>
+        {% endif %}
 
-            {# Footer actions #}
-            {% if footerActions|length %}
+        {# Footer actions #}
+        {% if footerActions|length %}
+            <div class="flex flex-nowrap">
                 {% for action in footerActions %}
                     {% if (action.permission is not defined) or (not action.permission) or currentUser.can(action.permission) %}
                         {% if action.type == 'button' %}
@@ -553,11 +536,11 @@
                         {% endif %}
                     {% endif %}
                 {% endfor %}
-            {% endif %}
 
-            {# Extra footer content from plugin #}
-            {% block extraFooter %}{% endblock %}
-        </div>
+                {# Extra footer content from plugin #}
+                {% block extraFooter %}{% endblock %}
+            </div>
+        {% endif %}
     </div>
 
     {# JavaScript #}
@@ -663,6 +646,7 @@
         // Checkbox functionality
         if (config.checkboxesEnabled) {
             const selectAllCheckbox = document.querySelector('.selectallcontainer .checkbox');
+            const checkboxes = document.querySelectorAll('#lr-table-body .lr-data-row .checkbox');
             let selectedIds = new Set();
 
             function toggleCheckbox(checkbox, checked) {
@@ -686,39 +670,11 @@
                 }));
             }
 
-            // Function to get current selectable checkboxes (re-queries DOM each time)
-            // Excludes disabled checkboxes (config items that can't be edited)
-            function getCheckboxes() {
-                return document.querySelectorAll('#lr-table-body .lr-data-row[data-selectable="true"] .checkbox:not(.disabled)');
-            }
-
-            // Function to bind checkbox click listeners
-            function bindCheckboxListeners() {
-                getCheckboxes().forEach(checkbox => {
-                    if (checkbox._lrBound) return; // Already bound
-                    checkbox._lrBound = true;
-                    checkbox.addEventListener('click', function(e) {
-                        e.stopPropagation(); // Don't trigger row click
-                        if (this.classList.contains('disabled')) return; // Skip disabled checkboxes
-                        const isChecked = !this.classList.contains('checked');
-                        toggleCheckbox(this, isChecked);
-                        const id = this.closest('tr').dataset.id;
-                        if (isChecked) {
-                            selectedIds.add(id);
-                        } else {
-                            selectedIds.delete(id);
-                        }
-                        updateBulkActions();
-                    });
-                });
-            }
-
             if (selectAllCheckbox) {
                 selectAllCheckbox.addEventListener('click', function() {
                     const isChecked = !this.classList.contains('checked');
                     toggleCheckbox(this, isChecked);
-                    // Re-query selectable checkboxes each time (DOM may have changed after AJAX refresh)
-                    getCheckboxes().forEach(checkbox => {
+                    checkboxes.forEach(checkbox => {
                         toggleCheckbox(checkbox, isChecked);
                         const id = checkbox.closest('tr').dataset.id;
                         if (isChecked) {
@@ -731,17 +687,19 @@
                 });
             }
 
-            // Initial binding
-            bindCheckboxListeners();
-
-            // Re-bind after AJAX refresh
-            document.addEventListener('lr:refresh', function() {
-                // Clear selection after refresh (rows may have changed)
-                selectedIds.clear();
-                toggleCheckbox(selectAllCheckbox, false);
-                // Bind listeners to new checkboxes after a short delay (let DOM update)
-                setTimeout(bindCheckboxListeners, 50);
-                updateBulkActions();
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Don't trigger row click
+                    const isChecked = !this.classList.contains('checked');
+                    toggleCheckbox(this, isChecked);
+                    const id = this.closest('tr').dataset.id;
+                    if (isChecked) {
+                        selectedIds.add(id);
+                    } else {
+                        selectedIds.delete(id);
+                    }
+                    updateBulkActions();
+                });
             });
 
             // Expose selection to global scope for plugins
@@ -752,8 +710,7 @@
                     selectedIds.clear();
                     document.querySelectorAll('.checkbox.checked').forEach(cb => toggleCheckbox(cb, false));
                     updateBulkActions();
-                },
-                rebindCheckboxes: bindCheckboxListeners
+                }
             };
         }
 
@@ -1083,15 +1040,4 @@
 
     {# Plugin-specific scripts #}
     {% block scripts %}{% endblock %}
-{% endblock %}
-
-
-{# ============================================================================
-   SIDEBAR/DETAILS BLOCK
-   Note: We use 'sidebarContent' instead of 'sidebar' to avoid collision
-   with Craft's left sidebar block in _layouts/cp
-   ============================================================================ #}
-
-{% block details %}
-    {% block sidebarContent %}{% endblock %}
 {% endblock %}

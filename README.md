@@ -1705,8 +1705,94 @@ Add a "New" button to the toolbar:
 | `sidebar` | Right sidebar content (uses Craft's details pane) |
 | `beforeTable` | Content before table (warnings, info boxes) |
 | `extraToolbar` | Additional toolbar items inside the toolbar form |
-| `extraFooter` | Additional footer content |
+| `extraFooter` | Additional footer content (always visible) |
 | `scripts` | Custom JavaScript for the page |
+
+### Footer Buttons: bulkActions vs extraFooter
+
+Use the appropriate block based on when buttons should appear:
+
+| Block | Visibility | Use Case |
+|-------|------------|----------|
+| `bulkActions` | Only when items selected | Delete selected (no "delete all" option) |
+| `extraFooter` | Always visible | Export, Delete All/Selected |
+
+**Example: Delete only when selected (Campaign Manager pattern)**
+```twig
+{% block bulkActions %}
+    <button type="button" class="btn secondary" id="delete-btn">
+        {{ 'Delete'|t('app') }} (<span id="selected-count">0</span>)
+    </button>
+{% endblock %}
+```
+
+**Example: Always visible with selection-aware behavior (SMS Manager pattern)**
+```twig
+{% block extraFooter %}
+    <button type="button" class="btn secondary" id="delete-btn">
+        <span id="delete-label">{{ 'Delete All'|t('app') }}</span>
+    </button>
+    {% include 'lindemannrock-base/_components/export-menu' with {
+        action: 'my-plugin/export',
+        selectionAware: true,
+        idsParam: 'itemIds',
+    } only %}
+{% endblock %}
+```
+
+### Config Items: Disabling Checkboxes
+
+Items from config files typically shouldn't be selected for bulk actions. The cp-table layout can automatically disable checkboxes for items where `source == 'config'`.
+
+**How it works:**
+1. Set `hasConfigItems: true` in your table config
+2. Items with `source == 'config'` get disabled checkboxes (grayed out)
+3. Items without `source` property or with `source != 'config'` are selectable
+
+**Enable in your tableConfig:**
+
+```twig
+{% set tableConfig = {
+    table: {
+        columns: [...],
+        items: myItems,
+        hasConfigItems: true,  // Enable config item detection
+    },
+} %}
+```
+
+**Implementing in your plugin:**
+
+Use the `ConfigSourceTrait` pattern:
+
+```php
+trait ConfigSourceTrait
+{
+    public string $source = 'database';
+
+    public function canEdit(): bool
+    {
+        return $this->source !== 'config';
+    }
+
+    public function isFromConfig(): bool
+    {
+        return $this->source === 'config';
+    }
+}
+```
+
+Then in your record/model:
+
+```php
+class ProviderRecord extends ActiveRecord
+{
+    use ConfigSourceTrait;
+    // ...
+}
+```
+
+Config items will automatically have disabled checkboxes and can't be selected for bulk actions.
 
 ### Sidebar Content
 

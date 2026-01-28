@@ -9,11 +9,21 @@
  # - permission: (optional) Permission required to show export button
  # - dateRangeParam: (optional) Current date range parameter name (default: 'dateRange')
  # - extraParams: (optional) Additional parameters to pass to export URL
+ # - selectionAware: (optional) If true, shows count and passes selected IDs (default: false)
+ # - idsParam: (optional) Parameter name for selected IDs (default: 'ids')
+ # - id: (optional) Unique ID for this menu instance (auto-generated if not provided)
  #
  # Usage:
  #   {% include 'lindemannrock-base/_components/export-menu' with {
  #       action: 'sms-manager/sms-logs/export',
  #       permission: 'smsManager:downloadLogs',
+ #   } only %}
+ #
+ # Selection-aware (shows "Export (X)" when items selected):
+ #   {% include 'lindemannrock-base/_components/export-menu' with {
+ #       action: 'my-plugin/export',
+ #       permission: 'myPlugin:export',
+ #       selectionAware: true,
  #   } only %}
  #
  # With extra params:
@@ -28,6 +38,9 @@
 {% set permission = permission ?? null %}
 {% set dateRangeParam = dateRangeParam ?? 'dateRange' %}
 {% set extraParams = extraParams ?? {} %}
+{% set selectionAware = selectionAware ?? false %}
+{% set idsParam = idsParam ?? 'ids' %}
+{% set menuId = id ?? 'lr-export-' ~ random() %}
 
 {# Check permission if specified #}
 {% set canExport = permission ? currentUser.can(permission) : true %}
@@ -41,27 +54,73 @@
         {# Build base params #}
         {% set baseParams = {(dateRangeParam): currentDateRange}|merge(extraParams) %}
 
-        <div class="btngroup">
-            <button type="button" class="btn menubtn" data-icon="download">{{ "Export"|t('app') }}</button>
+        <div class="btngroup" id="{{ menuId }}">
+            <button type="button" class="btn menubtn" data-icon="download">
+                <span class="lr-export-label">{{ "Export"|t('app') }}</span>
+            </button>
             <div class="menu" data-align="right">
                 <ul>
                     {% if lrExportEnabled('excel') %}
                         <li>
-                            <a href="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}">{{ "Export as Excel"|t('app') }}</a>
+                            <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}" data-format="excel" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}">{{ "Export as Excel"|t('app') }}</a>
                         </li>
                     {% endif %}
                     {% if lrExportEnabled('csv') %}
                         <li>
-                            <a href="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}">{{ "Export as CSV"|t('app') }}</a>
+                            <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}" data-format="csv" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}">{{ "Export as CSV"|t('app') }}</a>
                         </li>
                     {% endif %}
                     {% if lrExportEnabled('json') %}
                         <li>
-                            <a href="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}">{{ "Export as JSON"|t('app') }}</a>
+                            <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}" data-format="json" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}">{{ "Export as JSON"|t('app') }}</a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
+
+        {% if selectionAware %}
+        <script>
+        (function() {
+            const menu = document.getElementById('{{ menuId }}');
+            if (!menu) return;
+
+            const label = menu.querySelector('.lr-export-label');
+            const links = menu.querySelectorAll('.lr-export-link');
+            const idsParam = '{{ idsParam }}';
+            const defaultLabel = '{{ "Export"|t('app')|e('js') }}';
+
+            function updateExportMenu(selectedIds) {
+                const count = selectedIds.length;
+
+                // Update label
+                if (label) {
+                    label.textContent = count > 0 ? `${defaultLabel} (${count})` : defaultLabel;
+                }
+
+                // Update links with selected IDs
+                links.forEach(link => {
+                    const baseUrl = link.dataset.baseUrl;
+                    if (count > 0) {
+                        const separator = baseUrl.includes('?') ? '&' : '?';
+                        link.href = baseUrl + separator + idsParam + '=' + encodeURIComponent(JSON.stringify(selectedIds));
+                    } else {
+                        link.href = baseUrl;
+                    }
+                });
+            }
+
+            // Listen for selection changes
+            document.addEventListener('lr:selectionChanged', function(e) {
+                updateExportMenu(e.detail.selectedIds || []);
+            });
+
+            // Initialize with current selection if available
+            if (window.lrTableSelection) {
+                updateExportMenu(window.lrTableSelection.getSelectedIds());
+            }
+        })();
+        </script>
+        {% endif %}
     {% endif %}
 {% endif %}
