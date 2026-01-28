@@ -46,6 +46,8 @@ class Base extends Module
      *
      * This method is idempotent - calling it multiple times has no effect.
      * Should be called by consuming plugins in their init() method via PluginHelper::bootstrap()
+     *
+     * @since 5.0.0
      */
     public static function register(): void
     {
