@@ -497,6 +497,37 @@ All filters automatically respect the config settings:
 {% if lrIsFuture(entry.postDate) %}Scheduled{% endif %}
 ```
 
+#### Local Time Timestamps (isUtc Parameter)
+
+By default, string timestamps are assumed to be in UTC and converted to Craft's timezone. For timestamps already in local time (e.g., log files), pass `isUtc: false` to skip conversion:
+
+**PHP:**
+```php
+// Log file timestamp already in local time - don't convert
+DateTimeHelper::formatTime($logTimestamp, isUtc: false);
+DateTimeHelper::formatDatetime($logTimestamp, isUtc: false);
+```
+
+**Twig:**
+```twig
+{# Last parameter is isUtc (default: true) #}
+{# For timestamps already in local time, pass false #}
+
+{{ logEntry.timestamp|lrTime('short', true, false) }}
+{# Parameters: length, showSeconds, isUtc #}
+
+{{ logEntry.timestamp|lrDatetime('short', null, true, false) }}
+{# Parameters: length, showSeconds, includeYear, isUtc #}
+
+{{ logEntry.timestamp|lrDate('short', true, false) }}
+{# Parameters: length, includeYear, isUtc #}
+```
+
+**When to use `isUtc: false`:**
+- Log file timestamps (already written in server's local time)
+- User-entered times without timezone info
+- Any string timestamp that's already in the target timezone
+
 #### Example Configurations
 
 **European Client (24-hour, DD/MM/YYYY numeric):**

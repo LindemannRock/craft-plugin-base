@@ -90,6 +90,7 @@ class DateTimeExtension extends AbstractExtension
      * @param string $length 'short', 'medium', 'long'
      * @param bool|null $showSeconds
      * @param bool $includeYear Whether to include year in output
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
@@ -98,8 +99,9 @@ class DateTimeExtension extends AbstractExtension
         string $length = 'short',
         ?bool $showSeconds = null,
         bool $includeYear = true,
+        bool $isUtc = true,
     ): ?string {
-        return DateTimeHelper::formatDatetime($date, $length, $showSeconds, $includeYear);
+        return DateTimeHelper::formatDatetime($date, $length, $showSeconds, $includeYear, $isUtc);
     }
 
     /**
@@ -107,12 +109,13 @@ class DateTimeExtension extends AbstractExtension
      *
      * @param mixed $date
      * @param bool|null $showSeconds
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
-    public function formatCompactDatetime(mixed $date, ?bool $showSeconds = null): ?string
+    public function formatCompactDatetime(mixed $date, ?bool $showSeconds = null, bool $isUtc = true): ?string
     {
-        return DateTimeHelper::formatCompactDatetime($date, $showSeconds);
+        return DateTimeHelper::formatCompactDatetime($date, $showSeconds, $isUtc);
     }
 
     /**
@@ -121,6 +124,7 @@ class DateTimeExtension extends AbstractExtension
      * @param mixed $date
      * @param string $length 'short', 'medium', 'long'
      * @param bool $includeYear Whether to include year in output
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
@@ -128,8 +132,9 @@ class DateTimeExtension extends AbstractExtension
         mixed $date,
         string $length = 'short',
         bool $includeYear = true,
+        bool $isUtc = true,
     ): ?string {
-        return DateTimeHelper::formatDate($date, $length, $includeYear);
+        return DateTimeHelper::formatDate($date, $length, $includeYear, $isUtc);
     }
 
     /**
@@ -138,6 +143,7 @@ class DateTimeExtension extends AbstractExtension
      * @param mixed $date
      * @param string $length 'short', 'medium', 'long'
      * @param bool|null $showSeconds
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
@@ -145,32 +151,35 @@ class DateTimeExtension extends AbstractExtension
         mixed $date,
         string $length = 'short',
         ?bool $showSeconds = null,
+        bool $isUtc = true,
     ): ?string {
-        return DateTimeHelper::formatTime($date, $length, $showSeconds);
+        return DateTimeHelper::formatTime($date, $length, $showSeconds, $isUtc);
     }
 
     /**
      * Format short date for charts
      *
      * @param mixed $date
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
-    public function formatShortDate(mixed $date): ?string
+    public function formatShortDate(mixed $date, bool $isUtc = true): ?string
     {
-        return DateTimeHelper::formatShortDate($date);
+        return DateTimeHelper::formatShortDate($date, $isUtc);
     }
 
     /**
      * Format relative time
      *
      * @param mixed $date
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
-    public function formatRelative(mixed $date): ?string
+    public function formatRelative(mixed $date, bool $isUtc = true): ?string
     {
-        return DateTimeHelper::formatRelative($date);
+        return DateTimeHelper::formatRelative($date, $isUtc);
     }
 
     /**

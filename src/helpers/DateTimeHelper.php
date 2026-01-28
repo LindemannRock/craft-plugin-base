@@ -147,15 +147,16 @@ class DateTimeHelper
      * Convert a date to Craft's configured timezone
      *
      * Handles:
-     * - DateTime objects (assumes UTC if no timezone set)
-     * - Date strings (assumes UTC)
+     * - DateTime objects (converts to Craft timezone)
+     * - Date strings (assumes UTC by default, or local if $isUtc = false)
      * - Null values
      *
      * @param DateTime|string|null $date
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return DateTime|null
      * @since 5.8.0
      */
-    public static function toCraftTimezone(DateTime|string|null $date): ?DateTime
+    public static function toCraftTimezone(DateTime|string|null $date, bool $isUtc = true): ?DateTime
     {
         if ($date === null) {
             return null;
@@ -163,7 +164,10 @@ class DateTimeHelper
 
         if (is_string($date)) {
             try {
-                $date = new DateTime($date, new DateTimeZone('UTC'));
+                $timezone = $isUtc
+                    ? new DateTimeZone('UTC')
+                    : new DateTimeZone(Craft::$app->getTimeZone());
+                $date = new DateTime($date, $timezone);
             } catch (\Exception) {
                 return null;
             }
@@ -190,6 +194,7 @@ class DateTimeHelper
      * @param string $length 'short', 'medium', 'long'
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $includeYear Whether to include year in output
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
@@ -198,8 +203,9 @@ class DateTimeHelper
         string $length = 'short',
         ?bool $showSeconds = null,
         bool $includeYear = true,
+        bool $isUtc = true,
     ): ?string {
-        $date = self::toCraftTimezone($date);
+        $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
@@ -219,14 +225,16 @@ class DateTimeHelper
      *
      * @param DateTime|string|null $date
      * @param bool|null $showSeconds Override config default (null = use config)
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null Example: "Jan 23, 15:45" or "23 Jan 15:45"
      * @since 5.8.0
      */
     public static function formatCompactDatetime(
         DateTime|string|null $date,
         ?bool $showSeconds = null,
+        bool $isUtc = true,
     ): ?string {
-        return self::formatDatetime($date, 'short', $showSeconds, false);
+        return self::formatDatetime($date, 'short', $showSeconds, false, $isUtc);
     }
 
     /**
@@ -235,6 +243,7 @@ class DateTimeHelper
      * @param DateTime|string|null $date
      * @param string $length 'short', 'medium', 'long'
      * @param bool $includeYear Whether to include year in output
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
@@ -242,8 +251,9 @@ class DateTimeHelper
         DateTime|string|null $date,
         string $length = 'short',
         bool $includeYear = true,
+        bool $isUtc = true,
     ): ?string {
-        $date = self::toCraftTimezone($date);
+        $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
@@ -350,6 +360,7 @@ class DateTimeHelper
      * @param DateTime|string|null $date
      * @param string $length 'short', 'medium', 'long' (medium/long include seconds if showSeconds)
      * @param bool|null $showSeconds Override config default (null = use config)
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
@@ -357,8 +368,9 @@ class DateTimeHelper
         DateTime|string|null $date,
         string $length = 'short',
         ?bool $showSeconds = null,
+        bool $isUtc = true,
     ): ?string {
-        $date = self::toCraftTimezone($date);
+        $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
@@ -385,12 +397,13 @@ class DateTimeHelper
      * Format short date for charts/compact display
      *
      * @param DateTime|string|null $date
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null Example: "Jan 22"
      * @since 5.8.0
      */
-    public static function formatShortDate(DateTime|string|null $date): ?string
+    public static function formatShortDate(DateTime|string|null $date, bool $isUtc = true): ?string
     {
-        $date = self::toCraftTimezone($date);
+        $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
@@ -402,12 +415,13 @@ class DateTimeHelper
      * Format relative time (e.g., "2 hours ago")
      *
      * @param DateTime|string|null $date
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      * @since 5.8.0
      */
-    public static function formatRelative(DateTime|string|null $date): ?string
+    public static function formatRelative(DateTime|string|null $date, bool $isUtc = true): ?string
     {
-        $date = self::toCraftTimezone($date);
+        $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
