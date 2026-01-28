@@ -1,0 +1,652 @@
+{#
+ # Reusable Phone Input Component
+ #
+ # Renders a country code dropdown + phone number input with:
+ # - Auto-detection of country from pasted international numbers
+ # - NANP (US/CA) area code detection for +1 numbers
+ # - Input sanitization (digits only)
+ # - Invisible character removal
+ #
+ # Parameters:
+ # - id: Input ID (required, e.g., 'testRecipient')
+ # - name: Input name for forms (defaults to id)
+ # - value: Initial phone number value (optional)
+ # - countryId: Country select ID (defaults to id + 'Country')
+ # - countryName: Country select name (defaults to countryId)
+ # - defaultCountry: Default country code (e.g., 'US', 'KW')
+ # - allowedCountries: Array of allowed country codes or ['*'] for all (defaults to all)
+ # - placeholder: Input placeholder text (optional)
+ # - instructions: Field instructions (optional)
+ # - label: Field label (optional)
+ # - required: Whether field is required (default: false)
+ # - class: Additional CSS classes for input (optional)
+ #
+ # Usage:
+ # {% include 'lindemannrock-base/_components/phone-input' with {
+ #     id: 'recipient',
+ #     label: 'Phone Number',
+ #     instructions: 'Enter phone number. Paste with country code to auto-detect.',
+ #     defaultCountry: 'US',
+ #     allowedCountries: ['US', 'CA', 'GB'],
+ # } only %}
+ #
+ # Full phone number with dial code:
+ # const fullNumber = window.lrPhoneInput.getFullNumber('recipient');
+ #
+ # Events fired on the input element:
+ # - lr:phoneCountryChanged (detail: {country, dialCode, inputId})
+ # - lr:phoneNumberChanged (detail: {localNumber, fullNumber, inputId})
+ #}
+
+{% set inputId = id %}
+{% set inputName = name ?? id %}
+{% set countrySelectId = countryId ?? (id ~ 'Country') %}
+{% set countrySelectName = countryName ?? countrySelectId %}
+{% set countries = allowedCountries ?? ['*'] %}
+{% set isAllCountries = '*' in countries or countries|length == 0 %}
+{% set inputRequired = required ?? false %}
+{% set inputClass = class ?? '' %}
+
+{# Get dial codes from base helper #}
+{% set allDialCodes = [] %}
+{% for option in lrDialCodes() %}
+    {% set dc = lrDialCode(option.value) %}
+    {% if dc %}
+        {% if isAllCountries or option.value in countries %}
+            {% set allDialCodes = allDialCodes|merge([{
+                country: option.value,
+                dialCode: dc,
+                label: option.value ~ ' +' ~ dc,
+                name: lrCountryName(option.value)
+            }]) %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+<div class="field" id="{{ inputId }}Field">
+    {% if label ?? false %}
+    <div class="heading">
+        <label for="{{ inputId }}">{{ label }}</label>
+        {% if instructions ?? false %}
+        <div class="instructions">
+            <p>{{ instructions }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div class="input">
+        <div class="lr-phone-input-wrapper" data-input-id="{{ inputId }}" style="display: flex; align-items: stretch;">
+            <div class="select" style="flex-shrink: 0;">
+                <select id="{{ countrySelectId }}"
+                        name="{{ countrySelectName }}"
+                        class="lr-phone-country-select"
+                        style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; height: 100%;">
+                    {% for item in allDialCodes %}
+                        <option value="{{ item.country }}"
+                                data-dialcode="{{ item.dialCode }}"
+                                {% if item.country == (defaultCountry ?? '') %}selected{% endif %}>
+                            {{ item.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="text"
+                   id="{{ inputId }}"
+                   name="{{ inputName }}"
+                   class="text code lr-phone-input {{ inputClass }}"
+                   style="border-top-left-radius: 0; border-bottom-left-radius: 0; flex: 1; min-width: 0;"
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   inputmode="tel"
+                   {% if value ?? false %}value="{{ value }}"{% endif %}
+                   {% if placeholder ?? false %}placeholder="{{ placeholder }}"{% endif %}
+                   {% if inputRequired %}required{% endif %}>
+        </div>
+    </div>
+</div>
+
+{# Include JS only once - check if already loaded #}
+{% if not (lrPhoneInputLoaded ?? false) %}
+{% set lrPhoneInputLoaded = true %}
+{% js %}
+(function() {
+    // Prevent double initialization
+    if (window.lrPhoneInput) return;
+
+    // Priority countries for shared dial codes
+    // When multiple countries share a dial code, use this to pick the main one
+    const SHARED_DIAL_CODE_PRIORITY = {
+        '1': 'US',    // NANP - handled separately with area codes
+        '44': 'GB',   // UK (vs GG, JE, IM)
+        '61': 'AU',   // Australia (vs CC, CX)
+        '47': 'NO',   // Norway (vs SJ)
+        '212': 'MA',  // Morocco (vs EH)
+        '262': 'RE',  // Réunion (vs YT)
+        '358': 'FI',  // Finland (vs AX)
+        '590': 'GP',  // Guadeloupe (vs BL, MF)
+        '599': 'CW',  // Curaçao (vs BQ)
+        '64': 'NZ',   // New Zealand (vs PN)
+        '7': 'RU',    // Russia (vs KZ)
+    };
+
+    // NANP (North American Numbering Plan) area codes by country
+    // This helps differentiate +1 numbers between US, CA, and Caribbean
+    const NANP_AREA_CODES = {
+        // Canada
+        'CA': [
+            '204', '226', '236', '249', '250', '263', '289', '306', '343', '354',
+            '365', '367', '368', '382', '387', '403', '416', '418', '428', '431',
+            '437', '438', '450', '460', '468', '474', '506', '514', '519', '548',
+            '579', '581', '584', '587', '604', '613', '639', '647', '672', '683',
+            '705', '709', '742', '753', '778', '780', '782', '807', '819', '825',
+            '867', '873', '879', '902', '905'
+        ],
+        // Caribbean & other +1 territories
+        'AG': ['268'],       // Antigua and Barbuda
+        'AI': ['264'],       // Anguilla
+        'AS': ['684'],       // American Samoa
+        'BB': ['246'],       // Barbados
+        'BM': ['441'],       // Bermuda
+        'BS': ['242'],       // Bahamas
+        'DM': ['767'],       // Dominica
+        'DO': ['809', '829', '849'], // Dominican Republic
+        'GD': ['473'],       // Grenada
+        'GU': ['671'],       // Guam
+        'JM': ['658', '876'], // Jamaica
+        'KN': ['869'],       // Saint Kitts and Nevis
+        'KY': ['345'],       // Cayman Islands
+        'LC': ['758'],       // Saint Lucia
+        'MP': ['670'],       // Northern Mariana Islands
+        'MS': ['664'],       // Montserrat
+        'PR': ['787', '939'], // Puerto Rico
+        'SX': ['721'],       // Sint Maarten
+        'TC': ['649'],       // Turks and Caicos
+        'TT': ['868'],       // Trinidad and Tobago
+        'VC': ['784'],       // Saint Vincent and the Grenadines
+        'VG': ['284'],       // British Virgin Islands
+        'VI': ['340'],       // US Virgin Islands
+    };
+
+    // All dial codes (will be populated per instance)
+    const instanceDialCodes = {};
+
+    /**
+     * Sanitize phone number - remove invisible characters and formatting
+     */
+    function sanitizePhoneNumber(value) {
+        // Remove zero-width spaces, non-breaking spaces, directional marks, BOM, etc.
+        value = value.replace(/[\u200B-\u200D\uFEFF\u00A0\u2060\u202A-\u202E\u2066-\u2069]/g, '');
+        // Keep only digits and + (for detection)
+        return value.replace(/[^0-9+]/g, '');
+    }
+
+    /**
+     * Clean number for matching - remove formatting and prefix
+     */
+    function cleanForMatching(value) {
+        let cleaned = value.replace(/[\s\-\(\)]/g, '');
+        if (cleaned.startsWith('+')) {
+            cleaned = cleaned.substring(1);
+        }
+        if (cleaned.startsWith('00')) {
+            cleaned = cleaned.substring(2);
+        }
+        return cleaned;
+    }
+
+    /**
+     * Resolve NANP country from area code
+     */
+    function resolveNANPCountry(areaCode, allowedCountries) {
+        // Check each NANP country for the area code
+        for (const [country, areaCodes] of Object.entries(NANP_AREA_CODES)) {
+            if (areaCodes.includes(areaCode)) {
+                // If we have allowed countries filter, check it
+                if (allowedCountries && !allowedCountries.includes('*')) {
+                    if (allowedCountries.includes(country)) {
+                        return country;
+                    }
+                } else {
+                    return country;
+                }
+            }
+        }
+
+        // If no specific match, default to US if allowed
+        if (!allowedCountries || allowedCountries.includes('*') || allowedCountries.includes('US')) {
+            return 'US';
+        }
+
+        // Otherwise return first allowed NANP country
+        const nanpCountries = Object.keys(NANP_AREA_CODES).concat(['US']);
+        for (const country of nanpCountries) {
+            if (allowedCountries.includes(country)) {
+                return country;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Detect country and strip dial code from phone number
+     * Returns {dialCode, countryCode, localNumber} or null
+     */
+    function detectAndStripCountryCode(value, dialCodes, allowedCountries) {
+        const cleaned = cleanForMatching(value);
+
+        if (!cleaned || cleaned.length < 4) {
+            return null;
+        }
+
+        // Sort dial codes by length descending (longer codes first)
+        const sortedCodes = [...dialCodes].sort((a, b) => b.code.length - a.code.length);
+
+        for (const item of sortedCodes) {
+            if (cleaned.startsWith(item.code) && cleaned.length > item.code.length) {
+                const localNumber = cleaned.substring(item.code.length);
+
+                // Special handling for NANP (+1) - need to check area code
+                if (item.code === '1' && localNumber.length >= 3) {
+                    const areaCode = localNumber.substring(0, 3);
+                    const nanpCountry = resolveNANPCountry(areaCode, allowedCountries);
+
+                    if (nanpCountry) {
+                        return {
+                            dialCode: '1',
+                            countryCode: nanpCountry,
+                            localNumber: localNumber
+                        };
+                    }
+                }
+
+                // Check if this dial code has a priority country
+                let countryCode = item.country;
+                const priorityCountry = SHARED_DIAL_CODE_PRIORITY[item.code];
+                if (priorityCountry) {
+                    // Check if priority country is in allowed list
+                    if (!allowedCountries || allowedCountries.includes('*') || allowedCountries.includes(priorityCountry)) {
+                        countryCode = priorityCountry;
+                    }
+                }
+
+                return {
+                    dialCode: item.code,
+                    countryCode: countryCode,
+                    localNumber: localNumber
+                };
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Initialize phone input for an element
+     */
+    function initPhoneInput(wrapper) {
+        const inputId = wrapper.dataset.inputId;
+        const countrySelect = wrapper.querySelector('.lr-phone-country-select');
+        const phoneInput = wrapper.querySelector('.lr-phone-input');
+
+        if (!countrySelect || !phoneInput) return;
+
+        // Build dial codes array from select options
+        const dialCodes = [];
+        const allowedCountries = [];
+        Array.from(countrySelect.options).forEach(opt => {
+            const code = opt.dataset.dialcode;
+            const country = opt.value;
+            if (code) {
+                dialCodes.push({ code, country });
+                allowedCountries.push(country);
+            }
+        });
+
+        // Store for later use - keep both full list and allowed list
+        instanceDialCodes[inputId] = {
+            dialCodes,           // Current allowed dial codes
+            allowedCountries,    // Current allowed country codes
+            allDialCodes: dialCodes.slice()  // Full list for detection
+        };
+
+        // Handle paste - detect country code
+        phoneInput.addEventListener('paste', function(e) {
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const cleaned = sanitizePhoneNumber(pastedText);
+
+            // Only auto-detect if it looks like an international number
+            if (cleaned.startsWith('+') || cleaned.startsWith('00')) {
+                e.preventDefault();
+
+                // Get current instance (may have been updated dynamically)
+                const currentInstance = instanceDialCodes[inputId] || { dialCodes, allowedCountries, allDialCodes: dialCodes };
+                // Use ALL dial codes for detection, not just allowed ones
+                const detectionDialCodes = currentInstance.allDialCodes || currentInstance.dialCodes;
+                const result = detectAndStripCountryCode(cleaned, detectionDialCodes, null);
+                if (result && result.localNumber && result.countryCode) {
+                    // Check if country is in our allowed list
+                    const option = Array.from(countrySelect.options).find(
+                        opt => opt.value === result.countryCode
+                    );
+
+                    if (option) {
+                        countrySelect.value = result.countryCode;
+                        phoneInput.value = result.localNumber;
+
+                        // Fire country change event
+                        phoneInput.dispatchEvent(new CustomEvent('lr:phoneCountryChanged', {
+                            bubbles: true,
+                            detail: {
+                                country: result.countryCode,
+                                dialCode: result.dialCode,
+                                inputId: inputId
+                            }
+                        }));
+                    } else {
+                        // Country not allowed - fire event and don't paste
+                        phoneInput.dispatchEvent(new CustomEvent('lr:phoneCountryNotAllowed', {
+                            bubbles: true,
+                            detail: {
+                                detectedCountry: result.countryCode,
+                                detectedDialCode: result.dialCode,
+                                localNumber: result.localNumber,
+                                inputId: inputId
+                            }
+                        }));
+                        return; // Don't paste anything
+                    }
+
+                    // Fire number change event
+                    phoneInput.dispatchEvent(new CustomEvent('lr:phoneNumberChanged', {
+                        bubbles: true,
+                        detail: {
+                            localNumber: phoneInput.value,
+                            fullNumber: getFullNumberForInput(inputId),
+                            inputId: inputId
+                        }
+                    }));
+                } else {
+                    // No match, strip prefix and paste
+                    let num = cleaned;
+                    if (num.startsWith('+')) num = num.substring(1);
+                    if (num.startsWith('00')) num = num.substring(2);
+                    phoneInput.value = num.replace(/[^0-9]/g, '');
+                }
+            }
+        });
+
+        // Sanitize on input - digits only
+        phoneInput.addEventListener('input', function() {
+            const sanitized = this.value.replace(/[^0-9]/g, '');
+            if (sanitized !== this.value) {
+                const cursorPos = this.selectionStart;
+                const diff = this.value.length - sanitized.length;
+                this.value = sanitized;
+                this.setSelectionRange(
+                    Math.max(0, cursorPos - diff),
+                    Math.max(0, cursorPos - diff)
+                );
+            }
+
+            // Fire number change event
+            this.dispatchEvent(new CustomEvent('lr:phoneNumberChanged', {
+                bubbles: true,
+                detail: {
+                    localNumber: sanitized,
+                    fullNumber: getFullNumberForInput(inputId),
+                    inputId: inputId
+                }
+            }));
+        });
+
+        // Track last corrected value to avoid re-checking
+        let lastCorrectedValue = null;
+
+        // Check on blur if typed number contains a different country code - auto-correct
+        phoneInput.addEventListener('blur', function() {
+            const value = this.value;
+
+            // Only check numbers that are long enough to plausibly contain a dial code
+            // Most local numbers are 7-10 digits, so 11+ digits likely includes a dial code
+            if (!value || value.length < 11) return;
+
+            // Skip if this value was just auto-corrected
+            if (value === lastCorrectedValue) {
+                lastCorrectedValue = null;
+                return;
+            }
+
+            // Get current instance (may have been updated dynamically)
+            const currentInstance = instanceDialCodes[inputId] || { dialCodes, allowedCountries, allDialCodes: dialCodes };
+
+            // Use ALL dial codes for detection, not just allowed ones
+            const detectionDialCodes = currentInstance.allDialCodes || currentInstance.dialCodes;
+            const currentAllowedCountries = currentInstance.allowedCountries;
+
+            // Get currently selected country's dial code
+            const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+            const selectedDialCode = selectedOption ? selectedOption.dataset.dialcode : '';
+
+            // Check if the number starts with a dial code (detect against ALL codes)
+            const result = detectAndStripCountryCode(value, detectionDialCodes, null);
+            if (result) {
+                // Number contains a dial code - check if it matches selected or needs correction
+                const option = Array.from(countrySelect.options).find(
+                    opt => opt.value === result.countryCode
+                );
+
+                if (option) {
+                    // Country is allowed - auto-correct (strip dial code, set country)
+                    countrySelect.value = result.countryCode;
+                    phoneInput.value = result.localNumber;
+                    lastCorrectedValue = result.localNumber; // Remember to skip next blur
+
+                    // Fire country change event only if country actually changed
+                    if (result.dialCode !== selectedDialCode) {
+                        phoneInput.dispatchEvent(new CustomEvent('lr:phoneCountryChanged', {
+                            bubbles: true,
+                            detail: {
+                                country: result.countryCode,
+                                dialCode: result.dialCode,
+                                inputId: inputId
+                            }
+                        }));
+                    }
+                } else {
+                    // Country not allowed - show error
+                    phoneInput.dispatchEvent(new CustomEvent('lr:phoneCountryNotAllowed', {
+                        bubbles: true,
+                        detail: {
+                            detectedCountry: result.countryCode,
+                            detectedDialCode: result.dialCode,
+                            localNumber: result.localNumber,
+                            inputId: inputId
+                        }
+                    }));
+                }
+            }
+        });
+
+        // Country change event
+        countrySelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const dialCode = selectedOption ? selectedOption.dataset.dialcode : '';
+
+            phoneInput.dispatchEvent(new CustomEvent('lr:phoneCountryChanged', {
+                bubbles: true,
+                detail: {
+                    country: this.value,
+                    dialCode: dialCode,
+                    inputId: inputId
+                }
+            }));
+        });
+    }
+
+    /**
+     * Get full phone number with dial code for an input
+     */
+    function getFullNumberForInput(inputId) {
+        const wrapper = document.querySelector(`.lr-phone-input-wrapper[data-input-id="${inputId}"]`);
+        if (!wrapper) return '';
+
+        const countrySelect = wrapper.querySelector('.lr-phone-country-select');
+        const phoneInput = wrapper.querySelector('.lr-phone-input');
+
+        if (!countrySelect || !phoneInput) return '';
+
+        const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+        const dialCode = selectedOption ? selectedOption.dataset.dialcode : '';
+        const localNumber = phoneInput.value.replace(/[^0-9]/g, '');
+
+        return dialCode + localNumber;
+    }
+
+    /**
+     * Get current country for an input
+     */
+    function getCountryForInput(inputId) {
+        const wrapper = document.querySelector(`.lr-phone-input-wrapper[data-input-id="${inputId}"]`);
+        if (!wrapper) return '';
+
+        const countrySelect = wrapper.querySelector('.lr-phone-country-select');
+        return countrySelect ? countrySelect.value : '';
+    }
+
+    /**
+     * Get local number (without dial code) for an input
+     */
+    function getLocalNumberForInput(inputId) {
+        const wrapper = document.querySelector(`.lr-phone-input-wrapper[data-input-id="${inputId}"]`);
+        if (!wrapper) return '';
+
+        const phoneInput = wrapper.querySelector('.lr-phone-input');
+        return phoneInput ? phoneInput.value.replace(/[^0-9]/g, '') : '';
+    }
+
+    /**
+     * Set country for an input
+     */
+    function setCountryForInput(inputId, countryCode) {
+        const wrapper = document.querySelector(`.lr-phone-input-wrapper[data-input-id="${inputId}"]`);
+        if (!wrapper) return false;
+
+        const countrySelect = wrapper.querySelector('.lr-phone-country-select');
+        if (!countrySelect) return false;
+
+        const option = Array.from(countrySelect.options).find(opt => opt.value === countryCode);
+        if (option) {
+            countrySelect.value = countryCode;
+            countrySelect.dispatchEvent(new Event('change'));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Set phone number for an input
+     */
+    function setNumberForInput(inputId, number) {
+        const wrapper = document.querySelector(`.lr-phone-input-wrapper[data-input-id="${inputId}"]`);
+        if (!wrapper) return false;
+
+        const phoneInput = wrapper.querySelector('.lr-phone-input');
+        if (!phoneInput) return false;
+
+        phoneInput.value = number.replace(/[^0-9]/g, '');
+        phoneInput.dispatchEvent(new Event('input'));
+        return true;
+    }
+
+    // Initialize all phone inputs on page
+    function initAll() {
+        document.querySelectorAll('.lr-phone-input-wrapper').forEach(initPhoneInput);
+    }
+
+    // Auto-init on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+        initAll();
+    }
+
+    /**
+     * Update allowed countries for an input dynamically
+     * @param {string} inputId - The input ID
+     * @param {Array} newDialCodes - Array of {country, dialCode, label?, name?}
+     * @param {string} defaultCountry - Country to select after update (optional)
+     */
+    function updateAllowedCountries(inputId, newDialCodes, defaultCountry) {
+        const wrapper = document.querySelector(`.lr-phone-input-wrapper[data-input-id="${inputId}"]`);
+        if (!wrapper) return false;
+
+        const countrySelect = wrapper.querySelector('.lr-phone-country-select');
+        if (!countrySelect) return false;
+
+        // Clear existing options
+        countrySelect.innerHTML = '';
+
+        // Build new dial codes array
+        const dialCodes = [];
+        const allowedCountries = [];
+
+        newDialCodes.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.country;
+            option.dataset.dialcode = item.dialCode || item.code;
+            option.textContent = item.label || (item.country + ' +' + (item.dialCode || item.code));
+            countrySelect.appendChild(option);
+
+            dialCodes.push({
+                code: item.dialCode || item.code,
+                country: item.country
+            });
+            allowedCountries.push(item.country);
+        });
+
+        // Update stored instance - preserve allDialCodes for detection
+        const existingInstance = instanceDialCodes[inputId];
+        instanceDialCodes[inputId] = {
+            dialCodes,
+            allowedCountries,
+            allDialCodes: existingInstance?.allDialCodes || dialCodes.slice()
+        };
+
+        // Select default country if provided and exists
+        if (defaultCountry) {
+            const option = Array.from(countrySelect.options).find(
+                opt => opt.value === defaultCountry
+            );
+            if (option) {
+                countrySelect.value = defaultCountry;
+            }
+        }
+
+        return true;
+    }
+
+    // Public API
+    window.lrPhoneInput = {
+        init: initPhoneInput,
+        initAll: initAll,
+        getFullNumber: getFullNumberForInput,
+        getLocalNumber: getLocalNumberForInput,
+        getCountry: getCountryForInput,
+        setCountry: setCountryForInput,
+        setNumber: setNumberForInput,
+        updateAllowedCountries: updateAllowedCountries,
+        sanitize: sanitizePhoneNumber,
+        cleanForMatching: cleanForMatching,
+        detectCountry: function(phoneNumber, inputId) {
+            const instance = instanceDialCodes[inputId];
+            if (!instance) return null;
+            return detectAndStripCountryCode(phoneNumber, instance.dialCodes, instance.allowedCountries);
+        },
+        resolveNANPCountry: resolveNANPCountry,
+        NANP_AREA_CODES: NANP_AREA_CODES
+    };
+})();
+{% endjs %}
+{% endif %}

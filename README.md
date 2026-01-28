@@ -1269,6 +1269,121 @@ Renders action buttons or dropdown menus for table rows with permission handling
   - `confirm` - Confirmation message
   - `type: 'divider'` - Separator line
 
+### Phone Input Component
+
+Renders a phone number input with country code dropdown. Includes auto-detection of country from pasted international numbers, NANP (US/CA) area code detection, and input sanitization.
+
+**Location:** `lindemannrock-base/_components/phone-input`
+
+```twig
+{# Basic usage #}
+{% include 'lindemannrock-base/_components/phone-input' with {
+    id: 'recipient',
+    label: 'Phone Number',
+    instructions: 'Enter phone number. Paste with country code to auto-detect.',
+    defaultCountry: 'US',
+} only %}
+
+{# With allowed countries filter #}
+{% include 'lindemannrock-base/_components/phone-input' with {
+    id: 'testPhone',
+    label: 'Phone Number'|t('my-plugin'),
+    instructions: 'Enter phone number'|t('my-plugin'),
+    placeholder: 'e.g., 94400999',
+    defaultCountry: 'KW',
+    allowedCountries: ['KW', 'SA', 'AE', 'BH', 'OM', 'QA'],
+} only %}
+```
+
+**Parameters:**
+- `id` (required) - Input element ID
+- `name` - Form input name (defaults to `id`)
+- `label` - Field label
+- `instructions` - Help text
+- `placeholder` - Input placeholder
+- `value` - Initial phone number value
+- `defaultCountry` - Default country code (e.g., 'US', 'KW')
+- `allowedCountries` - Array of allowed country codes, or `['*']` for all (default: all)
+- `countryId` - Country select ID (defaults to `id + 'Country'`)
+- `required` - Whether field is required
+- `class` - Additional CSS classes for input
+
+**JavaScript API:**
+
+```javascript
+// Get full phone number with dial code
+const fullNumber = window.lrPhoneInput.getFullNumber('recipient');  // e.g., '15551234567'
+
+// Get local number (without dial code)
+const localNumber = window.lrPhoneInput.getLocalNumber('recipient');  // e.g., '5551234567'
+
+// Get selected country code
+const country = window.lrPhoneInput.getCountry('recipient');  // e.g., 'US'
+
+// Set country programmatically
+window.lrPhoneInput.setCountry('recipient', 'CA');
+
+// Set phone number
+window.lrPhoneInput.setNumber('recipient', '5551234567');
+
+// Update allowed countries dynamically (for provider-based filtering)
+const dialCodes = [
+    {country: 'US', dialCode: '1', label: 'US +1'},
+    {country: 'CA', dialCode: '1', label: 'CA +1'},
+    {country: 'GB', dialCode: '44', label: 'GB +44'},
+];
+window.lrPhoneInput.updateAllowedCountries('recipient', dialCodes, 'US');
+
+// Detect country from phone number
+const result = window.lrPhoneInput.detectCountry('+15551234567', 'recipient');
+// Returns: {dialCode: '1', countryCode: 'US', localNumber: '5551234567'}
+
+// Sanitize phone number
+const clean = window.lrPhoneInput.sanitize('+1 (555) 123-4567');  // '15551234567'
+
+// Access NANP area codes for US/CA detection
+console.log(window.lrPhoneInput.NANP_AREA_CODES.CA);  // ['204', '226', ...]
+```
+
+**Events:**
+
+The component fires custom events on the input element:
+
+```javascript
+// Country changed (via dropdown or paste auto-detect)
+document.getElementById('recipient').addEventListener('lr:phoneCountryChanged', function(e) {
+    console.log(e.detail.country);    // 'US'
+    console.log(e.detail.dialCode);   // '1'
+    console.log(e.detail.inputId);    // 'recipient'
+});
+
+// Phone number changed
+document.getElementById('recipient').addEventListener('lr:phoneNumberChanged', function(e) {
+    console.log(e.detail.localNumber);  // '5551234567'
+    console.log(e.detail.fullNumber);   // '15551234567'
+    console.log(e.detail.inputId);      // 'recipient'
+});
+
+// Country not allowed (detected country not in provider's allowed list)
+document.getElementById('recipient').addEventListener('lr:phoneCountryNotAllowed', function(e) {
+    console.log(e.detail.detectedCountry);  // 'GB'
+    console.log(e.detail.detectedDialCode); // '44'
+    console.log(e.detail.localNumber);      // '2079460958'
+    // Show error to user
+    Craft.cp.displayError('Country not allowed');
+});
+```
+
+**Features:**
+- **Paste detection**: Auto-detects country from pasted numbers with `+` or `00` prefix
+- **Blur detection**: Auto-detects and strips dial code from typed numbers (11+ digits)
+- **NANP support**: Differentiates US/CA/Caribbean by area code
+- **Shared dial codes**: Priority mapping for codes shared by multiple countries (+44→GB, +7→RU, +61→AU)
+- **Smart stripping**: Strips dial code even when it matches selected country (e.g., typing `971...` with AE selected)
+- **Country validation**: Fires `lr:phoneCountryNotAllowed` event when detected country isn't in allowed list
+- **Input sanitization**: Removes invisible characters (zero-width spaces, BOM) and non-digits
+- **Dynamic filtering**: Update allowed countries at runtime via `updateAllowedCountries()`
+
 ### Filter Components
 
 #### Status Filter
