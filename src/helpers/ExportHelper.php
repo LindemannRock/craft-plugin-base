@@ -84,17 +84,29 @@ class ExportHelper
     }
 
     /**
+     * Format aliases mapping URL params to config keys
+     */
+    private const FORMAT_ALIASES = [
+        'xlsx' => 'excel',
+        'xls' => 'excel',
+    ];
+
+    /**
      * Check if an export format is enabled
      *
-     * @param string $format 'csv', 'json', or 'excel'
+     * Accepts both config keys ('excel', 'csv', 'json') and common aliases ('xlsx', 'xls').
+     *
+     * @param string $format 'csv', 'json', 'excel', 'xlsx', or 'xls'
      * @return bool
      * @since 5.8.0
      */
     public static function isFormatEnabled(string $format): bool
     {
+        // Normalize format to config key
+        $configKey = self::FORMAT_ALIASES[$format] ?? $format;
         $config = self::getConfig();
 
-        return $config[$format] ?? self::DEFAULT_FORMATS[$format] ?? false;
+        return $config[$configKey] ?? self::DEFAULT_FORMATS[$configKey] ?? false;
     }
 
     /**

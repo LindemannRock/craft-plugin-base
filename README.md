@@ -812,15 +812,27 @@ return [
 ];
 ```
 
+### Format Values
+
+ExportHelper uses consistent format identifiers. The `isFormatEnabled()` method accepts aliases for convenience:
+
+| Config Key | Accepted Values | File Extension |
+|------------|-----------------|----------------|
+| `csv` | `'csv'` | `.csv` |
+| `json` | `'json'` | `.json` |
+| `excel` | `'excel'`, `'xlsx'`, `'xls'` | `.xlsx` |
+
+**Best Practice:** Use `'excel'` in templates and URL params for consistency with config keys. The export-menu component uses `'excel'`.
+
 ### PHP Usage
 
 ```php
 use lindemannrock\base\helpers\ExportHelper;
 
-// Check enabled formats
-if (ExportHelper::isFormatEnabled('excel')) {
-    // Excel export available
-}
+// Check enabled formats - accepts config keys and aliases
+ExportHelper::isFormatEnabled('excel');  // true (config key)
+ExportHelper::isFormatEnabled('xlsx');   // true (alias)
+ExportHelper::isFormatEnabled('csv');    // true
 
 $formats = ExportHelper::getEnabledFormats(); // ['csv', 'json', 'excel']
 
@@ -866,27 +878,31 @@ return ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated'], [
 
 ### Twig Usage
 
+**Recommended:** Use the `export-menu` component instead of building manually:
+
+```twig
+{% include 'lindemannrock-base/_components/export-menu' with {
+    action: 'my-plugin/export',
+    permission: 'myPlugin:export',
+} only %}
+```
+
+Manual export links (use `'excel'` not `'xlsx'` for consistency):
+
 ```twig
 {# Check if format is enabled #}
 {% if lrExportEnabled('excel') %}
-    <a href="{{ url('plugin/export', {format: 'xlsx'}) }}">Export as Excel</a>
+    <a href="{{ cpUrl('my-plugin/export', {format: 'excel'}) }}">Export as Excel</a>
 {% endif %}
 
 {# Build export menu from enabled formats #}
 <div class="menu">
     {% for format in lrExportFormats() %}
-        <a href="{{ url('plugin/export', {format: format}) }}">
+        <a href="{{ cpUrl('my-plugin/export', {format: format}) }}">
             {{ format|upper }}
         </a>
     {% endfor %}
 </div>
-
-{# Get format options for select fields (form dropdowns) #}
-{{ forms.selectField({
-    label: 'Export Format',
-    name: 'format',
-    options: lrExportFormatOptions(),
-}) }}
 ```
 
 ### Export Methods
@@ -897,7 +913,7 @@ return ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated'], [
 | `toJson($data, $filename, $dateColumns)` | JSON file | API/data exchange |
 | `toExcel($rows, $headers, $filename, $dateColumns, $options)` | XLSX file | Professional reports |
 | `filename($prefix, $extension)` | Timestamped filename | Consistent naming |
-| `isFormatEnabled($format)` | boolean | Check availability |
+| `isFormatEnabled($format)` | boolean | Check availability (accepts aliases) |
 | `getEnabledFormats()` | array | List all enabled formats |
 | `getFormatOptions()` | array | Options for select fields |
 | `formatDateColumns($rows, $dateColumns)` | Formatted rows | Database format dates |
@@ -918,22 +934,23 @@ The `toExcel()` method creates professionally styled spreadsheets:
 
 ```php
 use lindemannrock\base\helpers\ExportHelper;
+use yii\web\ForbiddenHttpException;
 
 public function actionExport(): Response
 {
     $this->requirePermission('myPlugin:export');
 
-    $format = Craft::$app->getRequest()->getQueryParam('format', 'csv');
+    $request = Craft::$app->getRequest();
+    $format = $request->getQueryParam('format', 'csv');
+    $dateRange = $request->getQueryParam('dateRange', 'last30days');
 
-    // Check if format is enabled
+    // Check if format is enabled (accepts 'excel', 'xlsx', 'csv', 'json')
     if (!ExportHelper::isFormatEnabled($format)) {
         throw new ForbiddenHttpException('Export format not available');
     }
 
-    // Get data
+    // Get and prepare data
     $logs = $this->logsService->getLogs();
-
-    // Prepare rows for export
     $rows = array_map(fn($log) => [
         'dateCreated' => $log['dateCreated'],
         'recipient' => $log['recipient'],
@@ -941,14 +958,35 @@ public function actionExport(): Response
         'status' => $log['status'],
     ], $logs);
 
+    // Check for empty data
+    if (empty($rows)) {
+        Craft::$app->getSession()->setError(Craft::t('my-plugin', 'No data to export.'));
+        return $this->redirect($request->getReferrer());
+    }
+
     $headers = ['Date', 'Recipient', 'Message', 'Status'];
     $dateColumns = ['dateCreated'];
     $settings = MyPlugin::$plugin->getSettings();
 
+    // Route to appropriate export method
     return match ($format) {
-        'json' => ExportHelper::toJson($rows, ExportHelper::filename($settings, ['logs', $dateRange], 'json'), $dateColumns),
-        'xlsx', 'excel' => ExportHelper::toExcel($rows, $headers, ExportHelper::filename($settings, ['logs', $dateRange], 'xlsx'), $dateColumns),
-        default => ExportHelper::toCsv($rows, $headers, ExportHelper::filename($settings, ['logs', $dateRange], 'csv'), $dateColumns),
+        'excel' => ExportHelper::toExcel(
+            $rows,
+            $headers,
+            ExportHelper::filename($settings, ['logs', $dateRange], 'xlsx'),
+            $dateColumns,
+        ),
+        'json' => ExportHelper::toJson(
+            $rows,
+            ExportHelper::filename($settings, ['logs', $dateRange], 'json'),
+            $dateColumns,
+        ),
+        default => ExportHelper::toCsv(
+            $rows,
+            $headers,
+            ExportHelper::filename($settings, ['logs', $dateRange], 'csv'),
+            $dateColumns,
+        ),
     };
 }
 ```
@@ -1368,10 +1406,27 @@ Reusable export dropdown menu that automatically shows only enabled formats base
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `action` | string | (required) | Controller action URL (e.g., `'sms-manager/logs/export'`) |
+| `action` | string | (required) | CP route path (e.g., `'my-plugin/logs/export'`) |
 | `permission` | string | `null` | Permission required to show button (checks `currentUser.can()`) |
 | `dateRangeParam` | string | `'dateRange'` | URL parameter name for date range |
 | `extraParams` | object | `{}` | Additional parameters to pass to export URL |
+
+**Important: CP Route Required**
+
+The `action` parameter uses `cpUrl()` internally, so you **must register a CP route** in your plugin that maps to the controller action:
+
+```php
+// In your plugin's getCpUrlRules() method:
+private function getCpUrlRules(): array
+{
+    return [
+        // ... other routes ...
+        'my-plugin/logs/export' => 'my-plugin/logs/export',
+    ];
+}
+```
+
+Without this route, clicking the export button will result in a 404 error.
 
 **Features:**
 
