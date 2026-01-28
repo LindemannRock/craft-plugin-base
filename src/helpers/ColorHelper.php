@@ -324,6 +324,16 @@ class ColorHelper
                 'delivered' => array_merge(self::PALETTE['green'], ['dot' => 'on']),
                 'failed' => array_merge(self::PALETTE['red'], ['dot' => 'off']),
             ],
+
+            // =================================================================
+            // HEALTH STATUS - ok = green, low = yellow, high = red
+            // For health checks, sync status, discrepancy levels, etc.
+            // =================================================================
+            'healthStatus' => [
+                'ok' => array_merge(self::PALETTE['green'], ['dot' => 'on']),
+                'low' => array_merge(self::PALETTE['yellow'], ['dot' => 'pending']),
+                'high' => array_merge(self::PALETTE['red'], ['dot' => 'off']),
+            ],
         ];
 
         self::$initialized = true;

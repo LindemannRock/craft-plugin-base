@@ -341,7 +341,40 @@ $countries = GeoHelper::getAllCountries();  // ['AD' => 'Andorra', 'AE' => 'Unit
 // Validate country code
 $valid = GeoHelper::isValidCountryCode('US');  // true
 $valid = GeoHelper::isValidCountryCode('XX');  // false
+
+// Get dial code for a country
+$dialCode = GeoHelper::getDialCode('US');  // "+1"
+
+// Get dial code options for phone fields
+$options = GeoHelper::getCountryDialCodeOptions();  // [{value: 'US', label: 'United States (+1)'}, ...]
 ```
+
+#### Twig Usage
+
+```twig
+{# Get all countries for a select field #}
+{% for code, name in lrCountries() %}
+    <option value="{{ code }}">{{ name }}</option>
+{% endfor %}
+
+{# Get country name by code #}
+{{ lrCountryName('US') }}  {# United States #}
+
+{# Get dial code options for phone fields #}
+{% for option in lrDialCodes() %}
+    <option value="{{ option.value }}">{{ option.label }}</option>
+{% endfor %}
+
+{# Get dial code for a country #}
+{{ lrDialCode('US') }}  {# +1 #}
+```
+
+| Function | Returns | Use Case |
+|----------|---------|----------|
+| `lrCountries()` | `array` | All country codes → names for select fields |
+| `lrCountryName(code)` | `string` | Get country name by ISO code |
+| `lrDialCodes()` | `array` | Dial code options for phone select fields |
+| `lrDialCode(code)` | `string` | Get dial code for a country (e.g., `+1`) |
 
 ### DateTimeHelper
 
@@ -932,6 +965,10 @@ ColorHelper provides a unified `PALETTE` constant with all available colors. Thi
 | `logLevel` | debug, info, warning, error | Log severity levels |
 | `pluginStatus` | active, disabled, notInstalled | Plugin installation state |
 | `exportStatus` | pending, processing, completed, failed | Export/job status |
+| `triggerType` | manual, scheduled, api | Trigger source types |
+| `exportFormat` | xlsx, csv, json | Export file formats |
+| `messageStatus` | pending, sent, delivered, failed | Message/notification status |
+| `healthStatus` | ok, low, high | Health checks, sync status, discrepancy levels |
 
 ### PHP Usage
 
