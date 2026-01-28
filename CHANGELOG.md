@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.13.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.12.0...v5.13.0) (2026-01-28)
+
+
+### Features
+
+* **analytics-panel:** add new analytics panel component ([575ed24](https://github.com/LindemannRock/craft-plugin-base/commit/575ed248717e22e8cbd2da24a81243a016e333a8))
+* **datetime:** enhance DateTimeHelper and DateTimeExtension with UTC handling ([70c7039](https://github.com/LindemannRock/craft-plugin-base/commit/70c7039247398fd63e396839ee9a90a46c6cf65f))
+* **export:** add format aliases for Excel export compatibility ([ff71856](https://github.com/LindemannRock/craft-plugin-base/commit/ff718560a3953fc8e86a98469fa0bc454963ea99))
+* **phone-input:** add reusable phone input component with country code detection ([bb74180](https://github.com/LindemannRock/craft-plugin-base/commit/bb74180583c195fdb22dcf5a0513dafeb7bb6aa8))
+* **table:** enhance bulk actions and item selection logic ([575ed24](https://github.com/LindemannRock/craft-plugin-base/commit/575ed248717e22e8cbd2da24a81243a016e333a8))
+
 ## [5.12.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.11.0...v5.12.0) (2026-01-28)
 
 
