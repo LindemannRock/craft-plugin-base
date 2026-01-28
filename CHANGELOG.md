@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.12.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.11.0...v5.12.0) (2026-01-28)
+
+
+### Features
+
+* add Geo Twig extension and health status colors to ColorHelper ([2e40f7e](https://github.com/LindemannRock/craft-plugin-base/commit/2e40f7edecafb54b4ee64fe071964d4349158dd3))
+
+
+### Bug Fixes
+
+* add phpspreadsheet ^5.0 support for Craft 5.9 compatibility ([4e4c596](https://github.com/LindemannRock/craft-plugin-base/commit/4e4c59688fcbc236b2da569340cc053f39adf806))
+
 ## [5.11.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.1...v5.11.0) (2026-01-27)
 
 
