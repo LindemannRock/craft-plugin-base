@@ -237,6 +237,7 @@ public function init(): void
 | `DateTimeHelper::forDatabase()` | Format for MySQL datetime storage |
 | `DateTimeHelper::forApi()` | Format as ISO 8601 for APIs |
 | `DateTimeHelper::forFilename()` | Format safe for filenames |
+| `CsvImportHelper::parseUpload()` | Parse CSV file upload with validation and delimiter detection |
 | `ColorHelper::getPaletteColor()` | Get a color from the palette by name |
 | `ColorHelper::getPaletteColorNames()` | Get all available palette color names |
 | `ColorHelper::getColorSet()` | Get entire color set by name |
@@ -990,6 +991,111 @@ public function actionExport(): Response
     };
 }
 ```
+
+## CsvImportHelper
+
+Provides utilities for parsing and validating CSV file uploads with automatic delimiter detection.
+
+### PHP Usage
+
+```php
+use lindemannrock\base\helpers\CsvImportHelper;
+use craft\web\UploadedFile;
+
+// Get uploaded file
+$file = UploadedFile::getInstanceByName('csvFile');
+
+// Parse with default options
+$result = CsvImportHelper::parseUpload($file);
+// Returns: ['headers' => [...], 'allRows' => [...], 'rowCount' => 150, 'delimiter' => ',']
+
+// Parse with custom options
+$result = CsvImportHelper::parseUpload($file, [
+    'maxRows' => 1000,           // Maximum rows to parse (default: 4000)
+    'maxBytes' => 10485760,      // Max file size in bytes (default: 5MB)
+    'allowedExtensions' => ['csv', 'txt'],  // Allowed extensions
+    'delimiter' => ';',          // Force specific delimiter (default: auto-detect)
+    'detectDelimiter' => true,   // Auto-detect delimiter (default: true)
+]);
+
+// Access parsed data
+$headers = $result['headers'];    // ['Name', 'Email', 'Phone']
+$rows = $result['allRows'];       // [['John', 'john@example.com', '123'], ...]
+$count = $result['rowCount'];     // 150
+$delimiter = $result['delimiter']; // ',' or ';' or '\t' or '|'
+```
+
+### Features
+
+- **File validation**: Extension, MIME type, and file size checks
+- **Delimiter detection**: Automatically detects comma, semicolon, tab, or pipe delimiters
+- **Row limits**: Configurable maximum rows to prevent memory issues
+- **Proper cleanup**: Temporary files are deleted even on error
+- **Flexible options**: All validation parameters are configurable
+
+### Supported Delimiters
+
+| Delimiter | Character |
+|-----------|-----------|
+| Comma | `,` |
+| Semicolon | `;` |
+| Tab | `\t` |
+| Pipe | `\|` |
+
+### Controller Example
+
+```php
+use lindemannrock\base\helpers\CsvImportHelper;
+use craft\web\UploadedFile;
+
+public function actionImport(): Response
+{
+    $this->requirePostRequest();
+    $this->requirePermission('myPlugin:import');
+
+    $file = UploadedFile::getInstanceByName('csvFile');
+    if (!$file) {
+        Craft::$app->getSession()->setError('No file uploaded.');
+        return $this->redirectToPostedUrl();
+    }
+
+    try {
+        $result = CsvImportHelper::parseUpload($file, [
+            'maxRows' => 2000,
+        ]);
+
+        // Process rows
+        foreach ($result['allRows'] as $row) {
+            // Map headers to values
+            $data = array_combine($result['headers'], $row);
+            // ... process $data
+        }
+
+        Craft::$app->getSession()->setNotice(
+            "Imported {$result['rowCount']} records."
+        );
+    } catch (\RuntimeException $e) {
+        Craft::$app->getSession()->setError($e->getMessage());
+    }
+
+    return $this->redirectToPostedUrl();
+}
+```
+
+### Error Handling
+
+The `parseUpload()` method throws `\RuntimeException` with user-friendly messages:
+
+| Error | Message |
+|-------|---------|
+| Invalid extension | "Invalid file type. Please upload a CSV file." |
+| File too large | "File size exceeds the allowed limit of XMB." |
+| Invalid MIME type | "Invalid file type. Please upload a CSV file." |
+| Can't read file | "Could not open uploaded file for reading." |
+| No headers | "Could not read CSV headers." |
+| Single column | "Could not detect CSV delimiter..." |
+| Too many rows | "CSV file is too large. Maximum X rows allowed. Please split your file into smaller batches." |
+| Empty file | "CSV file is empty or contains only headers." |
 
 ## ColorHelper
 
