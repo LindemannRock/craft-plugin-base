@@ -9,6 +9,8 @@
  # - title: Section title
  # - description: Intro text
  # - csvFormatTip: HTML string for the info popover (optional)
+ # - csvDescription: Description shown inside CSV section when using mode switch
+ # - secondaryDescription: Description shown inside alternate section
  # - fileLabel: File field label
  # - fileInstructions: File field instructions
  # - delimiterLabel: Delimiter label
@@ -22,6 +24,12 @@
  # - backupOnImport: Backup-on-import default (bool)
  # - backupWarning: Warning string when backups disabled
  # - submitLabel: Submit button label
+ # - showModeSwitch: Whether to show a mode switch (CSV vs alternate import)
+ # - primaryLabel: Label for the CSV mode button
+ # - secondaryLabel: Label for the alternate import mode button
+ # - secondaryHtml: HTML content for the alternate import mode
+ # - modeDefault: Default mode ('csv' or 'secondary')
+ # - renderTitleInSection: Move title/instructions inside CSV section when using mode switch
  #}
 
 {% import "_includes/forms" as forms %}
@@ -33,6 +41,8 @@
 {% set title = title ?? 'Import from CSV'|t('app') %}
 {% set description = description ?? '' %}
 {% set csvFormatTip = csvFormatTip ?? null %}
+{% set csvDescription = csvDescription ?? null %}
+{% set secondaryDescription = secondaryDescription ?? null %}
 {% set fileLabel = fileLabel ?? 'CSV File'|t('app') %}
 {% set fileInstructions = fileInstructions ?? '' %}
 {% set fileId = fileId ?? 'csvFile' %}
@@ -55,21 +65,62 @@
 {% set backupWarning = backupWarning ?? null %}
 {% set submitLabel = submitLabel ?? 'Upload & Map Columns'|t('app') %}
 {% set infoBoxMessage = infoBoxMessage ?? null %}
+{% set showModeSwitch = showModeSwitch ?? false %}
+{% set primaryLabel = primaryLabel ?? 'CSV Import'|t('app') %}
+{% set secondaryLabel = secondaryLabel ?? 'Alternate Import'|t('app') %}
+{% set secondaryHtml = secondaryHtml ?? null %}
+{% set modeDefault = modeDefault ?? 'csv' %}
+{% set toggleId = toggleId ?? (formId ? formId ~ '-mode-switch' : 'csv-import-mode-switch') %}
+{% set renderTitleInSection = renderTitleInSection ?? false %}
 
-<div class="field">
-    <div class="heading">
-        <label>{{ title }}</label>
-        {% if csvFormatTip %}
-            <span class="info">{{ csvFormatTip|raw }}</span>
-        {% endif %}
-        {% if description %}
-            <div class="instructions">
-                <p>{{ description }}</p>
-            </div>
-        {% endif %}
+{% if not (showModeSwitch and secondaryHtml and renderTitleInSection) %}
+    <div class="field">
+        <div class="heading">
+            <label>{{ title }}</label>
+            {% if csvFormatTip %}
+                <span class="info">{{ csvFormatTip|raw }}</span>
+            {% endif %}
+            {% if description and not (showModeSwitch and secondaryHtml) %}
+                <div class="instructions">
+                    <p>{{ description }}</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
-</div>
+{% endif %}
 
+{% if showModeSwitch and secondaryHtml %}
+    <div class="btngroup" id="{{ toggleId }}" style="margin-bottom: 24px;">
+        <button type="button" class="btn {{ modeDefault == 'csv' ? 'active' : '' }}" data-import-mode="csv" aria-pressed="{{ modeDefault == 'csv' ? 'true' : 'false' }}">
+            {{ primaryLabel }}
+        </button>
+        <button type="button" class="btn {{ modeDefault == 'secondary' ? 'active' : '' }}" data-import-mode="secondary" aria-pressed="{{ modeDefault == 'secondary' ? 'true' : 'false' }}">
+            {{ secondaryLabel }}
+        </button>
+    </div>
+{% endif %}
+
+<div id="{{ toggleId }}-csv" class="{{ showModeSwitch and secondaryHtml and modeDefault != 'csv' ? 'hidden' : '' }}">
+    {% if showModeSwitch and secondaryHtml and renderTitleInSection %}
+        <div class="field">
+            <div class="heading">
+                <label>{{ title }}</label>
+                {% if csvFormatTip %}
+                    <span class="info">{{ csvFormatTip|raw }}</span>
+                {% endif %}
+                {% if csvDescription or description %}
+                    <div class="instructions">
+                        <p>{{ csvDescription ?? description }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% if showModeSwitch and secondaryHtml and (csvDescription or description) and not renderTitleInSection %}
+        <div class="instructions" style="margin-bottom: 12px;">
+            <p>{{ csvDescription ?? description }}</p>
+        </div>
+    {% endif %}
 {% if wrapForm %}
 <form method="post" action="{{ action }}" enctype="multipart/form-data" {% if formId %}id="{{ formId }}"{% endif %}>
     {% if includeCsrf %}{{ csrfInput() }}{% endif %}
@@ -116,4 +167,53 @@
     </div>
 {% if wrapForm %}
 </form>
+{% endif %}
+</div>
+
+{% if showModeSwitch and secondaryHtml %}
+    <div id="{{ toggleId }}-secondary" class="{{ modeDefault == 'secondary' ? '' : 'hidden' }}">
+        {% if secondaryDescription %}
+            <div class="instructions" style="margin-bottom: 12px;">
+                <p>{{ secondaryDescription }}</p>
+            </div>
+        {% endif %}
+        {{ secondaryHtml|raw }}
+    </div>
+{% endif %}
+
+{% if showModeSwitch and secondaryHtml %}
+{% js %}
+    (function() {
+        const switcher = document.getElementById('{{ toggleId }}');
+        if (!switcher) {
+            return;
+        }
+
+        const csvSection = document.getElementById('{{ toggleId }}-csv');
+        const secondarySection = document.getElementById('{{ toggleId }}-secondary');
+
+        switcher.addEventListener('click', function(e) {
+            const button = e.target.closest('button[data-import-mode]');
+            if (!button) {
+                return;
+            }
+
+            const mode = button.getAttribute('data-import-mode');
+            const buttons = switcher.querySelectorAll('button[data-import-mode]');
+            buttons.forEach(btn => {
+                const isActive = btn === button;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+
+            if (mode === 'secondary') {
+                csvSection?.classList.add('hidden');
+                secondarySection?.classList.remove('hidden');
+            } else {
+                secondarySection?.classList.add('hidden');
+                csvSection?.classList.remove('hidden');
+            }
+        });
+    })();
+{% endjs %}
 {% endif %}

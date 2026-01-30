@@ -1706,8 +1706,9 @@ Reusable CSV import form block (file, delimiter, optional backup toggle).
 {% include 'lindemannrock-base/_partials/import-csv' with {
     action: actionUrl('plugin/import/upload'),
     formId: 'uploadForm',
-    title: 'Import from CSV',
+    title: 'Import Items',
     description: "Import items from a CSV file. You'll be able to map columns and preview before importing.",
+    csvDescription: "Optional description shown inside the CSV section when using a mode switch.",
     csvFormatTip: csvFormatTip,
     fileLabel: 'CSV File',
     fileInstructions: 'Select a CSV file to import',
@@ -1718,6 +1719,13 @@ Reusable CSV import form block (file, delimiter, optional backup toggle).
     backupOnImport: settings.backupOnImport,
     backupWarning: 'Backups are disabled in settings.',
     submitLabel: 'Upload & Map Columns',
+    showModeSwitch: false,           // set true to enable alternate import mode
+    primaryLabel: 'CSV Import',      // optional
+    secondaryLabel: 'PHP Import',    // optional
+    secondaryHtml: phpImportHtml,    // HTML for alternate import section
+    secondaryDescription: "Optional description shown inside the alternate import section.",
+    modeDefault: 'csv',              // 'csv' or 'secondary'
+    renderTitleInSection: false,     // move title under toggle when using mode switch
 } %}
 ```
 
@@ -2265,8 +2273,10 @@ The layout provides these pre-styled CSS classes:
 | Class | Description |
 |-------|-------------|
 | `.lr-tab-content` | Tab content wrapper (use `hidden` class for non-active) |
-| `.lr-analytics-stats` | Grid container for stat boxes |
+| `.lr-analytics-stats` | Grid container for stat boxes (4 columns) |
+| `.lr-analytics-stats.compact` | Compact grid for 5+ stat boxes |
 | `.lr-stat-box` | Individual stat box |
+| `.lr-stat-box-colored` | Palette-colored stat box (auto-applied with `palette` param) |
 | `.lr-stat-value` | Large stat value |
 | `.lr-stat-label` | Stat description label |
 | `.lr-analytics-charts` | Grid container for charts |
@@ -2329,13 +2339,32 @@ Use these components within your tab partials:
 
 **Stat Box:**
 ```twig
+{# Basic stat box #}
 {% include 'lindemannrock-base/_components/stat-box' with {
     value: 12345,
     label: 'Total Views',
-    color: '#10b981',  {# optional #}
+    color: '#10b981',  {# optional: value color only #}
     suffix: '%',       {# optional #}
     id: 'views-stat',  {# optional, for JS updates #}
 } only %}
+
+{# Palette-colored stat box (derives bg, border, value color) #}
+{% include 'lindemannrock-base/_components/stat-box' with {
+    value: 50,
+    label: 'New Items',
+    palette: 'green',  {# palette color name #}
+} only %}
+```
+
+**Compact Grid (5+ columns):**
+```twig
+<div class="lr-analytics-stats compact">
+    {% include 'lindemannrock-base/_components/stat-box' with {value: 100, label: 'Total'} only %}
+    {% include 'lindemannrock-base/_components/stat-box' with {value: 50, label: 'New', palette: 'green'} only %}
+    {% include 'lindemannrock-base/_components/stat-box' with {value: 20, label: 'Updates', palette: 'amber'} only %}
+    {% include 'lindemannrock-base/_components/stat-box' with {value: 25, label: 'Unchanged', palette: 'gray'} only %}
+    {% include 'lindemannrock-base/_components/stat-box' with {value: 5, label: 'Errors', palette: 'red'} only %}
+</div>
 ```
 
 **Chart Container:**

@@ -343,6 +343,9 @@ class ColorHelper
                 'restore' => self::PALETTE['orange'],
                 'manual' => self::PALETTE['teal'],
                 'scheduled' => self::PALETTE['purple'],
+                'maintenance' => self::PALETTE['gray'],
+                'clear' => self::PALETTE['red'],
+                'other' => self::PALETTE['gray'],
             ],
         ];
 

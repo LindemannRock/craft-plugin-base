@@ -8,29 +8,56 @@
  #   - value: The numeric or text value to display
  #   - label: Description label for the stat
  #   - id: (optional) HTML id for dynamic updates
- #   - color: (optional) Custom color for value (default: #0d78f2)
+ #   - color: (optional) Custom color for value only (default: #0d78f2)
+ #   - palette: (optional) Palette color name for full colored box (e.g., 'green', 'red', 'amber')
+ #              Derives background, border, and value color from the palette color
  #   - suffix: (optional) Suffix to append (e.g., '%', 'ms')
  #   - prefix: (optional) Prefix to prepend (e.g., '$')
  #   - size: (optional) 'small' for compact version
  #
- # Example:
+ # Examples:
+ #   // Basic (default blue value)
  #   {% include 'lindemannrock-base/_components/stat-box' with {
  #       value: 1234,
  #       label: 'Total Messages',
- #       suffix: '',
  #   } only %}
+ #
+ #   // With palette color (full colored box)
+ #   {% include 'lindemannrock-base/_components/stat-box' with {
+ #       value: 50,
+ #       label: 'New Items',
+ #       palette: 'green',
+ #   } only %}
+ #
+ # Grid usage (use .compact for 5 columns):
+ #   <div class="lr-analytics-stats compact">
+ #       {% include '...' with {value: 100, label: 'Total'} %}
+ #       {% include '...' with {value: 50, label: 'New', palette: 'green'} %}
+ #   </div>
  #}
 
 {% set valueId = id ?? '' %}
-{% set valueColor = color ?? '#0d78f2' %}
 {% set valueSuffix = suffix ?? '' %}
 {% set valuePrefix = prefix ?? '' %}
-{% set isSmall = size ?? '' == 'small' %}
+{% set isSmall = (size ?? '') == 'small' %}
+{% set paletteName = palette ?? null %}
 
-<div class="lr-stat-box {% if isSmall %}lr-stat-box-small{% endif %}">
+{# Get palette color data if specified #}
+{% if paletteName %}
+    {% set paletteColor = lrPaletteColor(paletteName) %}
+    {% set valueColor = paletteColor.color ?? '#0d78f2' %}
+    {% set rgbValue = paletteColor.rgb ?? '13, 120, 242' %}
+    {% set boxStyle = 'background: rgba(' ~ rgbValue ~ ', 0.12); border-color: rgba(' ~ rgbValue ~ ', 0.35);' %}
+{% else %}
+    {% set valueColor = color ?? '#0d78f2' %}
+    {% set boxStyle = '' %}
+{% endif %}
+
+<div class="lr-stat-box {% if isSmall %}lr-stat-box-small{% endif %}{% if paletteName %} lr-stat-box-colored{% endif %}"
+     {% if boxStyle %}style="{{ boxStyle }}"{% endif %}>
     <div class="lr-stat-value"
          {% if valueId %}id="{{ valueId }}"{% endif %}
-         {% if valueColor != '#0d78f2' %}style="color: {{ valueColor }};"{% endif %}>
+         style="color: {{ valueColor }};">
         {{ valuePrefix }}{{ value|number_format }}{{ valueSuffix }}
     </div>
     <div class="lr-stat-label">{{ label }}</div>

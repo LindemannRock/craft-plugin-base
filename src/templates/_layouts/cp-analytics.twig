@@ -255,6 +255,12 @@
             margin-bottom: 40px;
         }
 
+        /* Compact grid for 5+ columns */
+        .lr-analytics-stats.compact {
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
         /* Individual stat box */
         .lr-stat-box {
             background: #f3f7fc;
@@ -262,6 +268,13 @@
             border-radius: 4px;
             text-align: center;
             border: 1px solid var(--hairline-color, #e3e5e8);
+        }
+
+        /* Colored stat box (palette-based) */
+        .lr-stat-box-colored {
+            background: transparent;
+            border-style: solid;
+            border-width: 1px;
         }
 
         .lr-stat-value {
