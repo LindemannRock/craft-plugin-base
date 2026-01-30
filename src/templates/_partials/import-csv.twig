@@ -28,11 +28,15 @@
 
 {% set action = action ?? '' %}
 {% set formId = formId ?? '' %}
+{% set wrapForm = wrapForm ?? true %}
+{% set includeCsrf = includeCsrf ?? wrapForm %}
 {% set title = title ?? 'Import from CSV'|t('app') %}
 {% set description = description ?? '' %}
 {% set csvFormatTip = csvFormatTip ?? null %}
 {% set fileLabel = fileLabel ?? 'CSV File'|t('app') %}
 {% set fileInstructions = fileInstructions ?? '' %}
+{% set fileId = fileId ?? 'csvFile' %}
+{% set fileName = fileName ?? 'csvFile' %}
 {% set delimiterLabel = delimiterLabel ?? 'CSV Delimiter'|t('app') %}
 {% set delimiterInstructions = delimiterInstructions ?? '' %}
 {% set delimiterValue = delimiterValue ?? 'auto' %}
@@ -50,6 +54,7 @@
 {% set backupOnImport = backupOnImport ?? true %}
 {% set backupWarning = backupWarning ?? null %}
 {% set submitLabel = submitLabel ?? 'Upload & Map Columns'|t('app') %}
+{% set infoBoxMessage = infoBoxMessage ?? null %}
 
 <div class="field">
     <div class="heading">
@@ -65,14 +70,16 @@
     </div>
 </div>
 
+{% if wrapForm %}
 <form method="post" action="{{ action }}" enctype="multipart/form-data" {% if formId %}id="{{ formId }}"{% endif %}>
-    {{ csrfInput() }}
+    {% if includeCsrf %}{{ csrfInput() }}{% endif %}
+{% endif %}
 
     {{ forms.fileField({
         label: fileLabel,
         instructions: fileInstructions,
-        id: 'csvFile',
-        name: 'csvFile',
+        id: fileId,
+        name: fileName,
         required: true,
     }) }}
 
@@ -98,7 +105,15 @@
         }) }}
     {% endif %}
 
+    {% if infoBoxMessage %}
+        {% include 'lindemannrock-base/_components/info-box' with {
+            message: infoBoxMessage,
+        } %}
+    {% endif %}
+
     <div class="buttons">
         <button type="submit" class="btn submit">{{ submitLabel }}</button>
     </div>
+{% if wrapForm %}
 </form>
+{% endif %}

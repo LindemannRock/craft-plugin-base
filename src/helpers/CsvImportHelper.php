@@ -22,6 +22,20 @@ use craft\web\UploadedFile;
 class CsvImportHelper
 {
     /**
+     * Default maximum rows allowed for CSV imports
+     *
+     * @since 5.14.0
+     */
+    public const DEFAULT_MAX_ROWS = 4000;
+
+    /**
+     * Default maximum file size in bytes (5 MB)
+     *
+     * @since 5.14.0
+     */
+    public const DEFAULT_MAX_BYTES = 5242880;
+
+    /**
      * Parse a CSV upload into headers + rows stored in memory.
      *
      * @param UploadedFile $file The uploaded CSV file
@@ -39,8 +53,8 @@ class CsvImportHelper
     public static function parseUpload(UploadedFile $file, array $options = []): array
     {
         $options = array_merge([
-            'maxRows' => 4000,
-            'maxBytes' => 5242880,
+            'maxRows' => self::DEFAULT_MAX_ROWS,
+            'maxBytes' => self::DEFAULT_MAX_BYTES,
             'allowedExtensions' => ['csv', 'txt'],
             'allowedMimeTypes' => [
                 'text/csv',
