@@ -193,6 +193,11 @@
                                            data-action="{{ menuItem.jsAction }}"
                                            data-id="{{ item.id ?? '' }}"
                                        {% endif %}
+                                       {% if menuItem.data is defined and menuItem.data %}
+                                           {% for key, val in menuItem.data %}
+                                               data-{{ key|e('html_attr') }}="{{ val|e('html_attr') }}"
+                                           {% endfor %}
+                                       {% endif %}
                                        {% if menuItem.confirm is defined and menuItem.confirm %}
                                            data-confirm="{{ menuItem.confirm }}"
                                        {% endif %}

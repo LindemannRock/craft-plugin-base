@@ -1,0 +1,104 @@
+{#
+ # CSV Import Partial
+ #
+ # Reusable CSV import form block for CP pages.
+ #
+ # Parameters:
+ # - action: Form action URL (required)
+ # - formId: Form ID (optional)
+ # - title: Section title
+ # - description: Intro text
+ # - csvFormatTip: HTML string for the info popover (optional)
+ # - fileLabel: File field label
+ # - fileInstructions: File field instructions
+ # - delimiterLabel: Delimiter label
+ # - delimiterInstructions: Delimiter instructions
+ # - delimiterValue: Selected delimiter value (default: 'auto')
+ # - delimiterOptions: Options array for delimiter select
+ # - showBackupToggle: Whether to show backup toggle
+ # - backupLabel: Backup label
+ # - backupInstructions: Backup instructions
+ # - backupEnabled: Backup master switch (bool)
+ # - backupOnImport: Backup-on-import default (bool)
+ # - backupWarning: Warning string when backups disabled
+ # - submitLabel: Submit button label
+ #}
+
+{% import "_includes/forms" as forms %}
+
+{% set action = action ?? '' %}
+{% set formId = formId ?? '' %}
+{% set title = title ?? 'Import from CSV'|t('app') %}
+{% set description = description ?? '' %}
+{% set csvFormatTip = csvFormatTip ?? null %}
+{% set fileLabel = fileLabel ?? 'CSV File'|t('app') %}
+{% set fileInstructions = fileInstructions ?? '' %}
+{% set delimiterLabel = delimiterLabel ?? 'CSV Delimiter'|t('app') %}
+{% set delimiterInstructions = delimiterInstructions ?? '' %}
+{% set delimiterValue = delimiterValue ?? 'auto' %}
+{% set delimiterOptions = delimiterOptions ?? {
+    'auto': 'Auto (detect)'|t('app'),
+    ',': 'Comma (,)'|t('app'),
+    ';': 'Semicolon (;)'|t('app'),
+    "\t": 'Tab'|t('app'),
+    '|': 'Pipe (|)'|t('app'),
+} %}
+{% set showBackupToggle = showBackupToggle ?? false %}
+{% set backupLabel = backupLabel ?? 'Create Backup Before Import'|t('app') %}
+{% set backupInstructions = backupInstructions ?? '' %}
+{% set backupEnabled = backupEnabled ?? true %}
+{% set backupOnImport = backupOnImport ?? true %}
+{% set backupWarning = backupWarning ?? null %}
+{% set submitLabel = submitLabel ?? 'Upload & Map Columns'|t('app') %}
+
+<div class="field">
+    <div class="heading">
+        <label>{{ title }}</label>
+        {% if csvFormatTip %}
+            <span class="info">{{ csvFormatTip|raw }}</span>
+        {% endif %}
+        {% if description %}
+            <div class="instructions">
+                <p>{{ description }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<form method="post" action="{{ action }}" enctype="multipart/form-data" {% if formId %}id="{{ formId }}"{% endif %}>
+    {{ csrfInput() }}
+
+    {{ forms.fileField({
+        label: fileLabel,
+        instructions: fileInstructions,
+        id: 'csvFile',
+        name: 'csvFile',
+        required: true,
+    }) }}
+
+    {{ forms.selectField({
+        label: delimiterLabel,
+        instructions: delimiterInstructions,
+        id: 'delimiter',
+        name: 'delimiter',
+        value: delimiterValue,
+        options: delimiterOptions,
+        required: true,
+    }) }}
+
+    {% if showBackupToggle %}
+        {{ forms.lightswitchField({
+            label: backupLabel,
+            instructions: backupInstructions,
+            id: 'createBackup',
+            name: 'createBackup',
+            on: backupEnabled and backupOnImport,
+            disabled: not backupEnabled,
+            warning: not backupEnabled ? backupWarning : null,
+        }) }}
+    {% endif %}
+
+    <div class="buttons">
+        <button type="submit" class="btn submit">{{ submitLabel }}</button>
+    </div>
+</form>

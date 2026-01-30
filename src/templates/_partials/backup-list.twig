@@ -1,0 +1,27 @@
+{#
+ # Async Backup List Partial
+ #
+ # Renders loading, empty, and error containers for an async backup list.
+ #
+ # Parameters:
+ # - idPrefix: string prefix for element IDs (default: 'backup')
+ # - loadingMessage: message shown while loading
+ # - emptyMessage: message shown when no backups exist
+ #}
+
+{% set idPrefix = idPrefix ?? 'backup' %}
+{% set loadingMessage = loadingMessage ?? 'Loading backup history...'|t('app') %}
+{% set emptyMessage = emptyMessage ?? 'No backups found.'|t('app') %}
+
+<div id="{{ idPrefix }}-list-loading" class="centeralign">
+    <div class="spinner big"></div>
+    <p>{{ loadingMessage }}</p>
+</div>
+
+<div id="{{ idPrefix }}-list-content" class="hidden">
+    <div id="{{ idPrefix }}-table-container"></div>
+    <div id="{{ idPrefix }}-empty-message" class="hidden">
+        <p class="light" style="text-align: center; padding: 40px;">{{ emptyMessage }}</p>
+    </div>
+    <div id="{{ idPrefix }}-error-message" class="hidden error"></div>
+</div>

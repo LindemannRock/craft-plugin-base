@@ -334,6 +334,16 @@ class ColorHelper
                 'low' => array_merge(self::PALETTE['yellow'], ['dot' => 'pending']),
                 'high' => array_merge(self::PALETTE['red'], ['dot' => 'off']),
             ],
+
+            // =================================================================
+            // BACKUP REASON - import/restore/manual/scheduled
+            // =================================================================
+            'backupReason' => [
+                'import' => self::PALETTE['blue'],
+                'restore' => self::PALETTE['orange'],
+                'manual' => self::PALETTE['teal'],
+                'scheduled' => self::PALETTE['purple'],
+            ],
         ];
 
         self::$initialized = true;

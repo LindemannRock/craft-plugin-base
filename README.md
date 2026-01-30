@@ -1144,6 +1144,7 @@ ColorHelper provides a unified `PALETTE` constant with all available colors. Thi
 | `exportFormat` | xlsx, csv, json | Export file formats |
 | `messageStatus` | pending, sent, delivered, failed | Message/notification status |
 | `healthStatus` | ok, low, high | Health checks, sync status, discrepancy levels |
+| `backupReason` | import, restore, manual, scheduled | Backup origin/type |
 
 ### PHP Usage
 
@@ -1347,6 +1348,11 @@ Renders action buttons or dropdown menus for table rows with permission handling
                 url: url('plugin/edit/' ~ item.id),
                 permission: 'plugin:edit',
             },
+            {
+                label: 'Restore'|t('app'),
+                jsAction: 'restore',
+                data: {dirname: item.dirname, count: item.count},
+            },
             {type: 'divider'},
             {
                 label: 'Delete'|t('app'),
@@ -1372,6 +1378,7 @@ Renders action buttons or dropdown menus for table rows with permission handling
   - `showIf` / `hideIf` - Conditional display
   - `class` - CSS class (e.g., `'error'` for destructive)
   - `jsAction` - JavaScript action name (triggers `lr:rowAction` event)
+  - `data` - Key/value map for `data-*` attributes
   - `confirm` - Confirmation message
   - `type: 'divider'` - Separator line
 
@@ -1671,6 +1678,47 @@ When all formats are enabled, renders:
         </ul>
     </div>
 </div>
+```
+
+## Template Partials
+
+### Backup List (Async Loader Shell)
+
+Renders loading/empty/error containers for async backup lists.
+
+**Location:** `lindemannrock-base/_partials/backup-list`
+
+```twig
+{% include 'lindemannrock-base/_partials/backup-list' with {
+    idPrefix: 'backup',
+    loadingMessage: 'Loading backup history...',
+    emptyMessage: 'No backups found.',
+} %}
+```
+
+### CSV Import Form
+
+Reusable CSV import form block (file, delimiter, optional backup toggle).
+
+**Location:** `lindemannrock-base/_partials/import-csv`
+
+```twig
+{% include 'lindemannrock-base/_partials/import-csv' with {
+    action: actionUrl('plugin/import/upload'),
+    formId: 'uploadForm',
+    title: 'Import from CSV',
+    description: "Import items from a CSV file. You'll be able to map columns and preview before importing.",
+    csvFormatTip: csvFormatTip,
+    fileLabel: 'CSV File',
+    fileInstructions: 'Select a CSV file to import',
+    delimiterLabel: 'CSV Delimiter',
+    delimiterInstructions: 'Character used to separate values in your CSV (auto-detect is default)',
+    showBackupToggle: true,
+    backupEnabled: settings.backupEnabled,
+    backupOnImport: settings.backupOnImport,
+    backupWarning: 'Backups are disabled in settings.',
+    submitLabel: 'Upload & Map Columns',
+} %}
 ```
 
 ## CP Table Layout
