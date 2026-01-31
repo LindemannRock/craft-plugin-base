@@ -1229,7 +1229,7 @@ public function init(): void
 {
     parent::init();
 
-    // Bootstrap with custom color sets
+    // Bootstrap with custom color sets and log menu
     PluginHelper::bootstrap(
         $this,
         'myPluginHelper',
@@ -1242,9 +1242,13 @@ public function init(): void
                     'pending' => ColorHelper::getPaletteColor('orange'),
                     'failed' => ColorHelper::getPaletteColor('red'),
                 ],
-                'myType' => [
-                    'typeA' => ColorHelper::getPaletteColor('purple'),
-                    'typeB' => ColorHelper::getPaletteColor('blue'),
+            ],
+            // Optional: Customize log sidebar menu
+            'logMenu' => [
+                'label' => 'Logs',
+                'items' => [
+                    'system' => ['label' => 'System', 'url' => 'my-plugin/logs/system'],
+                    'activity' => ['label' => 'Activity', 'url' => 'my-plugin/logs/activity'],
                 ],
             ],
         ]
@@ -1888,6 +1892,9 @@ A reusable layout for building consistent table/listing pages in the Control Pan
 | `ajax.enabled` | bool | `false` | Enable auto-refresh |
 | `ajax.interval` | int | `0` | Refresh interval in seconds |
 | `ajax.endpoint` | string | `''` | AJAX endpoint URL |
+| `sidebarMenu.label` | string | `title` | Left sidebar nav label (aria-label) |
+| `sidebarMenu.items` | object | `{}` | Nav items: `{key: {label, url}}` |
+| `sidebarMenu.selected` | string | `''` | Currently selected nav item key |
 
 ### AJAX Auto-Refresh
 
@@ -2093,6 +2100,34 @@ To add content to the right sidebar (details pane), use the `sidebarContent` blo
 The sidebar appears on the right side of the page using Craft's built-in details pane.
 
 > **Note**: We use `sidebarContent` instead of `sidebar` to avoid collision with Craft's left sidebar block in `_layouts/cp`.
+
+### Sidebar Menu (Left Navigation)
+
+Add a left sidebar navigation menu for sub-pages (like settings sections):
+
+```twig
+{% set tableConfig = {
+    // ... other config ...
+    sidebarMenu: {
+        label: 'Logs'|t('app'),
+        items: {
+            system: {label: 'System'|t('app'), url: 'my-plugin/logs/system'},
+            activity: {label: 'Activity'|t('app'), url: 'my-plugin/logs/activity'},
+            errors: {label: 'Errors'|t('app'), url: 'my-plugin/logs/errors'},
+        },
+        selected: 'system',
+    },
+} %}
+```
+
+**Parameters:**
+- `label` - Aria label for the nav element (defaults to page title)
+- `items` - Object with keys and `{label, url}` values
+- `selected` - Key of the currently active item
+
+The sidebar menu only renders if there are **2 or more items**. Single-item menus are hidden automatically.
+
+Uses Craft's native `_includes/nav` component for consistent styling with settings pages.
 
 ### JavaScript Events
 
