@@ -66,6 +66,8 @@ class PluginHelper
      * @param array $options Additional options:
      *   - 'colorSets': array of color sets to register for badges/filters
      *     Example: ['myStatus' => ['active' => ['color' => '#10b981', 'rgb' => '16, 185, 129', 'text' => '#065f46']]]
+     *   - 'logMenu': array to customize log sidebar menu (label/items)
+     *     Example: ['label' => 'Logs', 'items' => ['system' => ['label' => 'System', 'url' => 'my-plugin/logs/system']]]
      * @since 5.0.0
      */
     public static function bootstrap(
@@ -102,6 +104,15 @@ class PluginHelper
             $logLevel = $settings->logLevel ?? 'error';
             $itemsPerPage = $settings->itemsPerPage ?? 100;
 
+            $logMenu = $options['logMenu'] ?? null;
+            $logMenuItems = null;
+            $logMenuLabel = null;
+
+            if (is_array($logMenu)) {
+                $logMenuItems = is_array($logMenu['items'] ?? null) ? $logMenu['items'] : null;
+                $logMenuLabel = is_string($logMenu['label'] ?? null) ? $logMenu['label'] : null;
+            }
+
             LoggingLibrary::configure([
                 'pluginHandle' => $plugin->handle,
                 'pluginName' => $pluginName,
@@ -109,6 +120,8 @@ class PluginHelper
                 'itemsPerPage' => $itemsPerPage,
                 'viewPermissions' => $viewPermissions,
                 'downloadPermissions' => $downloadPermissions,
+                'logMenuItems' => $logMenuItems,
+                'logMenuLabel' => $logMenuLabel,
             ]);
         }
 

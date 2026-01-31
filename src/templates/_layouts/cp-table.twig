@@ -18,6 +18,14 @@
  # │         subnav: 'sms-logs',                                     │
  # │         crumbs: [...],                                          │
  # │     },                                                          │
+ # │     sidebarMenu: {  // Optional left sidebar navigation          │
+ # │         label: 'Logs',                                          │
+ # │         items: {                                                │
+ # │             system: {label: 'System', url: 'plugin/logs/system'},│
+ # │             activity: {label: 'Activity', url: 'plugin/logs/activity'},│
+ # │         },                                                      │
+ # │         selected: 'system',                                     │
+ # │     },                                                          │
  # │     filters: [...],                                             │
  # │     search: {placeholder: 'Search logs...', value: search},     │
  # │     table: {                                                    │
@@ -53,6 +61,7 @@
  # - {% block rowActions %} - Per-row action buttons
  # - {% block expandableRow %} - Expandable detail row (logs, etc.)
  # - {% block bulkActions %} - Bulk action buttons (shown when items selected)
+ # - {% block sidebar %} - Left sidebar navigation (auto-rendered from config.sidebarMenu)
  # - {% block sidebarContent %} - Right sidebar/details pane content
  # - {% block toolbarActions %} - Toolbar action buttons (export, etc.)
  # - {% block extraToolbar %} - Additional toolbar items inside toolbar
@@ -80,6 +89,12 @@
 {% set selectedSubnavItem = pageConfig.subnav ?? '' %}
 {% set crumbs = pageConfig.crumbs ?? [] %}
 {% set fullPageForm = pageConfig.fullPageForm ?? false %}
+
+{# Sidebar Menu (left navigation) #}
+{% set sidebarMenuConfig = config.sidebarMenu ?? {} %}
+{% set sidebarMenuItems = sidebarMenuConfig.items ?? {} %}
+{% set sidebarMenuLabel = sidebarMenuConfig.label ?? title %}
+{% set sidebarMenuSelected = sidebarMenuConfig.selected ?? '' %}
 
 {# Filters #}
 {% set filters = config.filters ?? [] %}
@@ -1087,9 +1102,25 @@
 
 
 {# ============================================================================
-   SIDEBAR/DETAILS BLOCK
-   Note: We use 'sidebarContent' instead of 'sidebar' to avoid collision
-   with Craft's left sidebar block in _layouts/cp
+   LEFT SIDEBAR (Navigation Menu)
+   Uses Craft's native 'sidebar' block and _includes/nav component.
+   Config: sidebarMenu: {label, items, selected}
+   ============================================================================ #}
+
+{% block sidebar %}
+    {% if sidebarMenuItems|length > 1 %}
+        {% include "_includes/nav" with {
+            label: sidebarMenuLabel,
+            items: sidebarMenuItems,
+            selectedItem: sidebarMenuSelected,
+        } only %}
+    {% endif %}
+{% endblock %}
+
+
+{# ============================================================================
+   RIGHT SIDEBAR (Details Pane)
+   Uses 'sidebarContent' as our block name inside Craft's 'details' block.
    ============================================================================ #}
 
 {% block details %}
