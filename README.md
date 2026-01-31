@@ -237,6 +237,16 @@ public function init(): void
 | `DateTimeHelper::forDatabase()` | Format for MySQL datetime storage |
 | `DateTimeHelper::forApi()` | Format as ISO 8601 for APIs |
 | `DateTimeHelper::forFilename()` | Format safe for filenames |
+| `DateRangeHelper::getDefaultDateRange()` | Get default date range from config |
+| `DateRangeHelper::getOptions()` | Get standard date range options for dropdowns |
+| `DateRangeHelper::getBounds()` | Get UTC date bounds for a range |
+| `DateRangeHelper::applyToQuery()` | Apply date range filter to a query |
+| `DateRangeHelper::getDaysCount()` | Get number of days in a range |
+| `ExportHelper::isFormatEnabled()` | Check if export format is enabled |
+| `ExportHelper::getEnabledFormats()` | Get all enabled export formats |
+| `ExportHelper::toCsv()` | Export data to CSV |
+| `ExportHelper::toJson()` | Export data to JSON |
+| `ExportHelper::toExcel()` | Export data to Excel |
 | `CsvImportHelper::parseUpload()` | Parse CSV file upload with validation and delimiter detection |
 | `ColorHelper::getPaletteColor()` | Get a color from the palette by name |
 | `ColorHelper::getPaletteColorNames()` | Get all available palette color names |
@@ -403,6 +413,17 @@ return [
     // Show seconds by default: true/false
     'showSeconds' => false,
 
+    // Export formats (defaults: csv=true, json=false, excel=true)
+    'exports' => [
+        'csv' => true,
+        'json' => false,
+        'excel' => true,
+    ],
+
+    // Default date range for analytics, logs, dashboards, and any date-filtered pages
+    // Options: today, yesterday, last7days, last30days, last90days, thisMonth, lastMonth, thisYear, lastYear, all
+    'defaultDateRange' => 'last30days',
+
     // Environment-specific overrides
     // 'production' => [
     //     'timeFormat' => '12',
@@ -410,6 +431,32 @@ return [
     // ],
 ];
 ```
+
+#### Plugin-Specific Overrides
+
+Plugins can override base settings in their own config file (e.g., `config/sms-manager.php`):
+
+```php
+<?php
+// config/sms-manager.php
+return [
+    // ... other plugin settings ...
+
+    // Override default date range for this plugin only
+    // Used by analytics, logs, dashboard - any page with date filtering
+    'defaultDateRange' => 'last7days',  // SMS is time-sensitive
+
+    // Override export formats for this plugin only
+    'exports' => [
+        'json' => true,  // Enable JSON export for this plugin
+    ],
+];
+```
+
+**Resolution Order:**
+1. Plugin config (`config/my-plugin.php`) - highest priority
+2. Base config (`config/lindemannrock-base.php`)
+3. Built-in defaults - lowest priority
 
 #### PHP Usage
 
@@ -804,11 +851,12 @@ Add to `config/lindemannrock-base.php` to control which export formats are avail
 return [
     // ... other settings ...
 
-    // Export formats (all default to true if not specified)
+    // Export formats
+    // Defaults: csv=true, json=false, excel=true
     'exports' => [
         'csv' => true,
-        'json' => true,
-        'excel' => true,  // Set false to disable
+        'json' => false,   // Developer format - disabled by default
+        'excel' => true,
     ],
 ];
 ```
@@ -991,6 +1039,126 @@ public function actionExport(): Response
     };
 }
 ```
+
+## DateRangeHelper
+
+Centralizes date range parsing for analytics, logs, dashboards, and any date-filtered pages. Provides consistent date boundaries for all LindemannRock plugins.
+
+### Configuration
+
+Add to `config/lindemannrock-base.php` to set the default date range:
+
+```php
+return [
+    // ... other settings ...
+
+    // Default date range for all date-filtered pages
+    // Options: 'today', 'yesterday', 'last7days', 'last30days', 'last90days',
+    //          'thisMonth', 'lastMonth', 'thisYear', 'lastYear', 'all'
+    'defaultDateRange' => 'last30days',
+];
+```
+
+### Available Date Ranges
+
+| Value | Description |
+|-------|-------------|
+| `today` | Current day |
+| `yesterday` | Previous day |
+| `last7days` | Past 7 days |
+| `last30days` | Past 30 days (default) |
+| `last90days` | Past 90 days |
+| `thisMonth` | Current month to date |
+| `lastMonth` | Previous calendar month |
+| `thisYear` | Current year to date |
+| `lastYear` | Previous calendar year |
+| `all` | All time (no date filter) |
+
+### PHP Usage
+
+```php
+use lindemannrock\base\helpers\DateRangeHelper;
+
+// Get default date range from config
+$default = DateRangeHelper::getDefaultDateRange();  // 'last30days'
+
+// With plugin-specific override
+$default = DateRangeHelper::getDefaultDateRange('sms-manager');
+
+// Get standard options for dropdowns
+$options = DateRangeHelper::getOptions();
+// Returns: [{value: 'today', label: 'Today'}, {value: 'yesterday', label: 'Yesterday'}, ...]
+
+// Get as associative array
+$options = DateRangeHelper::getOptions('assoc');
+// Returns: ['today' => 'Today', 'yesterday' => 'Yesterday', ...]
+
+// Normalize date range (handles aliases, null values)
+$range = DateRangeHelper::normalize($request->getParam('dateRange'));
+
+// Get date bounds for queries
+$bounds = DateRangeHelper::getBounds('last7days');
+// Returns: ['start' => DateTime, 'end' => DateTime|null]
+
+// Apply to a query
+DateRangeHelper::applyToQuery($query, 'last30days', 'dateCreated');
+
+// Get day count (for averages)
+$days = DateRangeHelper::getDaysCount('thisMonth');  // 15 (if today is 15th)
+```
+
+### Controller Example
+
+```php
+public function actionIndex(): Response
+{
+    $dateRange = DateRangeHelper::normalize(
+        Craft::$app->getRequest()->getParam('dateRange'),
+        DateRangeHelper::getDefaultDateRange('my-plugin')  // Plugin-specific default
+    );
+
+    $query = (new Query())->from('{{%my_analytics}}');
+    DateRangeHelper::applyToQuery($query, $dateRange);
+
+    return $this->renderTemplate('my-plugin/analytics/index', [
+        'dateRange' => $dateRange,
+        'stats' => $query->all(),
+    ]);
+}
+```
+
+### Twig Usage
+
+```twig
+{# Get default date range from config #}
+{% set defaultRange = lrDefaultDateRange() %}
+
+{# With plugin-specific override #}
+{% set defaultRange = lrDefaultDateRange('sms-manager') %}
+
+{# Get date range options for dropdowns #}
+{% set options = lrDateRangeOptions() %}
+{# Returns: [{value: 'today', label: 'Today'}, {value: 'yesterday', label: 'Yesterday'}, ...] #}
+
+{# Get options as associative array (for cp-analytics layout) #}
+{% set options = lrDateRangeOptions('assoc') %}
+{# Returns: {today: 'Today', yesterday: 'Yesterday', last7days: 'Last 7 days', ...} #}
+
+{# In cp-analytics config - omit default to use config #}
+{% set analyticsConfig = {
+    filters: {
+        dateRange: {
+            current: dateRange,
+            {# default: will use lrDefaultDateRange() automatically #}
+        },
+    },
+} %}
+```
+
+| Function | Returns | Use Case |
+|----------|---------|----------|
+| `lrDefaultDateRange(pluginHandle?)` | `string` | Get default range from config (e.g., 'last30days') |
+| `lrDateRangeOptions(format?)` | `array` | Get options for dropdowns ('array' or 'assoc' format) |
 
 ## CsvImportHelper
 
@@ -2229,8 +2397,8 @@ A reusable layout for building consistent analytics/dashboard pages in the Contr
     },
     filters: {
         dateRange: {
-            default: 'last7days',
             current: dateRange,
+            {# default: uses lrDefaultDateRange() from config if omitted #}
         },
         sites: {
             enabled: true,
@@ -2290,7 +2458,7 @@ document.addEventListener('lr:analyticsInit', function(e) {
 | `page.title` | string | `'Analytics'` | Page title |
 | `page.subnav` | string | `'analytics'` | Active subnav item |
 | `tabs` | object | `{}` | Tab definitions: `{ tabId: { label: 'Label' } }` |
-| `filters.dateRange.default` | string | `'last7days'` | Default date range |
+| `filters.dateRange.default` | string | `lrDefaultDateRange()` | Default date range (from config if omitted) |
 | `filters.dateRange.current` | string | | Current date range value |
 | `filters.sites.enabled` | bool | `false` | Enable site filter |
 | `filters.sites.current` | string | `''` | Current site ID |

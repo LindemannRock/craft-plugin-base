@@ -8,6 +8,7 @@
 
 namespace lindemannrock\base\twigextensions;
 
+use lindemannrock\base\helpers\DateRangeHelper;
 use lindemannrock\base\helpers\DateTimeHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -76,6 +77,8 @@ class DateTimeExtension extends AbstractExtension
             new TwigFunction('lrIsToday', [DateTimeHelper::class, 'isToday']),
             new TwigFunction('lrIsPast', [DateTimeHelper::class, 'isPast']),
             new TwigFunction('lrIsFuture', [DateTimeHelper::class, 'isFuture']),
+            new TwigFunction('lrDefaultDateRange', [DateRangeHelper::class, 'getDefaultDateRange']),
+            new TwigFunction('lrDateRangeOptions', [DateRangeHelper::class, 'getOptions']),
         ];
     }
 

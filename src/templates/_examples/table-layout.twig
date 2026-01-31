@@ -168,6 +168,7 @@
     {% include 'lindemannrock-base/_components/export-menu' with {
         action: 'my-plugin/items/export',
         permission: 'myPlugin:exportItems',
+        pluginHandle: pluginHandle,
     } only %}
 {% endblock %}
 

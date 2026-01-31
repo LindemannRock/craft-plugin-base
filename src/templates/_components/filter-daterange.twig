@@ -16,17 +16,8 @@
  # - urlParams: Current URL parameters to maintain
  #}
 
-{# Default date range options if not provided #}
-{% set defaultOptions = [
-    {value: 'today', label: 'Today'|t('app')},
-    {value: 'yesterday', label: 'Yesterday'|t('app')},
-    {value: 'last7days', label: 'Last 7 days'|t('app')},
-    {value: 'last30days', label: 'Last 30 days'|t('app')},
-    {value: 'last90days', label: 'Last 90 days'|t('app')},
-    {value: 'all', label: 'All time'|t('app')},
-] %}
-
-{% set options = filter.options ?? defaultOptions %}
+{# Use centralized date range options from DateRangeHelper #}
+{% set options = filter.options ?? lrDateRangeOptions() %}
 
 {% set currentOption = null %}
 {% for option in options %}

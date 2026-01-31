@@ -3,10 +3,12 @@
  #
  # A reusable export dropdown menu that automatically shows only enabled formats.
  # Uses ExportHelper configuration from config/lindemannrock-base.php.
+ # Supports plugin-specific overrides via pluginHandle parameter.
  #
  # Parameters:
  # - action: (required) The controller action URL (e.g., 'sms-manager/sms-logs/export')
  # - permission: (optional) Permission required to show export button
+ # - pluginHandle: (optional) Plugin handle for config overrides (e.g., 'sms-manager')
  # - dateRangeParam: (optional) Current date range parameter name (default: 'dateRange')
  # - extraParams: (optional) Additional parameters to pass to export URL
  # - selectionAware: (optional) If true, shows count and passes selected IDs (default: false)
@@ -17,12 +19,14 @@
  #   {% include 'lindemannrock-base/_components/export-menu' with {
  #       action: 'sms-manager/sms-logs/export',
  #       permission: 'smsManager:downloadLogs',
+ #       pluginHandle: 'sms-manager',
  #   } only %}
  #
  # Selection-aware (shows "Export (X)" when items selected):
  #   {% include 'lindemannrock-base/_components/export-menu' with {
  #       action: 'my-plugin/export',
  #       permission: 'myPlugin:export',
+ #       pluginHandle: 'my-plugin',
  #       selectionAware: true,
  #   } only %}
  #
@@ -30,12 +34,14 @@
  #   {% include 'lindemannrock-base/_components/export-menu' with {
  #       action: 'my-plugin/export',
  #       permission: 'myPlugin:export',
+ #       pluginHandle: 'my-plugin',
  #       extraParams: {status: statusFilter, provider: providerFilter},
  #   } only %}
  #}
 
 {% set action = action ?? '' %}
 {% set permission = permission ?? null %}
+{% set pluginHandle = pluginHandle ?? null %}
 {% set dateRangeParam = dateRangeParam ?? 'dateRange' %}
 {% set extraParams = extraParams ?? {} %}
 {% set selectionAware = selectionAware ?? false %}
@@ -46,7 +52,7 @@
 {% set canExport = permission ? currentUser.can(permission) : true %}
 
 {% if canExport and action %}
-    {% set enabledFormats = lrExportFormats() %}
+    {% set enabledFormats = lrExportFormats(pluginHandle) %}
     {% if enabledFormats|length > 0 %}
         {# Get current dateRange from request #}
         {% set currentDateRange = craft.app.request.getParam(dateRangeParam, 'last30days') %}
@@ -60,17 +66,17 @@
             </button>
             <div class="menu" data-align="right">
                 <ul>
-                    {% if lrExportEnabled('excel') %}
+                    {% if lrExportEnabled('excel', pluginHandle) %}
                         <li>
                             <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}" data-format="excel" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}">{{ "Export as Excel"|t('app') }}</a>
                         </li>
                     {% endif %}
-                    {% if lrExportEnabled('csv') %}
+                    {% if lrExportEnabled('csv', pluginHandle) %}
                         <li>
                             <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}" data-format="csv" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}">{{ "Export as CSV"|t('app') }}</a>
                         </li>
                     {% endif %}
-                    {% if lrExportEnabled('json') %}
+                    {% if lrExportEnabled('json', pluginHandle) %}
                         <li>
                             <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}" data-format="json" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}">{{ "Export as JSON"|t('app') }}</a>
                         </li>

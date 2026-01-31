@@ -71,6 +71,7 @@
 {% set exportAction = exportConfig.action ?? '' %}
 {% set exportPermission = exportConfig.permission ?? null %}
 {% set exportExtraParams = exportConfig.extraParams ?? {} %}
+{% set exportPluginHandle = exportConfig.pluginHandle ?? config.pluginHandle ?? null %}
 {% set canExport = exportPermission ? currentUser.can(exportPermission) : (exportAction ? true : false) %}
 
 {# Date range options #}
@@ -258,6 +259,7 @@
                 {% include 'lindemannrock-base/_components/export-menu' with {
                     action: exportAction,
                     permission: exportPermission,
+                    pluginHandle: exportPluginHandle,
                     extraParams: exportExtraParams|merge({(dateRangeParam): dateRangeCurrent}),
                 } only %}
             {% endif %}

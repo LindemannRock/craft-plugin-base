@@ -92,20 +92,13 @@
 {# Filters #}
 {% set filtersConfig = config.filters ?? {} %}
 
-{# Date range filter #}
+{# Date range filter - uses config/lindemannrock-base.php analytics.defaultDateRange #}
 {% set dateRangeConfig = filtersConfig.dateRange ?? {} %}
-{% set dateRangeDefault = dateRangeConfig.default ?? 'last7days' %}
+{% set dateRangeDefault = dateRangeConfig.default ?? lrDefaultDateRange() %}
 {% set dateRange = dateRangeConfig.current ?? craft.app.request.getParam('dateRange', dateRangeDefault) %}
 
-{# Date range options #}
-{% set dateRangeOptions = {
-    'today': 'Today'|t('app'),
-    'yesterday': 'Yesterday'|t('app'),
-    'last7days': 'Last 7 days'|t('app'),
-    'last30days': 'Last 30 days'|t('app'),
-    'last90days': 'Last 90 days'|t('app'),
-    'all': 'All time'|t('app'),
-} %}
+{# Date range options from centralized helper #}
+{% set dateRangeOptions = lrDateRangeOptions('assoc') %}
 
 {# Site filter #}
 {% set siteFilterConfig = filtersConfig.sites ?? {} %}
@@ -150,6 +143,7 @@
             {% include 'lindemannrock-base/_components/export-menu' with {
                 action: exportAction,
                 extraParams: exportParams,
+                pluginHandle: pluginConfig.handle ?? null,
             } only %}
         </div>
     {% endif %}

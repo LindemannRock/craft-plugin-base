@@ -66,18 +66,33 @@ class ExportHelper
      */
     private const DEFAULT_FORMATS = [
         'csv' => true,
-        'json' => true,
+        'json' => false,  // Developer format - disabled by default
         'excel' => true,
     ];
 
     /**
      * Get export configuration
      *
+     * Checks plugin-specific config first, then falls back to lindemannrock-base.php.
+     *
+     * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return array
      * @since 5.8.0
      */
-    public static function getConfig(): array
+    public static function getConfig(?string $pluginHandle = null): array
     {
+        // Check plugin-specific config first
+        if ($pluginHandle) {
+            $pluginConfig = Craft::$app->config->getConfigFromFile($pluginHandle) ?: [];
+            if (isset($pluginConfig['exports'])) {
+                // Merge with defaults (plugin config overrides base)
+                $baseConfig = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
+                $baseExports = $baseConfig['exports'] ?? self::DEFAULT_FORMATS;
+                return array_merge($baseExports, $pluginConfig['exports']);
+            }
+        }
+
+        // Fall back to base config
         $config = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
 
         return $config['exports'] ?? self::DEFAULT_FORMATS;
@@ -97,14 +112,15 @@ class ExportHelper
      * Accepts both config keys ('excel', 'csv', 'json') and common aliases ('xlsx', 'xls').
      *
      * @param string $format 'csv', 'json', 'excel', 'xlsx', or 'xls'
+     * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return bool
      * @since 5.8.0
      */
-    public static function isFormatEnabled(string $format): bool
+    public static function isFormatEnabled(string $format, ?string $pluginHandle = null): bool
     {
         // Normalize format to config key
         $configKey = self::FORMAT_ALIASES[$format] ?? $format;
-        $config = self::getConfig();
+        $config = self::getConfig($pluginHandle);
 
         return $config[$configKey] ?? self::DEFAULT_FORMATS[$configKey] ?? false;
     }
@@ -112,12 +128,13 @@ class ExportHelper
     /**
      * Get list of enabled export formats
      *
+     * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return array ['csv', 'json', 'excel']
      * @since 5.8.0
      */
-    public static function getEnabledFormats(): array
+    public static function getEnabledFormats(?string $pluginHandle = null): array
     {
-        $config = self::getConfig();
+        $config = self::getConfig($pluginHandle);
         $enabled = [];
 
         foreach (self::DEFAULT_FORMATS as $format => $default) {
