@@ -228,6 +228,8 @@ public function init(): void
 | `PluginHelper::isPluginEnabled()` | Check if a plugin is installed and enabled |
 | `PluginHelper::isPluginInstalled()` | Check if a plugin is installed (may not be enabled) |
 | `PluginHelper::getPlugin()` | Get a plugin instance (null if not available) |
+| `CpNavHelper::buildSubnav()` | Build CP subnav from section definitions |
+| `CpNavHelper::firstAccessibleRoute()` | Get first accessible CP route from section definitions |
 | `GeoHelper::getCountryName()` | Convert ISO 3166-1 alpha-2 country code to name |
 | `GeoHelper::getAllCountries()` | Get all 249 countries as code => name array |
 | `GeoHelper::isValidCountryCode()` | Validate a country code |
@@ -258,6 +260,31 @@ public function init(): void
 | `ColorHelper::hasColorSet()` | Check if a color set exists |
 | `ColorHelper::getAvailableColorSets()` | Get all available color set names |
 | `ColorHelper::registerColorSet()` | Register custom color set at runtime |
+
+### CP Navigation Helper
+
+Use `CpNavHelper` to centralize permission + settings checks for CP subnav and default route redirects.
+
+```php
+use lindemannrock\base\helpers\CpNavHelper;
+
+$sections = $this->getCpSections($settings);
+$item['subnav'] = CpNavHelper::buildSubnav($user, $settings, $sections);
+```
+
+```php
+$sections = MyPlugin::$plugin->getCpSections($settings, false);
+$route = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
+if ($route) {
+    return $this->redirect($route);
+}
+```
+
+**Section options:**
+- `permissionsAll`: require all permissions (array or string)
+- `permissionsAny`: require any permission (array or string)
+- `settingsFlag`: require a truthy setting on the settings model (string)
+- `when`: custom callback `fn($settings, $user) => bool` for complex rules
 
 ### Cache Path Helpers
 
