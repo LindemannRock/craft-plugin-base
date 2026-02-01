@@ -34,8 +34,8 @@ use lindemannrock\logginglibrary\LoggingLibrary;
  *     PluginHelper::bootstrap(
  *         $this,
  *         'redirectHelper',
- *         ['redirectManager:viewLogs'],
- *         ['redirectManager:downloadLogs']
+ *         ['redirectManager:viewSystemLogs'],
+ *         ['redirectManager:downloadSystemLogs']
  *     );
  *
  *     // Apply plugin name from config file
@@ -61,8 +61,8 @@ class PluginHelper
      *
      * @param PluginInterface $plugin The plugin instance
      * @param string $helperVariableName Twig global variable name (e.g., 'redirectHelper')
-     * @param array $viewPermissions Permissions required to view logs (e.g., ['redirectManager:viewLogs'])
-     * @param array $downloadPermissions Permissions required to download logs (e.g., ['redirectManager:downloadLogs'])
+     * @param array $viewSystemLogsPermissions Permissions required to view system logs (e.g., ['redirectManager:viewSystemLogs'])
+     * @param array $downloadSystemLogsPermissions Permissions required to download system logs (e.g., ['redirectManager:downloadSystemLogs'])
      * @param array $options Additional options:
      *   - 'colorSets': array of color sets to register for badges/filters
      *     Example: ['myStatus' => ['active' => ['color' => '#10b981', 'rgb' => '16, 185, 129', 'text' => '#065f46']]]
@@ -73,8 +73,8 @@ class PluginHelper
     public static function bootstrap(
         PluginInterface $plugin,
         string $helperVariableName,
-        array $viewPermissions = [],
-        array $downloadPermissions = [],
+        array $viewSystemLogsPermissions = [],
+        array $downloadSystemLogsPermissions = [],
         array $options = [],
     ): void {
         // Register base module (idempotent - safe to call multiple times)
@@ -94,9 +94,9 @@ class PluginHelper
             }
         );
 
-        // Configure logging library (if available and viewPermissions provided)
-        // Only plugins that explicitly pass viewPermissions will have logging enabled
-        if (!empty($viewPermissions) && class_exists(LoggingLibrary::class)) {
+        // Configure logging library (if available and viewSystemLogsPermissions provided)
+        // Only plugins that explicitly pass viewSystemLogsPermissions will have logging enabled
+        if (!empty($viewSystemLogsPermissions) && class_exists(LoggingLibrary::class)) {
             $settings = $plugin->getSettings();
 
             // Get settings values with fallbacks
@@ -118,8 +118,8 @@ class PluginHelper
                 'pluginName' => $pluginName,
                 'logLevel' => $logLevel,
                 'itemsPerPage' => $itemsPerPage,
-                'viewPermissions' => $viewPermissions,
-                'downloadPermissions' => $downloadPermissions,
+                'viewSystemLogsPermissions' => $viewSystemLogsPermissions,
+                'downloadSystemLogsPermissions' => $downloadSystemLogsPermissions,
                 'logMenuItems' => $logMenuItems,
                 'logMenuLabel' => $logMenuLabel,
             ]);
