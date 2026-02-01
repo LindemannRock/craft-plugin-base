@@ -71,6 +71,22 @@ trait DeviceDetectionTrait
     }
 
     /**
+     * Build a device info model from raw detection data.
+     *
+     * @param array<string, mixed> $data
+     * @param class-string $class
+     * @param array<string, string> $map Map of target => source keys
+     */
+    protected function buildDeviceModel(array $data, string $class, array $map = []): object
+    {
+        if ($this->deviceDetection === null) {
+            $this->deviceDetection = new DeviceDetection();
+        }
+
+        return $this->deviceDetection->toModel($data, $class, $map);
+    }
+
+    /**
      * Override in your service to provide plugin-specific settings.
      *
      * @return array<string, mixed>

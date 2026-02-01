@@ -382,6 +382,39 @@ class DeviceDetection
         return $prefix . md5($userAgent);
     }
 
+    /**
+     * Map device info array to a model instance.
+     *
+     * @param array<string, mixed> $data
+     * @param class-string $class
+     * @param array<string, string> $map Map of target => source keys
+     */
+    public function toModel(array $data, string $class, array $map = []): object
+    {
+        $model = new $class();
+
+        if (!empty($map)) {
+            $mapped = [];
+            foreach ($map as $target => $source) {
+                $mapped[$target] = $data[$source] ?? null;
+            }
+            $data = $mapped;
+        }
+
+        if (method_exists($model, 'setAttributes')) {
+            $model->setAttributes($data, false);
+            return $model;
+        }
+
+        foreach ($data as $key => $value) {
+            if (property_exists($model, $key)) {
+                $model->{$key} = $value;
+            }
+        }
+
+        return $model;
+    }
+
     private function logWarning(string $message, array $config, array $context = []): void
     {
         $logger = $config['logWarning'] ?? null;

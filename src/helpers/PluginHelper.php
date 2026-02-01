@@ -198,6 +198,38 @@ class PluginHelper
     }
 
     /**
+     * Build a cache key prefix from a plugin handle and key type.
+     *
+     * Example: redirect-manager + device -> redirectmanager:device:
+     *
+     * @param string $handle Plugin handle
+     * @param string $type Cache type (e.g., 'device')
+     * @return string
+     * @since 5.14.0
+     */
+    public static function getCacheKeyPrefix(string $handle, string $type): string
+    {
+        $safeHandle = str_replace('-', '', $handle);
+        return $safeHandle . ':' . $type . ':';
+    }
+
+    /**
+     * Build a Redis cache key set name for a plugin handle and key type.
+     *
+     * Example: redirect-manager + device -> redirectmanager-device-keys
+     *
+     * @param string $handle Plugin handle
+     * @param string $type Cache type (e.g., 'device')
+     * @return string
+     * @since 5.13.0
+     */
+    public static function getCacheKeySet(string $handle, string $type): string
+    {
+        $safeHandle = str_replace('-', '', $handle);
+        return $safeHandle . '-' . $type . '-keys';
+    }
+
+    /**
      * Register translations for a plugin
      *
      * Convenience method to register translation messages.
