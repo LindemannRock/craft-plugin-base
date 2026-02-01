@@ -301,9 +301,9 @@ class DeviceDetection
             }
 
             if (!self::$redisFallbackLogged) {
-                Craft::warning(
+                $this->logWarning(
                     'Redis cache selected but Craft cache is not Redis; falling back to file cache',
-                    __METHOD__
+                    $config
                 );
                 self::$redisFallbackLogged = true;
             }
@@ -362,17 +362,45 @@ class DeviceDetection
             return;
         }
 
-        if (!is_dir($cachePath)) {
-            \craft\helpers\FileHelper::createDirectory($cachePath);
-        }
+        try {
+            if (!is_dir($cachePath)) {
+                \craft\helpers\FileHelper::createDirectory($cachePath);
+            }
 
-        $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($userAgent) . '.cache';
-        file_put_contents($cacheFile, json_encode($data));
+            $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($userAgent) . '.cache';
+            file_put_contents($cacheFile, json_encode($data));
+        } catch (\Throwable $e) {
+            $this->logError('Failed to cache device info', $config, [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     private function getCacheKey(string $userAgent, array $config): string
     {
         $prefix = $config['cacheKeyPrefix'] ?? 'device:';
         return $prefix . md5($userAgent);
+    }
+
+    private function logWarning(string $message, array $config, array $context = []): void
+    {
+        $logger = $config['logWarning'] ?? null;
+        if (is_callable($logger)) {
+            $logger($message, $context);
+            return;
+        }
+
+        Craft::warning($message, __METHOD__);
+    }
+
+    private function logError(string $message, array $config, array $context = []): void
+    {
+        $logger = $config['logError'] ?? null;
+        if (is_callable($logger)) {
+            $logger($message, $context);
+            return;
+        }
+
+        Craft::error($message, __METHOD__);
     }
 }

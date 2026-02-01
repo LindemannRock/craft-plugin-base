@@ -55,6 +55,14 @@ trait DeviceDetectionTrait
     {
         $config = array_replace($this->getDeviceDetectionConfig(), $overrideConfig);
 
+        // Prefer plugin logging if available
+        if (!isset($config['logWarning']) && method_exists($this, 'logWarning')) {
+            $config['logWarning'] = [$this, 'logWarning'];
+        }
+        if (!isset($config['logError']) && method_exists($this, 'logError')) {
+            $config['logError'] = [$this, 'logError'];
+        }
+
         if ($this->deviceDetection === null || !empty($overrideConfig)) {
             $this->deviceDetection = new DeviceDetection($config);
         }
