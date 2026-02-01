@@ -114,7 +114,7 @@ class PluginHelper
             }
 
             LoggingLibrary::configure([
-                'pluginHandle' => $plugin->handle,
+                'pluginHandle' => $plugin->id,
                 'pluginName' => $pluginName,
                 'logLevel' => $logLevel,
                 'itemsPerPage' => $itemsPerPage,
@@ -162,7 +162,7 @@ class PluginHelper
      */
     public static function applyPluginNameFromConfig(PluginInterface $plugin): void
     {
-        $configPath = Craft::$app->getPath()->getConfigPath() . '/' . $plugin->handle . '.php';
+        $configPath = Craft::$app->getPath()->getConfigPath() . '/' . $plugin->id . '.php';
 
         if (!file_exists($configPath)) {
             return;
@@ -265,7 +265,7 @@ class PluginHelper
      */
     public static function getCacheBasePath(PluginInterface $plugin): string
     {
-        return Craft::$app->getPath()->getRuntimePath() . '/' . $plugin->handle . '/cache/';
+        return Craft::$app->getPath()->getRuntimePath() . '/' . $plugin->id . '/cache/';
     }
 
     /**
