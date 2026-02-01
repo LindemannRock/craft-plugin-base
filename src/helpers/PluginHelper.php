@@ -221,7 +221,7 @@ class PluginHelper
      * @param string $handle Plugin handle
      * @param string $type Cache type (e.g., 'device')
      * @return string
-     * @since 5.13.0
+     * @since 5.14.0
      */
     public static function getCacheKeySet(string $handle, string $type): string
     {
