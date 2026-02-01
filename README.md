@@ -13,7 +13,9 @@ This package provides shared functionality for all LindemannRock plugins:
 
 - **Edition Support** for Craft Plugin Store licensing with standardized tiers (Standard/Lite/Pro)
 - **Traits** for Settings models (displayName, database persistence, config overrides)
+- **Device Detection** for standardized UA parsing and caching (Matomo DeviceDetector)
 - **DateTimeHelper** for centralized date/time formatting with timezone support
+- **DateRangeHelper** for standardized date range selection and filtering
 - **Twig Extensions** for plugin name helpers and datetime filters in templates
 - **Helpers** for common plugin initialization tasks and geographic utilities
 - **Templates** for shared components (plugin-credit, info-box, ip-salt-error)
@@ -199,6 +201,7 @@ public function init(): void
 | `SettingsDisplayNameTrait` | `getDisplayName()`, `getFullName()`, `getPluralDisplayName()`, `getLowerDisplayName()`, `getPluralLowerDisplayName()` |
 | `SettingsPersistenceTrait` | `loadFromDatabase()`, `saveToDatabase()` |
 | `SettingsConfigTrait` | `isOverriddenByConfig()` |
+| `DeviceDetectionTrait` | `detectDeviceInfo()`, `detectLanguageFromConfig()`, `buildDeviceModel()` |
 
 ### Templates
 
@@ -225,6 +228,8 @@ public function init(): void
 | `PluginHelper::registerTranslations()` | Register translation messages for a plugin |
 | `PluginHelper::getCacheBasePath()` | Get the cache base path for a plugin |
 | `PluginHelper::getCachePath()` | Get a specific cache type path for a plugin |
+| `PluginHelper::getCacheKeyPrefix()` | Build standardized cache key prefixes for Redis/file caches |
+| `PluginHelper::getCacheKeySet()` | Build standardized Redis set keys for cache tracking |
 | `PluginHelper::isPluginEnabled()` | Check if a plugin is installed and enabled |
 | `PluginHelper::isPluginInstalled()` | Check if a plugin is installed (may not be enabled) |
 | `PluginHelper::getPlugin()` | Get a plugin instance (null if not available) |
@@ -306,6 +311,20 @@ $autocompleteCache = PluginHelper::getCachePath($plugin, 'autocomplete');
 
 $deviceCache = PluginHelper::getCachePath($plugin, 'device');
 // Returns: storage/runtime/my-plugin/cache/device/
+```
+
+### Cache Key Helpers
+
+Standardized cache key prefixes and Redis set keys for tracking cached entries across plugins.
+
+```php
+use lindemannrock\base\helpers\PluginHelper;
+
+$prefix = PluginHelper::getCacheKeyPrefix($plugin->id, 'device');
+// Returns: my-plugin:device:
+
+$setKey = PluginHelper::getCacheKeySet($plugin->id, 'device');
+// Returns: my-plugin:device:keys
 ```
 
 ### Plugin Detection Helpers
@@ -1066,6 +1085,43 @@ public function actionExport(): Response
     };
 }
 ```
+
+## Device Detection
+
+Centralized user-agent parsing and caching via Matomo DeviceDetector. Use the trait for consistent arrays and optional model mapping.
+
+### Service Usage (Recommended)
+
+```php
+use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\base\traits\DeviceDetectionTrait;
+
+class DeviceDetectionService
+{
+    use DeviceDetectionTrait;
+
+    protected function getDeviceDetectionConfig(): array
+    {
+        return [
+            'cacheEnabled' => true,
+            'cachePath' => PluginHelper::getCachePath(MyPlugin::$plugin, 'device'),
+            'cacheKeyPrefix' => PluginHelper::getCacheKeyPrefix(MyPlugin::$plugin->id, 'device'),
+            'cacheKeySet' => PluginHelper::getCacheKeySet(MyPlugin::$plugin->id, 'device'),
+            'includePlatform' => true,
+            'includeLanguage' => true,
+            'languageDetectionMethod' => 'browser', // browser|ip|both
+            'enableGeoDetection' => true,
+            'geoLookupCallback' => fn() => $this->geoService->getCountryCode(),
+        ];
+    }
+}
+```
+
+### Notes
+
+- Cache format is JSON; cache keys and Redis tracking are standardized via `PluginHelper`.
+- `detectDeviceInfo()` returns a normalized array; `buildDeviceModel()` maps it into a model when needed.
+- Logging uses the base logging trait when available; otherwise falls back to `Craft::warning()`/`Craft::error()`.
 
 ## DateRangeHelper
 
