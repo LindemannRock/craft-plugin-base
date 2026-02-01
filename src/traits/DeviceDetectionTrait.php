@@ -71,6 +71,29 @@ trait DeviceDetectionTrait
     }
 
     /**
+     * Detect language based on device detection config.
+     *
+     * @param array<string, mixed> $overrideConfig
+     */
+    protected function detectLanguageFromConfig(array $overrideConfig = []): string
+    {
+        $config = array_replace($this->getDeviceDetectionConfig(), $overrideConfig);
+
+        if (!isset($config['logWarning']) && method_exists($this, 'logWarning')) {
+            $config['logWarning'] = [$this, 'logWarning'];
+        }
+        if (!isset($config['logError']) && method_exists($this, 'logError')) {
+            $config['logError'] = [$this, 'logError'];
+        }
+
+        if ($this->deviceDetection === null || !empty($overrideConfig)) {
+            $this->deviceDetection = new DeviceDetection($config);
+        }
+
+        return $this->deviceDetection->detectLanguage($config);
+    }
+
+    /**
      * Build a device info model from raw detection data.
      *
      * @param array<string, mixed> $data

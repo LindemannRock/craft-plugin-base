@@ -21,6 +21,30 @@ use DeviceDetector\DeviceDetector;
  */
 class DeviceDetection
 {
+    private const DEFAULT_COUNTRY_LANGUAGE_MAP = [
+        'SA' => 'ar',
+        'AE' => 'ar',
+        'KW' => 'ar',
+        'QA' => 'ar',
+        'BH' => 'ar',
+        'OM' => 'ar',
+        'EG' => 'ar',
+        'JO' => 'ar',
+        'LB' => 'ar',
+        'IQ' => 'ar',
+        'SY' => 'ar',
+        'YE' => 'ar',
+        'LY' => 'ar',
+        'TN' => 'ar',
+        'DZ' => 'ar',
+        'MA' => 'ar',
+        'US' => 'en',
+        'GB' => 'en',
+        'CA' => 'en',
+        'AU' => 'en',
+        'NZ' => 'en',
+        'IE' => 'en',
+    ];
     private array $config;
     private ?DeviceDetector $detector = null;
     private static bool $redisFallbackLogged = false;
@@ -189,7 +213,22 @@ class DeviceDetection
         }
 
         if (!$detectedLang) {
-            $detectedLang = $this->detectFromBrowser();
+            $method = $config['languageDetectionMethod'] ?? 'browser';
+            switch ($method) {
+                case 'ip':
+                    $detectedLang = $this->detectFromIp($config);
+                    break;
+                case 'both':
+                    $detectedLang = $this->detectFromBrowser();
+                    if (!$detectedLang) {
+                        $detectedLang = $this->detectFromIp($config);
+                    }
+                    break;
+                case 'browser':
+                default:
+                    $detectedLang = $this->detectFromBrowser();
+                    break;
+            }
         }
 
         if (!$detectedLang) {
@@ -274,6 +313,39 @@ class DeviceDetection
 
         arsort($languages);
         return array_key_first($languages);
+    }
+
+    private function detectFromIp(array $config): ?string
+    {
+        if (empty($config['enableGeoDetection'])) {
+            return null;
+        }
+
+        $ip = Craft::$app->getRequest()->getUserIP();
+        if (!$ip) {
+            return null;
+        }
+
+        $lookup = $config['geoLookupCallback'] ?? null;
+        if (!is_callable($lookup)) {
+            return null;
+        }
+
+        $location = $lookup($ip);
+        $countryCode = null;
+
+        if (is_array($location)) {
+            $countryCode = $location['countryCode'] ?? null;
+        } elseif (is_string($location)) {
+            $countryCode = $location;
+        }
+
+        if (!$countryCode) {
+            return null;
+        }
+
+        $map = $config['countryLanguageMap'] ?? self::DEFAULT_COUNTRY_LANGUAGE_MAP;
+        return $map[$countryCode] ?? null;
     }
 
     private function getDetector(): DeviceDetector
