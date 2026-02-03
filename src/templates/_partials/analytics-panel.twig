@@ -78,15 +78,8 @@
 {% set exportPluginHandle = exportConfig.pluginHandle ?? config.pluginHandle ?? null %}
 {% set canExport = exportPermission ? currentUser.can(exportPermission) : (exportAction ? true : false) %}
 
-{# Date range options #}
-{% set dateRangeOptions = [
-    {value: 'today', label: 'Today'|t('app')},
-    {value: 'yesterday', label: 'Yesterday'|t('app')},
-    {value: 'last7days', label: 'Last 7 Days'|t('app')},
-    {value: 'last30days', label: 'Last 30 Days'|t('app')},
-    {value: 'last90days', label: 'Last 90 Days'|t('app')},
-    {value: 'all', label: 'All Time'|t('app')},
-] %}
+{# Date range options - from centralized helper #}
+{% set dateRangeOptions = lrDateRangeOptions() %}
 
 {# Panel-specific styles (shared styles come from ComponentsAsset) #}
 <style>

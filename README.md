@@ -211,6 +211,7 @@ public function init(): void
 | `info-box` | Styled info/success/warning message box |
 | `ip-salt-error` | Error banner for missing IP hash salt configuration |
 | `badge` | Colored status badge with dot and text |
+| `cards/unified-card` | Flexible card for dashboards, analytics, and utilities |
 | `row-actions` | Action buttons/menus for table rows |
 | `filter-status` | Status dropdown filter with colored indicators |
 | `filter-dropdown` | Simple dropdown filter |
@@ -2623,34 +2624,110 @@ document.addEventListener('lr:tabChanged', function(e) {
 
 Use these components within your tab partials:
 
-**Stat Box:**
+**Unified Card (Recommended):**
+
+The `unified-card` component is a flexible card that supports 3 different styles:
+
+| Style | Key Parameters | Use Case |
+|-------|----------------|----------|
+| **Analytics** | `value`, `description`, `align: 'center'` (no `title`) | Stats, import previews, dashboards |
+| **Utility** | `title`, `value`, `color` | Dashboard cards with header |
+| **Colored** | Add `palette: 'green'` to any style | Highlight success/error/warning |
+
 ```twig
-{# Basic stat box #}
-{% include 'lindemannrock-base/_components/stat-box' with {
-    value: 12345,
-    label: 'Total Views',
-    color: '#10b981',  {# optional: value color only #}
-    suffix: '%',       {# optional #}
-    id: 'views-stat',  {# optional, for JS updates #}
+{# 1. Analytics Style (centered, no title) #}
+{% include 'lindemannrock-base/_components/cards/unified-card' with {
+    value: 1234,
+    description: 'Total Messages',
+    align: 'center',
 } only %}
 
-{# Palette-colored stat box (derives bg, border, value color) #}
-{% include 'lindemannrock-base/_components/stat-box' with {
+{# 2. Analytics Style with Color (import preview pattern) #}
+{% include 'lindemannrock-base/_components/cards/unified-card' with {
     value: 50,
-    label: 'New Items',
-    palette: 'green',  {# palette color name #}
+    description: 'Valid',
+    palette: 'green',
+    align: 'center',
+} only %}
+
+{# 3. Utility Style (with title + dot) #}
+{% include 'lindemannrock-base/_components/cards/unified-card' with {
+    title: 'Total Messages',
+    color: '#059669',
+    value: 1234,
+    description: 'messages sent',
+} only %}
+
+{# 4. Utility Style with Badge #}
+{% include 'lindemannrock-base/_components/cards/unified-card' with {
+    title: 'Success Rate',
+    color: '#10b981',
+    value: '89%',
+    badge: '+15%',
+    badgeType: 'positive',
+} only %}
+
+{# 5. With Sub-boxes #}
+{% include 'lindemannrock-base/_components/cards/unified-card' with {
+    title: 'Message Status',
+    color: '#8b5cf6',
+    value: 1523,
+    subBoxes: [
+        {value: 1250, label: 'Sent', color: '#10b981'},
+        {value: 23, label: 'Failed', color: '#ef4444'},
+        {value: 250, label: 'Pending', color: '#f59e0b'},
+    ],
 } only %}
 ```
 
-**Compact Grid (5+ columns):**
+**Grid Layouts:**
 ```twig
-<div class="lr-analytics-stats compact">
-    {% include 'lindemannrock-base/_components/stat-box' with {value: 100, label: 'Total'} only %}
-    {% include 'lindemannrock-base/_components/stat-box' with {value: 50, label: 'New', palette: 'green'} only %}
-    {% include 'lindemannrock-base/_components/stat-box' with {value: 20, label: 'Updates', palette: 'amber'} only %}
-    {% include 'lindemannrock-base/_components/stat-box' with {value: 25, label: 'Unchanged', palette: 'gray'} only %}
-    {% include 'lindemannrock-base/_components/stat-box' with {value: 5, label: 'Errors', palette: 'red'} only %}
+{# Responsive grid (auto-fit) #}
+<div class="lr-unified-cards">
+    {% include '...' %}
+    {% include '...' %}
 </div>
+
+{# Fixed columns (responsive on mobile <769px) #}
+<div class="lr-unified-cards cols-4">
+    {% include '...' with {value: 100, description: 'Total', align: 'center'} only %}
+    {% include '...' with {value: 50, description: 'Valid', palette: 'green', align: 'center'} only %}
+    {% include '...' with {value: 20, description: 'Duplicates', palette: 'amber', align: 'center'} only %}
+    {% include '...' with {value: 5, description: 'Errors', palette: 'red', align: 'center'} only %}
+</div>
+
+{# Available: cols-2, cols-3, cols-4, cols-5 #}
+```
+
+**All Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `title` | string | Card title (shows dot + header when present) |
+| `color` | string | Accent color for dot (hex, default: `#0d78f2`) |
+| `value` | mixed | Primary value (numbers auto-format) |
+| `valueColor` | string | Custom value text color (defaults to `color`) |
+| `secondary` | mixed | Secondary value shown as "/ value" |
+| `description` | string | Description/subtitle text |
+| `badge` | string | Badge text beside value |
+| `badgeType` | string | `'default'`, `'positive'`, `'negative'` |
+| `badgeColor` | string | Custom badge color (overrides badgeType) |
+| `subBoxes` | array | Sub-metrics: `[{value, label, color?}]` |
+| `palette` | string | Palette color for colored background (`'green'`, `'red'`, `'amber'`, etc.) |
+| `align` | string | Content alignment: `'start'`, `'center'`, `'end'` |
+
+---
+
+**Stat Box (Legacy):**
+
+> **Note:** Prefer `unified-card` for new code. `stat-box` is retained for backwards compatibility.
+
+```twig
+{% include 'lindemannrock-base/_components/stat-box' with {
+    value: 12345,
+    label: 'Total Views',
+    palette: 'green',
+} only %}
 ```
 
 **Chart Container:**
