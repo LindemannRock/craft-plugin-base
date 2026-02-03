@@ -3,6 +3,12 @@
  #
  # Renders just the status dot indicator (no label).
  # Uses same color system as the badge component.
+ # Supports Craft status classes, color sets, or custom hex colors.
+ #
+ # Usage with Craft status class:
+ # {% include 'lindemannrock-base/_components/status-dot' with {
+ #     status: 'enabled',
+ # } only %}
  #
  # Usage with colorSet:
  # {% include 'lindemannrock-base/_components/status-dot' with {
@@ -10,24 +16,33 @@
  #     colorSet: 'pluginStatus',
  # } only %}
  #
- # Usage with Craft status class:
+ # Usage with custom hex color:
  # {% include 'lindemannrock-base/_components/status-dot' with {
- #     status: 'enabled',
+ #     color: '#059669',
  # } only %}
  #
  # With custom size:
  # {% include 'lindemannrock-base/_components/status-dot' with {
- #     value: 'active',
- #     colorSet: 'pluginStatus',
+ #     color: '#059669',
  #     size: 8,
+ # } only %}
+ #
+ # Without margin (for use in card headers, etc.):
+ # {% include 'lindemannrock-base/_components/status-dot' with {
+ #     color: '#059669',
+ #     noMargin: true,
  # } only %}
  #
  # Parameters:
  # - status: Craft's built-in status class (enabled, disabled, live, off, etc.)
  # - value: Value to look up in colorSet
  # - colorSet: Name of predefined color set from ColorHelper
+ # - color: Custom hex color (e.g., '#059669')
  # - size: Optional dot size in pixels (default: uses Craft's default)
+ # - noMargin: Remove default margin-inline-end (default: false)
  # - title: Optional tooltip
+ #
+ # @since 5.5.0
  #}
 
 {% set dotClass = '' %}
@@ -50,11 +65,20 @@
         {# Fallback to inline style #}
         {% set inlineStyle = 'background: ' ~ valueColors.color ~ ';' %}
     {% endif %}
+
+{# Option 3: Custom hex color #}
+{% elseif color is defined and color %}
+    {% set inlineStyle = 'background: ' ~ color ~ ';' %}
 {% endif %}
 
 {# Size styling #}
 {% if size is defined and size %}
     {% set inlineStyle = inlineStyle ~ ' width: ' ~ size ~ 'px; height: ' ~ size ~ 'px;' %}
+{% endif %}
+
+{# Remove margin if requested #}
+{% if noMargin is defined and noMargin %}
+    {% set inlineStyle = inlineStyle ~ ' margin-inline-end: 0;' %}
 {% endif %}
 
 <span class="status {{ dotClass }}"{% if inlineStyle %} style="{{ inlineStyle }}"{% endif %}{% if title is defined and title %} title="{{ title }}"{% endif %}></span>

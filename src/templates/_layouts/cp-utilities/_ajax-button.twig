@@ -1,0 +1,83 @@
+{#
+ # AJAX Button Handler Macro
+ #
+ # Generates JavaScript for common button click handlers that make AJAX calls.
+ #
+ # Parameters:
+ #   id: Button element ID (without #)
+ #   action: Controller action URL
+ #   confirm: Confirmation message (optional, shows confirm dialog if set)
+ #   confirmSecond: Second confirmation message (optional, for destructive actions)
+ #   successMessage: Message to show on success (optional, uses response.message if not set)
+ #   errorMessage: Message to show on error
+ #   reloadDelay: Delay before page reload in ms (default: 1500, use 0 to skip reload)
+ #
+ # Example:
+ #   {% include 'lindemannrock-base/_layouts/cp-utilities/_ajax-button' with {
+ #       id: 'clear-cache',
+ #       action: actionUrl('my-plugin/settings/clear-cache'),
+ #       errorMessage: 'Failed to clear cache'|t('my-plugin'),
+ #   } only %}
+ #
+ #   {% include 'lindemannrock-base/_layouts/cp-utilities/_ajax-button' with {
+ #       id: 'clear-all-analytics',
+ #       action: actionUrl('my-plugin/settings/clear-analytics'),
+ #       confirm: 'Are you sure you want to delete all analytics?'|t('my-plugin'),
+ #       confirmSecond: 'This cannot be undone. Are you absolutely sure?'|t('my-plugin'),
+ #       errorMessage: 'Failed to clear analytics'|t('my-plugin'),
+ #       reloadDelay: 2000,
+ #   } only %}
+ #
+ # @copyright Copyright (c) 2026 LindemannRock
+ #}
+
+{% set id = id ?? '' %}
+{% set action = action ?? '' %}
+{% set confirm = confirm ?? '' %}
+{% set confirmSecond = confirmSecond ?? '' %}
+{% set successMessage = successMessage ?? '' %}
+{% set errorMessage = errorMessage ?? 'An error occurred' %}
+{% set reloadDelay = reloadDelay ?? 1500 %}
+
+{% if id and action %}
+$('#{{ id }}').on('click', function() {
+    {% if confirm %}
+    if (!confirm('{{ confirm|e('js') }}')) {
+        return;
+    }
+    {% endif %}
+    {% if confirmSecond %}
+    if (!confirm('{{ confirmSecond|e('js') }}')) {
+        return;
+    }
+    {% endif %}
+
+    const $btn = $(this);
+    $btn.addClass('loading').prop('disabled', true);
+
+    $.ajax({
+        url: '{{ action|raw }}',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            {{ craft.app.config.general.csrfTokenName }}: '{{ craft.app.request.csrfToken }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                Craft.cp.displayNotice({% if successMessage %}'{{ successMessage|e('js') }}'{% else %}response.message{% endif %});
+                {% if reloadDelay > 0 %}
+                setTimeout(() => window.location.reload(), {{ reloadDelay }});
+                {% endif %}
+            } else {
+                Craft.cp.displayError(response.error || '{{ errorMessage|e('js') }}');
+            }
+        },
+        error: function() {
+            Craft.cp.displayError('{{ errorMessage|e('js') }}');
+        },
+        complete: function() {
+            $btn.removeClass('loading').prop('disabled', false);
+        }
+    });
+});
+{% endif %}

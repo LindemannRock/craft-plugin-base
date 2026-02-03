@@ -1,0 +1,88 @@
+{#
+ # Quick Action Section Component
+ #
+ # Creates a section within the Quick Actions pane with title, description,
+ # and action buttons.
+ #
+ # Parameters:
+ #   title: Section title (e.g., "Navigation", "Cache Management")
+ #   description: Section description text
+ #   buttons: Array of button configs
+ #     - type: 'link' or 'button' (default: 'button')
+ #     - label: Button text
+ #     - url: URL for links
+ #     - id: Button ID for JavaScript handlers
+ #     - class: Additional CSS classes (default: 'btn', use 'btn secondary' for secondary)
+ #     - permission: Permission check (optional, button hidden if user lacks permission)
+ #     - count: Number to display after label (optional)
+ #     - showCount: Whether to show count (default: true if count provided)
+ #   showSeparator: Show <hr> before this section (default: false)
+ #
+ # Example:
+ #   {% include 'lindemannrock-base/_layouts/cp-utilities/_action-section' with {
+ #       title: 'Navigation'|t('my-plugin'),
+ #       description: 'Access main plugin sections'|t('my-plugin'),
+ #       buttons: [
+ #           {type: 'link', label: 'Manage Items'|t('my-plugin'), url: url('my-plugin/items'), permission: 'myPlugin:viewItems'},
+ #           {type: 'link', label: 'View Settings'|t('my-plugin'), url: url('my-plugin/settings'), permission: 'myPlugin:manageSettings'},
+ #       ],
+ #   } only %}
+ #
+ #   {% include 'lindemannrock-base/_layouts/cp-utilities/_action-section' with {
+ #       title: 'Cache Management'|t('my-plugin'),
+ #       description: 'Clear cached data'|t('my-plugin'),
+ #       showSeparator: true,
+ #       buttons: [
+ #           {type: 'button', label: 'Clear Cache'|t('my-plugin'), id: 'clear-cache', count: cacheCount},
+ #           {type: 'button', label: 'Clear All'|t('my-plugin'), id: 'clear-all', class: 'btn secondary'},
+ #       ],
+ #   } only %}
+ #
+ # @copyright Copyright (c) 2026 LindemannRock
+ #}
+
+{% set title = title ?? '' %}
+{% set description = description ?? '' %}
+{% set buttons = buttons ?? [] %}
+{% set showSeparator = showSeparator ?? false %}
+
+{# Filter buttons by permission #}
+{% set visibleButtons = [] %}
+{% for button in buttons %}
+    {% if button.permission is not defined or currentUser.can(button.permission) %}
+        {% set visibleButtons = visibleButtons|merge([button]) %}
+    {% endif %}
+{% endfor %}
+
+{% if visibleButtons|length > 0 %}
+    {% if showSeparator %}
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;">
+    {% endif %}
+
+    <div style="margin-bottom: 24px;">
+        {% if title %}
+            <h3 style="margin-bottom: 8px;">{{ title }}</h3>
+        {% endif %}
+        {% if description %}
+            <p class="light" style="margin-bottom: 16px;">{{ description }}</p>
+        {% endif %}
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {% for button in visibleButtons %}
+                {% set buttonClass = button.class ?? 'btn' %}
+                {% set buttonType = button.type ?? 'button' %}
+                {% set showCount = button.showCount ?? (button.count is defined) %}
+
+                {% if buttonType == 'link' %}
+                    <a href="{{ button.url }}" class="{{ buttonClass }}">
+                        {{ button.label }}{% if showCount and button.count is defined %} ({{ button.count|number_format }}){% endif %}
+                    </a>
+                {% else %}
+                    <button type="button" class="{{ buttonClass }}"{% if button.id is defined %} id="{{ button.id }}"{% endif %}>
+                        {{ button.label }}{% if showCount and button.count is defined %} ({{ button.count|number_format }}){% endif %}
+                    </button>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

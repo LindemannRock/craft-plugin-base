@@ -62,6 +62,9 @@
 
 {% import "_includes/forms" as forms %}
 
+{# Register ComponentsAsset for layout styles #}
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
 {# ============================================================================
    CONFIGURATION EXTRACTION
    ============================================================================ #}
@@ -264,102 +267,6 @@
    ============================================================================ #}
 
 {% block content %}
-    {# Inline styles for this layout #}
-    <style>
-        .tableview { margin: 0 !important; }
-        .tablepane { margin: 0 !important; }
-        .lr-checkbox-cell { width: 40px !important; text-align: center; }
-        .page-info { margin: 0 12px; color: #596673; }
-        .status-label { white-space: nowrap; }
-        .pagination { gap: 4px; align-items: center; }
-        .lr-menu-header { font-size: 11px; text-transform: uppercase; color: #7c97b2; padding: 8px 14px 4px; font-weight: 600; letter-spacing: 0.5px; }
-        #toolbar.flex { flex-wrap: nowrap; gap: 8px; margin-bottom: 16px; }
-        #toolbar .flex-grow { min-width: 0; flex-shrink: 1; }
-        .lr-clickable-row { cursor: pointer; transition: background 0.1s ease; }
-        .lr-clickable-row:hover { background: #f9fafb !important; }
-        .lr-context-row td { padding: 0 !important; }
-        .lr-context-row .lr-context-content { padding: 16px; background: #f9fafb; border-left: 3px solid #3498db; }
-        @media (max-width: 768px) {
-            #lr-new-btn .lr-label-full { display: none; }
-            #lr-new-btn .lr-label-short { display: inline !important; }
-            #lr-new-btn:before { margin-inline-end: 0 !important; }
-        }
-
-        /* Info box wrapper (for warnings/notices before tables) */
-        .info-box-table-wrapper { padding-bottom: 14px; }
-        @media (min-width: 769px) {
-            .info-box-table-wrapper { padding-bottom: 46px; }
-        }
-
-        /* Config info icon (shows tooltip on hover for config-defined items) */
-        .config-info-icon {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            margin-left: 5px;
-            border-radius: 50%;
-            background: #9aa5b1;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 600;
-            text-align: center;
-            line-height: 16px;
-            vertical-align: middle;
-            cursor: help;
-        }
-        .config-info-icon::before { content: 'i'; }
-        .config-info-icon:hover { background: #7b8794; }
-
-        /* Config tooltip (shows PHP config code) */
-        .config-tooltip {
-            position: absolute;
-            background: #fff;
-            color: #3f4d5a;
-            padding: 12px 14px;
-            border-radius: 6px;
-            border: 1px solid #cdd8e4;
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            font-size: 12px;
-            line-height: 1.5;
-            white-space: pre;
-            z-index: 1000;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            max-width: 500px;
-            overflow-x: auto;
-        }
-
-        /* View menu */
-        .lr-view-menu { min-width: 280px; }
-
-        /* Column visibility */
-        .lr-column-hidden { display: none !important; }
-
-        /* AJAX refresh notice - inline minimal style */
-        .lr-refresh-notice {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 12px;
-            padding-left: 12px;
-            border-left: 1px solid #e3e5e8;
-            cursor: default;
-        }
-        .lr-refresh-notice svg {
-            width: 12px;
-            height: 12px;
-            opacity: 0.5;
-        }
-        .lr-refresh-notice.is-refreshing svg {
-            opacity: 1;
-            stroke: #10b981;
-            animation: lr-spin 1s linear infinite;
-        }
-        @keyframes lr-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </style>
-
     {# Content before table (warnings, info boxes, etc.) #}
     {% block beforeTable %}{% endblock %}
 

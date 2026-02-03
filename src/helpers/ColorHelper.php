@@ -134,9 +134,9 @@ class ColorHelper
         ],
         'emerald' => [
             'class' => 'emerald',
-            'color' => '#10b981',
-            'rgb' => '16, 185, 129',
-            'text' => '#065f46',
+            'color' => '#059669',
+            'rgb' => '5, 150, 105',
+            'text' => '#064e3b',
         ],
         'indigo' => [
             'class' => 'indigo',

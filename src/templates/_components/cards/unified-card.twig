@@ -1,0 +1,182 @@
+{#
+ # Unified Card Component
+ #
+ # A flexible card that combines patterns from stat-card, dashboard-card, and overview-card.
+ # Use for dashboards, utilities, and analytics displays.
+ #
+ # Parameters:
+ #   - title: (required) Card title text
+ #   - color: (required) Accent color for dot (hex, e.g., '#059669')
+ #   - value: (optional) Primary value to display (number or text)
+ #   - valueColor: (optional) Color for value text (defaults to color param)
+ #   - secondary: (optional) Secondary value beside primary (e.g., 200 shows as "/ 200")
+ #   - description: (optional) Description/subtitle text
+ #   - badge: (optional) Badge text beside value (e.g., 'Active', '-25%')
+ #   - badgeType: (optional) 'default', 'positive', 'negative' - preset badge colors
+ #   - badgeColor: (optional) Custom badge color (hex) - overrides badgeType
+ #   - subBoxes: (optional) Array of sub-metrics at bottom of card
+ #       Each item: {value: number|string, label: string, color: string (optional)}
+ #   - palette: (optional) Palette color name for colored card style (e.g., 'green', 'red', 'amber')
+ #   - align: (optional) Content alignment: 'start', 'center', 'end' (default: 'start')
+ #
+ # Examples:
+ #   // Basic card with value
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       title: 'Total Messages',
+ #       color: '#059669',
+ #       value: 1234,
+ #       description: 'messages sent',
+ #   } only %}
+ #
+ #   // With secondary value (150 / 200)
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       title: 'Messages Sent',
+ #       color: '#0ea5e9',
+ #       value: 150,
+ #       secondary: 200,
+ #       description: 'of total capacity',
+ #   } only %}
+ #
+ #   // With preset badge
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       title: 'Success Rate',
+ #       color: '#10b981',
+ #       value: '89%',
+ #       badge: '+15%',
+ #       badgeType: 'positive',
+ #   } only %}
+ #
+ #   // With custom color badge
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       title: 'Coverage',
+ #       color: '#dc2626',
+ #       value: '45%',
+ #       badge: 'Needs Attention',
+ #       badgeColor: '#dc2626',
+ #   } only %}
+ #
+ #   // With subBoxes (colored values)
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       title: 'Analytics',
+ #       color: '#8b5cf6',
+ #       value: 1523,
+ #       subBoxes: [
+ #           {value: 1250, label: 'Sent', color: '#10b981'},
+ #           {value: 23, label: 'Failed', color: '#ef4444'},
+ #           {value: 250, label: 'Pending', color: '#f59e0b'},
+ #       ],
+ #   } only %}
+ #
+ #   // With checkmark subBoxes
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       title: 'Cache Status',
+ #       color: '#22c55e',
+ #       value: 'Active',
+ #       subBoxes: [
+ #           {value: '✓', label: 'Search'},
+ #           {value: '✓', label: 'Cache'},
+ #       ],
+ #   } only %}
+ #
+ #   // Colored stat-style card (centered)
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       value: 1234,
+ #       description: 'Total Messages',
+ #       palette: 'green',
+ #       align: 'center',
+ #   } only %}
+ #
+ # Grid usage:
+ #   <div class="lr-unified-cards">
+ #       {% include '...' with {...} %}
+ #       {% include '...' with {...} %}
+ #   </div>
+ #
+ # @since 5.6.0
+ #}
+
+{# Register ComponentsAsset for styles #}
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set cardTitle = title ?? null %}
+{% set cardColor = color ?? '#059669' %}
+{% set cardValue = value ?? null %}
+{% set cardValueColor = valueColor ?? cardColor %}
+{% set cardSecondary = secondary ?? null %}
+{% set cardDescription = description ?? null %}
+{% set cardBadge = badge ?? null %}
+{% set cardBadgeType = badgeType ?? 'default' %}
+{% set cardBadgeColor = badgeColor ?? null %}
+{% set cardSubBoxes = subBoxes ?? [] %}
+{% set cardPalette = palette ?? null %}
+{% set cardAlign = align ?? 'start' %}
+
+{# Get palette color data if specified #}
+{% if cardPalette %}
+    {% set paletteColor = lrPaletteColor(cardPalette) %}
+    {% set cardValueColor = paletteColor.color ?? cardValueColor %}
+    {% set rgbValue = paletteColor.rgb ?? '13, 120, 242' %}
+    {% set paletteStyle = 'background: rgba(' ~ rgbValue ~ ', 0.12); border: 1px solid rgba(' ~ rgbValue ~ ', 0.35);' %}
+{% else %}
+    {% set paletteStyle = '' %}
+{% endif %}
+
+<div class="lr-unified-card pane {% if cardAlign != 'start' %}align-{{ cardAlign }}{% endif %}"{% if paletteStyle %} style="{{ paletteStyle }}"{% endif %}>
+    {# Header: dot + title (hidden if no title provided) #}
+    {% if cardTitle %}
+        <div class="lr-unified-card-header">
+            {% include 'lindemannrock-base/_components/status-dot' with {color: cardColor, noMargin: true} only %}
+            <h4 class="lr-unified-card-title">{{ cardTitle }}</h4>
+        </div>
+    {% endif %}
+
+    {# Value row with optional secondary/badge #}
+    {% if cardValue is not null or cardBadge or cardSecondary is not null %}
+        <div class="lr-unified-card-value-row">
+            {% if cardValue is not null %}
+                <div class="lr-unified-card-value" style="color: {{ cardValueColor }};">
+                    {% if cardValue matches '/^-?\\d+(\\.\\d+)?$/' %}
+                        {{ cardValue|number_format }}
+                    {% else %}
+                        {{ cardValue }}
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if cardSecondary is not null %}
+                <div class="lr-unified-card-secondary">
+                    / {% if cardSecondary matches '/^-?\\d+(\\.\\d+)?$/' %}{{ cardSecondary|number_format }}{% else %}{{ cardSecondary }}{% endif %}
+                </div>
+            {% endif %}
+            {% if cardBadge %}
+                {% if cardBadgeColor %}
+                    <span class="lr-unified-card-badge custom" style="background: {{ cardBadgeColor }}; border-color: {{ cardBadgeColor }};">{{ cardBadge }}</span>
+                {% else %}
+                    <span class="lr-unified-card-badge {{ cardBadgeType }}">{{ cardBadge }}</span>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {# Description #}
+    {% if cardDescription %}
+        <div class="lr-unified-card-description">{{ cardDescription }}</div>
+    {% endif %}
+
+    {# Sub-boxes grid #}
+    {% if cardSubBoxes|length > 0 %}
+        <div class="lr-unified-card-subboxes" style="grid-template-columns: repeat({{ cardSubBoxes|length > 3 ? 3 : cardSubBoxes|length }}, 1fr);">
+            {% for box in cardSubBoxes %}
+                <div class="lr-unified-card-subbox">
+                    <div class="lr-unified-card-subbox-value" {% if box.color is defined %}style="color: {{ box.color }};"{% endif %}>
+                        {% if box.value matches '/^-?\\d+(\\.\\d+)?$/' %}
+                            {{ box.value|number_format }}
+                        {% else %}
+                            {{ box.value }}
+                        {% endif %}
+                    </div>
+                    <div class="lr-unified-card-subbox-label">{{ box.label }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

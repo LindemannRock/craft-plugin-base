@@ -1,0 +1,94 @@
+{#
+ # CP Utilities Layout
+ #
+ # Standardized layout for plugin utility pages with system overview cards
+ # and quick action buttons.
+ #
+ # Configuration (utilitiesConfig):
+ #   plugin:
+ #     handle: Plugin handle for translations
+ #     name: Plugin display name (e.g., redirectHelper.fullName)
+ #   page:
+ #     title: Page title (e.g., "Overview")
+ #     description: Page description text
+ #
+ # Blocks:
+ #   overview - System overview cards (use lr-unified-cards grid)
+ #   quickActions - Quick action sections (navigation, cache, etc.)
+ #   scripts - JavaScript handlers
+ #
+ # Example usage:
+ #   {% extends 'lindemannrock-base/_layouts/cp-utilities' %}
+ #
+ #   {% set utilitiesConfig = {
+ #       plugin: {
+ #           handle: 'my-plugin',
+ #           name: myHelper.fullName,
+ #       },
+ #       page: {
+ #           title: 'Overview'|t('my-plugin'),
+ #           description: 'Monitor and manage...'|t('my-plugin'),
+ #       },
+ #   } %}
+ #
+ #   {% block overview %}
+ #       {% include 'lindemannrock-base/_components/cards/unified-card' with {...} only %}
+ #   {% endblock %}
+ #
+ #   {% block quickActions %}
+ #       {% include 'lindemannrock-base/_layouts/cp-utilities/_action-section' with {
+ #           title: 'Navigation',
+ #           description: 'Access main sections',
+ #           buttons: [...],
+ #       } only %}
+ #   {% endblock %}
+ #
+ # @copyright Copyright (c) 2026 LindemannRock
+ #}
+
+{% set config = utilitiesConfig ?? {} %}
+{% set pluginHandle = config.plugin.handle ?? 'app' %}
+{% set pluginName = config.plugin.name ?? 'Plugin' %}
+{% set pageTitle = config.page.title ?? 'Overview' %}
+{% set pageDescription = config.page.description ?? '' %}
+
+{# Header #}
+<div style="margin-bottom: 32px;">
+    <h2>{{ pluginName }} {{ pageTitle }}</h2>
+    {% if pageDescription %}
+        <p class="light">{{ pageDescription }}</p>
+    {% endif %}
+</div>
+
+{# System Overview #}
+{% set overviewContent %}{% block overview %}{% endblock %}{% endset %}
+{% if overviewContent|trim %}
+<div style="margin-bottom: 40px;">
+    <h2>{{ "System Overview"|t(pluginHandle) }}</h2>
+    <div class="lr-unified-cards">
+        {{ overviewContent|raw }}
+    </div>
+</div>
+{% endif %}
+
+{# Quick Actions #}
+{% set quickActionsContent %}{% block quickActions %}{% endblock %}{% endset %}
+{% if quickActionsContent|trim %}
+<div style="margin-bottom: 40px;">
+    <h2>{{ "Quick Actions"|t(pluginHandle) }}</h2>
+    <div class="pane">
+        {{ quickActionsContent|raw }}
+    </div>
+</div>
+{% endif %}
+
+{# Additional Content (for plugin-specific sections) #}
+{% block additionalContent %}{% endblock %}
+
+{# JavaScript #}
+{% block scripts %}{% endblock %}
+
+{# Plugin Credit #}
+{% block pluginCredit %}
+{% include 'lindemannrock-base/_components/plugin-credit' %}
+{% endblock %}
