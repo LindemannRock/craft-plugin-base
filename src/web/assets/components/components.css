@@ -549,6 +549,7 @@
 .lr-chart-container h3 {
     margin: 0 0 20px;
     font-size: 16px;
+    font-weight: 600;
 }
 
 .lr-chart-container canvas {

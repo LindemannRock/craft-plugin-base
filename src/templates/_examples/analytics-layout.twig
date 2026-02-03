@@ -8,7 +8,7 @@
  # - Tabbed interface
  # - Date range filter
  # - Custom filters (provider, etc.)
- # - Stat boxes
+ # - Unified cards (stat display)
  # - Chart containers
  # - Data tables
  # - Export (Excel/CSV/JSON - formats controlled via config/lindemannrock-base.php)
@@ -123,30 +123,29 @@
     {# Overview Tab #}
     <div id="overview" class="lr-tab-content">
         {# Summary Stats #}
-        <div class="lr-analytics-stats">
-            {% include 'lindemannrock-base/_components/stat-box' with {
+        <div class="lr-unified-cards">
+            {% include 'lindemannrock-base/_components/cards/unified-card' with {
                 value: summaryStats.totalViews,
-                label: 'Total Views'|t('app'),
+                description: 'Total Views'|t('app'),
+                align: 'center',
             } only %}
 
-            {% include 'lindemannrock-base/_components/stat-box' with {
+            {% include 'lindemannrock-base/_components/cards/unified-card' with {
                 value: summaryStats.uniqueVisitors,
-                label: 'Unique Visitors'|t('app'),
-                color: '#10b981',
+                description: 'Unique Visitors'|t('app'),
+                align: 'center',
             } only %}
 
-            {% include 'lindemannrock-base/_components/stat-box' with {
-                value: summaryStats.avgDuration,
-                label: 'Avg. Duration'|t('app'),
-                suffix: 's',
-                color: '#8b5cf6',
+            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+                value: summaryStats.avgDuration ~ 's',
+                description: 'Avg. Duration'|t('app'),
+                align: 'center',
             } only %}
 
-            {% include 'lindemannrock-base/_components/stat-box' with {
-                value: summaryStats.bounceRate,
-                label: 'Bounce Rate'|t('app'),
-                suffix: '%',
-                color: '#f59e0b',
+            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+                value: summaryStats.bounceRate ~ '%',
+                description: 'Bounce Rate'|t('app'),
+                align: 'center',
             } only %}
         </div>
 
