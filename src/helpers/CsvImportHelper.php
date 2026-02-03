@@ -109,6 +109,11 @@ class CsvImportHelper
                 throw new \RuntimeException('Could not read CSV headers.');
             }
 
+            // Strip UTF-8 BOM from first header if present
+            if (!empty($headers[0])) {
+                $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+            }
+
             if (count($headers) === 1) {
                 fclose($handle);
                 throw new \RuntimeException('Could not detect CSV delimiter. The file may have only one column or use an unsupported delimiter.');
