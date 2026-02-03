@@ -57,6 +57,25 @@
     align-items: stretch;
 }
 
+/* Fixed column layouts for unified cards - only on larger screens */
+@media (min-width: 769px) {
+    .lr-unified-cards.cols-2 {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+    }
+
+    .lr-unified-cards.cols-3 {
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+    }
+
+    .lr-unified-cards.cols-4 {
+        grid-template-columns: repeat(4, minmax(150px, 1fr));
+    }
+
+    .lr-unified-cards.cols-5 {
+        grid-template-columns: repeat(5, minmax(120px, 1fr));
+    }
+}
+
 /* Gradient background for all cards */
 .lr-dashboard-card,
 .lr-overview-card,
