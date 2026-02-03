@@ -467,6 +467,22 @@
     padding: 24px;
 }
 
+/* Analytics toolbar header */
+.lr-analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.lr-analytics-header-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 /* Stat boxes grid (legacy stat-box support) */
 .lr-analytics-stats {
     display: grid;
@@ -581,6 +597,58 @@
     box-sizing: border-box;
 }
 
+/* Analytics loading overlay */
+#lr-analytics-content,
+.lr-analytics-panel {
+    position: relative;
+}
+
+#lr-analytics-content.is-loading {
+    pointer-events: none;
+}
+
+.lr-analytics-loader {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(1px);
+    z-index: 10;
+}
+
+.lr-analytics-loader.is-active {
+    display: flex;
+}
+
+.lr-analytics-loader-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #4b5563;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.lr-analytics-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: lr-spin 0.8s linear infinite;
+}
+
+@keyframes lr-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 /* Section headings */
 .lr-section-heading {
     margin: 30px 0 20px;
@@ -600,6 +668,31 @@
 .lr-table-scroll table {
     min-width: 100%;
     width: 100%;
+}
+
+/* Analytics panel adjustments */
+.lr-analytics-panel .lr-unified-cards {
+    margin-bottom: 32px;
+}
+
+@media (max-width: 900px) {
+    .lr-analytics-panel .lr-analytics-charts.two-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+.lr-analytics-panel .lr-analytics-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: #6b7280;
+}
+
+.lr-analytics-panel .lr-analytics-empty p {
+    margin: 0 0 8px;
+}
+
+.lr-analytics-panel .lr-analytics-empty p.light {
+    color: #9ca3af;
 }
 
 @media (max-width: 768px) {

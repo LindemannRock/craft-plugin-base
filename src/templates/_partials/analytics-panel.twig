@@ -81,52 +81,14 @@
 {# Date range options - from centralized helper #}
 {% set dateRangeOptions = lrDateRangeOptions() %}
 
-{# Panel-specific styles (shared styles come from ComponentsAsset) #}
-<style>
-    .lr-analytics-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .lr-analytics-header-filters {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    /* Panel-specific: tighter unified cards margin */
-    .lr-analytics-panel .lr-unified-cards {
-        margin-bottom: 32px;
-    }
-
-    /* Panel-specific: smaller breakpoint for embedded context */
-    @media (max-width: 900px) {
-        .lr-analytics-panel .lr-analytics-charts.two-columns {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* Empty state */
-    .lr-analytics-panel .lr-analytics-empty {
-        text-align: center;
-        padding: 48px 24px;
-        color: #6b7280;
-    }
-
-    .lr-analytics-panel .lr-analytics-empty p {
-        margin: 0 0 8px;
-    }
-
-    .lr-analytics-panel .lr-analytics-empty p.light {
-        color: #9ca3af;
-    }
-</style>
-
-<div class="lr-analytics-panel">
+{% set panelId = config.id ?? 'lr-analytics-panel' %}
+<div class="lr-analytics-panel" id="{{ panelId }}">
+    <div class="lr-analytics-loader" aria-hidden="true">
+        <div class="lr-analytics-loader-inner">
+            <div class="lr-analytics-spinner"></div>
+            <span>{{ "Loading"|t('app') }}</span>
+        </div>
+    </div>
     {# Header with date filter and export #}
     {% if dateRangeEnabled or (canExport and exportAction) %}
         <div class="lr-analytics-header">
@@ -184,6 +146,17 @@
 (function() {
     'use strict';
 
+    var replaceTimer = null;
+
+    function setPanelLoading(isLoading, panel) {
+        var currentPanel = panel || document.getElementById('{{ panelId }}');
+        if (!currentPanel) return;
+        var loader = currentPanel.querySelector('.lr-analytics-loader');
+        if (loader) {
+            loader.classList.toggle('is-active', isLoading);
+        }
+    }
+
     // Date range handler
     document.addEventListener('click', function(e) {
         var link = e.target.closest('.lr-panel-date-range');
@@ -197,7 +170,66 @@
             if (hash) {
                 url.hash = hash;
             }
-            window.location.href = url.toString();
+
+            if (replaceTimer) {
+                clearTimeout(replaceTimer);
+            }
+
+            setPanelLoading(true);
+            replaceTimer = setTimeout(function() {
+                var fetchUrl = new URL(url.toString());
+                fetchUrl.searchParams.set('ajax', '1');
+
+                fetch(fetchUrl.toString(), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(response) { return response.text(); })
+                .then(function(html) {
+                    var doc = new DOMParser().parseFromString(html, 'text/html');
+                    var newPanel = doc.getElementById('{{ panelId }}');
+                    var currentPanel = document.getElementById('{{ panelId }}');
+
+                    if (!newPanel || !currentPanel) {
+                        setPanelLoading(false);
+                        window.location.href = url.toString();
+                        return;
+                    }
+
+                    currentPanel.replaceWith(newPanel);
+                    window.history.replaceState({}, '', url.toString());
+                    setPanelLoading(false, newPanel);
+
+                    // Re-init menu buttons inside the new panel
+                    newPanel.querySelectorAll('.menubtn').forEach(function(btn) {
+                        if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
+                            new Craft.MenuBtn(btn);
+                        } else if (typeof Garnish !== 'undefined' && Garnish.MenuBtn) {
+                            new Garnish.MenuBtn(btn);
+                        }
+                    });
+
+                    // Re-execute inline scripts inside the new panel
+                    newPanel.querySelectorAll('script').forEach(function(oldScript) {
+                        var script = document.createElement('script');
+                        if (oldScript.src) {
+                            script.src = oldScript.src;
+                        } else {
+                            script.textContent = oldScript.textContent;
+                        }
+                        document.body.appendChild(script);
+                        script.parentNode.removeChild(script);
+                    });
+
+                    // Notify chart init listeners
+                    if (typeof Chart !== 'undefined') {
+                        document.dispatchEvent(new CustomEvent('lr:panelChartsReady'));
+                    }
+                })
+                .catch(function() {
+                    setPanelLoading(false);
+                    window.location.href = url.toString();
+                });
+            }, 150);
         }
     });
 

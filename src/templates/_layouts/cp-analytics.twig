@@ -109,6 +109,10 @@
 
 {# Custom filters #}
 {% set customFilters = filtersConfig.custom ?? [] %}
+{% set customFilterParams = {} %}
+{% for filter in customFilters %}
+    {% set customFilterParams = customFilterParams|merge({(filter.param): filter.current}) %}
+{% endfor %}
 
 {# Export config #}
 {% set exportConfig = config.export ?? {} %}
@@ -235,6 +239,23 @@
    ============================================================================ #}
 
 {% block content %}
+    <div
+        id="lr-analytics-content"
+    data-prefix="{{ chartPrefix }}"
+    data-endpoint="{{ chartDataEndpoint ? actionUrl(chartDataEndpoint) : '' }}"
+    data-date-range="{{ dateRange }}"
+    data-site-id="{{ currentSiteId }}"
+    data-custom-filters="{{ customFilterParams|json_encode|e('html_attr') }}"
+    data-csrf-token="{{ craft.app.request.csrfToken }}"
+    data-csrf-name="{{ craft.app.config.general.csrfTokenName }}"
+    data-tabs="{{ tabsConfig|keys|json_encode|e('html_attr') }}"
+    >
+        <div class="lr-analytics-loader" aria-hidden="true">
+            <div class="lr-analytics-loader-inner">
+                <div class="lr-analytics-spinner"></div>
+                <span>{{ "Loading"|t('app') }}</span>
+            </div>
+        </div>
     {# Tab Content - Plugin defines the content #}
     {% block tabs %}
         {# Override this block to define tab content #}
@@ -262,6 +283,7 @@
             dataEndpoint: '{{ chartDataEndpoint ? actionUrl(chartDataEndpoint) : '' }}',
             dateRange: '{{ dateRange }}',
             siteId: '{{ currentSiteId }}',
+            customFilters: {{ customFilterParams|json_encode|raw }},
             csrfToken: '{{ craft.app.request.csrfToken }}',
             csrfName: '{{ craft.app.config.general.csrfTokenName }}',
             tabs: {{ tabsConfig|keys|json_encode|raw }}
@@ -269,6 +291,153 @@
 
         // Tab state
         window.currentTab = config.tabs[0] || 'overview';
+
+        function initMenuButtons() {
+            document.querySelectorAll('.menubtn').forEach(function(btn) {
+                if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
+                    new Craft.MenuBtn(btn);
+                } else if (typeof Garnish !== 'undefined' && Garnish.MenuBtn) {
+                    new Garnish.MenuBtn(btn);
+                }
+            });
+        }
+
+        function buildConfigFromContent(el) {
+            if (!el) return config;
+            var tabs = [];
+            try {
+                tabs = JSON.parse(el.dataset.tabs || '[]');
+            } catch (e) {
+                tabs = config.tabs || [];
+            }
+
+            return {
+                prefix: el.dataset.prefix || config.prefix,
+                dataEndpoint: el.dataset.endpoint || config.dataEndpoint,
+                dateRange: el.dataset.dateRange || config.dateRange,
+                siteId: el.dataset.siteId || config.siteId,
+                customFilters: el.dataset.customFilters ? JSON.parse(el.dataset.customFilters) : (config.customFilters || {}),
+                csrfToken: el.dataset.csrfToken || config.csrfToken,
+                csrfName: el.dataset.csrfName || config.csrfName,
+                tabs: tabs
+            };
+        }
+
+        var replaceTimer = null;
+        var requestId = 0;
+
+        function setLoading(isLoading, root) {
+            var content = root || document.getElementById('lr-analytics-content');
+            if (!content) return;
+            var loader = content.querySelector('.lr-analytics-loader');
+            if (loader) {
+                loader.classList.toggle('is-active', isLoading);
+            }
+            content.classList.toggle('is-loading', isLoading);
+        }
+
+        function replaceAnalyticsContent(url) {
+            var currentRequest = ++requestId;
+            setLoading(true);
+            var fetchUrl = new URL(url);
+            fetchUrl.searchParams.set('ajax', '1');
+
+            fetch(fetchUrl.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function(response) { return response.text(); })
+            .then(function(html) {
+                if (currentRequest !== requestId) {
+                    return;
+                }
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var newContent = doc.getElementById('lr-analytics-content');
+                var currentContent = document.getElementById('lr-analytics-content');
+                var newToolbar = doc.getElementById('toolbar');
+                var currentToolbar = document.getElementById('toolbar');
+                var newActionButton = doc.getElementById('action-button');
+                var currentActionButton = document.getElementById('action-button');
+
+                if (!newContent || !currentContent) {
+                    setLoading(false);
+                    window.location = url;
+                    return;
+                }
+
+                if (newToolbar && currentToolbar) {
+                    currentToolbar.replaceWith(newToolbar);
+                }
+                if (newActionButton && currentActionButton) {
+                    currentActionButton.replaceWith(newActionButton);
+                }
+
+                currentContent.replaceWith(newContent);
+                window.history.replaceState({}, '', url);
+                setLoading(false, newContent);
+
+                var newConfig = buildConfigFromContent(newContent);
+                initMenuButtons();
+                switchTab(window.location.hash.substring(1) || newConfig.tabs[0] || 'overview');
+
+                // Re-execute inline scripts marked for AJAX reinit
+                newContent.querySelectorAll('script[data-analytics-reinit]').forEach(function(oldScript) {
+                    var script = document.createElement('script');
+                    if (oldScript.src) {
+                        script.src = oldScript.src;
+                    } else {
+                        script.textContent = oldScript.textContent;
+                    }
+                    document.body.appendChild(script);
+                    script.parentNode.removeChild(script);
+                });
+
+                if (typeof window.lrDestroyCharts === 'function') {
+                    window.lrDestroyCharts(newConfig.prefix);
+                }
+
+                // Defer init to ensure listeners are attached
+                setTimeout(function() {
+                    if (typeof window.lrAnalyticsInit === 'function') {
+                        window.lrAnalyticsInit(newConfig);
+                    } else {
+                        window.lrAnalyticsConfig = newConfig;
+                        document.dispatchEvent(new CustomEvent('lr:analyticsInit', {
+                            detail: {
+                                dateRange: newConfig.dateRange || 'last7days',
+                                siteId: newConfig.siteId || '',
+                                customFilters: newConfig.customFilters || {},
+                                config: newConfig
+                            }
+                        }));
+                    }
+
+                    // Fallback: if charts didn't render, force another init
+                    var needsRetry = false;
+                    document.querySelectorAll('canvas').forEach(function(c) {
+                        if (c.offsetParent !== null && c.width === 0) {
+                            needsRetry = true;
+                        }
+                    });
+                    if (needsRetry && typeof window.lrAnalyticsInit === 'function') {
+                        window.lrAnalyticsInit(newConfig);
+                    }
+                }, 50);
+            })
+            .catch(function() {
+                setLoading(false);
+                window.location = url;
+            });
+        }
+
+        function scheduleReplace(url) {
+            if (replaceTimer) {
+                clearTimeout(replaceTimer);
+            }
+            setLoading(true);
+            replaceTimer = setTimeout(function() {
+                replaceAnalyticsContent(url);
+            }, 150);
+        }
 
         // Tab Switching
         function switchTab(tabId) {
@@ -300,13 +469,7 @@
         // Document ready
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize menu buttons
-            document.querySelectorAll('.menubtn').forEach(function(btn) {
-                if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
-                    new Craft.MenuBtn(btn);
-                } else if (typeof Garnish !== 'undefined' && Garnish.MenuBtn) {
-                    new Garnish.MenuBtn(btn);
-                }
-            });
+            initMenuButtons();
 
             // Handle tab link clicks
             document.addEventListener('click', function(e) {
@@ -328,7 +491,7 @@
                     e.preventDefault();
                     var url = new URL(window.location);
                     url.searchParams.set('dateRange', option.dataset.range);
-                    window.location = url;
+                    scheduleReplace(url.toString());
                 }
             });
 
@@ -343,7 +506,7 @@
                     } else {
                         url.searchParams.delete('siteId');
                     }
-                    window.location = url;
+                    scheduleReplace(url.toString());
                 }
             });
 
@@ -360,7 +523,7 @@
                     } else {
                         url.searchParams.delete(param);
                     }
-                    window.location = url;
+                    scheduleReplace(url.toString());
                 }
             });
 
@@ -374,4 +537,5 @@
 
     {# Plugin-specific scripts #}
     {% block scripts %}{% endblock %}
+    </div>
 {% endblock %}
