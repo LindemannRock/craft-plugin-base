@@ -11,11 +11,15 @@
  #   page:
  #     title: Page title (e.g., "Overview")
  #     description: Page description text
+ #     overviewTitle: Custom title for overview section (default: "System Overview")
  #
  # Blocks:
+ #   headerActions - Actions in header (e.g., site selector dropdown)
  #   overview - System overview cards (use lr-unified-cards grid)
  #   quickActions - Quick action sections (navigation, cache, etc.)
+ #   additionalContent - Plugin-specific sections after Quick Actions
  #   scripts - JavaScript handlers
+ #   pluginCredit - Plugin credit (defaults to standard credit)
  #
  # Example usage:
  #   {% extends 'lindemannrock-base/_layouts/cp-utilities' %}
@@ -51,20 +55,33 @@
 {% set pluginName = config.plugin.name ?? 'Plugin' %}
 {% set pageTitle = config.page.title ?? 'Overview' %}
 {% set pageDescription = config.page.description ?? '' %}
+{% set overviewTitle = config.page.overviewTitle ?? 'System Overview'|t(pluginHandle) %}
 
 {# Header #}
+{% set headerActionsContent %}{% block headerActions %}{% endblock %}{% endset %}
 <div style="margin-bottom: 32px;">
-    <h2>{{ pluginName }} {{ pageTitle }}</h2>
-    {% if pageDescription %}
-        <p class="light">{{ pageDescription }}</p>
+    {% if headerActionsContent|trim %}
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+        <div style="flex: 1;">
+    {% endif %}
+            <h2>{{ pluginName }} {{ pageTitle }}</h2>
+            {% if pageDescription %}
+                <p class="light">{{ pageDescription }}</p>
+            {% endif %}
+    {% if headerActionsContent|trim %}
+        </div>
+        <div>
+            {{ headerActionsContent|raw }}
+        </div>
+    </div>
     {% endif %}
 </div>
 
-{# System Overview #}
+{# Overview #}
 {% set overviewContent %}{% block overview %}{% endblock %}{% endset %}
 {% if overviewContent|trim %}
 <div style="margin-bottom: 40px;">
-    <h2>{{ "System Overview"|t(pluginHandle) }}</h2>
+    <h2>{{ overviewTitle }}</h2>
     <div class="lr-unified-cards">
         {{ overviewContent|raw }}
     </div>
