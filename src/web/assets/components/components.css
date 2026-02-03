@@ -300,7 +300,7 @@
 
 .lr-unified-card {
     padding: 24px;
-    margin-block: 0;
+    margin-block: 0 !important;
     display: flex;
     flex-direction: column;
     height: 100%;
