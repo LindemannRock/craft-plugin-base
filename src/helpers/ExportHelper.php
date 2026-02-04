@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use yii\web\BadRequestHttpException;
 
@@ -224,21 +225,7 @@ class ExportHelper
         string $filename,
         array $dateColumns = [],
     ): Response {
-        // Format date columns if specified
-        if (!empty($dateColumns)) {
-            $rows = self::formatDateColumns($rows, $dateColumns);
-        }
-
-        $output = fopen('php://temp', 'r+');
-        fputcsv($output, $headers);
-
-        foreach ($rows as $row) {
-            fputcsv($output, self::sanitizeRow(array_values($row)));
-        }
-
-        rewind($output);
-        $csv = stream_get_contents($output);
-        fclose($output);
+        $csv = self::csvContent($rows, $headers, $dateColumns);
 
         return self::createResponse($csv, $filename, 'text/csv');
     }
@@ -302,7 +289,184 @@ class ExportHelper
 
         // Set sheet title
         $sheetTitle = $options['sheetTitle'] ?? 'Export';
-        $sheet->setTitle(substr($sheetTitle, 0, 31)); // Excel limit is 31 chars
+        $sheet->setTitle(self::sanitizeSheetTitle($sheetTitle));
+        self::writeSheet($sheet, $rows, $headers, $options);
+
+        // Write to temp file
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel_export_');
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tempFile);
+
+        $content = file_get_contents($tempFile);
+        unlink($tempFile);
+
+        // Clean up
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+
+        return self::createResponse(
+            $content,
+            $filename,
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+    }
+
+    /**
+     * Export multiple sheets as an Excel workbook
+     *
+     * Each sheet should include:
+     * - title (string, optional)
+     * - headers (array)
+     * - rows (array)
+     * - dateColumns (array, optional)
+     * - options (array, optional)
+     *
+     * @param array $sheets Sheet definitions
+     * @param string $filename Output filename
+     * @return Response
+     * @since 5.13.1
+     */
+    public static function toExcelMulti(array $sheets, string $filename): Response
+    {
+        if (empty($sheets)) {
+            throw new BadRequestHttpException('No sheets to export.');
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheetIndex = 0;
+
+        foreach ($sheets as $sheetConfig) {
+            if (!is_array($sheetConfig)) {
+                continue;
+            }
+
+            $headers = $sheetConfig['headers'] ?? [];
+            $rows = $sheetConfig['rows'] ?? [];
+            $dateColumns = $sheetConfig['dateColumns'] ?? [];
+            $options = $sheetConfig['options'] ?? [];
+            $title = $sheetConfig['title'] ?? ($options['sheetTitle'] ?? ('Sheet ' . ($sheetIndex + 1)));
+
+            if (!empty($dateColumns)) {
+                $rows = self::formatDateColumns($rows, $dateColumns);
+            }
+
+            $sheet = $sheetIndex === 0 ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet();
+            $sheet->setTitle(self::sanitizeSheetTitle((string)$title));
+            self::writeSheet($sheet, $rows, $headers, $options);
+
+            $sheetIndex++;
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel_export_');
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tempFile);
+
+        $content = file_get_contents($tempFile);
+        unlink($tempFile);
+
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+
+        return self::createResponse(
+            $content,
+            $filename,
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+    }
+
+    /**
+     * Build CSV content from rows and headers
+     *
+     * @param array $rows Data rows to export
+     * @param array $headers Column headers
+     * @param array $dateColumns Column keys to format as database datetime
+     * @return string CSV string
+     * @since 5.13.1
+     */
+    public static function csvContent(
+        array $rows,
+        array $headers,
+        array $dateColumns = [],
+    ): string {
+        // Format date columns if specified
+        if (!empty($dateColumns)) {
+            $rows = self::formatDateColumns($rows, $dateColumns);
+        }
+
+        $output = fopen('php://temp', 'r+');
+        fputcsv($output, $headers);
+
+        foreach ($rows as $row) {
+            fputcsv($output, self::sanitizeRow(array_values($row)));
+        }
+
+        rewind($output);
+        $csv = stream_get_contents($output);
+        fclose($output);
+
+        return $csv;
+    }
+
+    /**
+     * Export multiple files as a ZIP archive
+     *
+     * Each file can be provided as:
+     * - ['name' => 'file.csv', 'content' => '...']
+     * - 'file.csv' => '...'
+     *
+     * @param array $files Files to include in the ZIP
+     * @param string $filename Output filename (.zip)
+     * @return Response
+     * @since 5.13.1
+     */
+    public static function toZip(array $files, string $filename): Response
+    {
+        if (!str_ends_with($filename, '.zip')) {
+            $filename .= '.zip';
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'zip_export_');
+        $zip = new \ZipArchive();
+        $zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+
+        foreach ($files as $key => $file) {
+            $name = null;
+            $content = '';
+
+            if (is_array($file)) {
+                $name = $file['name'] ?? null;
+                $content = (string)($file['content'] ?? '');
+            } elseif (is_string($key)) {
+                $name = $key;
+                $content = (string)$file;
+            }
+
+            if ($name) {
+                $zip->addFromString($name, $content);
+            }
+        }
+
+        $zip->close();
+
+        $content = file_get_contents($tempFile);
+        unlink($tempFile);
+
+        return self::createResponse($content, $filename, 'application/zip');
+    }
+
+    /**
+     * Write headers and rows to a worksheet
+     *
+     * @param Worksheet $sheet Sheet instance
+     * @param array $rows Data rows
+     * @param array $headers Column headers
+     * @param array $options Sheet options
+     */
+    private static function writeSheet(Worksheet $sheet, array $rows, array $headers, array $options = []): void
+    {
+        if (empty($headers)) {
+            return;
+        }
 
         // Write headers
         $colIndex = 1;
@@ -388,71 +552,24 @@ class ExportHelper
                 ]);
             }
         }
-
-        // Write to temp file
-        $tempFile = tempnam(sys_get_temp_dir(), 'excel_export_');
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($tempFile);
-
-        $content = file_get_contents($tempFile);
-        unlink($tempFile);
-
-        // Clean up
-        $spreadsheet->disconnectWorksheets();
-        unset($spreadsheet);
-
-        return self::createResponse(
-            $content,
-            $filename,
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        );
     }
 
     /**
-     * Export multiple files as a ZIP archive
-     *
-     * Each file can be provided as:
-     * - ['name' => 'file.csv', 'content' => '...']
-     * - 'file.csv' => '...'
-     *
-     * @param array $files Files to include in the ZIP
-     * @param string $filename Output filename (.zip)
-     * @return Response
-     * @since 5.13.1
+     * Sanitize a sheet title for Excel
      */
-    public static function toZip(array $files, string $filename): Response
+    private static function sanitizeSheetTitle(string $title): string
     {
-        if (!str_ends_with($filename, '.zip')) {
-            $filename .= '.zip';
+        $title = trim($title);
+        $title = str_replace(['\\', '/', '?', '*', '[', ']', ':'], '-', $title);
+        $title = preg_replace('/\s+/', ' ', $title);
+
+        $title = trim($title, " \t\n\r\0\x0B-'");
+
+        if ($title === '') {
+            $title = 'Sheet';
         }
 
-        $tempFile = tempnam(sys_get_temp_dir(), 'zip_export_');
-        $zip = new \ZipArchive();
-        $zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-
-        foreach ($files as $key => $file) {
-            $name = null;
-            $content = '';
-
-            if (is_array($file)) {
-                $name = $file['name'] ?? null;
-                $content = (string)($file['content'] ?? '');
-            } elseif (is_string($key)) {
-                $name = $key;
-                $content = (string)$file;
-            }
-
-            if ($name) {
-                $zip->addFromString($name, $content);
-            }
-        }
-
-        $zip->close();
-
-        $content = file_get_contents($tempFile);
-        unlink($tempFile);
-
-        return self::createResponse($content, $filename, 'application/zip');
+        return substr($title, 0, 31);
     }
 
     /**

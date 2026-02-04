@@ -4,7 +4,7 @@
   "description": "Build tools for LindemannRock Plugin Base",
   "scripts": {
     "minify": "npm run minify:js && npm run minify:css",
-    "minify:js": "terser src/web/assets/analytics/analytics.js -o src/web/assets/analytics/analytics.min.js -c -m",
+    "minify:js": "terser src/web/assets/analytics/analytics.js -o src/web/assets/analytics/analytics.min.js -c -m && terser src/web/assets/components/components.js -o src/web/assets/components/components.min.js -c -m",
     "minify:css": "cleancss -o src/web/assets/components/components.min.css src/web/assets/components/components.css"
   },
   "devDependencies": {

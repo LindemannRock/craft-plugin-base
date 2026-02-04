@@ -769,48 +769,6 @@
             countdownTimer = setInterval(tickCountdown, 1000);
         }
 
-        // Config tooltip for config-based items (shows PHP config code on hover)
-        let activeConfigTooltip = null;
-        document.querySelectorAll('.config-info-icon').forEach(icon => {
-            icon.addEventListener('mouseenter', function() {
-                const configData = this.dataset.config;
-                if (!configData) return;
-
-                // Remove any existing tooltip
-                if (activeConfigTooltip) {
-                    activeConfigTooltip.remove();
-                }
-
-                // Create tooltip
-                const tooltip = document.createElement('div');
-                tooltip.className = 'config-tooltip';
-                tooltip.textContent = configData;
-                document.body.appendChild(tooltip);
-                activeConfigTooltip = tooltip;
-
-                // Position tooltip
-                const rect = this.getBoundingClientRect();
-                const tooltipRect = tooltip.getBoundingClientRect();
-                let left = rect.left + window.scrollX;
-                let top = rect.bottom + window.scrollY + 8;
-
-                // Keep within viewport
-                if (left + tooltipRect.width > window.innerWidth - 20) {
-                    left = window.innerWidth - tooltipRect.width - 20;
-                }
-
-                tooltip.style.left = left + 'px';
-                tooltip.style.top = top + 'px';
-            });
-
-            icon.addEventListener('mouseleave', function() {
-                if (activeConfigTooltip) {
-                    activeConfigTooltip.remove();
-                    activeConfigTooltip = null;
-                }
-            });
-        });
-
         // View button functionality (column visibility + sort from menu)
         if (config.viewEnabled) {
             const viewBtn = document.getElementById('lr-view-btn');

@@ -960,6 +960,9 @@ ExportHelper::assertNotEmpty($rows, 'Custom message');  // Custom error message
 // CSV export
 return ExportHelper::toCsv($rows, $headers, $filename, ['dateCreated']);
 
+// CSV string (for zips)
+$csvContent = ExportHelper::csvContent($rows, $headers, ['dateCreated']);
+
 // JSON export
 return ExportHelper::toJson($rows, $filename, ['dateCreated']);
 
@@ -970,6 +973,22 @@ return ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated'], [
     'autoFilter' => true,             // Add filter dropdowns (default: true)
     'columnWidths' => ['A' => 20],    // Custom column widths (optional)
 ]);
+
+// Excel export (multiple sheets)
+$sheets = [
+    [
+        'title' => 'Recent Searches',
+        'headers' => $headers,
+        'rows' => $rows,
+        'dateColumns' => ['dateCreated'],
+    ],
+    [
+        'title' => 'Trends',
+        'headers' => $trendHeaders,
+        'rows' => $trendRows,
+    ],
+];
+return ExportHelper::toExcelMulti($sheets, ExportHelper::filename($settings, ['analytics'], 'xlsx'));
 
 // ZIP export (multiple files)
 $zipName = ExportHelper::filename($settings, ['reports'], 'zip');
@@ -2618,6 +2637,22 @@ document.addEventListener('lr:tabChanged', function(e) {
     console.log('Active tab:', e.detail.tabId);
 });
 ```
+
+### Config Tooltip (CP Tables)
+
+Use the base config tooltip for showing config snippets on index listings.
+
+**Markup:**
+```twig
+<span class="lr-config-info-icon"
+      data-config="{{ item.rawConfigDisplay|e('html_attr') }}"
+      data-config-source="config/my-plugin.php"></span>
+```
+
+**Notes:**
+- `data-config` is the preformatted config text.
+- `data-config-source` (optional) renders a small header label inside the tooltip.
+- Requires `ComponentsAsset` (loaded automatically in `cp-table` / `cp-table-utility` layouts).
 
 ### Available Blocks
 

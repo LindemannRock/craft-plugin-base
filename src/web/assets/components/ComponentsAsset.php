@@ -37,6 +37,9 @@ class ComponentsAsset extends AssetBundle
         $this->css = [
             $devMode ? 'components.css' : 'components.min.css',
         ];
+        $this->js = [
+            $devMode ? 'components.js' : 'components.min.js',
+        ];
 
         parent::init();
     }

@@ -55,7 +55,7 @@
     {% set enabledFormats = lrExportFormats(pluginHandle) %}
     {% if enabledFormats|length > 0 %}
         {# Get current dateRange from request #}
-        {% set currentDateRange = craft.app.request.getParam(dateRangeParam, 'last30days') %}
+        {% set currentDateRange = craft.app.request.getParam(dateRangeParam, lrDefaultDateRange(pluginHandle)) %}
 
         {# Build base params #}
         {% set baseParams = {(dateRangeParam): currentDateRange}|merge(extraParams) %}

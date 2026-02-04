@@ -597,6 +597,11 @@
     box-sizing: border-box;
 }
 
+.lr-chart-canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 /* Analytics loading overlay */
 #lr-analytics-content,
 .lr-analytics-panel {
@@ -668,6 +673,116 @@
 .lr-table-scroll table {
     min-width: 100%;
     width: 100%;
+}
+
+/* Analytics utility helpers */
+.lr-text-center {
+    text-align: center;
+}
+
+.lr-text-end {
+    text-align: end;
+}
+
+.lr-text-start {
+    text-align: start;
+}
+
+.lr-text-muted {
+    color: #6b7280;
+}
+
+.lr-inline-flex {
+    display: inline-flex;
+    align-items: center;
+}
+
+.lr-gap-4 {
+    gap: 4px;
+}
+
+.lr-heading-tight {
+    margin: 0 0 10px;
+}
+
+.lr-paragraph {
+    margin: 0 0 20px;
+}
+
+.lr-note {
+    margin: -10px 0 15px;
+    font-size: 12px;
+}
+
+.lr-note-tight {
+    margin: -10px 0 20px;
+    font-size: 12px;
+}
+
+.lr-footnote {
+    margin-top: 20px;
+    font-size: 12px;
+}
+
+.lr-muted-center {
+    text-align: center;
+    margin-top: 10px;
+    color: #666;
+}
+
+.lr-empty-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.lr-text-purple {
+    color: #9b59b6;
+}
+
+.lr-text-green {
+    color: #27ae60;
+}
+
+.lr-text-red {
+    color: #e74c3c;
+}
+
+.lr-text-blue {
+    color: #3498db;
+}
+
+.lr-text-amber {
+    color: #f39c12;
+}
+
+.lr-chart-height-200 {
+    height: 200px;
+}
+
+.lr-chart-height-250 {
+    height: 250px;
+}
+
+.lr-chart-height-300 {
+    height: 300px;
+}
+
+.lr-mt-24 {
+    margin-top: 24px;
+}
+
+.lr-word-cloud {
+    height: 300px;
+    position: relative;
+    width: 100%;
+}
+
+.lr-peak-label {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #596673;
 }
 
 /* Analytics panel adjustments */
@@ -809,11 +924,11 @@
 }
 
 /* Config info icon */
-.config-info-icon {
+.lr-config-info-icon {
     display: inline-block;
     width: 16px;
     height: 16px;
-    margin-left: 5px;
+    margin-inline-start: 5px;
     border-radius: 50%;
     background: #9aa5b1;
     color: #fff;
@@ -825,16 +940,16 @@
     cursor: help;
 }
 
-.config-info-icon::before {
+.lr-config-info-icon::before {
     content: 'i';
 }
 
-.config-info-icon:hover {
+.lr-config-info-icon:hover {
     background: #7b8794;
 }
 
 /* Config tooltip */
-.config-tooltip {
+.lr-config-tooltip {
     position: absolute;
     background: #fff;
     color: #3f4d5a;
@@ -849,6 +964,15 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     max-width: 500px;
     overflow-x: auto;
+}
+
+.lr-config-tooltip-header {
+    display: block;
+    color: #8f98a3;
+    font-size: 10px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e3e5e8;
 }
 
 /* View menu */
@@ -937,4 +1061,15 @@
     .lr-overview-card-primary {
         font-size: 24px;
     }
+}
+
+
+
+.lr-info-box-table-wrapper {
+	padding-bottom: 14px;
+}
+@media (min-width: 769px) {
+	.lr-info-box-table-wrapper {
+		padding-bottom: 46px;
+	}
 }
