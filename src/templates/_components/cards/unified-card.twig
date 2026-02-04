@@ -7,6 +7,7 @@
  # Parameters:
  #   - title: (required) Card title text
  #   - color: (required) Accent color for dot (hex, e.g., '#059669')
+ #   - url: (optional) URL to make the card clickable (renders as <a> with hover effect)
  #   - value: (optional) Primary value to display (number or text)
  #   - valueColor: (optional) Color for value text (defaults to color param)
  #   - secondary: (optional) Secondary value beside primary (e.g., 200 shows as "/ 200")
@@ -86,6 +87,15 @@
  #       align: 'center',
  #   } only %}
  #
+ #   // Clickable card with URL (hover effect)
+ #   {% include 'lindemannrock-base/_components/cards/unified-card' with {
+ #       title: 'View Logs',
+ #       color: '#0ea5e9',
+ #       value: 150,
+ #       description: 'messages today',
+ #       url: url('my-plugin/logs'),
+ #   } only %}
+ #
  # Grid usage:
  #   <div class="lr-unified-cards">
  #       {% include '...' with {...} %}
@@ -100,7 +110,9 @@
 
 {% set cardTitle = title ?? null %}
 {% set cardColor = color ?? '#0d78f2' %}
+{% set cardUrl = url ?? null %}
 {% set cardValue = value ?? null %}
+{% set cardValueIsFormatted = valueIsFormatted ?? false %}
 {% set cardValueColor = valueColor ?? cardColor %}
 {% set cardSecondary = secondary ?? null %}
 {% set cardDescription = description ?? null %}
@@ -121,7 +133,11 @@
     {% set paletteStyle = '' %}
 {% endif %}
 
+{% if cardUrl %}
+<a href="{{ cardUrl }}" class="lr-unified-card lr-unified-card-link pane {% if cardAlign != 'start' %}align-{{ cardAlign }}{% endif %}"{% if paletteStyle %} style="{{ paletteStyle }}"{% endif %}>
+{% else %}
 <div class="lr-unified-card pane {% if cardAlign != 'start' %}align-{{ cardAlign }}{% endif %}"{% if paletteStyle %} style="{{ paletteStyle }}"{% endif %}>
+{% endif %}
     {# Header: dot + title (hidden if no title provided) #}
     {% if cardTitle %}
         <div class="lr-unified-card-header">
@@ -135,7 +151,9 @@
         <div class="lr-unified-card-value-row">
             {% if cardValue is not null %}
                 <div class="lr-unified-card-value" style="color: {{ cardValueColor }};">
-                    {% if cardValue matches '/^-?\\d+(\\.\\d+)?$/' %}
+                    {% if cardValueIsFormatted %}
+                        {{ cardValue }}
+                    {% elseif cardValue matches '/^-?\\d+(\\.\\d+)?$/' %}
                         {{ cardValue|number_format }}
                     {% else %}
                         {{ cardValue }}
@@ -179,4 +197,8 @@
             {% endfor %}
         </div>
     {% endif %}
+{% if cardUrl %}
+</a>
+{% else %}
 </div>
+{% endif %}

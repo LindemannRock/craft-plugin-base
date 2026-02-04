@@ -325,6 +325,22 @@
     height: 100%;
 }
 
+/* Clickable card link variant */
+a.lr-unified-card-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+a.lr-unified-card-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+a.lr-unified-card-link:active {
+    transform: translateY(0);
+}
+
 /* Alignment variants */
 .lr-unified-card.align-center {
     text-align: center;
@@ -616,11 +632,12 @@
     position: absolute;
     inset: 0;
     display: none;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     background: rgba(255, 255, 255, 0.65);
     backdrop-filter: blur(1px);
     z-index: 10;
+    padding-top: 10rem;
 }
 
 .lr-analytics-loader.is-active {
@@ -686,6 +703,10 @@
 
 .lr-text-start {
     text-align: start;
+}
+
+.lr-border-top-muted {
+    border-top: 2px solid #e5e7eb;
 }
 
 .lr-text-muted {
@@ -768,14 +789,44 @@
     height: 300px;
 }
 
+.lr-chart-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lr-chart-center canvas {
+    max-width: 260px;
+    max-height: 260px;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .lr-mt-24 {
     margin-top: 24px;
+}
+
+.lr-mt-30 {
+    margin-top: 30px;
 }
 
 .lr-word-cloud {
     height: 300px;
     position: relative;
     width: 100%;
+}
+
+.lr-word-cloud-item {
+    display: inline-block;
+    padding: 5px;
+    color: #0d78f2;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.lr-word-cloud-item:hover {
+    color: #d35400;
+    transform: scale(1.1);
 }
 
 .lr-peak-label {
