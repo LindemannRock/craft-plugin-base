@@ -970,6 +970,14 @@ return ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated'], [
     'autoFilter' => true,             // Add filter dropdowns (default: true)
     'columnWidths' => ['A' => 20],    // Custom column widths (optional)
 ]);
+
+// ZIP export (multiple files)
+$zipName = ExportHelper::filename($settings, ['reports'], 'zip');
+$files = [
+    ['name' => 'recent-searches.csv', 'content' => $csvContent],
+    'summary.json' => $jsonContent,
+];
+return ExportHelper::toZip($files, $zipName);
 ```
 
 ### Twig Usage

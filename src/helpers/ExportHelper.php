@@ -409,6 +409,53 @@ class ExportHelper
     }
 
     /**
+     * Export multiple files as a ZIP archive
+     *
+     * Each file can be provided as:
+     * - ['name' => 'file.csv', 'content' => '...']
+     * - 'file.csv' => '...'
+     *
+     * @param array $files Files to include in the ZIP
+     * @param string $filename Output filename (.zip)
+     * @return Response
+     * @since 5.13.1
+     */
+    public static function toZip(array $files, string $filename): Response
+    {
+        if (!str_ends_with($filename, '.zip')) {
+            $filename .= '.zip';
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'zip_export_');
+        $zip = new \ZipArchive();
+        $zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+
+        foreach ($files as $key => $file) {
+            $name = null;
+            $content = '';
+
+            if (is_array($file)) {
+                $name = $file['name'] ?? null;
+                $content = (string)($file['content'] ?? '');
+            } elseif (is_string($key)) {
+                $name = $key;
+                $content = (string)$file;
+            }
+
+            if ($name) {
+                $zip->addFromString($name, $content);
+            }
+        }
+
+        $zip->close();
+
+        $content = file_get_contents($tempFile);
+        unlink($tempFile);
+
+        return self::createResponse($content, $filename, 'application/zip');
+    }
+
+    /**
      * Generate an export filename
      *
      * Supports three usage patterns:
