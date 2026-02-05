@@ -38,6 +38,9 @@ use lindemannrock\logginglibrary\LoggingLibrary;
  *         ['redirectManager:downloadSystemLogs']
  *     );
  *
+ *     // Optional: register translations automatically (if translations/ exists)
+ *     // PluginHelper::bootstrap(..., options: ['registerTranslations' => true]);
+ *
  *     // Apply plugin name from config file
  *     PluginHelper::applyPluginNameFromConfig($this);
  *
@@ -68,6 +71,9 @@ class PluginHelper
      *     Example: ['myStatus' => ['active' => ['color' => '#10b981', 'rgb' => '16, 185, 129', 'text' => '#065f46']]]
      *   - 'logMenu': array to customize log sidebar menu (label/items)
      *     Example: ['label' => 'Logs', 'items' => ['system' => ['label' => 'System', 'url' => 'my-plugin/logs/system']]]
+     *   - 'registerTranslations': bool to auto-register translations (default true)
+     *   - 'translationCategory': string override for translation category (default plugin id)
+     *   - 'translationBasePath': string override for translation base path (default {plugin}/translations)
      * @since 5.0.0
      */
     public static function bootstrap(
@@ -132,6 +138,14 @@ class PluginHelper
                     ColorHelper::registerColorSet($setName, $colors);
                 }
             }
+        }
+
+        // Register translations (if enabled and translations/ exists)
+        $registerTranslations = $options['registerTranslations'] ?? true;
+        if ($registerTranslations) {
+            $category = is_string($options['translationCategory'] ?? null) ? $options['translationCategory'] : null;
+            $basePath = is_string($options['translationBasePath'] ?? null) ? $options['translationBasePath'] : null;
+            self::registerTranslations($plugin, $basePath, $category);
         }
     }
 
@@ -235,13 +249,39 @@ class PluginHelper
      * Convenience method to register translation messages.
      * Alternative to doing it manually in each plugin.
      *
-     * @param string $handle Plugin handle (translation category)
-     * @param string $basePath Path to translations directory
-     * @since 5.0.0
+     * @param PluginInterface|string $pluginOrHandle Plugin instance or translation category handle
+     * @param string|null $basePath Path to translations directory (required for handle-only usage)
+     * @param string|null $category Translation category override (defaults to plugin id)
+     * @since 5.29.0
      */
-    public static function registerTranslations(string $handle, string $basePath): void
+    public static function registerTranslations(PluginInterface|string $pluginOrHandle, ?string $basePath = null, ?string $category = null): void
     {
-        Craft::$app->i18n->translations[$handle] = [
+        if ($pluginOrHandle instanceof PluginInterface) {
+            $category = $category ?: $pluginOrHandle->id;
+            if ($basePath === null) {
+                if ($pluginOrHandle instanceof \craft\base\Plugin) {
+                    $basePath = $pluginOrHandle->getBasePath() . DIRECTORY_SEPARATOR . 'translations';
+                } else {
+                    $ref = new \ReflectionClass($pluginOrHandle);
+                    $basePath = dirname($ref->getFileName()) . DIRECTORY_SEPARATOR . 'translations';
+                }
+            }
+        } else {
+            $category = $category ?: $pluginOrHandle;
+        }
+
+        if (!$category || !$basePath) {
+            return;
+        }
+
+        $alreadyRegistered = isset(Craft::$app->i18n->translations[$category]);
+        $hasTranslationsDir = is_dir($basePath);
+
+        if ($alreadyRegistered || !$hasTranslationsDir) {
+            return;
+        }
+
+        Craft::$app->i18n->translations[$category] = [
             'class' => \craft\i18n\PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'basePath' => $basePath,

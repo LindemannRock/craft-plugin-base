@@ -160,7 +160,7 @@ public function init(): void
 {
     parent::init();
 
-    // Bootstrap base module (registers Twig extension + logging)
+    // Bootstrap base module (registers Twig extension, logging, translations)
     PluginHelper::bootstrap($this, 'myPluginHelper', ['myPlugin:viewLogs']);
 
     // Apply plugin name from config file
