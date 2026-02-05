@@ -118,6 +118,7 @@
 {% set items = tableConf.items ?? [] %}
 {% set emptyMessage = tableConf.emptyMessage ?? 'No items found.'|t('app') %}
 {% set expandableEnabled = tableConf.expandable ?? false %}
+{% set rowClassKey = tableConf.rowClassKey ?? null %}
 {% set hasConfigItems = tableConf.hasConfigItems ?? false %}
 
 {# View button configuration - only enabled when there are hideable columns #}
@@ -342,7 +343,8 @@
                             {% endif %}
 
                             {# Main row #}
-                            <tr class="lr-data-row {% if expandableEnabled %}lr-clickable-row{% endif %}{% if not itemSelectable %} lr-not-selectable{% endif %}"
+                            {% set rowClass = rowClassKey ? attribute(item, rowClassKey)|default('') : '' %}
+                            <tr class="lr-data-row {% if expandableEnabled %}lr-clickable-row{% endif %}{% if not itemSelectable %} lr-not-selectable{% endif %}{{ rowClass ? ' ' ~ rowClass : '' }}"
                                 data-id="{{ item.id ?? loop.index }}"
                                 data-entry-id="{{ loop.index }}"
                                 data-selectable="{{ itemSelectable ? 'true' : 'false' }}">

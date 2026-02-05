@@ -258,6 +258,31 @@ public function init(): void
 | `CsvImportHelper::parseUpload()` | Parse CSV file upload with validation and delimiter detection |
 | `ColorHelper::getPaletteColor()` | Get a color from the palette by name |
 | `ColorHelper::getPaletteColorNames()` | Get all available palette color names |
+
+### Table Row Highlighting
+
+The `cp-table` layout supports row highlighting via CSS classes.
+
+1) Provide a `rowClassKey` in `tableConfig.table`:
+
+```twig
+{% set tableConfig = {
+    table: {
+        rowClassKey: 'rowClass',
+        items: items,
+        columns: [...]
+    }
+} %}
+```
+
+2) Set `rowClass` on each item (server-side):
+
+- `lr-row--info`
+- `lr-row--success`
+- `lr-row--warning`
+- `lr-row--danger`
+
+These tones include hover/selected overrides that integrate with Craft’s table styles.
 | `ColorHelper::getColorSet()` | Get entire color set by name |
 | `ColorHelper::getSetColor()` | Get specific color from a set |
 | `ColorHelper::getNeutralColor()` | Get neutral/unselected color |

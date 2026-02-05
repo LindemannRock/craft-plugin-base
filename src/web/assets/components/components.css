@@ -940,6 +940,83 @@ a.lr-unified-card-link:active {
     background: #f9fafb !important;
 }
 
+/* Row highlight tones */
+.lr-row--info {
+    background: #eff6ff;
+}
+
+.lr-row--success {
+    background: #ecfdf3;
+}
+
+.lr-row--warning {
+    background: #fffbeb;
+}
+
+.lr-row--danger {
+    background: #fef2f2;
+}
+
+.data tbody tr.lr-row--info {
+    --hover-bg-color: #dbeafe;
+    --selected-bg-color: #bfdbfe;
+}
+
+.data tbody tr.lr-row--success {
+    --hover-bg-color: #dcfce7;
+    --selected-bg-color: #bbf7d0;
+}
+
+.data tbody tr.lr-row--warning {
+    --hover-bg-color: #fef3c7;
+    --selected-bg-color: #fde68a;
+}
+
+.data tbody tr.lr-row--danger {
+    --hover-bg-color: #fee2e2;
+    --selected-bg-color: #fecaca;
+}
+
+.data tbody tr.lr-row--info:hover,
+.lr-row--info.lr-clickable-row:hover {
+    background: #dbeafe !important;
+}
+
+.data tbody tr.lr-row--success:hover,
+.lr-row--success.lr-clickable-row:hover {
+    background: #dcfce7 !important;
+}
+
+.data tbody tr.lr-row--warning:hover,
+.lr-row--warning.lr-clickable-row:hover {
+    background: #fef3c7 !important;
+}
+
+.data tbody tr.lr-row--danger:hover,
+.lr-row--danger.lr-clickable-row:hover {
+    background: #fee2e2 !important;
+}
+
+.data tbody tr.lr-row--info.sel,
+.data tbody tr.lr-row--info.selected {
+    background: #bfdbfe !important;
+}
+
+.data tbody tr.lr-row--success.sel,
+.data tbody tr.lr-row--success.selected {
+    background: #bbf7d0 !important;
+}
+
+.data tbody tr.lr-row--warning.sel,
+.data tbody tr.lr-row--warning.selected {
+    background: #fde68a !important;
+}
+
+.data tbody tr.lr-row--danger.sel,
+.data tbody tr.lr-row--danger.selected {
+    background: #fecaca !important;
+}
+
 .lr-context-row td {
     padding: 0 !important;
 }
