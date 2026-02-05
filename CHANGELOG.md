@@ -1,5 +1,42 @@
 # Changelog
 
+## [5.14.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.13.0...v5.14.0) (2026-02-05)
+
+
+### Features
+
+* Add CP Utilities layout and components ([3de42a2](https://github.com/LindemannRock/craft-plugin-base/commit/3de42a27cc6fd0be801404d8a0e750af10c3a9eb))
+* **analytics-panel:** enhance loading states and AJAX content replacement ([39da043](https://github.com/LindemannRock/craft-plugin-base/commit/39da043864f92a87ab30f1abdcfb2188876766a6))
+* **backup:** add backup reason handling and CSV import form ([20ccc71](https://github.com/LindemannRock/craft-plugin-base/commit/20ccc7154bef61b24dcbe29c31361126e64aee5f))
+* **config:** add centralized configuration for date formatting and export options ([8bbc5cc](https://github.com/LindemannRock/craft-plugin-base/commit/8bbc5cc53e80508a914802298f02bc9e67f6a674))
+* **cp-nav:** add CpNavHelper for centralized permission and settings checks ([306ef82](https://github.com/LindemannRock/craft-plugin-base/commit/306ef82c2081f28ddf3644829a59055b14ef2725))
+* **csv-import:** add CsvImportHelper for CSV file upload parsing and validation ([b005405](https://github.com/LindemannRock/craft-plugin-base/commit/b005405031fee366051837b241467a60056be708))
+* **csv-import:** refactor CsvImportHelper to use constants for max rows and bytes ([71bebb5](https://github.com/LindemannRock/craft-plugin-base/commit/71bebb594728958a6a84f3b6b8f2681100816398))
+* **device-detection:** add DeviceDetection and DeviceDetectionTrait for user-agent parsing ([bd36d78](https://github.com/LindemannRock/craft-plugin-base/commit/bd36d78ba4316290ef085ee0d4bc60596e3596b0))
+* **device-detection:** add model mapping and cache key generation methods ([2ecdc2b](https://github.com/LindemannRock/craft-plugin-base/commit/2ecdc2b47f800fcabd002af157e0b29cb9fd8014))
+* **device-detection:** enhance language detection capabilities ([defb47f](https://github.com/LindemannRock/craft-plugin-base/commit/defb47f4031891cf655cdb8aead1977e1e23e5ca))
+* **device-detection:** enhance logging capabilities in DeviceDetection and DeviceDetectionTrait ([a0273b1](https://github.com/LindemannRock/craft-plugin-base/commit/a0273b1266aa67b73e0b46ac4d6ac3ddfadee8bf))
+* enhance export menu and analytics panel functionality ([329fb0a](https://github.com/LindemannRock/craft-plugin-base/commit/329fb0a6cc4b98393f9ce0f73edac5515e154152))
+* **export-helper:** add functionality to export multiple files as a ZIP archive ([49c222d](https://github.com/LindemannRock/craft-plugin-base/commit/49c222d758dc75d2487f6d01eb52ae4327f59a46))
+* **import-csv:** enhance CSV import functionality with mode switch and descriptions ([9b345bd](https://github.com/LindemannRock/craft-plugin-base/commit/9b345bd97691af9d778d7765b36dff47eedc4bdd))
+* **plugin-helper:** add logMenu option for customizable log sidebar navigation ([9ffdc3c](https://github.com/LindemannRock/craft-plugin-base/commit/9ffdc3c825829737bb0396f1d2de1d3be2de4fcf))
+* **plugin-helper:** update permissions for log viewing in PluginHelper ([e5ace60](https://github.com/LindemannRock/craft-plugin-base/commit/e5ace60687133178048e5f3176b09e0ccb2e55a5))
+* **PluginHelper:** add automatic translation registration functionality ([36e066a](https://github.com/LindemannRock/craft-plugin-base/commit/36e066a8085591e2e7d1b33d6b84d35c29c7b6ab))
+* **table:** add row class customization for dynamic styling ([fe04c2e](https://github.com/LindemannRock/craft-plugin-base/commit/fe04c2e527014ed7e33e0d43695864ac404fcb9e))
+* **unified-card:** add clickable card functionality with hover effects ([68a3c02](https://github.com/LindemannRock/craft-plugin-base/commit/68a3c02336d86780472312a6dd6aff90de80b857))
+* **unified-cards:** add responsive column layouts for unified cards ([5811b07](https://github.com/LindemannRock/craft-plugin-base/commit/5811b074d0a5fa59e9bd179424dc7c1044e5d421))
+
+
+### Bug Fixes
+
+* **csv-import:** strip UTF-8 BOM from first header to prevent parsing issues ([a7e3554](https://github.com/LindemannRock/craft-plugin-base/commit/a7e355438cce12e22a8fb587313886295d8b8582))
+
+
+### Miscellaneous Chores
+
+* **composer:** update matomo/device-detector dependency to ^6.4 ([7a56ba2](https://github.com/LindemannRock/craft-plugin-base/commit/7a56ba2f989345133f74408f64f280fb2a7c1b8c))
+* **PluginHelper:** update version annotation for getCacheKeySet method to 5.14.0 ([fcad3c8](https://github.com/LindemannRock/craft-plugin-base/commit/fcad3c84adbb75f29146662f843afeed71b04c99))
+
 ## [5.13.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.12.0...v5.13.0) (2026-01-28)
 
 
