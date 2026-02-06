@@ -14,7 +14,7 @@ This package provides shared functionality for all LindemannRock plugins:
 - **Edition Support** for Craft Plugin Store licensing with standardized tiers (Standard/Lite/Pro)
 - **Traits** for Settings models (displayName, database persistence, config overrides)
 - **Device Detection** for standardized UA parsing and caching (Matomo DeviceDetector)
-- **DateTimeHelper** for centralized date/time formatting with timezone support
+- **DateFormatHelper** for centralized date/time formatting with timezone support
 - **DateRangeHelper** for standardized date range selection and filtering
 - **Twig Extensions** for plugin name helpers and datetime filters in templates
 - **Helpers** for common plugin initialization tasks and geographic utilities
@@ -239,12 +239,12 @@ public function init(): void
 | `GeoHelper::getCountryName()` | Convert ISO 3166-1 alpha-2 country code to name |
 | `GeoHelper::getAllCountries()` | Get all 249 countries as code => name array |
 | `GeoHelper::isValidCountryCode()` | Validate a country code |
-| `DateTimeHelper::formatDatetime()` | Format datetime for display with timezone |
-| `DateTimeHelper::formatDate()` | Format date only for display |
-| `DateTimeHelper::formatTime()` | Format time only for display |
-| `DateTimeHelper::forDatabase()` | Format for MySQL datetime storage |
-| `DateTimeHelper::forApi()` | Format as ISO 8601 for APIs |
-| `DateTimeHelper::forFilename()` | Format safe for filenames |
+| `DateFormatHelper::formatDatetime()` | Format datetime for display with timezone |
+| `DateFormatHelper::formatDate()` | Format date only for display |
+| `DateFormatHelper::formatTime()` | Format time only for display |
+| `DateFormatHelper::forDatabase()` | Format for MySQL datetime storage |
+| `DateFormatHelper::forApi()` | Format as ISO 8601 for APIs |
+| `DateFormatHelper::forFilename()` | Format safe for filenames |
 | `DateRangeHelper::getDefaultDateRange()` | Get default date range from config |
 | `DateRangeHelper::getOptions()` | Get standard date range options for dropdowns |
 | `DateRangeHelper::getBounds()` | Get UTC date bounds for a range |
@@ -391,7 +391,12 @@ $name = PluginHelper::getPluginName('missing-plugin', 'Fallback Name');  // "Fal
 #### Twig Usage
 
 ```twig
-{# Check if plugin is enabled #}
+{# Check if plugin is installed (may be disabled) #}
+{% if lrPluginInstalled('formie') %}
+    <p>Formie is installed</p>
+{% endif %}
+
+{# Check if plugin is installed AND enabled #}
 {% if lrPluginEnabled('formie') %}
     <p>Formie integration available</p>
 {% endif %}
@@ -405,7 +410,8 @@ $name = PluginHelper::getPluginName('missing-plugin', 'Fallback Name');  // "Fal
 
 | Function | Returns | Use Case |
 |----------|---------|----------|
-| `lrPluginEnabled(handle)` | `bool` | Conditional plugin features |
+| `lrPluginInstalled(handle)` | `bool` | Check if installed (may be disabled) |
+| `lrPluginEnabled(handle)` | `bool` | Check if installed AND enabled |
 | `lrPluginName(handle, fallback)` | `string` | Display plugin names in UI |
 
 ### GeoHelper Usage
@@ -459,7 +465,42 @@ $options = GeoHelper::getCountryDialCodeOptions();  // [{value: 'US', label: 'Un
 | `lrDialCodes()` | `array` | Dial code options for phone select fields |
 | `lrDialCode(code)` | `string` | Get dial code for a country (e.g., `+1`) |
 
-### DateTimeHelper
+### DbHelper
+
+Provides DB-agnostic SQL expressions for operations that differ between MySQL and PostgreSQL.
+
+#### JSON Column Extraction
+
+```php
+use lindemannrock\base\helpers\DbHelper;
+
+// Get a raw SQL string for use in where/select clauses
+$sql = DbHelper::jsonExtract('metadata', 'source');
+// MySQL:      JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.source'))
+// PostgreSQL: metadata->>'source'
+
+// Use in Yii query builder where clauses
+$query->where([DbHelper::jsonExtract('metadata', 'clickType') => 'button']);
+
+// Use in select clauses
+$query->select([DbHelper::jsonExtract('metadata', 'platform') . ' as platform', 'COUNT(*) as count']);
+
+// Use in complex expressions (CASE/SUM)
+$query->select([
+    'SUM(CASE WHEN ' . DbHelper::jsonExtract('a.metadata', 'source') . ' = \'qr\' THEN 1 ELSE 0 END) as qrScans',
+]);
+
+// Get a yii\db\Expression with optional alias
+$expr = DbHelper::jsonExtractExpression('metadata', 'source', 'sourceValue');
+$query->select([$expr, 'COUNT(*) as count']);
+```
+
+| Method | Returns | Use Case |
+|--------|---------|----------|
+| `jsonExtract($column, $path)` | `string` | Raw SQL for JSON text extraction |
+| `jsonExtractExpression($column, $path, $alias)` | `Expression` | Yii Expression for query builder |
+
+### DateFormatHelper
 
 Provides centralized date/time formatting for all plugins. Respects Craft's timezone and configurable format preferences.
 
@@ -533,49 +574,49 @@ return [
 #### PHP Usage
 
 ```php
-use lindemannrock\base\helpers\DateTimeHelper;
+use lindemannrock\base\helpers\DateFormatHelper;
 
 // Display formatting (respects config + Craft timezone)
-DateTimeHelper::formatDatetime($date);                    // "22/01/2026 15:45"
-DateTimeHelper::formatDatetime($date, 'long');            // "22 January 2026 at 15:45"
-DateTimeHelper::formatDatetime($date, showSeconds: true); // "22/01/2026 15:45:32"
+DateFormatHelper::formatDatetime($date);                    // "22/01/2026 15:45"
+DateFormatHelper::formatDatetime($date, 'long');            // "22 January 2026 at 15:45"
+DateFormatHelper::formatDatetime($date, showSeconds: true); // "22/01/2026 15:45:32"
 
 // Compact datetime (no year) - ideal for dashboards
-DateTimeHelper::formatCompactDatetime($date);             // "22 Jan 15:45"
+DateFormatHelper::formatCompactDatetime($date);             // "22 Jan 15:45"
 
 // Exclude year with includeYear parameter
-DateTimeHelper::formatDatetime($date, includeYear: false); // "22/01 15:45"
-DateTimeHelper::formatDate($date, includeYear: false);     // "22/01"
+DateFormatHelper::formatDatetime($date, includeYear: false); // "22/01 15:45"
+DateFormatHelper::formatDate($date, includeYear: false);     // "22/01"
 
-DateTimeHelper::formatDate($date);                        // "22/01/2026"
-DateTimeHelper::formatDate($date, 'medium');              // "22 Jan 2026"
-DateTimeHelper::formatDate($date, 'long');                // "22 January 2026"
+DateFormatHelper::formatDate($date);                        // "22/01/2026"
+DateFormatHelper::formatDate($date, 'medium');              // "22 Jan 2026"
+DateFormatHelper::formatDate($date, 'long');                // "22 January 2026"
 
-DateTimeHelper::formatTime($date);                        // "15:45" or "3:45 PM"
-DateTimeHelper::formatTime($date, showSeconds: true);     // "15:45:32"
+DateFormatHelper::formatTime($date);                        // "15:45" or "3:45 PM"
+DateFormatHelper::formatTime($date, showSeconds: true);     // "15:45:32"
 
-DateTimeHelper::formatShortDate($date);                   // "Jan 22" (for charts)
-DateTimeHelper::formatRelative($date);                    // "2 hours ago"
+DateFormatHelper::formatShortDate($date);                   // "Jan 22" (for charts)
+DateFormatHelper::formatRelative($date);                    // "2 hours ago"
 
 // Database formatting
-DateTimeHelper::forDatabase($date);                       // "2026-01-22 15:45:32"
-DateTimeHelper::forDatabaseDate($date);                   // "2026-01-22"
-DateTimeHelper::forDatabaseDayStart($date);               // "2026-01-22 00:00:00"
-DateTimeHelper::forDatabaseDayEnd($date);                 // "2026-01-22 23:59:59"
+DateFormatHelper::forDatabase($date);                       // "2026-01-22 15:45:32"
+DateFormatHelper::forDatabaseDate($date);                   // "2026-01-22"
+DateFormatHelper::forDatabaseDayStart($date);               // "2026-01-22 00:00:00"
+DateFormatHelper::forDatabaseDayEnd($date);                 // "2026-01-22 23:59:59"
 
 // API formatting (ISO 8601)
-DateTimeHelper::forApi($date);                            // "2026-01-22T15:45:32+00:00"
+DateFormatHelper::forApi($date);                            // "2026-01-22T15:45:32+00:00"
 
 // Filename formatting
-DateTimeHelper::forFilename();                            // "2026-01-22-154532"
-DateTimeHelper::forFilename($date, includeTime: false);   // "2026-01-22"
+DateFormatHelper::forFilename();                            // "2026-01-22-154532"
+DateFormatHelper::forFilename($date, includeTime: false);   // "2026-01-22"
 
 // Utilities
-DateTimeHelper::now();                                    // Current DateTime in Craft timezone
-DateTimeHelper::isToday($date);                           // true/false
-DateTimeHelper::isPast($date);                            // true/false
-DateTimeHelper::isFuture($date);                          // true/false
-DateTimeHelper::toCraftTimezone($date);                   // Convert UTC to Craft timezone
+DateFormatHelper::now();                                    // Current DateTime in Craft timezone
+DateFormatHelper::isToday($date);                           // true/false
+DateFormatHelper::isPast($date);                            // true/false
+DateFormatHelper::isFuture($date);                          // true/false
+DateFormatHelper::toCraftTimezone($date);                   // Convert UTC to Craft timezone
 ```
 
 #### Twig Usage
@@ -624,8 +665,8 @@ By default, string timestamps are assumed to be in UTC and converted to Craft's 
 **PHP:**
 ```php
 // Log file timestamp already in local time - don't convert
-DateTimeHelper::formatTime($logTimestamp, isUtc: false);
-DateTimeHelper::formatDatetime($logTimestamp, isUtc: false);
+DateFormatHelper::formatTime($logTimestamp, isUtc: false);
+DateFormatHelper::formatDatetime($logTimestamp, isUtc: false);
 ```
 
 **Twig:**
@@ -711,28 +752,28 @@ The `monthFormat` config sets the default, but you can always override per-call:
 
 **AJAX Response (Controller):**
 ```php
-use lindemannrock\base\helpers\DateTimeHelper;
+use lindemannrock\base\helpers\DateFormatHelper;
 
 public function actionGetLogs(): Response
 {
     $logs = $this->logsService->getLogs();
 
     foreach ($logs as &$log) {
-        $log['dateFormatted'] = DateTimeHelper::formatDatetime($log['dateCreated']);
-        $log['timeFormatted'] = DateTimeHelper::formatTime($log['dateCreated'], showSeconds: true);
+        $log['dateFormatted'] = DateFormatHelper::formatDatetime($log['dateCreated']);
+        $log['timeFormatted'] = DateFormatHelper::formatTime($log['dateCreated'], showSeconds: true);
     }
 
     return $this->asJson([
         'success' => true,
         'logs' => $logs,
-        'exportedAt' => DateTimeHelper::forApi(DateTimeHelper::now()),
+        'exportedAt' => DateFormatHelper::forApi(DateFormatHelper::now()),
     ]);
 }
 ```
 
 **CSV Export:**
 ```php
-use lindemannrock\base\helpers\DateTimeHelper;
+use lindemannrock\base\helpers\DateFormatHelper;
 
 public function actionExportCsv(): Response
 {
@@ -745,8 +786,8 @@ public function actionExportCsv(): Response
     // Data rows with formatted dates
     foreach ($data as $row) {
         fputcsv($output, [
-            DateTimeHelper::formatDate($row['dateCreated']),
-            DateTimeHelper::formatTime($row['dateCreated'], showSeconds: true),
+            DateFormatHelper::formatDate($row['dateCreated']),
+            DateFormatHelper::formatTime($row['dateCreated'], showSeconds: true),
             $row['message'],
             $row['status'],
         ]);
@@ -757,7 +798,7 @@ public function actionExportCsv(): Response
     fclose($output);
 
     // Filename with timestamp
-    $filename = 'export-' . DateTimeHelper::forFilename() . '.csv';
+    $filename = 'export-' . DateFormatHelper::forFilename() . '.csv';
 
     return $this->response
         ->setHeader('Content-Type', 'text/csv')
@@ -768,26 +809,26 @@ public function actionExportCsv(): Response
 
 **JSON Export:**
 ```php
-use lindemannrock\base\helpers\DateTimeHelper;
+use lindemannrock\base\helpers\DateFormatHelper;
 
 public function actionExportJson(): Response
 {
     $data = $this->service->getData();
 
     $export = [
-        'exportedAt' => DateTimeHelper::forApi(DateTimeHelper::now()),
+        'exportedAt' => DateFormatHelper::forApi(DateFormatHelper::now()),
         'timezone' => Craft::$app->getTimeZone(),
         'records' => array_map(fn($row) => [
             'id' => $row['id'],
-            'date' => DateTimeHelper::formatDate($row['dateCreated']),
-            'time' => DateTimeHelper::formatTime($row['dateCreated']),
-            'datetime' => DateTimeHelper::formatDatetime($row['dateCreated']),
-            'iso' => DateTimeHelper::forApi($row['dateCreated']),
+            'date' => DateFormatHelper::formatDate($row['dateCreated']),
+            'time' => DateFormatHelper::formatTime($row['dateCreated']),
+            'datetime' => DateFormatHelper::formatDatetime($row['dateCreated']),
+            'iso' => DateFormatHelper::forApi($row['dateCreated']),
             'message' => $row['message'],
         ], $data),
     ];
 
-    $filename = 'export-' . DateTimeHelper::forFilename() . '.json';
+    $filename = 'export-' . DateFormatHelper::forFilename() . '.json';
 
     return $this->response
         ->setHeader('Content-Type', 'application/json')
@@ -824,7 +865,7 @@ public function actionExportJson(): Response
 
 #### Migration Guide
 
-When updating existing code to use DateTimeHelper, replace the old patterns:
+When updating existing code to use DateFormatHelper, replace the old patterns:
 
 **Before (Manual timezone conversion):**
 ```php
@@ -835,7 +876,7 @@ $result['lastHitFormatted'] = Craft::$app->getFormatter()->asDatetime($utcDate, 
 
 **After:**
 ```php
-$result['lastHitFormatted'] = DateTimeHelper::formatDatetime($result['lastHit']);
+$result['lastHitFormatted'] = DateFormatHelper::formatDatetime($result['lastHit']);
 ```
 
 ---
@@ -848,7 +889,7 @@ $log['datetimeFormatted'] = $formatter->asDatetime($log['dateCreated'], 'medium'
 
 **After:**
 ```php
-$log['datetimeFormatted'] = DateTimeHelper::formatDatetime($log['dateCreated'], 'medium');
+$log['datetimeFormatted'] = DateFormatHelper::formatDatetime($log['dateCreated'], 'medium');
 ```
 
 ---
@@ -863,10 +904,10 @@ $date->format('M j, Y');                 // For display
 
 **After:**
 ```php
-DateTimeHelper::forDatabase($date);      // For database
-DateTimeHelper::forApi($date);           // For API
-DateTimeHelper::forFilename();           // For filename
-DateTimeHelper::formatDate($date, 'medium');  // For display
+DateFormatHelper::forDatabase($date);      // For database
+DateFormatHelper::forApi($date);           // For API
+DateFormatHelper::forFilename();           // For filename
+DateFormatHelper::formatDate($date, 'medium');  // For display
 ```
 
 ---

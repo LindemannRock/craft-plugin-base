@@ -11,12 +11,14 @@ namespace lindemannrock\base\helpers;
 use Craft;
 use DateTime;
 use DateTimeZone;
+use yii\db\Expression;
 
 /**
- * DateTime Helper
+ * Date Format Helper
  *
  * Provides centralized date/time formatting for all LindemannRock plugins.
  * Respects Craft's timezone and configurable format preferences.
+ * Named DateFormatHelper to avoid collision with Craft's DateTimeHelper.
  *
  * Configuration via config/lindemannrock-base.php:
  * ```php
@@ -31,24 +33,24 @@ use DateTimeZone;
  *
  * Usage:
  * ```php
- * use lindemannrock\base\helpers\DateTimeHelper;
+ * use lindemannrock\base\helpers\DateFormatHelper;
  *
  * // Display formatting (uses Craft timezone + config)
- * DateTimeHelper::formatDatetime($date);              // "22/01/2026 15:45"
- * DateTimeHelper::formatDate($date);                  // "22/01/2026"
- * DateTimeHelper::formatTime($date);                  // "15:45"
- * DateTimeHelper::formatTime($date, showSeconds: true); // "15:45:32"
+ * DateFormatHelper::formatDatetime($date);              // "22/01/2026 15:45"
+ * DateFormatHelper::formatDate($date);                  // "22/01/2026"
+ * DateFormatHelper::formatTime($date);                  // "15:45"
+ * DateFormatHelper::formatTime($date, showSeconds: true); // "15:45:32"
  *
  * // For database/API/filenames
- * DateTimeHelper::forDatabase($date);   // "2026-01-22 15:45:32"
- * DateTimeHelper::forApi($date);        // "2026-01-22T15:45:32+00:00"
- * DateTimeHelper::forFilename();        // "2026-01-22-154532"
+ * DateFormatHelper::forDatabase($date);   // "2026-01-22 15:45:32"
+ * DateFormatHelper::forApi($date);        // "2026-01-22T15:45:32+00:00"
+ * DateFormatHelper::forFilename();        // "2026-01-22-154532"
  * ```
  *
  * @author LindemannRock
  * @since 5.8.0
  */
-class DateTimeHelper
+class DateFormatHelper
 {
     /**
      * @var array|null Cached configuration
@@ -181,6 +183,94 @@ class DateTimeHelper
         }
 
         return $date;
+    }
+
+    // =========================================================================
+    // SQL EXPRESSIONS (DB-agnostic timezone conversion for queries)
+    // =========================================================================
+
+    /**
+     * Build a local-date SQL expression for grouping by calendar date in the site's timezone.
+     *
+     * Returns a `yii\db\Expression` that converts a UTC datetime column to the site's
+     * local timezone and extracts the date. Works on both MySQL and PostgreSQL.
+     *
+     * Usage:
+     * ```php
+     * $localDate = DateFormatHelper::localDateExpression('dateCreated');
+     * $query->select(['date' => $localDate, 'COUNT(*) as count'])
+     *       ->groupBy($localDate);
+     * ```
+     *
+     * @param string $column The UTC datetime column name (e.g. 'dateCreated')
+     * @return Expression
+     * @since 5.15.0
+     */
+    public static function localDateExpression(string $column): Expression
+    {
+        $offset = self::getCraftTimezoneOffset();
+
+        if (Craft::$app->getDb()->getIsMysql()) {
+            return new Expression(
+                "DATE(CONVERT_TZ([[$column]], '+00:00', :tzOffset))",
+                [':tzOffset' => $offset],
+            );
+        }
+
+        // PostgreSQL
+        return new Expression(
+            "DATE([[$column]] AT TIME ZONE 'UTC' AT TIME ZONE :tzOffset)",
+            [':tzOffset' => $offset],
+        );
+    }
+
+    /**
+     * Build a local-hour SQL expression for grouping by hour-of-day in the site's timezone.
+     *
+     * Returns a `yii\db\Expression` that converts a UTC datetime column to the site's
+     * local timezone and extracts the hour (0-23). Works on both MySQL and PostgreSQL.
+     *
+     * Usage:
+     * ```php
+     * $localHour = DateFormatHelper::localHourExpression('dateCreated');
+     * $query->select(['hour' => $localHour, 'COUNT(*) as count'])
+     *       ->groupBy($localHour);
+     * ```
+     *
+     * @param string $column The UTC datetime column name (e.g. 'dateCreated')
+     * @return Expression
+     * @since 5.15.0
+     */
+    public static function localHourExpression(string $column): Expression
+    {
+        $offset = self::getCraftTimezoneOffset();
+
+        if (Craft::$app->getDb()->getIsMysql()) {
+            return new Expression(
+                "HOUR(CONVERT_TZ([[$column]], '+00:00', :tzOffset))",
+                [':tzOffset' => $offset],
+            );
+        }
+
+        // PostgreSQL
+        return new Expression(
+            "EXTRACT(HOUR FROM [[$column]] AT TIME ZONE 'UTC' AT TIME ZONE :tzOffset)",
+            [':tzOffset' => $offset],
+        );
+    }
+
+    /**
+     * Get the Craft site's timezone offset in ±HH:MM format for SQL use.
+     *
+     * @return string e.g. '+03:00', '-05:00'
+     * @since 5.15.0
+     */
+    public static function getCraftTimezoneOffset(): string
+    {
+        $timezone = Craft::$app->getTimeZone();
+        $dateTime = new DateTime('now', new DateTimeZone($timezone));
+
+        return $dateTime->format('P');
     }
 
     // =========================================================================

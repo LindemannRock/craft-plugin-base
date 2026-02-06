@@ -614,7 +614,7 @@ class ExportHelper
 
         // Pattern 2: Simple prefix + extension
         if (is_string($pluginOrPrefix) && is_string($partsOrExtension) && $extension === null) {
-            return $pluginOrPrefix . '-' . DateTimeHelper::forFilename() . '.' . $partsOrExtension;
+            return $pluginOrPrefix . '-' . DateFormatHelper::forFilename() . '.' . $partsOrExtension;
         }
 
         // Pattern 1: Settings/string + parts array + extension
@@ -632,11 +632,11 @@ class ExportHelper
             $allParts = array_filter([$pluginName, ...$partsOrExtension], fn($p) => $p !== null && $p !== '');
             $baseName = implode('-', $allParts);
 
-            return $baseName . '-' . DateTimeHelper::forFilename() . '.' . $extension;
+            return $baseName . '-' . DateFormatHelper::forFilename() . '.' . $extension;
         }
 
         // Fallback
-        return 'export-' . DateTimeHelper::forFilename() . '.csv';
+        return 'export-' . DateFormatHelper::forFilename() . '.csv';
     }
 
     /**
@@ -652,7 +652,7 @@ class ExportHelper
         foreach ($rows as &$row) {
             foreach ($dateColumns as $column) {
                 if (isset($row[$column]) && $row[$column] !== null) {
-                    $row[$column] = DateTimeHelper::forDatabase($row[$column]);
+                    $row[$column] = DateFormatHelper::forDatabase($row[$column]);
                 }
             }
         }
@@ -673,7 +673,7 @@ class ExportHelper
         foreach ($rows as &$row) {
             foreach ($dateColumns as $column) {
                 if (isset($row[$column]) && $row[$column] !== null) {
-                    $row[$column] = DateTimeHelper::forApi($row[$column]);
+                    $row[$column] = DateFormatHelper::forApi($row[$column]);
                 }
             }
         }

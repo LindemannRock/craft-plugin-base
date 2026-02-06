@@ -8,8 +8,8 @@
 
 namespace lindemannrock\base\twigextensions;
 
+use lindemannrock\base\helpers\DateFormatHelper;
 use lindemannrock\base\helpers\DateRangeHelper;
-use lindemannrock\base\helpers\DateTimeHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -18,7 +18,7 @@ use Twig\TwigFunction;
  * DateTime Twig Extension
  *
  * Provides Twig filters and functions for date/time formatting.
- * All filters use the centralized DateTimeHelper which respects
+ * All filters use the centralized DateFormatHelper which respects
  * config/lindemannrock-base.php settings.
  *
  * Filters:
@@ -73,10 +73,10 @@ class DateTimeExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('lrNow', [DateTimeHelper::class, 'now']),
-            new TwigFunction('lrIsToday', [DateTimeHelper::class, 'isToday']),
-            new TwigFunction('lrIsPast', [DateTimeHelper::class, 'isPast']),
-            new TwigFunction('lrIsFuture', [DateTimeHelper::class, 'isFuture']),
+            new TwigFunction('lrNow', [DateFormatHelper::class, 'now']),
+            new TwigFunction('lrIsToday', [DateFormatHelper::class, 'isToday']),
+            new TwigFunction('lrIsPast', [DateFormatHelper::class, 'isPast']),
+            new TwigFunction('lrIsFuture', [DateFormatHelper::class, 'isFuture']),
             new TwigFunction('lrDefaultDateRange', [DateRangeHelper::class, 'getDefaultDateRange']),
             new TwigFunction('lrDateRangeOptions', [DateRangeHelper::class, 'getOptions']),
         ];
@@ -104,7 +104,7 @@ class DateTimeExtension extends AbstractExtension
         bool $includeYear = true,
         bool $isUtc = true,
     ): ?string {
-        return DateTimeHelper::formatDatetime($date, $length, $showSeconds, $includeYear, $isUtc);
+        return DateFormatHelper::formatDatetime($date, $length, $showSeconds, $includeYear, $isUtc);
     }
 
     /**
@@ -118,7 +118,7 @@ class DateTimeExtension extends AbstractExtension
      */
     public function formatCompactDatetime(mixed $date, ?bool $showSeconds = null, bool $isUtc = true): ?string
     {
-        return DateTimeHelper::formatCompactDatetime($date, $showSeconds, $isUtc);
+        return DateFormatHelper::formatCompactDatetime($date, $showSeconds, $isUtc);
     }
 
     /**
@@ -137,7 +137,7 @@ class DateTimeExtension extends AbstractExtension
         bool $includeYear = true,
         bool $isUtc = true,
     ): ?string {
-        return DateTimeHelper::formatDate($date, $length, $includeYear, $isUtc);
+        return DateFormatHelper::formatDate($date, $length, $includeYear, $isUtc);
     }
 
     /**
@@ -156,7 +156,7 @@ class DateTimeExtension extends AbstractExtension
         ?bool $showSeconds = null,
         bool $isUtc = true,
     ): ?string {
-        return DateTimeHelper::formatTime($date, $length, $showSeconds, $isUtc);
+        return DateFormatHelper::formatTime($date, $length, $showSeconds, $isUtc);
     }
 
     /**
@@ -169,7 +169,7 @@ class DateTimeExtension extends AbstractExtension
      */
     public function formatShortDate(mixed $date, bool $isUtc = true): ?string
     {
-        return DateTimeHelper::formatShortDate($date, $isUtc);
+        return DateFormatHelper::formatShortDate($date, $isUtc);
     }
 
     /**
@@ -182,7 +182,7 @@ class DateTimeExtension extends AbstractExtension
      */
     public function formatRelative(mixed $date, bool $isUtc = true): ?string
     {
-        return DateTimeHelper::formatRelative($date, $isUtc);
+        return DateFormatHelper::formatRelative($date, $isUtc);
     }
 
     /**
@@ -194,7 +194,7 @@ class DateTimeExtension extends AbstractExtension
      */
     public function forDatabase(mixed $date): ?string
     {
-        return DateTimeHelper::forDatabase($date);
+        return DateFormatHelper::forDatabase($date);
     }
 
     /**
@@ -206,7 +206,7 @@ class DateTimeExtension extends AbstractExtension
      */
     public function forApi(mixed $date): ?string
     {
-        return DateTimeHelper::forApi($date);
+        return DateFormatHelper::forApi($date);
     }
 
     /**
@@ -219,6 +219,6 @@ class DateTimeExtension extends AbstractExtension
      */
     public function forFilename(mixed $date = null, bool $includeTime = true): string
     {
-        return DateTimeHelper::forFilename($date, $includeTime);
+        return DateFormatHelper::forFilename($date, $includeTime);
     }
 }

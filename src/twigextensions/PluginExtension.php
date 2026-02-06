@@ -19,10 +19,11 @@ use Twig\TwigFunction;
  *
  * Usage:
  * ```twig
- * {# Check if plugin is enabled #}
+ * {# Check if plugin is installed (may be disabled) #}
+ * {% if lrPluginInstalled('formie') %}
+ *
+ * {# Check if plugin is installed AND enabled #}
  * {% if lrPluginEnabled('formie') %}
- *     <p>Formie is available!</p>
- * {% endif %}
  *
  * {# Get plugin display name (respects custom pluginName setting) #}
  * {{ lrPluginName('redirect-manager') }}
@@ -50,6 +51,7 @@ class PluginExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('lrPluginInstalled', [PluginHelper::class, 'isPluginInstalled']),
             new TwigFunction('lrPluginEnabled', [PluginHelper::class, 'isPluginEnabled']),
             new TwigFunction('lrPluginName', [PluginHelper::class, 'getPluginName']),
         ];
