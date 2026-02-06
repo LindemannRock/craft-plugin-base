@@ -479,6 +479,11 @@ $sql = DbHelper::jsonExtract('metadata', 'source');
 // MySQL:      JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.source'))
 // PostgreSQL: metadata->>'source'
 
+// Paths with special characters (hyphens, dots) are auto-quoted for MySQL
+$sql = DbHelper::jsonExtract('content', 'abc-123-def');
+// MySQL:      JSON_UNQUOTE(JSON_EXTRACT(content, '$."abc-123-def"'))
+// PostgreSQL: content->>'abc-123-def'
+
 // Use in Yii query builder where clauses
 $query->where([DbHelper::jsonExtract('metadata', 'clickType') => 'button']);
 
@@ -495,10 +500,27 @@ $expr = DbHelper::jsonExtractExpression('metadata', 'source', 'sourceValue');
 $query->select([$expr, 'COUNT(*) as count']);
 ```
 
+#### String Aggregation
+
+```php
+// DB-agnostic GROUP_CONCAT / STRING_AGG
+$sql = DbHelper::groupConcat('column_name');
+// MySQL:      GROUP_CONCAT(column_name SEPARATOR ,)
+// PostgreSQL: STRING_AGG((column_name)::text, ',')
+
+// With custom separator
+$sql = DbHelper::groupConcat('column_name', ' | ');
+
+// With expressions (e.g., CAST)
+$ratingExpr = DbHelper::jsonExtract('content', $fieldUid);
+$sql = DbHelper::groupConcat("CAST($ratingExpr AS DECIMAL(10,2))");
+```
+
 | Method | Returns | Use Case |
 |--------|---------|----------|
-| `jsonExtract($column, $path)` | `string` | Raw SQL for JSON text extraction |
+| `jsonExtract($column, $path)` | `string` | Raw SQL for JSON text extraction (auto-quotes special chars) |
 | `jsonExtractExpression($column, $path, $alias)` | `Expression` | Yii Expression for query builder |
+| `groupConcat($expression, $separator)` | `string` | DB-agnostic string aggregation |
 
 ### DateFormatHelper
 
@@ -618,6 +640,27 @@ DateFormatHelper::isPast($date);                            // true/false
 DateFormatHelper::isFuture($date);                          // true/false
 DateFormatHelper::toCraftTimezone($date);                   // Convert UTC to Craft timezone
 ```
+
+#### Timezone-Aware SQL Expressions
+
+For analytics queries that group by date or hour, use these instead of raw `DATE()` or `HOUR()` — they handle both MySQL (`CONVERT_TZ`) and PostgreSQL (`AT TIME ZONE`) automatically:
+
+```php
+use lindemannrock\base\helpers\DateFormatHelper;
+
+// Group analytics by local date (replaces DATE(CONVERT_TZ(...)))
+$localDate = DateFormatHelper::localDateExpression('dateCreated');
+$query->select(['date' => $localDate, 'COUNT(*) as count'])
+      ->groupBy($localDate)
+      ->orderBy(['date' => SORT_ASC]);
+
+// Group by local hour (replaces HOUR(CONVERT_TZ(...)))
+$localHour = DateFormatHelper::localHourExpression('dateCreated');
+$query->select(['hour' => $localHour, 'COUNT(*) as count'])
+      ->groupBy($localHour);
+```
+
+> **Note:** Use the aliased column name (`'date'`, `'hour'`) in `orderBy()`, not the Expression object, since PHP array keys must be `int|string`.
 
 #### Twig Usage
 

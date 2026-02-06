@@ -36,8 +36,12 @@ class DbHelper
      */
     public static function jsonExtract(string $column, string $path): string
     {
+        // If path contains special characters (hyphens, dots), quote it for MySQL
+        $needsQuoting = (bool) preg_match('/[^a-zA-Z0-9_]/', $path);
+
         if (Craft::$app->getDb()->getIsMysql()) {
-            return "JSON_UNQUOTE(JSON_EXTRACT($column, '$.$path'))";
+            $jsonPath = $needsQuoting ? "$.\"$path\"" : "$.$path";
+            return "JSON_UNQUOTE(JSON_EXTRACT($column, '$jsonPath'))";
         }
 
         // PostgreSQL
@@ -65,5 +69,26 @@ class DbHelper
         }
 
         return new Expression($sql);
+    }
+
+    /**
+     * Returns a DB-agnostic expression to concatenate grouped values.
+     *
+     * MySQL:      GROUP_CONCAT(expression SEPARATOR separator)
+     * PostgreSQL: STRING_AGG(expression::text, separator)
+     *
+     * @param string $expression The SQL expression to aggregate
+     * @param string $separator The separator between values (default ',')
+     * @return string Raw SQL expression string
+     * @since 5.16.0
+     */
+    public static function groupConcat(string $expression, string $separator = ','): string
+    {
+        if (Craft::$app->getDb()->getIsMysql()) {
+            return "GROUP_CONCAT($expression SEPARATOR '$separator')";
+        }
+
+        // PostgreSQL
+        return "STRING_AGG(($expression)::text, '$separator')";
     }
 }
