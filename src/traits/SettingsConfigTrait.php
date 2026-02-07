@@ -78,62 +78,22 @@ trait SettingsConfigTrait
      */
     public function isOverriddenByConfig(string $attribute): bool
     {
-        $configPath = Craft::$app->getPath()->getConfigPath() . '/' . static::pluginHandle() . '.php';
-
-        if (!file_exists($configPath)) {
-            return false;
-        }
-
         try {
-            $rawConfig = require $configPath;
+            $config = Craft::$app->getConfig()->getConfigFromFile(static::pluginHandle());
         } catch (\Throwable $e) {
             return false;
         }
 
-        if (!is_array($rawConfig)) {
+        if (!is_array($config)) {
             return false;
         }
-
-        $env = Craft::$app->getConfig()->env;
 
         // Handle dot notation for nested config (e.g., 'backends.algolia.enabled')
         if (str_contains($attribute, '.')) {
-            $parts = explode('.', $attribute);
-
-            // Check root level
-            if (self::hasNestedKey($rawConfig, $parts)) {
-                return true;
-            }
-
-            // Check environment-specific config
-            if ($env && is_array($rawConfig[$env] ?? null) && self::hasNestedKey($rawConfig[$env], $parts)) {
-                return true;
-            }
-
-            // Check wildcard config ('*')
-            if (is_array($rawConfig['*'] ?? null) && self::hasNestedKey($rawConfig['*'], $parts)) {
-                return true;
-            }
-
-            return false;
+            return self::hasNestedKey($config, explode('.', $attribute));
         }
 
-        // Check root level (use array_key_exists to detect null values)
-        if (array_key_exists($attribute, $rawConfig)) {
-            return true;
-        }
-
-        // Check environment-specific config (e.g., 'production', 'dev')
-        if ($env && is_array($rawConfig[$env] ?? null) && array_key_exists($attribute, $rawConfig[$env])) {
-            return true;
-        }
-
-        // Check wildcard config ('*')
-        if (is_array($rawConfig['*'] ?? null) && array_key_exists($attribute, $rawConfig['*'])) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists($attribute, $config);
     }
 
     /**
