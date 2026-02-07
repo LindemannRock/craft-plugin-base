@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.15.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.14.0...v5.15.0) (2026-02-07)
+
+
+### Features
+
+* Add DateFormatHelper and DbHelper for date and database operations ([34eb74b](https://github.com/LindemannRock/craft-plugin-base/commit/34eb74b5c92610f1164b74a329b1072b435e1da9))
+* **DbHelper:** enhance jsonExtract and add groupConcat for DB-agnostic SQL ([25fbfb8](https://github.com/LindemannRock/craft-plugin-base/commit/25fbfb836cf4e71fbbc71ebae7e785e0c294958d))
+
 ## [5.14.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.13.0...v5.14.0) (2026-02-05)
 
 
