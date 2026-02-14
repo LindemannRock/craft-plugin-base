@@ -34,7 +34,6 @@ yarn-error.log*
 /temp/
 
 # Development files
-/docs/
 PLAN.md
 
 # Plugin releases
