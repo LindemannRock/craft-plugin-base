@@ -49,17 +49,14 @@
 
 {# Get dial codes from base helper #}
 {% set allDialCodes = [] %}
-{% for option in lrDialCodes() %}
-    {% set dc = lrDialCode(option.value) %}
-    {% if dc %}
-        {% if isAllCountries or option.value in countries %}
-            {% set allDialCodes = allDialCodes|merge([{
-                country: option.value,
-                dialCode: dc,
-                label: option.value ~ ' +' ~ dc,
-                name: lrCountryName(option.value)
-            }]) %}
-        {% endif %}
+{% for item in lrCountryDialCodeData() %}
+    {% if isAllCountries or item.countryCode in countries %}
+        {% set allDialCodes = allDialCodes|merge([{
+            country: item.countryCode,
+            dialCode: item.dialCode,
+            label: item.countryCode ~ ' +' ~ item.dialCode,
+            name: item.countryName
+        }]) %}
     {% endif %}
 {% endfor %}
 
