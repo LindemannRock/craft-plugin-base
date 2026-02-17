@@ -150,11 +150,12 @@ class PluginHelper
     }
 
     /**
-     * Override plugin name from config file
+     * Apply custom plugin name from config file or database settings
      *
-     * Checks config/{plugin-handle}.php for a 'pluginName' setting
-     * and applies it to the plugin instance. Supports environment-specific
-     * and wildcard configurations.
+     * Priority order:
+     * 1. Config file (config/{plugin-handle}.php) — highest priority
+     * 2. Database settings ($plugin->getSettings()->pluginName) — fallback
+     * 3. Default plugin name — if neither is set
      *
      * Config file examples:
      * ```php
@@ -176,38 +177,49 @@ class PluginHelper
      */
     public static function applyPluginNameFromConfig(PluginInterface $plugin): void
     {
-        $configPath = Craft::$app->getPath()->getConfigPath() . '/' . $plugin->id . '.php';
-
-        if (!file_exists($configPath)) {
-            return;
-        }
-
+        // 1. Check config file first (highest priority)
         try {
-            $config = require $configPath;
+            $configPath = Craft::$app->getPath()->getConfigPath() . '/' . $plugin->id . '.php';
 
-            if (!is_array($config)) {
-                return;
-            }
+            if (file_exists($configPath)) {
+                $config = require $configPath;
 
-            // Check root level first
-            if (isset($config['pluginName']) && is_string($config['pluginName'])) {
-                $plugin->name = $config['pluginName'];
-                return;
-            }
+                if (is_array($config)) {
+                    // Check root level first
+                    if (isset($config['pluginName']) && is_string($config['pluginName'])) {
+                        $plugin->name = $config['pluginName'];
+                        return;
+                    }
 
-            // Check environment-specific
-            $env = Craft::$app->getConfig()->env;
-            if ($env && isset($config[$env]['pluginName']) && is_string($config[$env]['pluginName'])) {
-                $plugin->name = $config[$env]['pluginName'];
-                return;
-            }
+                    // Check environment-specific
+                    $env = Craft::$app->getConfig()->env;
+                    if ($env && isset($config[$env]['pluginName']) && is_string($config[$env]['pluginName'])) {
+                        $plugin->name = $config[$env]['pluginName'];
+                        return;
+                    }
 
-            // Check wildcard
-            if (isset($config['*']['pluginName']) && is_string($config['*']['pluginName'])) {
-                $plugin->name = $config['*']['pluginName'];
+                    // Check wildcard
+                    if (isset($config['*']['pluginName']) && is_string($config['*']['pluginName'])) {
+                        $plugin->name = $config['*']['pluginName'];
+                        return;
+                    }
+                }
             }
         } catch (\Throwable $e) {
-            // Silently ignore config errors - plugin continues with default name
+            // Silently ignore config errors
+        }
+
+        // 2. Fall back to database settings
+        try {
+            $settings = $plugin->getSettings();
+            if ($settings && property_exists($settings, 'pluginName')) {
+                $dbName = trim($settings->pluginName);
+                if ($dbName !== '' && $dbName !== $plugin->name) {
+                    $plugin->name = $dbName;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently ignore - plugin continues with default name
         }
     }
 
