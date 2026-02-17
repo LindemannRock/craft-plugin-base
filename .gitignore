@@ -33,11 +33,10 @@ yarn-error.log*
 /tmp/
 /temp/
 
-# Development files
-PLAN.md
+# Internal
+/.internal/
 
 # Plugin releases
 *.zip
 /releases/
 /backups/
-
