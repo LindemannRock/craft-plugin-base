@@ -640,7 +640,10 @@ class ExportHelper
     }
 
     /**
-     * Format date columns in rows for CSV/Excel (database format)
+     * Format date columns in rows for CSV/Excel export.
+     *
+     * Converts UTC database dates to the Craft site timezone so exported
+     * data matches what users see in the Control Panel.
      *
      * @param array $rows Data rows
      * @param array $dateColumns Column keys containing dates
@@ -652,7 +655,10 @@ class ExportHelper
         foreach ($rows as &$row) {
             foreach ($dateColumns as $column) {
                 if (isset($row[$column]) && $row[$column] !== null) {
-                    $row[$column] = DateFormatHelper::forDatabase($row[$column]);
+                    $localDate = DateFormatHelper::toCraftTimezone($row[$column]);
+                    $row[$column] = $localDate !== null
+                        ? DateFormatHelper::forDatabase($localDate)
+                        : $row[$column];
                 }
             }
         }
@@ -661,7 +667,10 @@ class ExportHelper
     }
 
     /**
-     * Format date columns in rows for JSON (ISO 8601 format)
+     * Format date columns in rows for JSON export (ISO 8601).
+     *
+     * Converts UTC database dates to the Craft site timezone so exported
+     * data includes the correct local offset.
      *
      * @param array $rows Data rows
      * @param array $dateColumns Column keys containing dates
@@ -673,7 +682,10 @@ class ExportHelper
         foreach ($rows as &$row) {
             foreach ($dateColumns as $column) {
                 if (isset($row[$column]) && $row[$column] !== null) {
-                    $row[$column] = DateFormatHelper::forApi($row[$column]);
+                    $localDate = DateFormatHelper::toCraftTimezone($row[$column]);
+                    $row[$column] = $localDate !== null
+                        ? DateFormatHelper::forApi($localDate)
+                        : $row[$column];
                 }
             }
         }
