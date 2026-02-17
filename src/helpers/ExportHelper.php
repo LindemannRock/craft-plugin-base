@@ -11,6 +11,7 @@ namespace lindemannrock\base\helpers;
 use Craft;
 use craft\web\Response;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -504,13 +505,18 @@ class ExportHelper
             ],
         ]);
 
-        // Write data rows (sanitized to prevent formula injection)
+        // Write data rows — use explicit string type for dangerous values
+        // (prevents formula injection without the visible ' prefix that sanitizeCellValue adds for CSV)
         $rowIndex = 2;
         foreach ($rows as $row) {
             $colIndex = 1;
-            foreach (self::sanitizeRow(array_values($row)) as $value) {
+            foreach (array_values($row) as $value) {
                 $cellRef = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
-                $sheet->setCellValue($cellRef, $value);
+                if (self::isDangerousValue($value)) {
+                    $sheet->setCellValueExplicit($cellRef, $value, DataType::TYPE_STRING);
+                } else {
+                    $sheet->setCellValue($cellRef, $value);
+                }
                 $colIndex++;
             }
             $rowIndex++;
@@ -758,6 +764,45 @@ class ExportHelper
     private static function sanitizeRow(array $row): array
     {
         return array_map([self::class, 'sanitizeCellValue'], $row);
+    }
+
+    /**
+     * Check if a value would trigger formula injection in a spreadsheet
+     *
+     * Same logic as sanitizeCellValue() but returns a boolean instead of modifying the value.
+     * Used by Excel export to decide whether to use setCellValueExplicit() with TYPE_STRING.
+     *
+     * @param mixed $value The cell value to check
+     * @return bool True if the value is potentially dangerous
+     */
+    private static function isDangerousValue(mixed $value): bool
+    {
+        if (!is_string($value) || $value === '') {
+            return false;
+        }
+
+        $alwaysDangerous = ['=', '@', "\t", "\r", "\n"];
+
+        if (in_array($value[0], $alwaysDangerous, true)) {
+            return true;
+        }
+
+        $trimmed = ltrim($value);
+        if ($trimmed !== '' && in_array($trimmed[0], $alwaysDangerous, true)) {
+            return true;
+        }
+
+        // Allow +/- only when followed by numeric pattern
+        if (preg_match('/^[+-]?\d+([.,]\d+)?$/', $trimmed)) {
+            return false;
+        }
+
+        // Block +/- when NOT numeric
+        if ($trimmed !== '' && in_array($trimmed[0], ['+', '-'], true)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
