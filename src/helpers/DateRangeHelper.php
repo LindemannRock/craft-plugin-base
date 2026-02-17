@@ -216,26 +216,28 @@ class DateRangeHelper
     {
         $normalized = self::normalize($dateRange);
 
-        // For dynamic ranges, calculate actual days
+        // For dynamic ranges, calculate actual days using Craft's timezone
+        $tz = new \DateTimeZone(\Craft::$app->getTimeZone());
+
         if ($normalized === 'thisMonth') {
-            $now = new \DateTime();
+            $now = new \DateTime('now', $tz);
             return (int) $now->format('j'); // Day of month (1-31)
         }
 
         if ($normalized === 'lastMonth') {
-            $lastMonth = new \DateTime('first day of last month');
+            $lastMonth = new \DateTime('first day of last month', $tz);
             return (int) $lastMonth->format('t'); // Days in month
         }
 
         if ($normalized === 'thisYear') {
-            $now = new \DateTime();
-            $startOfYear = new \DateTime('first day of January this year');
+            $now = new \DateTime('now', $tz);
+            $startOfYear = new \DateTime('first day of January this year', $tz);
             return (int) $now->diff($startOfYear)->days + 1;
         }
 
         if ($normalized === 'lastYear') {
-            // Check if last year was a leap year
-            $lastYear = (int) date('Y') - 1;
+            $now = new \DateTime('now', $tz);
+            $lastYear = (int) $now->format('Y') - 1;
             return ((($lastYear % 4 === 0) && ($lastYear % 100 !== 0)) || ($lastYear % 400 === 0)) ? 366 : 365;
         }
 
