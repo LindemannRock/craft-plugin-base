@@ -52,6 +52,7 @@ class ColorHelper
      * Default color for unknown values
      */
     public const DEFAULT_COLOR = [
+        'class' => 'default',
         'color' => '#9aa5b1',
         'rgb' => '154, 165, 177',
         'text' => '#374151',
