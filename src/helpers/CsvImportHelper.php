@@ -114,10 +114,7 @@ class CsvImportHelper
                 $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
             }
 
-            if (count($headers) === 1) {
-                fclose($handle);
-                throw new \RuntimeException('Could not detect CSV delimiter. The file may have only one column or use an unsupported delimiter.');
-            }
+            // Single-column CSVs are valid (e.g., a list of emails or phone numbers)
 
             $allRows = [];
             while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
