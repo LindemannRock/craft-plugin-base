@@ -538,7 +538,7 @@ class DateFormatHelper
 
         if (is_string($date)) {
             try {
-                $date = new DateTime($date);
+                $date = new DateTime($date, new DateTimeZone('UTC'));
             } catch (\Exception) {
                 return null;
             }
@@ -562,7 +562,7 @@ class DateFormatHelper
 
         if (is_string($date)) {
             try {
-                $date = new DateTime($date);
+                $date = new DateTime($date, new DateTimeZone('UTC'));
             } catch (\Exception) {
                 return null;
             }
@@ -586,7 +586,7 @@ class DateFormatHelper
 
         if (is_string($date)) {
             try {
-                $date = new DateTime($date);
+                $date = new DateTime($date, new DateTimeZone('UTC'));
             } catch (\Exception) {
                 return null;
             }
@@ -610,7 +610,7 @@ class DateFormatHelper
 
         if (is_string($date)) {
             try {
-                $date = new DateTime($date);
+                $date = new DateTime($date, new DateTimeZone('UTC'));
             } catch (\Exception) {
                 return null;
             }
@@ -638,7 +638,7 @@ class DateFormatHelper
 
         if (is_string($date)) {
             try {
-                $date = new DateTime($date);
+                $date = new DateTime($date, new DateTimeZone('UTC'));
             } catch (\Exception) {
                 return null;
             }
