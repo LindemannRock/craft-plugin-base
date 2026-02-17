@@ -15,7 +15,7 @@
  #     - class: Additional CSS classes (default: 'btn', use 'btn secondary' for secondary)
  #     - permission: Permission check (optional, button hidden if user lacks permission)
  #     - count: Number to display after label (optional)
- #     - showCount: Whether to show count (default: true if count provided)
+ #     - showCount: Whether to show count (default: true if count is not null)
  #   showSeparator: Show <hr> before this section (default: false)
  #
  # Example:
@@ -71,7 +71,7 @@
             {% for button in visibleButtons %}
                 {% set buttonClass = button.class ?? 'btn' %}
                 {% set buttonType = button.type ?? 'button' %}
-                {% set showCount = button.showCount ?? (button.count is defined) %}
+                {% set showCount = button.showCount ?? (button.count is defined and button.count is not same as(null)) %}
 
                 {% if buttonType == 'link' %}
                     <a href="{{ button.url }}" class="{{ buttonClass }}">
