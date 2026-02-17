@@ -80,15 +80,15 @@ Relative time using Craft's formatter.
 DateFormatHelper::formatRelative($date);  // "2 hours ago"
 ```
 
-## Database Formatting
+## Machine Formatting
 
-Fixed formats for database storage — not affected by config settings.
+Fixed formats for database storage and exports — not affected by config settings.
 
 ```php
-DateFormatHelper::forDatabase($date);        // "2026-01-24 15:45:32"
-DateFormatHelper::forDatabaseDate($date);    // "2026-01-24"
-DateFormatHelper::forDatabaseDayStart($date); // "2026-01-24 00:00:00"
-DateFormatHelper::forDatabaseDayEnd($date);   // "2026-01-24 23:59:59"
+DateFormatHelper::toDateTimeString($date);  // "2026-01-24 15:45:32"
+DateFormatHelper::toDateString($date);      // "2026-01-24"
+DateFormatHelper::toDayStartString($date);  // "2026-01-24 00:00:00"
+DateFormatHelper::toDayEndString($date);    // "2026-01-24 23:59:59"
 ```
 
 ## API Formatting
@@ -96,7 +96,7 @@ DateFormatHelper::forDatabaseDayEnd($date);   // "2026-01-24 23:59:59"
 ISO 8601 format for API responses.
 
 ```php
-DateFormatHelper::forApi($date);  // "2026-01-24T15:45:32+00:00"
+DateFormatHelper::toApiString($date);  // "2026-01-24T15:45:32+00:00"
 ```
 
 ## Filename Formatting
@@ -104,9 +104,9 @@ DateFormatHelper::forApi($date);  // "2026-01-24T15:45:32+00:00"
 Safe characters for use in filenames. Format: `Y-m-d-His`.
 
 ```php
-DateFormatHelper::forFilename();              // "2026-01-24-154532" (current time)
-DateFormatHelper::forFilename($date);         // "2026-01-24-154532"
-DateFormatHelper::forFilename($date, false);  // "2026-01-24" (date only)
+DateFormatHelper::toFilenameString();              // "2026-01-24-154532" (current time)
+DateFormatHelper::toFilenameString($date);         // "2026-01-24-154532"
+DateFormatHelper::toFilenameString($date, false);  // "2026-01-24" (date only)
 ```
 
 ## Timezone Conversion

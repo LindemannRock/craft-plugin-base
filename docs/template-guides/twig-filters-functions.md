@@ -35,14 +35,14 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 ### Machine Formatting
 
 ```twig
-{# Database format #}
-{{ entry.dateCreated|lrForDatabase }}                  {# "2026-01-24 15:45:32" #}
+{# Datetime string format #}
+{{ entry.dateCreated|lrToDateTimeString }}             {# "2026-01-24 15:45:32" #}
 
 {# API format (ISO 8601) #}
-{{ entry.dateCreated|lrForApi }}                       {# "2026-01-24T15:45:32+00:00" #}
+{{ entry.dateCreated|lrToApiString }}                  {# "2026-01-24T15:45:32+00:00" #}
 
 {# Filename format #}
-{{ entry.dateCreated|lrForFilename }}                  {# "2026-01-24-154532" #}
+{{ entry.dateCreated|lrToFilenameString }}             {# "2026-01-24-154532" #}
 ```
 
 ### Filter Parameters
@@ -55,9 +55,9 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 | `lrTime` | `length='short'`, `showSeconds=null`, `isUtc=true` | Time only |
 | `lrShortDate` | `isUtc=true` | Short date for charts |
 | `lrRelative` | `isUtc=true` | Relative time |
-| `lrForDatabase` | (none) | `Y-m-d H:i:s` format |
-| `lrForApi` | (none) | ISO 8601 format |
-| `lrForFilename` | `includeTime=true` | `Y-m-d-His` format |
+| `lrToDateTimeString` | (none) | `Y-m-d H:i:s` format |
+| `lrToApiString` | (none) | ISO 8601 format |
+| `lrToFilenameString` | `includeTime=true` | `Y-m-d-His` format |
 
 ## Date/Time Functions
 

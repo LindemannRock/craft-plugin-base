@@ -33,7 +33,7 @@ Reusable traits for Settings models and plugin classes:
 
 Filters and functions available in all CP templates after bootstrap:
 
-- **Date/time filters** — `|lrDatetime`, `|lrDate`, `|lrTime`, `|lrShortDate`, `|lrRelative`, `|lrForDatabase`, `|lrForApi`, `|lrForFilename`
+- **Date/time filters** — `|lrDatetime`, `|lrDate`, `|lrTime`, `|lrShortDate`, `|lrRelative`, `|lrToDateTimeString`, `|lrToApiString`, `|lrToFilenameString`
 - **Date/time functions** — `lrNow()`, `lrIsToday()`, `lrIsPast()`, `lrIsFuture()`
 - **Color functions** — `lrPaletteColor()`, `lrColorSet()`, `lrSetColor()`, `lrFilterColor()`, `lrNeutralColor()`
 - **Export functions** — `lrExportEnabled()`, `lrExportFormats()`, `lrExportFormatOptions()`

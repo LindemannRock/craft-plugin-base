@@ -42,12 +42,12 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `forDatabase($dt)` | `string` | `Y-m-d H:i:s` |
-| `forDatabaseDate($dt)` | `string` | `Y-m-d` |
-| `forDatabaseDayStart($dt)` | `string` | `Y-m-d 00:00:00` |
-| `forDatabaseDayEnd($dt)` | `string` | `Y-m-d 23:59:59` |
-| `forApi($dt)` | `string` | ISO 8601 |
-| `forFilename($dt, $includeTime)` | `string` | `Y-m-d-His` |
+| `toDateTimeString($dt)` | `string` | `Y-m-d H:i:s` |
+| `toDateString($dt)` | `string` | `Y-m-d` |
+| `toDayStartString($dt)` | `string` | `Y-m-d 00:00:00` |
+| `toDayEndString($dt)` | `string` | `Y-m-d 23:59:59` |
+| `toApiString($dt)` | `string` | ISO 8601 |
+| `toFilenameString($dt, $includeTime)` | `string` | `Y-m-d-His` |
 
 **Utilities:**
 
