@@ -630,7 +630,7 @@ class ExportHelper
 
         // Pattern 2: Simple prefix + extension
         if (is_string($pluginOrPrefix) && is_string($partsOrExtension) && $extension === null) {
-            return $pluginOrPrefix . '-' . DateFormatHelper::forFilename() . '.' . $partsOrExtension;
+            return $pluginOrPrefix . '-' . DateFormatHelper::toFilenameString() . '.' . $partsOrExtension;
         }
 
         // Pattern 1: Settings/string + parts array + extension
@@ -648,11 +648,11 @@ class ExportHelper
             $allParts = array_filter([$pluginName, ...$partsOrExtension], fn($p) => $p !== null && $p !== '');
             $baseName = implode('-', $allParts);
 
-            return $baseName . '-' . DateFormatHelper::forFilename() . '.' . $extension;
+            return $baseName . '-' . DateFormatHelper::toFilenameString() . '.' . $extension;
         }
 
         // Fallback
-        return 'export-' . DateFormatHelper::forFilename() . '.csv';
+        return 'export-' . DateFormatHelper::toFilenameString() . '.csv';
     }
 
     /**
@@ -673,7 +673,7 @@ class ExportHelper
                 if (isset($row[$column]) && $row[$column] !== null) {
                     $localDate = DateFormatHelper::toCraftTimezone($row[$column]);
                     $row[$column] = $localDate !== null
-                        ? DateFormatHelper::forDatabase($localDate)
+                        ? DateFormatHelper::toDateTimeString($localDate)
                         : $row[$column];
                 }
             }
@@ -700,7 +700,7 @@ class ExportHelper
                 if (isset($row[$column]) && $row[$column] !== null) {
                     $localDate = DateFormatHelper::toCraftTimezone($row[$column]);
                     $row[$column] = $localDate !== null
-                        ? DateFormatHelper::forApi($localDate)
+                        ? DateFormatHelper::toApiString($localDate)
                         : $row[$column];
                 }
             }
