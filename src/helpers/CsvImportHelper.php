@@ -151,6 +151,32 @@ class CsvImportHelper
      * @return string Detected delimiter
      * @since 5.14.0
      */
+    /**
+     * Strip formula escape prefix from an imported value
+     *
+     * Reverses the sanitization done by ExportHelper during CSV export,
+     * restoring the original value. Only strips a leading apostrophe when followed
+     * by optional whitespace and a formula character (=, +, -, @).
+     *
+     * Examples:
+     *   "'=SUM(A1)" → "=SUM(A1)"
+     *   "'+1234"    → "+1234"
+     *   "'  =1"     → "  =1" (preserves internal whitespace)
+     *   "'test"     → "'test" (no change — 't' is not a formula char)
+     *
+     * @param string $value The imported cell value
+     * @return string The unescaped value
+     * @since 5.14.0
+     */
+    public static function stripFormulaEscapePrefix(string $value): string
+    {
+        if (preg_match("/^'(\\s*[=+\\-@])/", $value)) {
+            return substr($value, 1);
+        }
+
+        return $value;
+    }
+
     private static function detectDelimiter(string $filePath): string
     {
         $delimiters = [
