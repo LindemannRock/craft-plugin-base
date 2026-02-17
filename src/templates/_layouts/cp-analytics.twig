@@ -293,12 +293,16 @@
         window.currentTab = config.tabs[0] || 'overview';
 
         function initMenuButtons() {
-            document.querySelectorAll('.menubtn').forEach(function(btn) {
-                if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
-                    new Craft.MenuBtn(btn);
-                } else if (typeof Garnish !== 'undefined' && Garnish.MenuBtn) {
-                    new Garnish.MenuBtn(btn);
-                }
+            ['#toolbar', '#action-button'].forEach(function(sel) {
+                var container = document.querySelector(sel);
+                if (!container) return;
+                container.querySelectorAll('.menubtn').forEach(function(btn) {
+                    if (typeof Craft !== 'undefined' && Craft.MenuBtn) {
+                        new Craft.MenuBtn(btn);
+                    } else if (typeof Garnish !== 'undefined' && Garnish.MenuBtn) {
+                        new Garnish.MenuBtn(btn);
+                    }
+                });
             });
         }
 
@@ -380,15 +384,18 @@
                 switchTab(window.location.hash.substring(1) || newConfig.tabs[0] || 'overview');
 
                 // Re-execute inline scripts marked for AJAX reinit
-                newContent.querySelectorAll('script[data-analytics-reinit]').forEach(function(oldScript) {
-                    var script = document.createElement('script');
-                    if (oldScript.src) {
-                        script.src = oldScript.src;
-                    } else {
-                        script.textContent = oldScript.textContent;
-                    }
-                    document.body.appendChild(script);
-                    script.parentNode.removeChild(script);
+                [newContent, newActionButton].forEach(function(container) {
+                    if (!container) return;
+                    container.querySelectorAll('script[data-analytics-reinit]').forEach(function(oldScript) {
+                        var script = document.createElement('script');
+                        if (oldScript.src) {
+                            script.src = oldScript.src;
+                        } else {
+                            script.textContent = oldScript.textContent;
+                        }
+                        document.body.appendChild(script);
+                        script.parentNode.removeChild(script);
+                    });
                 });
 
                 if (typeof window.lrDestroyCharts === 'function') {
