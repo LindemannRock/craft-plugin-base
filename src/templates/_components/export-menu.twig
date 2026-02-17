@@ -4,6 +4,7 @@
  # A reusable export dropdown menu that automatically shows only enabled formats.
  # Uses ExportHelper configuration from config/lindemannrock-base.php.
  # Supports plugin-specific overrides via pluginHandle parameter.
+ # All exports are submitted via POST with CSRF tokens for security.
  #
  # Parameters:
  # - action: (required) The controller action URL (e.g., 'sms-manager/sms-logs/export')
@@ -68,65 +69,103 @@
                 <ul>
                     {% if lrExportEnabled('excel', pluginHandle) %}
                         <li>
-                            <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}" data-format="excel" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'excel'})) }}">{{ "Export as Excel"|t('app') }}</a>
+                            <a href="#" data-lr-export="{{ menuId }}" data-format="excel">{{ "Export as Excel"|t('app') }}</a>
                         </li>
                     {% endif %}
                     {% if lrExportEnabled('csv', pluginHandle) %}
                         <li>
-                            <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}" data-format="csv" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'csv'})) }}">{{ "Export as CSV"|t('app') }}</a>
+                            <a href="#" data-lr-export="{{ menuId }}" data-format="csv">{{ "Export as CSV"|t('app') }}</a>
                         </li>
                     {% endif %}
                     {% if lrExportEnabled('json', pluginHandle) %}
                         <li>
-                            <a class="lr-export-link" href="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}" data-format="json" data-base-url="{{ cpUrl(action, baseParams|merge({format: 'json'})) }}">{{ "Export as JSON"|t('app') }}</a>
+                            <a href="#" data-lr-export="{{ menuId }}" data-format="json">{{ "Export as JSON"|t('app') }}</a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
 
-        {% if selectionAware %}
-        <script>
+        <script data-analytics-reinit>
         (function() {
-            const menu = document.getElementById('{{ menuId }}');
-            if (!menu) return;
+            window._lrExportConfigs = window._lrExportConfigs || {};
+            window._lrExportConfigs['{{ menuId }}'] = {
+                actionUrl: '{{ actionUrl(action)|e('js') }}',
+                csrfName: '{{ craft.app.config.general.csrfTokenName|e('js') }}',
+                csrfValue: '{{ craft.app.request.csrfToken|e('js') }}',
+                params: {{ baseParams|json_encode|raw }},
+                {% if selectionAware %}
+                selectedIds: [],
+                idsParam: '{{ idsParam }}',
+                {% endif %}
+            };
 
-            const label = menu.querySelector('.lr-export-label');
-            const links = menu.querySelectorAll('.lr-export-link');
-            const idsParam = '{{ idsParam }}';
-            const defaultLabel = '{{ "Export"|t('app')|e('js') }}';
+            {% if selectionAware %}
+            var menuEl = document.getElementById('{{ menuId }}');
+            var label = menuEl ? menuEl.querySelector('.lr-export-label') : null;
+            var defaultLabel = '{{ "Export"|t('app')|e('js') }}';
+            var conf = window._lrExportConfigs['{{ menuId }}'];
 
-            function updateExportMenu(selectedIds) {
-                const count = selectedIds.length;
-
-                // Update label
+            function updateExportLabel(ids) {
+                conf.selectedIds = ids;
                 if (label) {
-                    label.textContent = count > 0 ? `${defaultLabel} (${count})` : defaultLabel;
+                    var count = ids.length;
+                    label.textContent = count > 0 ? defaultLabel + ' (' + count + ')' : defaultLabel;
                 }
-
-                // Update links with selected IDs
-                links.forEach(link => {
-                    const baseUrl = link.dataset.baseUrl;
-                    if (count > 0) {
-                        const separator = baseUrl.includes('?') ? '&' : '?';
-                        link.href = baseUrl + separator + idsParam + '=' + encodeURIComponent(JSON.stringify(selectedIds));
-                    } else {
-                        link.href = baseUrl;
-                    }
-                });
             }
 
-            // Listen for selection changes
             document.addEventListener('lr:selectionChanged', function(e) {
-                updateExportMenu(e.detail.selectedIds || []);
+                updateExportLabel(e.detail.selectedIds || []);
             });
 
-            // Initialize with current selection if available
             if (window.lrTableSelection) {
-                updateExportMenu(window.lrTableSelection.getSelectedIds());
+                updateExportLabel(window.lrTableSelection.getSelectedIds());
+            }
+            {% endif %}
+
+            if (!window._lrExportHandlerAttached) {
+                window._lrExportHandlerAttached = true;
+                document.addEventListener('click', function(e) {
+                    var link = e.target.closest('[data-lr-export]');
+                    if (!link) return;
+                    e.preventDefault();
+
+                    var id = link.dataset.lrExport;
+                    var config = (window._lrExportConfigs || {})[id];
+                    if (!config) return;
+
+                    var format = link.dataset.format;
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = config.actionUrl;
+                    form.style.display = 'none';
+
+                    var csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = config.csrfName;
+                    csrf.value = config.csrfValue;
+                    form.appendChild(csrf);
+
+                    var params = Object.assign({}, config.params, {format: format});
+                    if (config.selectedIds && config.selectedIds.length > 0) {
+                        params[config.idsParam] = JSON.stringify(config.selectedIds);
+                    }
+
+                    for (var key in params) {
+                        if (params[key] !== null && params[key] !== undefined) {
+                            var input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = params[key];
+                            form.appendChild(input);
+                        }
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
+                });
             }
         })();
         </script>
-        {% endif %}
     {% endif %}
 {% endif %}
