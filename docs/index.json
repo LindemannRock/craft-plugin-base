@@ -1,0 +1,7 @@
+{
+    "plugin": {
+        "name": "LindemannRock Base",
+        "handle": "plugin-base",
+        "description": "Common utilities and building blocks for LindemannRock Craft CMS plugins — helpers, traits, layouts, and Twig extensions."
+    }
+}
