@@ -181,15 +181,21 @@ trait SettingsConfigTrait
             return;
         }
 
-        // Setting is from database - save the correction
-        Craft::warning(
-            'Log level automatically changed from "debug" to "info" because devMode is disabled.',
-            static::pluginHandle()
-        );
-
-        // Save to database if method exists (from SettingsPersistenceTrait)
-        if (method_exists($this, 'saveToDatabase')) {
-            $this->saveToDatabase();
+        // Setting is from database - correct in-memory only (preserves user's preference for when devMode is re-enabled)
+        if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $sessionKey = static::pluginHandle() . '_debug_db_warning';
+            if (Craft::$app->getSession()->get($sessionKey) === null) {
+                Craft::warning(
+                    'Log level automatically changed from "debug" to "info" because devMode is disabled.',
+                    static::pluginHandle()
+                );
+                Craft::$app->getSession()->set($sessionKey, true);
+            }
+        } else {
+            Craft::warning(
+                'Log level automatically changed from "debug" to "info" because devMode is disabled.',
+                static::pluginHandle()
+            );
         }
     }
 }
