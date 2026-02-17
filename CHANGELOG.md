@@ -1,5 +1,27 @@
 # Changelog
 
+## [5.16.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.15.0...v5.16.0) (2026-02-17)
+
+
+### Features
+
+* **export-menu:** enhance export functionality with CSRF protection ([c22dad6](https://github.com/LindemannRock/craft-plugin-base/commit/c22dad6530def5bbf396d574f4236d44f0169563))
+* **GeoHelper, GeoExtension:** add getCountryDialCodeData function and update Twig extension ([89ced6f](https://github.com/LindemannRock/craft-plugin-base/commit/89ced6f9bee73fdd4d0cd986763615a453fb5be1))
+* **unified-card:** add optional HTML id attribute for JS targeting ([761cdaf](https://github.com/LindemannRock/craft-plugin-base/commit/761cdaffbd597200653f3d17c7ddaf75c4b58f2e))
+
+
+### Bug Fixes
+
+* **DateFormatHelper:** ensure UTC timezone is used for date parsing ([11b899d](https://github.com/LindemannRock/craft-plugin-base/commit/11b899d0c65a85d2affe55e44f52eb6c4b7219ba))
+* **DbHelper:** add input validation to prevent SQL injection ([1a818e3](https://github.com/LindemannRock/craft-plugin-base/commit/1a818e386b680fa0bd1845551d293bf14622a56e))
+* **ExportHelper:** convert UTC dates to Craft site timezone for exports ([acbc753](https://github.com/LindemannRock/craft-plugin-base/commit/acbc75348633e831680f4f485b2cdec583d2a871))
+* **SettingsConfigTrait:** correct log level handling when devMode is disabled ([054bab6](https://github.com/LindemannRock/craft-plugin-base/commit/054bab6bf508d0102ba682bd69c14d7e43544de1))
+
+
+### Miscellaneous Chores
+
+* add .gitattributes with export-ignore for Packagist distribution ([a824c9f](https://github.com/LindemannRock/craft-plugin-base/commit/a824c9f76595acffa55dbfa254a170dd42cb34a7))
+
 ## [5.15.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.14.0...v5.15.0) (2026-02-07)
 
 
