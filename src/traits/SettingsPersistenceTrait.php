@@ -242,7 +242,13 @@ trait SettingsPersistenceTrait
         // Encode JSON fields
         foreach (static::jsonFields() as $field) {
             if (isset($attributes[$field])) {
-                $attributes[$field] = json_encode($attributes[$field]);
+                $encoded = json_encode($attributes[$field]);
+                if ($encoded === false) {
+                    Craft::error("Failed to JSON encode settings field '$field': " . json_last_error_msg(), __METHOD__);
+                    $attributes[$field] = null;
+                } else {
+                    $attributes[$field] = $encoded;
+                }
             }
         }
 
