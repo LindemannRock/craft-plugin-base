@@ -60,10 +60,10 @@ class DateTimeExtension extends AbstractExtension
             new TwigFilter('lrShortDate', [$this, 'formatShortDate']),
             new TwigFilter('lrRelative', [$this, 'formatRelative']),
 
-            // Database/API formatting
-            new TwigFilter('lrForDatabase', [$this, 'forDatabase']),
-            new TwigFilter('lrForApi', [$this, 'forApi']),
-            new TwigFilter('lrForFilename', [$this, 'forFilename']),
+            // Machine formatting
+            new TwigFilter('lrToDateTimeString', [$this, 'toDateTimeString']),
+            new TwigFilter('lrToApiString', [$this, 'toApiString']),
+            new TwigFilter('lrToFilenameString', [$this, 'toFilenameString']),
         ];
     }
 
@@ -186,39 +186,39 @@ class DateTimeExtension extends AbstractExtension
     }
 
     /**
-     * Format for database
+     * Format as datetime string (Y-m-d H:i:s)
      *
      * @param mixed $date
      * @return string|null
      * @since 5.8.0
      */
-    public function forDatabase(mixed $date): ?string
+    public function toDateTimeString(mixed $date): ?string
     {
-        return DateFormatHelper::forDatabase($date);
+        return DateFormatHelper::toDateTimeString($date);
     }
 
     /**
-     * Format for API (ISO 8601)
+     * Format as ISO 8601 string
      *
      * @param mixed $date
      * @return string|null
      * @since 5.8.0
      */
-    public function forApi(mixed $date): ?string
+    public function toApiString(mixed $date): ?string
     {
-        return DateFormatHelper::forApi($date);
+        return DateFormatHelper::toApiString($date);
     }
 
     /**
-     * Format for filename
+     * Format as filename-safe string
      *
      * @param mixed $date
      * @param bool $includeTime
      * @return string
      * @since 5.8.0
      */
-    public function forFilename(mixed $date = null, bool $includeTime = true): string
+    public function toFilenameString(mixed $date = null, bool $includeTime = true): string
     {
-        return DateFormatHelper::forFilename($date, $includeTime);
+        return DateFormatHelper::toFilenameString($date, $includeTime);
     }
 }
