@@ -440,7 +440,7 @@ class DeviceDetection
             }
 
             $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($userAgent) . '.cache';
-            file_put_contents($cacheFile, json_encode($data));
+            file_put_contents($cacheFile, json_encode($data), LOCK_EX);
         } catch (\Throwable $e) {
             $this->logError('Failed to cache device info', $config, [
                 'error' => $e->getMessage(),
