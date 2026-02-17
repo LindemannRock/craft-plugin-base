@@ -300,6 +300,11 @@ class ExportHelper
         $content = file_get_contents($tempFile);
         unlink($tempFile);
 
+        if ($content === false) {
+            $spreadsheet->disconnectWorksheets();
+            throw new \yii\web\BadRequestHttpException('Failed to read generated Excel file.');
+        }
+
         // Clean up
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
@@ -363,6 +368,11 @@ class ExportHelper
 
         $content = file_get_contents($tempFile);
         unlink($tempFile);
+
+        if ($content === false) {
+            $spreadsheet->disconnectWorksheets();
+            throw new \yii\web\BadRequestHttpException('Failed to read generated Excel file.');
+        }
 
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
