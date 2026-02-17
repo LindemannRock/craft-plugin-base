@@ -166,7 +166,7 @@ class CsvImportHelper
      *
      * @param string $value The imported cell value
      * @return string The unescaped value
-     * @since 5.14.0
+     * @since 5.17.0
      */
     public static function stripFormulaEscapePrefix(string $value): string
     {
