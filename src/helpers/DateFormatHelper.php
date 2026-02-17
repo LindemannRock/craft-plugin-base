@@ -41,10 +41,10 @@ use yii\db\Expression;
  * DateFormatHelper::formatTime($date);                  // "15:45"
  * DateFormatHelper::formatTime($date, showSeconds: true); // "15:45:32"
  *
- * // For database/API/filenames
- * DateFormatHelper::forDatabase($date);   // "2026-01-22 15:45:32"
- * DateFormatHelper::forApi($date);        // "2026-01-22T15:45:32+00:00"
- * DateFormatHelper::forFilename();        // "2026-01-22-154532"
+ * // For database/export/API/filenames
+ * DateFormatHelper::toDateTimeString($date); // "2026-01-22 15:45:32"
+ * DateFormatHelper::toApiString($date);      // "2026-01-22T15:45:32+00:00"
+ * DateFormatHelper::toFilenameString();      // "2026-01-22-154532"
  * ```
  *
  * @author LindemannRock
@@ -524,13 +524,16 @@ class DateFormatHelper
     // =========================================================================
 
     /**
-     * Format for database storage (MySQL datetime)
+     * Format a date as a datetime string (Y-m-d H:i:s)
+     *
+     * Used for database storage and export formatting.
+     * String inputs are parsed as UTC.
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22 15:45:32"
      * @since 5.8.0
      */
-    public static function forDatabase(DateTime|string|null $date): ?string
+    public static function toDateTimeString(DateTime|string|null $date): ?string
     {
         if ($date === null) {
             return null;
@@ -548,13 +551,13 @@ class DateFormatHelper
     }
 
     /**
-     * Format date only for database
+     * Format a date as a date-only string (Y-m-d)
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22"
      * @since 5.8.0
      */
-    public static function forDatabaseDate(DateTime|string|null $date): ?string
+    public static function toDateString(DateTime|string|null $date): ?string
     {
         if ($date === null) {
             return null;
@@ -572,13 +575,13 @@ class DateFormatHelper
     }
 
     /**
-     * Format for database date range start (beginning of day)
+     * Format a date as start-of-day string (Y-m-d 00:00:00)
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22 00:00:00"
      * @since 5.8.0
      */
-    public static function forDatabaseDayStart(DateTime|string|null $date): ?string
+    public static function toDayStartString(DateTime|string|null $date): ?string
     {
         if ($date === null) {
             return null;
@@ -596,13 +599,13 @@ class DateFormatHelper
     }
 
     /**
-     * Format for database date range end (end of day)
+     * Format a date as end-of-day string (Y-m-d 23:59:59)
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22 23:59:59"
      * @since 5.8.0
      */
-    public static function forDatabaseDayEnd(DateTime|string|null $date): ?string
+    public static function toDayEndString(DateTime|string|null $date): ?string
     {
         if ($date === null) {
             return null;
@@ -624,13 +627,13 @@ class DateFormatHelper
     // =========================================================================
 
     /**
-     * Format for API responses (ISO 8601)
+     * Format a date as an ISO 8601 string for API responses
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22T15:45:32+00:00"
      * @since 5.8.0
      */
-    public static function forApi(DateTime|string|null $date): ?string
+    public static function toApiString(DateTime|string|null $date): ?string
     {
         if ($date === null) {
             return null;
@@ -652,14 +655,14 @@ class DateFormatHelper
     // =========================================================================
 
     /**
-     * Format for filenames (safe characters)
+     * Format a date as a filename-safe string
      *
      * @param DateTime|string|null $date Defaults to now if null
      * @param bool $includeTime Whether to include time portion
      * @return string "2026-01-22-154532" or "2026-01-22"
      * @since 5.8.0
      */
-    public static function forFilename(
+    public static function toFilenameString(
         DateTime|string|null $date = null,
         bool $includeTime = true,
     ): string {
