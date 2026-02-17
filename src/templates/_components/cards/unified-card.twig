@@ -19,6 +19,7 @@
  #       Each item: {value: number|string, label: string, color: string (optional)}
  #   - palette: (optional) Palette color name for colored card style (e.g., 'green', 'red', 'amber')
  #   - align: (optional) Content alignment: 'start', 'center', 'end' (default: 'start')
+ #   - id: (optional) HTML id attribute on the outer element (for JS targeting)
  #
  # Examples:
  #   // Basic card with value
@@ -122,6 +123,7 @@
 {% set cardSubBoxes = subBoxes ?? [] %}
 {% set cardPalette = palette ?? null %}
 {% set cardAlign = align ?? 'start' %}
+{% set cardId = id ?? null %}
 
 {# Get palette color data if specified #}
 {% if cardPalette %}
@@ -134,9 +136,9 @@
 {% endif %}
 
 {% if cardUrl %}
-<a href="{{ cardUrl }}" class="lr-unified-card lr-unified-card-link pane {% if cardAlign != 'start' %}align-{{ cardAlign }}{% endif %}"{% if paletteStyle %} style="{{ paletteStyle }}"{% endif %}>
+<a href="{{ cardUrl }}"{% if cardId %} id="{{ cardId }}"{% endif %} class="lr-unified-card lr-unified-card-link pane {% if cardAlign != 'start' %}align-{{ cardAlign }}{% endif %}"{% if paletteStyle %} style="{{ paletteStyle }}"{% endif %}>
 {% else %}
-<div class="lr-unified-card pane {% if cardAlign != 'start' %}align-{{ cardAlign }}{% endif %}"{% if paletteStyle %} style="{{ paletteStyle }}"{% endif %}>
+<div{% if cardId %} id="{{ cardId }}"{% endif %} class="lr-unified-card pane {% if cardAlign != 'start' %}align-{{ cardAlign }}{% endif %}"{% if paletteStyle %} style="{{ paletteStyle }}"{% endif %}>
 {% endif %}
     {# Header: dot + title (hidden if no title provided) #}
     {% if cardTitle %}
