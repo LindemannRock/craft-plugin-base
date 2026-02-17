@@ -164,12 +164,15 @@ class GeoLookup
     }
 
     /**
-     * Remove API key from URL for logging
+     * Remove API key and IP address from URL for logging
      */
     private function sanitizeUrl(string $url): string
     {
         // Remove common API key parameter patterns
-        return preg_replace('/([?&])(key|token|apiKey)=[^&]+/', '$1$2=***', $url) ?? $url;
+        $sanitized = preg_replace('/([?&])(key|token|apiKey)=[^&]+/', '$1$2=***', $url) ?? $url;
+
+        // Redact IP addresses (IPv4) from URL path to protect end-user privacy
+        return preg_replace('/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/|$|\?)/', '/***$1', $sanitized) ?? $sanitized;
     }
 
     /**
