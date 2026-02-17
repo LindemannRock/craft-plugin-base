@@ -748,6 +748,35 @@ class GeoHelper
     }
 
     /**
+     * Get all countries with their dial codes as structured data
+     *
+     * Returns an array of associative arrays with countryCode, dialCode, and countryName
+     * for every country that has a dial code, sorted by country name.
+     *
+     * @return array<array{countryCode: string, dialCode: string, countryName: string}>
+     * @since 5.17.0
+     */
+    public static function getCountryDialCodeData(): array
+    {
+        $data = [];
+
+        foreach (self::COUNTRIES as $code => $name) {
+            $dialCode = self::DIAL_CODES[$code] ?? null;
+            if ($dialCode) {
+                $data[] = [
+                    'countryCode' => $code,
+                    'dialCode' => $dialCode,
+                    'countryName' => $name,
+                ];
+            }
+        }
+
+        usort($data, fn($a, $b) => strcmp($a['countryName'], $b['countryName']));
+
+        return $data;
+    }
+
+    /**
      * Get country name and dial code for display
      *
      * @param string $countryCode Two-letter country code

@@ -27,13 +27,19 @@ use Twig\TwigFunction;
  * {# Get country name by code #}
  * {{ lrCountryName('US') }}  {# United States #}
  *
- * {# Get dial code options for phone fields #}
- * {% for option in lrDialCodes() %}
- *     <option value="{{ option.value }}">{{ option.label }}</option>
+ * {# Get all countries with dial codes as structured data #}
+ * {% set data = lrCountryDialCodeData() %}
+ * {# [{countryCode: 'KW', dialCode: '965', countryName: 'Kuwait'}, ...] #}
+ * {% for item in data %}
+ *     {{ item.countryCode }} +{{ item.dialCode }} - {{ item.countryName }}
  * {% endfor %}
  *
- * {# Get dial code for a country #}
- * {{ lrDialCode('US') }}  {# +1 #}
+ * {# Single lookups #}
+ * {{ lrDialCode('US') }}              {# 1 #}
+ * {{ lrCountryWithDialCode('KW') }}   {# Kuwait (+965) #}
+ *
+ * {# Validation #}
+ * {% if lrValidCountryCode('US') %}...{% endif %}
  * ```
  *
  * @author LindemannRock
@@ -57,8 +63,10 @@ class GeoExtension extends AbstractExtension
         return [
             new TwigFunction('lrCountries', [GeoHelper::class, 'getAllCountries']),
             new TwigFunction('lrCountryName', [GeoHelper::class, 'getCountryName']),
-            new TwigFunction('lrDialCodes', [GeoHelper::class, 'getCountryDialCodeOptions']),
+            new TwigFunction('lrCountryDialCodeData', [GeoHelper::class, 'getCountryDialCodeData']),
             new TwigFunction('lrDialCode', [GeoHelper::class, 'getDialCode']),
+            new TwigFunction('lrCountryWithDialCode', [GeoHelper::class, 'getCountryWithDialCode']),
+            new TwigFunction('lrValidCountryCode', [GeoHelper::class, 'isValidCountryCode']),
         ];
     }
 }
