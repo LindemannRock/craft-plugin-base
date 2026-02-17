@@ -39,7 +39,8 @@ trait SettingsDisplayNameTrait
      * Get display name (singular, without "Manager")
      *
      * Strips "Manager" and singularizes the plugin name for use in UI labels.
-     * Acronyms (all-uppercase words) are not singularized.
+     * If `$singularDisplayName` is defined on the Settings model, it is used directly.
+     * Otherwise, a heuristic handles common English plural patterns.
      *
      * Examples:
      * - "Redirect Manager" -> "Redirect"
@@ -47,23 +48,84 @@ trait SettingsDisplayNameTrait
      * - "Search Manager" -> "Search"
      * - "Icons" -> "Icon"
      * - "SMS Manager" -> "SMS" (acronym preserved)
+     * - "News Manager" -> "News" (exception — already singular)
+     * - "Survey Categories" -> "Survey Category" (ies -> y)
      *
      * @return string
      * @since 5.0.0
      */
     public function getDisplayName(): string
     {
+        // Use explicit override if defined on the Settings model
+        if (property_exists($this, 'singularDisplayName') && !empty($this->singularDisplayName)) {
+            return $this->singularDisplayName;
+        }
+
         // Strip "Manager" or "manager" from the name and trim whitespace
         $name = trim(str_replace([' Manager', ' manager'], '', $this->pluginName));
 
-        // Singularize by removing trailing 's' if present
-        // But only if:
-        // - The word is more than 2 characters (don't change "As" to "A")
-        // - Not if it ends in 'ss' (e.g., "Class" should stay "Class")
-        // - Not if it's all uppercase (acronyms like "SMS" should stay "SMS")
-        $isAcronym = strtoupper($name) === $name && strlen($name) > 1;
-        if (strlen($name) > 2 && str_ends_with($name, 's') && !str_ends_with($name, 'ss') && !$isAcronym) {
-            $name = substr($name, 0, -1);
+        return self::singularize($name);
+    }
+
+    /**
+     * Singularize a name using common English plural rules
+     *
+     * Handles: acronyms, exception words, -ies, -shes/-ches/-xes/-sses, and trailing -s.
+     */
+    private static function singularize(string $name): string
+    {
+        // Check last word for acronym (all uppercase, like "SMS")
+        $words = explode(' ', $name);
+        $lastWord = end($words);
+
+        if (strtoupper($lastWord) === $lastWord && strlen($lastWord) > 1) {
+            return $name;
+        }
+
+        // Don't singularize very short last words
+        if (strlen($lastWord) <= 2) {
+            return $name;
+        }
+
+        // Words that are already singular despite ending in 's'
+        $exceptions = ['news', 'analytics', 'status', 'campus', 'canvas', 'atlas', 'series', 'species', 'means', 'alias'];
+        if (in_array(strtolower($lastWord), $exceptions, true)) {
+            return $name;
+        }
+
+        // Don't singularize words ending in 'ss' (class, boss, etc.)
+        if (str_ends_with($name, 'ss')) {
+            return $name;
+        }
+
+        // Don't singularize words ending in 'us' (status, campus, census, corpus)
+        if (str_ends_with(strtolower($lastWord), 'us')) {
+            return $name;
+        }
+
+        // Don't singularize words ending in 'is' (analysis, basis, thesis)
+        if (str_ends_with(strtolower($lastWord), 'is')) {
+            return $name;
+        }
+
+        // 'ies' → 'y' (entries → entry, categories → category)
+        if (str_ends_with($name, 'ies')) {
+            return substr($name, 0, -3) . 'y';
+        }
+
+        // 'sses' → strip 'es' (addresses → address, classes → class)
+        if (str_ends_with($name, 'sses')) {
+            return substr($name, 0, -2);
+        }
+
+        // '(sh|ch|x)es' → strip 'es' (searches → search, watches → watch, boxes → box)
+        if (preg_match('/(sh|ch|x)es$/i', $name)) {
+            return substr($name, 0, -2);
+        }
+
+        // Default: strip trailing 's'
+        if (str_ends_with($name, 's') && strlen($name) > 2) {
+            return substr($name, 0, -1);
         }
 
         return $name;
