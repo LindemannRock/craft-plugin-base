@@ -179,7 +179,8 @@ class PluginHelper
     {
         // 1. Check config file first (highest priority)
         try {
-            $configPath = Craft::$app->getPath()->getConfigPath() . '/' . $plugin->id . '.php';
+            $safeId = basename($plugin->id);
+            $configPath = Craft::$app->getPath()->getConfigPath() . '/' . $safeId . '.php';
 
             if (file_exists($configPath)) {
                 $config = require $configPath;
