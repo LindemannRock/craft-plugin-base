@@ -50,7 +50,7 @@
     },
     "extra": {
         "name": "LindemannRock Plugin Base",
-        "handle": "plugin-base",
+        "handle": "lindemannrock-base",
         "developer": "LindemannRock",
         "developerUrl": "https://lindemannrock.com",
         "documentationUrl": "https://github.com/LindemannRock/craft-plugin-base/blob/main/README.md",
