@@ -58,6 +58,7 @@ trait SettingsConfigTrait
      * Example: 'redirect-manager' for config/redirect-manager.php
      *
      * @return string
+     * @since 5.0.0
      */
     abstract protected static function pluginHandle(): string;
 

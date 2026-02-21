@@ -265,7 +265,7 @@ class PluginHelper
      * @param PluginInterface|string $pluginOrHandle Plugin instance or translation category handle
      * @param string|null $basePath Path to translations directory (required for handle-only usage)
      * @param string|null $category Translation category override (defaults to plugin id)
-     * @since 5.29.0
+     * @since 5.14.0
      */
     public static function registerTranslations(PluginInterface|string $pluginOrHandle, ?string $basePath = null, ?string $category = null): void
     {
@@ -314,7 +314,7 @@ class PluginHelper
      *
      * @param PluginInterface $plugin The plugin instance
      * @return string
-     * @since 5.0.0
+     * @since 5.5.0
      */
     public static function getCacheBasePath(PluginInterface $plugin): string
     {
@@ -329,7 +329,7 @@ class PluginHelper
      * @param PluginInterface $plugin The plugin instance
      * @param string $type Cache type (e.g., 'search', 'autocomplete', 'device')
      * @return string
-     * @since 5.0.0
+     * @since 5.5.0
      */
     public static function getCachePath(PluginInterface $plugin, string $type): string
     {

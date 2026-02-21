@@ -145,13 +145,6 @@ class CsvImportHelper
     }
 
     /**
-     * Detect the most likely CSV delimiter from the first line.
-     *
-     * @param string $filePath Path to the temporary CSV file
-     * @return string Detected delimiter
-     * @since 5.14.0
-     */
-    /**
      * Strip formula escape prefix from an imported value
      *
      * Reverses the sanitization done by ExportHelper during CSV export,
@@ -166,7 +159,7 @@ class CsvImportHelper
      *
      * @param string $value The imported cell value
      * @return string The unescaped value
-     * @since 5.17.0
+     * @since 5.16.0
      */
     public static function stripFormulaEscapePrefix(string $value): string
     {

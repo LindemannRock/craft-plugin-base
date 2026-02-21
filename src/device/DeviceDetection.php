@@ -17,7 +17,7 @@ use DeviceDetector\DeviceDetector;
  * Centralized user-agent parsing and device normalization.
  * Designed to be reused by multiple plugins via DeviceDetectionTrait.
  *
- * @since 5.2.0
+ * @since 5.14.0
  */
 class DeviceDetection
 {
@@ -49,6 +49,9 @@ class DeviceDetection
     private ?DeviceDetector $detector = null;
     private static bool $redisFallbackLogged = false;
 
+    /**
+     * @since 5.14.0
+     */
     public function __construct(array $config = [])
     {
         $this->config = $config;
@@ -60,6 +63,7 @@ class DeviceDetection
      * @param string|null $userAgent
      * @param array<string, mixed> $overrideConfig
      * @return array<string, mixed>
+     * @since 5.14.0
      */
     public function detect(?string $userAgent = null, array $overrideConfig = []): array
     {
@@ -161,6 +165,7 @@ class DeviceDetection
      * Check if device is mobile (phone or tablet).
      *
      * @param array<string, mixed> $deviceInfo
+     * @since 5.14.0
      */
     public function isMobileDevice(array $deviceInfo): bool
     {
@@ -171,6 +176,7 @@ class DeviceDetection
      * Check if device is a tablet.
      *
      * @param array<string, mixed> $deviceInfo
+     * @since 5.14.0
      */
     public function isTablet(array $deviceInfo): bool
     {
@@ -181,6 +187,7 @@ class DeviceDetection
      * Check if device is desktop.
      *
      * @param array<string, mixed> $deviceInfo
+     * @since 5.14.0
      */
     public function isDesktop(array $deviceInfo): bool
     {
@@ -191,6 +198,7 @@ class DeviceDetection
      * Check if device is a bot.
      *
      * @param array<string, mixed> $deviceInfo
+     * @since 5.14.0
      */
     public function isBot(array $deviceInfo): bool
     {
@@ -201,6 +209,7 @@ class DeviceDetection
      * Detect language from request.
      *
      * @param array<string, mixed> $config
+     * @since 5.14.0
      */
     public function detectLanguage(array $config = []): string
     {
@@ -460,6 +469,7 @@ class DeviceDetection
      * @param array<string, mixed> $data
      * @param class-string $class
      * @param array<string, string> $map Map of target => source keys
+     * @since 5.14.0
      */
     public function toModel(array $data, string $class, array $map = []): object
     {

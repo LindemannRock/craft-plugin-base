@@ -43,7 +43,7 @@ use Twig\TwigFunction;
  * ```
  *
  * @author LindemannRock
- * @since 5.11.0
+ * @since 5.12.0
  */
 class GeoExtension extends AbstractExtension
 {

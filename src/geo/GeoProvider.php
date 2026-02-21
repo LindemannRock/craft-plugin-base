@@ -23,7 +23,7 @@ namespace lindemannrock\base\geo;
  * ```
  *
  * @author LindemannRock
- * @since 5.0.0
+ * @since 5.7.0
  */
 class GeoProvider
 {
@@ -91,7 +91,7 @@ class GeoProvider
      *
      * @param string $name Provider name (e.g., 'ipapi.co', 'ipinfo.io', 'ip-api.com')
      * @return array<string, mixed>|null Provider configuration or null if not found
-     * @since 5.0.0
+     * @since 5.7.0
      */
     public static function getProvider(string $name): ?array
     {
@@ -102,7 +102,7 @@ class GeoProvider
      * Get all providers for dropdown
      *
      * @return array<string, string> Provider options with labels
-     * @since 5.0.0
+     * @since 5.7.0
      */
     public static function getProviderOptions(): array
     {

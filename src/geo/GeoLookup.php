@@ -31,7 +31,7 @@ use lindemannrock\logginglibrary\traits\LoggingTrait;
  * ```
  *
  * @author LindemannRock
- * @since 5.0.0
+ * @since 5.7.0
  */
 class GeoLookup
 {
@@ -52,7 +52,7 @@ class GeoLookup
      *   - provider: Provider name (default: 'ip-api.com')
      *   - apiKey: API key for paid tiers (default: null)
      *   - timeout: Request timeout in seconds (default: 2)
-     * @since 5.0.0
+     * @since 5.7.0
      */
     public function __construct(array $config = [])
     {
@@ -70,7 +70,7 @@ class GeoLookup
      *
      * @param string $ip IP address to lookup
      * @return array<string, mixed>|null Normalized geo data or null on failure
-     * @since 5.0.0
+     * @since 5.7.0
      */
     public function lookup(string $ip): ?array
     {

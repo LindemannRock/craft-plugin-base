@@ -754,7 +754,7 @@ class GeoHelper
      * for every country that has a dial code, sorted by country name.
      *
      * @return array<array{countryCode: string, dialCode: string, countryName: string}>
-     * @since 5.17.0
+     * @since 5.16.0
      */
     public static function getCountryDialCodeData(): array
     {

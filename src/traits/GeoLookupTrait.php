@@ -42,7 +42,7 @@ use lindemannrock\base\geo\GeoLookup;
  * ```
  *
  * @author LindemannRock
- * @since 5.0.0
+ * @since 5.7.0
  */
 trait GeoLookupTrait
 {
@@ -54,6 +54,7 @@ trait GeoLookupTrait
      * @param string $ip IP address
      * @param array<string, mixed> $config Config override (provider, apiKey)
      * @return array<string, mixed>|null Normalized geo data or null on failure/private IP
+     * @since 5.7.0
      */
     protected function lookupGeoIp(string $ip, array $config = []): ?array
     {
@@ -70,6 +71,7 @@ trait GeoLookupTrait
      * Override this method in your service to provide plugin-specific settings.
      *
      * @return array<string, mixed> Config array with provider, apiKey
+     * @since 5.7.0
      */
     protected function getGeoConfig(): array
     {

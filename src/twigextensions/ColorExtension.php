@@ -74,8 +74,6 @@ class ColorExtension extends AbstractExtension
             new TwigFunction('lrNeutralColor', [ColorHelper::class, 'getNeutralColor']),
             new TwigFunction('lrDefaultColor', [ColorHelper::class, 'getDefaultColor']),
             new TwigFunction('lrFilterColor', [ColorHelper::class, 'getFilterColor']),
-            // Backwards compatibility (deprecated)
-            new TwigFunction('lrColor', [ColorHelper::class, 'getSetColor']),
         ];
     }
 }

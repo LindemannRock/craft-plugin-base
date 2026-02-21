@@ -104,7 +104,7 @@ class DbHelper
      * @param string $separator The separator between values (default ',')
      * @return string Raw SQL expression string
      * @throws \InvalidArgumentException if expression contains unsafe characters
-     * @since 5.16.0
+     * @since 5.15.0
      */
     public static function groupConcat(string $expression, string $separator = ','): string
     {
