@@ -102,6 +102,7 @@ class DateRangeHelper
      * @param string|null $dateRange The date range to normalize
      * @param string|null $default The default value (if null, uses config default)
      * @return string The normalized date range
+     * @since 5.2.0
      */
     public static function normalize(?string $dateRange, ?string $default = null): string
     {
@@ -119,6 +120,7 @@ class DateRangeHelper
      * Return UTC date bounds for a date range.
      *
      * @return array{start: \DateTime|null, end: \DateTime|null}
+     * @since 5.2.0
      */
     public static function getBounds(string $dateRange, ?\DateTimeZone $tz = null): array
     {
@@ -190,6 +192,8 @@ class DateRangeHelper
 
     /**
      * Apply a date range filter to a query.
+     *
+     * @since 5.2.0
      */
     public static function applyToQuery(Query $query, string $dateRange, string $column = 'dateCreated', ?\DateTimeZone $tz = null): void
     {
