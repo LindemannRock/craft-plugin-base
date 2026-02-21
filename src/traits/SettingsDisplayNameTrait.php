@@ -49,6 +49,7 @@ trait SettingsDisplayNameTrait
      * - "Icons" -> "Icon"
      * - "SMS Manager" -> "SMS" (acronym preserved)
      * - "News Manager" -> "News" (exception — already singular)
+     * - "Docs Manager" -> "Docs" (exception — informal form, not a true plural)
      * - "Survey Categories" -> "Survey Category" (ies -> y)
      *
      * @return string
@@ -88,7 +89,7 @@ trait SettingsDisplayNameTrait
         }
 
         // Words that are already singular despite ending in 's'
-        $exceptions = ['news', 'analytics', 'status', 'campus', 'canvas', 'atlas', 'series', 'species', 'means', 'alias'];
+        $exceptions = ['news', 'analytics', 'status', 'campus', 'canvas', 'atlas', 'series', 'species', 'means', 'alias', 'docs', 'stats', 'cms', 'settings', 'metrics', 'graphics', 'lens'];
         if (in_array(strtolower($lastWord), $exceptions, true)) {
             return $name;
         }
