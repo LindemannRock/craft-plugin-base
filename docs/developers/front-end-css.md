@@ -52,7 +52,7 @@ Simple metric display with a centered value and label.
 | Modifier | Effect |
 |----------|--------|
 | `.lr-stat-card-colored` | Transparent background with colored border |
-| `.lr-stat-card-small` | Reduced padding and 24px font |
+| `.lr-stat-card-small` | Reduced padding (16px) and 24px value font |
 
 ### Dashboard Card (`.lr-dashboard-card`)
 
@@ -85,11 +85,17 @@ Non-clickable display card with optional sub-boxes.
 | Class | Description |
 |-------|-------------|
 | `.lr-overview-card-header` | Dot + title row |
+| `.lr-overview-card-dot` | Color dot inside header |
+| `.lr-overview-card-title` | Title text inside header |
+| `.lr-overview-card-content` | Flex column wrapper for card body |
+| `.lr-overview-card-value-row` | Row containing primary value + badge |
 | `.lr-overview-card-primary` | Large value (28px) |
 | `.lr-overview-card-badge` | Colored badge next to value |
 | `.lr-overview-card-description` | Description text |
 | `.lr-overview-card-subboxes` | Grid of smaller metric boxes |
-| `.lr-overview-card-subbox` | Individual sub-box with value + label |
+| `.lr-overview-card-subbox` | Individual sub-box |
+| `.lr-overview-card-subbox-value` | Sub-box value |
+| `.lr-overview-card-subbox-label` | Sub-box label |
 
 ### Unified Card (`.lr-unified-card`)
 
@@ -104,6 +110,8 @@ Flexible card with alignment variants, badges, and sub-boxes. Combines features 
 | Class | Description |
 |-------|-------------|
 | `.lr-unified-card-header` | Dot + title + badge row |
+| `.lr-unified-card-title` | Title text inside header |
+| `.lr-unified-card-value-row` | Row containing value + badge |
 | `.lr-unified-card-badge` | Default gray badge |
 | `.lr-unified-card-badge.positive` | Green badge |
 | `.lr-unified-card-badge.negative` | Red badge |
@@ -112,8 +120,20 @@ Flexible card with alignment variants, badges, and sub-boxes. Combines features 
 | `.lr-unified-card-secondary` | Secondary metric |
 | `.lr-unified-card-description` | Description text |
 | `.lr-unified-card-subboxes` | Sub-box grid |
+| `.lr-unified-card-subbox` | Individual sub-box |
+| `.lr-unified-card-subbox-value` | Sub-box value |
+| `.lr-unified-card-subbox-label` | Sub-box label |
 
 ## Analytics Layout Classes
+
+### Panel & Stats
+
+| Class | Description |
+|-------|-------------|
+| `.lr-analytics-panel` | Main analytics panel wrapper (`position: relative`) |
+| `.lr-analytics-stats.compact` | Compact stat grid (min 140px, smaller gap) |
+| `.lr-section-heading` | Section heading (18px, 600 weight, `margin: 30px 0 20px`) |
+| `.lr-analytics-empty` | Empty state wrapper for analytics panels |
 
 ### Charts
 
@@ -123,6 +143,7 @@ Flexible card with alignment variants, badges, and sub-boxes. Combines features 
 | `.lr-analytics-charts.two-columns` | Fixed two-column chart grid |
 | `.lr-chart-container` | White bordered chart wrapper |
 | `.lr-chart-container.full-width` | Spans full grid width |
+| `.lr-chart-canvas` | Full-width canvas (`width: 100% !important; height: 100% !important`) |
 | `.lr-chart-loading` | Loading state (centered, 200px min height) |
 | `.lr-chart-empty` | Empty state message |
 
@@ -146,7 +167,7 @@ Flexible card with alignment variants, badges, and sub-boxes. Combines features 
 | `.lr-chart-height-200` | 200px |
 | `.lr-chart-height-250` | 250px |
 | `.lr-chart-height-300` | 300px |
-| `.lr-chart-center` | Flex centered, max 260px canvas |
+| `.lr-chart-center` | Flex centered, max 260px width and height on canvas |
 
 ### Tab Content
 
@@ -176,7 +197,7 @@ Flexible card with alignment variants, badges, and sub-boxes. Combines features 
 |-------|-------------|
 | `.lr-analytics-loader` | Overlay container (hidden by default) |
 | `.lr-analytics-loader.is-active` | Show overlay |
-| `.lr-analytics-loader-inner` | White pill with spinner + text |
+| `.lr-analytics-loader-inner` | White rounded box with spinner + text |
 | `.lr-analytics-spinner` | Animated spinning circle |
 
 ## Table Layout Classes
@@ -192,7 +213,7 @@ Apply tone classes to `<tr>` elements for contextual row backgrounds.
 | `.lr-row--warning` | Amber | Warning state |
 | `.lr-row--danger` | Red | Error state |
 
-Each tone has matching hover and selected states.
+Each tone sets `--hover-bg-color` and `--selected-bg-color` custom properties on the `<tr>` for Craft element index integration. Selected rows use `.sel` / `.selected` class selectors.
 
 ### Expandable Rows
 
@@ -275,6 +296,13 @@ Display config file contents on hover.
 | `.lr-muted-center` | Centered muted text |
 | `.lr-empty-icon` | Large faded icon for empty states |
 
+### Misc
+
+| Class | Description |
+|-------|-------------|
+| `.lr-menu-header` | Styled section header inside dropdown menus |
+| `.lr-info-box-table-wrapper` | Padding wrapper for info-box/table layout |
+
 ### Table Scroll
 
 ```twig
@@ -294,15 +322,15 @@ For tag/keyword visualization in analytics.
 | Class | Description |
 |-------|-------------|
 | `.lr-word-cloud` | Container (300px height) |
-| `.lr-word-cloud-item` | Individual word (hover: orange + scale) |
+| `.lr-word-cloud-item` | Individual word (blue `#0d78f2`, hover: orange `#d35400` + scale) |
 | `.lr-peak-label` | Centered label below chart |
 
 ## Responsive Behavior
 
 - All card grids collapse to single column below 768px
-- Two-column chart grids collapse below 1024px
+- Two-column chart grids collapse below 1024px (900px inside `.lr-analytics-panel`)
 - Table scroll containers add horizontal scrolling below 768px
-- Card primary values shrink from 32px to 24px on mobile
+- Dashboard and overview card primary values shrink from 32px to 24px on mobile (unified cards do not shrink)
 
 ## Next Steps
 

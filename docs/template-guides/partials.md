@@ -85,7 +85,7 @@ document.addEventListener('lr:panelChartsReady', function() {
 
 ### CSS Classes
 
-Use the same CSS classes as the [CP Analytics Layout](cp-analytics-layout.md): `.lr-unified-cards`, `.lr-analytics-charts`, `.lr-chart-container`, `.lr-table-scroll`, `.lr-section-heading`. See [Front-End CSS](../developers/front-end-css.md) for the full reference.
+Use the same CSS classes as the [CP Analytics Layout](cp-analytics-layout.md): `.lr-unified-cards`, `.lr-analytics-charts`, `.lr-chart-container`, `.lr-table-scroll`, `.lr-section-heading`, `.lr-analytics-empty`. See [Front-End CSS](../developers/front-end-css.md) for the full reference.
 
 ---
 
@@ -147,14 +147,18 @@ Switch between CSV import and an alternate method (e.g., paste URLs):
 | `action` | `string` | `''` | Form action URL |
 | `formId` | `string` | `''` | Form element ID |
 | `wrapForm` | `bool` | `true` | Wrap in `<form>` tag |
+| `includeCsrf` | `bool` | same as `wrapForm` | Include CSRF token hidden input |
 | `title` | `string` | `'Import from CSV'` | Section title |
 | `description` | `string` | `''` | Intro text |
+| `csvDescription` | `string` | `null` | Description inside CSV section (when using mode switch with `renderTitleInSection`) |
+| `secondaryDescription` | `string` | `null` | Description inside alternate section |
 | `csvFormatTip` | `string` | `null` | HTML for info popover next to title |
 | `fileLabel` | `string` | `'CSV File'` | File input label |
 | `fileInstructions` | `string` | `''` | File input instructions |
 | `fileId` | `string` | `'csvFile'` | File input element ID |
 | `fileName` | `string` | `'csvFile'` | File input name attribute |
 | `delimiterLabel` | `string` | `'CSV Delimiter'` | Delimiter select label |
+| `delimiterInstructions` | `string` | `''` | Delimiter select instructions |
 | `delimiterValue` | `string` | `'auto'` | Selected delimiter |
 | `delimiterOptions` | `object` | Auto, comma, semicolon, tab, pipe | Delimiter options |
 | `submitLabel` | `string` | `'Upload & Map Columns'` | Submit button text |
@@ -163,6 +167,7 @@ Switch between CSV import and an alternate method (e.g., paste URLs):
 | `backupOnImport` | `bool` | `true` | Default backup toggle state |
 | `backupWarning` | `string` | `null` | Warning when backups disabled |
 | `showModeSwitch` | `bool` | `false` | Show CSV/alternate mode buttons |
+| `toggleId` | `string` | `'csv-import-mode-switch'` | Element ID for the mode switch button group (auto-prefixed with `formId` when set) |
 | `primaryLabel` | `string` | `'CSV Import'` | CSV mode button label |
 | `secondaryLabel` | `string` | `'Alternate Import'` | Alternate mode button label |
 | `secondaryHtml` | `string` | `null` | HTML for alternate import mode |

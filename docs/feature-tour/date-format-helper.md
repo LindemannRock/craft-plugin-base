@@ -2,7 +2,8 @@
 
 Centralized date/time formatting for all LindemannRock plugins. Converts dates to Craft's configured timezone, formats them for display, database storage, API responses, and filenames — all driven by a single config file.
 
-> **Note:** Named `DateFormatHelper` (not `DateTimeHelper`) to avoid collision with Craft's built-in `craft\helpers\DateTimeHelper`.
+> [!NOTE]
+> Named `DateFormatHelper` (not `DateTimeHelper`) to avoid collision with Craft's built-in `craft\helpers\DateTimeHelper`.
 
 ## How It Works
 
@@ -124,11 +125,25 @@ $local = DateFormatHelper::toCraftTimezone('2026-01-24 15:45:32');
 $local = DateFormatHelper::toCraftTimezone('2026-01-24 15:45:32', isUtc: false);
 ```
 
-## SQL Expressions
+## Configuration Access
+
+Read the resolved config values programmatically:
+
+```php
+DateFormatHelper::getConfig();         // Full config array
+DateFormatHelper::getTimeFormat();     // '12' or '24'
+DateFormatHelper::getDateOrder();      // 'dmy', 'mdy', or 'ymd'
+DateFormatHelper::getDateSeparator();  // '/', '-', or '.'
+DateFormatHelper::getShowSeconds();    // bool
+DateFormatHelper::getMonthFormat();    // 'numeric', 'short', or 'long'
+DateFormatHelper::clearConfigCache();  // Clear cached config (useful in tests)
+```
+
+## SQL Expressions @since(5.15.0)
 
 DB-agnostic timezone-aware SQL expressions for grouping queries by date or hour. These generate the correct SQL for both MySQL and PostgreSQL, using bound parameters to prevent SQL injection.
 
-### localDateExpression()
+### localDateExpression() @since(5.15.0)
 
 Groups by calendar date in the site's timezone.
 
@@ -142,7 +157,7 @@ Generates:
 - **MySQL:** `DATE(CONVERT_TZ(dateCreated, '+00:00', '+03:00'))`
 - **PostgreSQL:** `DATE(dateCreated AT TIME ZONE 'UTC' AT TIME ZONE '+03:00')`
 
-### localHourExpression()
+### localHourExpression() @since(5.15.0)
 
 Groups by hour-of-day (0–23) in the site's timezone.
 
@@ -152,7 +167,7 @@ $query->select(['hour' => $localHour, 'COUNT(*) as count'])
       ->groupBy($localHour);
 ```
 
-### getCraftTimezoneOffset()
+### getCraftTimezoneOffset() @since(5.15.0)
 
 Returns the site's timezone offset in `±HH:MM` format.
 

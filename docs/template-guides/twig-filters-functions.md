@@ -94,7 +94,6 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 {# {'enabled': {...}, 'disabled': {...}, 'pending': {...}, ...} #}
 
 {% set enabledColor = lrSetColor('status', 'enabled') %}
-{% set enabledColor = lrColor('status', 'enabled') %}  {# Alias for lrSetColor #}
 
 {# Check if a color set exists #}
 {% if lrHasColorSet('myCustomSet') %}...{% endif %}
@@ -177,6 +176,7 @@ Each plugin registers a Twig global via `PluginHelper::bootstrap()`. This variab
 {{ myHelper.fullName }}             {# "Redirect Manager" #}
 {{ myHelper.pluralDisplayName }}    {# "Redirects" #}
 {{ myHelper.lowerDisplayName }}     {# "redirect" #}
+{{ myHelper.pluralLowerDisplayName }} {# "redirects" #}
 ```
 
 ## Next Steps

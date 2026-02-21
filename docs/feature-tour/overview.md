@@ -33,10 +33,11 @@ Reusable traits for Settings models and plugin classes:
 
 Filters and functions available in all CP templates after bootstrap:
 
-- **Date/time filters** — `|lrDatetime`, `|lrDate`, `|lrTime`, `|lrShortDate`, `|lrRelative`, `|lrToDateTimeString`, `|lrToApiString`, `|lrToFilenameString`
-- **Date/time functions** — `lrNow()`, `lrIsToday()`, `lrIsPast()`, `lrIsFuture()`
-- **Color functions** — `lrPaletteColor()`, `lrColorSet()`, `lrSetColor()`, `lrFilterColor()`, `lrNeutralColor()`
+- **Date/time filters** — `|lrDatetime`, `|lrCompactDatetime`, `|lrDate`, `|lrTime`, `|lrShortDate`, `|lrRelative`, `|lrToDateTimeString`, `|lrToApiString`, `|lrToFilenameString`
+- **Date/time functions** — `lrNow()`, `lrIsToday()`, `lrIsPast()`, `lrIsFuture()`, `lrDefaultDateRange()`, `lrDateRangeOptions()`
+- **Color functions** — `lrPaletteColor()`, `lrPaletteColorNames()`, `lrColorSet()`, `lrSetColor()`, `lrHasColorSet()`, `lrAvailableColorSets()`, `lrNeutralColor()`, `lrDefaultColor()`, `lrFilterColor()`
 - **Export functions** — `lrExportEnabled()`, `lrExportFormats()`, `lrExportFormatOptions()`
+- **Geo functions** — `lrCountries()`, `lrCountryName()`, `lrCountryDialCodeData()`, `lrDialCode()`, `lrCountryWithDialCode()`, `lrValidCountryCode()`
 - **Plugin functions** — `lrPluginInstalled()`, `lrPluginEnabled()`, `lrPluginName()`
 
 See [Twig Filters & Functions](../template-guides/twig-filters-functions.md) for the complete reference.

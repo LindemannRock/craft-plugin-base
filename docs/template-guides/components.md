@@ -22,12 +22,12 @@ Look up colors from a registered [color set](../feature-tour/color-helper.md):
 
 ### With Craft Status Class
 
-Use Craft's built-in status classes (`green`, `red`, `orange`, `blue`, `disabled`, etc.):
+Use Craft's built-in status classes (`teal`, `gray`, `orange`, `red`, `blue`, `pink`, `disabled`):
 
 ```twig
 {% include 'lindemannrock-base/_components/badge' with {
     label: 'Active',
-    status: 'green',
+    status: 'teal',
 } only %}
 ```
 
@@ -58,7 +58,8 @@ Pass hex colors directly:
 | `url` | `string` | Wrap badge in a link |
 | `title` | `string` | Tooltip text |
 
-> **Note:** `status-badge` is a deprecated alias that redirects to `badge`.
+> [!NOTE]
+> `status-badge` is a deprecated alias that redirects to `badge`.
 
 ---
 
@@ -82,13 +83,13 @@ Alert and notification banners for warnings, errors, tips, and success messages.
 | `message` | `string` | | Message text |
 | `type` | `string` | `'info'` | `info`, `success`, `warning`, `error` |
 | `variant` | `string` | `'subtle'` | `subtle` (light bg) or `colored` (full bg) |
-| `margin` | `string` | `'both'` | `top`, `bottom`, `both`, `none` |
+| `margin` | `string` | `'top'` | `top`, `bottom`, `both`, `none` |
 | `bg` | `string` | `'gray'` | Background: `gray` or `white` |
 | `stretch` | `bool` | `false` | Full-width banner |
 | `boxId` | `string` | | HTML `id` for the container |
 | `messageId` | `string` | | HTML `id` for the message text |
 | `hidden` | `bool` | `false` | Render hidden (for JS toggling) |
-| `allowHtml` | `bool` | `false` | Render message as raw HTML |
+| `allowHtml` | `bool` | `true` | Render message as raw HTML |
 
 ```twig
 {% include 'lindemannrock-base/_components/info-box' with {
@@ -235,6 +236,7 @@ Flexible card component for dashboards, utilities, and analytics. Supports prima
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
+| `id` | `string` | | HTML `id` attribute on the outer element (for JS targeting) |
 | `title` | `string` | | Card title (shows colored dot) |
 | `color` | `string` | `'#0d78f2'` | Accent color for dot and value |
 | `url` | `string` | | Make card clickable with hover effect |
@@ -446,6 +448,7 @@ Per-row action buttons or dropdown menus with permission handling and conditiona
 | `permission` | `string` | Column-level permission (hides entire column) |
 | `label` | `string` | Button text (for `button` type without icon) |
 | `title` | `string` | Button tooltip |
+| `confirm` | `string` | Confirmation prompt before action (for `button` type) |
 | `items` | `array` | Menu items (for `menu` type) |
 
 **Menu item properties:**
@@ -535,6 +538,8 @@ Selected items show their actual color; unselected items show neutral gray.
 
 Options can include a `count` property to show totals: `{value: 'sent', label: 'Sent', colorKey: 'sent', count: 42}`.
 
+Grouped options can include `extraParams` to merge additional URL parameters for that specific option: `{value: 'config', label: 'Config', colorKey: 'config', extraParams: {type: 'system'}}`.
+
 ### Dropdown Filter
 
 Plain dropdown without status indicators.
@@ -564,6 +569,7 @@ Plain dropdown without status indicators.
 | `filter.current` | `string` | Currently selected value |
 | `filter.label` | `string` | Default button label |
 | `filter.icon` | `string` | Optional button icon |
+| `filter.menuStyle` | `string` | Inline CSS style for the dropdown menu element |
 | `filter.options` | `array` | `{value, label}` pairs (options may include `extra` for secondary text) |
 
 ### Date Range Filter
@@ -583,7 +589,13 @@ Date range dropdown using options from [DateRangeHelper](../feature-tour/date-ra
 } only %}
 ```
 
-Options default to the standard date range list from `lrDateRangeOptions()`. Pass `filter.options` to override.
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `filter.param` | `string` | URL parameter name |
+| `filter.current` | `string` | Currently selected value |
+| `filter.label` | `string` | Default button label |
+| `filter.icon` | `string` | Optional button icon |
+| `filter.options` | `array` | Custom `{value, label}` pairs (defaults to `lrDateRangeOptions()`) |
 
 ---
 

@@ -168,12 +168,9 @@ charts: {
 | Block | Description |
 |-------|-------------|
 | `tabs` | Tab content (each tab in its own div) |
-| `tabContent_[tabId]` | Content for a specific tab |
 | `extraToolbar` | Additional toolbar items |
 | `actionButton` | Action button area (export, etc.) |
 | `scripts` | Additional JavaScript |
-| `chartInit` | Chart initialization code |
-| `chartRender` | Chart rendering functions |
 
 ## JavaScript API
 

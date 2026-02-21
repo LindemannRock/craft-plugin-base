@@ -9,6 +9,16 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 `lindemannrock\base\helpers\ColorHelper`
 [Full docs](../feature-tour/color-helper.md)
 
+**Constants:**
+
+| Constant | Type | Value |
+|----------|------|-------|
+| `NEUTRAL_COLOR` | `string` | `'#aab6c1'` |
+| `DEFAULT_COLOR` | `array` | `['class' => 'default', 'color' => '#9aa5b1', ...]` |
+| `PALETTE` | `array` | Full 18-color palette keyed by name |
+
+**Methods:**
+
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `getPaletteColor(string $name)` | `array` | Get palette color by name |
@@ -49,21 +59,34 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | `toApiString($dt)` | `string` | ISO 8601 |
 | `toFilenameString($dt, $includeTime)` | `string` | `Y-m-d-His` |
 
+**Configuration:**
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getConfig()` | `array` | Full config from `lindemannrock-base.php` |
+| `getTimeFormat()` | `string` | `'12'` or `'24'` |
+| `getDateOrder()` | `string` | `'dmy'`, `'mdy'`, or `'ymd'` |
+| `getDateSeparator()` | `string` | `'/'`, `'-'`, or `'.'` |
+| `getShowSeconds()` | `bool` | Default showSeconds preference |
+| `getMonthFormat()` | `string` | `'numeric'`, `'short'`, or `'long'` |
+| `clearConfigCache()` | `void` | Clear cached config (useful for testing) |
+
 **Utilities:**
 
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `now()` | `DateTime` | Current time in Craft timezone |
-| `isToday($dt, $isUtc)` | `bool` | Check if today |
-| `isPast($dt, $isUtc)` | `bool` | Check if in past |
-| `isFuture($dt, $isUtc)` | `bool` | Check if in future |
+| `toCraftTimezone($dt, bool $isUtc)` | `?DateTime` | Convert date to Craft timezone |
+| `isToday(DateTime\|string\|null $dt)` | `bool` | Check if today |
+| `isPast(DateTime\|string\|null $dt)` | `bool` | Check if in past |
+| `isFuture(DateTime\|string\|null $dt)` | `bool` | Check if in future |
 
 **SQL expressions:**
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `localDateExpression(string $column, Query $query)` | `string` | DB-agnostic timezone date expression |
-| `localHourExpression(string $column, Query $query)` | `string` | DB-agnostic timezone hour expression |
+| `localDateExpression(string $column)` | `Expression` | DB-agnostic timezone date expression |
+| `localHourExpression(string $column)` | `Expression` | DB-agnostic timezone hour expression |
 | `getCraftTimezoneOffset()` | `string` | Timezone offset string (e.g., `'+02:00'`) |
 
 ### DateRangeHelper
@@ -74,10 +97,10 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `getDefaultDateRange(?string $handle)` | `string` | Default date range from config |
-| `getOptions(string $format)` | `array` | Date range options for dropdowns |
-| `normalize(?string $range, ?string $handle)` | `string` | Normalize range key with fallback |
-| `getBounds(string $range)` | `array` | `[DateTime $start, DateTime $end]` |
-| `applyToQuery(Query $query, string $column, string $range)` | `void` | Add date range WHERE to query |
+| `getOptions(string $format = 'array')` | `array` | Date range options for dropdowns |
+| `normalize(?string $range, ?string $default)` | `string` | Normalize range key; `$default` falls back to config |
+| `getBounds(string $range, ?DateTimeZone $tz)` | `array` | `['start' => ?DateTime, 'end' => ?DateTime]` in UTC |
+| `applyToQuery(Query $query, string $dateRange, string $column, ?DateTimeZone $tz)` | `void` | Add date range WHERE to query |
 | `getDaysCount(string $range)` | `int` | Number of days in range |
 
 ### ExportHelper
@@ -87,16 +110,20 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 | Method | Returns | Description |
 |--------|---------|-------------|
+| `getConfig(?string $pluginHandle)` | `array` | Resolved export config (plugin overrides base) |
 | `isFormatEnabled(string $format, ?string $handle)` | `bool` | Check if format is enabled |
 | `getEnabledFormats(?string $handle)` | `array` | List enabled format keys |
 | `getFormatOptions()` | `array` | Options for select fields |
 | `filename($settings, $parts, ?string $ext)` | `string` | Generate export filename |
-| `assertNotEmpty(array $data)` | `void` | Throw if data is empty |
+| `assertNotEmpty(array $data, ?string $message = null)` | `void` | Throw if data is empty |
 | `toCsv(array $rows, array $headers, string $file, array $dateCols)` | `Response` | CSV download response |
-| `toJson(array $rows, string $file, array $dateCols)` | `Response` | JSON download response |
+| `csvContent(array $rows, array $headers, array $dateCols)` | `string` | Build CSV string without sending response |
+| `toJson(array $rows, string $file, array $dateCols, bool $pretty = true)` | `Response` | JSON download response |
 | `toExcel(array $rows, array $headers, string $file, array $dateCols, array $opts)` | `Response` | Excel download response |
-| `toMultiSheetExcel(array $sheets, string $file)` | `Response` | Multi-sheet Excel |
+| `toExcelMulti(array $sheets, string $file)` | `Response` | Multi-sheet Excel workbook |
 | `toZip(array $files, string $file)` | `Response` | ZIP archive download |
+| `formatDateColumns(array $rows, array $dateCols)` | `array` | Format dates for CSV/Excel (Craft TZ, `Y-m-d H:i:s`) |
+| `formatDateColumnsForApi(array $rows, array $dateCols)` | `array` | Format dates for JSON export (ISO 8601) |
 
 ### GeoHelper
 
@@ -110,7 +137,7 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | `isValidCountryCode(string $code)` | `bool` | Validate country code |
 | `getDialCode(string $code)` | `?string` | Dial code (e.g., `'1'`, no `+`) |
 | `getAllDialCodes()` | `array` | All dial codes |
-| `getCountryDialCodeOptions()` | `array` | Options for select fields |
+| `getCountryDialCodeOptions(bool $includeAll = false)` | `array` | Options for select fields |
 | `getCountryDialCodeData()` | `array` | All countries with `{countryCode, dialCode, countryName}`, sorted by name |
 | `getCountryWithDialCode(string $code)` | `string` | Formatted name with dial code (e.g., `"Kuwait (+965)"`) |
 | `isPhoneNumberAllowed(string $phone, array $allowed)` | `bool` | Validate against allowed countries |
@@ -141,18 +168,28 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `jsonExtract(Query $query, string $column, string $path)` | `string` | JSON extract with bound param |
-| `jsonExtractExpression(string $column, string $path)` | `string` | Raw JSON extract SQL |
-| `groupConcat(string $column, string $separator, bool $distinct)` | `string` | DB-agnostic GROUP_CONCAT |
+| `jsonExtract(string $column, string $path)` | `string` | Raw SQL string for JSON extraction |
+| `jsonExtractExpression(string $column, string $path, ?string $alias)` | `Expression` | Yii Expression for JSON extraction, with optional alias |
+| `groupConcat(string $expression, string $separator)` | `string` | DB-agnostic GROUP_CONCAT / STRING_AGG |
 
 ### CsvImportHelper
 
 `lindemannrock\base\helpers\CsvImportHelper`
 [Full docs](../feature-tour/csv-import-helper.md)
 
+**Constants:**
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `DEFAULT_MAX_ROWS` | `4000` | Default row limit for imports |
+| `DEFAULT_MAX_BYTES` | `5242880` | Default file size limit (5 MB) |
+
+**Methods:**
+
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `parseUpload(UploadedFile $file, array $options)` | `array` | Parse CSV file into rows |
+| `stripFormulaEscapePrefix(string $value)` | `string` | Strip leading `'` added by ExportHelper for formula-safe CSV values |
 
 ### CpNavHelper
 
@@ -161,8 +198,8 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `buildSubnav(PluginInterface $plugin, array $sections)` | `array` | Build subnav array |
-| `firstAccessibleRoute(array $sections)` | `?string` | First route user can access |
+| `buildSubnav(User $user, ?Model $settings, array $sections)` | `array` | Build subnav array from section definitions |
+| `firstAccessibleRoute(User $user, ?Model $settings, array $sections)` | `?string` | First route the user can access |
 
 ---
 
@@ -209,18 +246,30 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 [Full docs](../feature-tour/edition-support.md) — Plugin edition checking.
 
+**Constants:**
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `EDITION_STANDARD` | `'standard'` | Free tier |
+| `EDITION_LITE` | `'lite'` | Entry-level paid tier |
+| `EDITION_PRO` | `'pro'` | Full-featured paid tier |
+
+**Methods:**
+
 | Method | Returns | Description |
 |--------|---------|-------------|
+| `editions()` | `string[]` | **(static)** Editions this plugin supports |
 | `isLite()` | `bool` | Check if Lite edition |
 | `isStandard()` | `bool` | Check if Standard edition |
 | `isPro()` | `bool` | Check if Pro edition |
 | `isAtLeast(string $edition)` | `bool` | At least this edition? |
 | `isBelow(string $edition)` | `bool` | Below this edition? |
-| `requireEdition(string $edition, string $feature)` | `void` | Throw if below edition |
-| `getEditionName()` | `string` | Current edition display name |
+| `requireEdition(string $edition, ?string $feature)` | `void` | Throw if below edition |
+| `getEditionHandle()` | `string` | Current edition handle (e.g., `'pro'`) |
+| `getEditionName(?string $edition)` | `string` | Edition display name (e.g., `'Pro'`) |
 | `hasMultipleEditions()` | `bool` | Plugin has multiple editions? |
 | `hasFeature(string $feature)` | `bool` | Check feature availability |
-| `getEditionFeatures()` | `array` | Override for feature list |
+| `getEditionFeatures(string $edition)` | `array` | Override for feature list |
 
 ### DeviceDetectionTrait
 
@@ -229,9 +278,9 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `detectDeviceInfo(?string $ua, array $config)` | `array` | Detect device/browser/OS |
-| `detectLanguageFromConfig()` | `string` | Detect browser language |
+| `detectLanguageFromConfig(array $overrideConfig = [])` | `string` | Detect browser language |
 | `buildDeviceModel(array $data, string $class, array $map)` | `object` | Map detection data to model |
-| `getDeviceDetectionConfig(): array` | `array` | **(abstract)** Return config |
+| `getDeviceDetectionConfig(): array` | `array` | Return config (default: `[]`) |
 
 ### GeoLookupTrait
 
@@ -239,8 +288,8 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `lookupGeoIp(string $ip, ?array $config)` | `?array` | Look up IP location |
-| `getGeoConfig(): array` | `array` | **(abstract)** Return config |
+| `lookupGeoIp(string $ip, array $config = [])` | `?array` | Look up IP location |
+| `getGeoConfig(): array` | `array` | Return config (default: `['provider' => 'ip-api.com', 'apiKey' => null]`) |
 
 ---
 

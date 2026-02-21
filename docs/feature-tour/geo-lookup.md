@@ -4,7 +4,7 @@ IP geolocation for service classes. Resolves IP addresses to country, city, and 
 
 ## Setup
 
-Add the trait to your service and implement `getGeoConfig()`:
+Add the trait to your service. Override `getGeoConfig()` to pull settings from your plugin (optional — defaults to `ip-api.com` with no API key):
 
 ```php
 use yii\base\Component;
@@ -32,9 +32,12 @@ class AnalyticsService extends Component
 $geoData = $this->lookupGeoIp($ipAddress);
 
 if ($geoData) {
-    $country = $geoData['countryCode'];  // 'US'
-    $city = $geoData['city'];            // 'New York'
-    $region = $geoData['region'];        // 'New York'
+    $geoData['countryCode'];  // 'US'
+    $geoData['country'];      // 'United States'
+    $geoData['region'];       // 'New York'
+    $geoData['city'];         // 'New York'
+    $geoData['latitude'];     // 40.7128
+    $geoData['longitude'];    // -74.0060
 }
 ```
 

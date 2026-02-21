@@ -58,7 +58,8 @@ $plugin->isBelow(MyPlugin::EDITION_PRO);     // true for Standard and Lite
 
 // Edition metadata
 $plugin->getEditionHandle();     // 'lite', 'pro', etc.
-$plugin->getEditionName();       // 'Lite', 'Pro', etc.
+$plugin->getEditionName();       // 'Lite', 'Pro', etc. (current edition)
+$plugin->getEditionName('pro');  // 'Pro' (any edition by handle)
 $plugin->hasMultipleEditions();  // true if more than one edition
 ```
 

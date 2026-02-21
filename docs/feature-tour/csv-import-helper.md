@@ -2,6 +2,13 @@
 
 Parses CSV file uploads with automatic delimiter detection, file validation, and row limits. Handles UTF-8 BOM stripping and common MIME type variations.
 
+## Constants
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `DEFAULT_MAX_ROWS` | `4000` | Default row limit for imports |
+| `DEFAULT_MAX_BYTES` | `5242880` | Default file size limit (5 MB) |
+
 ## Basic Usage
 
 ```php
@@ -65,9 +72,10 @@ $result = CsvImportHelper::parseUpload($file, ['delimiter' => ';']);
 | Wrong extension | "Invalid file type. Please upload a CSV file." |
 | Too large | "File size exceeds the allowed limit of 5.0MB." |
 | Wrong MIME type | "Invalid file type. Please upload a CSV file." |
-| Single column | "Could not detect CSV delimiter. The file may have only one column or use an unsupported delimiter." |
 | Too many rows | "CSV file is too large. Maximum 4000 rows allowed. Please split your file into smaller batches." |
 | Empty file | "CSV file is empty or contains only headers." |
+
+Single-column CSVs are valid. A file with only one column (e.g., a list of email addresses or phone numbers) parses without error.
 
 ## Typical Controller Pattern
 
@@ -102,6 +110,35 @@ public function actionImport(): Response
     return $this->redirectToPostedUrl();
 }
 ```
+
+## Stripping Formula-Escape Prefixes @since(5.16.0)
+
+When data is exported via `ExportHelper`, cell values that start with formula characters (`=`, `+`, `-`, `@`) are prefixed with a leading apostrophe (`'`) to prevent spreadsheet formula injection. If the same data is later re-imported, those apostrophes must be removed to restore the original values.
+
+Use `stripFormulaEscapePrefix()` to reverse this escaping on a per-value basis:
+
+```php
+use lindemannrock\base\helpers\CsvImportHelper;
+
+// After parsing the upload, clean values that may have been exported by ExportHelper
+foreach ($result['allRows'] as &$row) {
+    foreach ($row as &$value) {
+        $value = CsvImportHelper::stripFormulaEscapePrefix($value);
+    }
+}
+```
+
+The method only strips the apostrophe when it is followed (with optional whitespace) by a formula character. Ordinary apostrophes in data (e.g., `O'Brien`) are left untouched:
+
+| Input | Output | Reason |
+|-------|--------|--------|
+| `'=SUM(A1)` | `=SUM(A1)` | Formula escape stripped |
+| `'+1234` | `+1234` | Formula escape stripped |
+| `'  =1` | `  =1` | Whitespace preserved, escape stripped |
+| `'test` | `'test` | `t` is not a formula char — no change |
+| `O'Brien` | `O'Brien` | Apostrophe is mid-string — no change |
+
+This pairs naturally with `ExportHelper::toCsv()` to create a safe round-trip for data that contains formulas or values starting with special characters.
 
 ## Next Steps
 

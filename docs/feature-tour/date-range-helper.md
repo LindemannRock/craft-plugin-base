@@ -43,6 +43,10 @@ Sanitizes user input and applies defaults.
 $range = DateRangeHelper::normalize($request->getQueryParam('dateRange'));
 // Returns the input if valid, or the default range if null/empty
 
+// With explicit fallback default
+$range = DateRangeHelper::normalize($input, 'last7days');
+// Uses 'last7days' instead of config default when input is null/invalid
+
 // Also normalizes legacy 'alltime' to 'all'
 $range = DateRangeHelper::normalize('alltime');  // Returns 'all'
 ```

@@ -347,6 +347,10 @@ Content before the table (warnings, info boxes).
 
 Toolbar buttons (export menus, etc.).
 
+### sidebar
+
+Left sidebar navigation. Auto-rendered from `sidebarMenu` config (shows `_includes/nav` when there are more than 1 menu items). Override to customize the sidebar entirely.
+
 ### sidebarContent
 
 Right sidebar / details pane content.

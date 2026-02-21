@@ -1,4 +1,4 @@
-# Quickstart Cheatsheet
+# Quickstart
 
 A condensed reference for building a new plugin with the base module. Every pattern below is used across all LindemannRock plugins — copy, adapt, and ship.
 
@@ -92,19 +92,22 @@ public function getCpNavItem(): ?array
         $item['label'] = $settings->getFullName();
 
         $sections = [
-            'dashboard' => [
+            [
+                'key' => 'dashboard',
                 'label' => 'Dashboard',
                 'url' => 'my-plugin',
             ],
-            'items' => [
+            [
+                'key' => 'items',
                 'label' => 'Items',
                 'url' => 'my-plugin/items',
-                'permission' => 'myPlugin:manageItems',
+                'permissionsAny' => ['myPlugin:manageItems'],
             ],
-            'settings' => [
+            [
+                'key' => 'settings',
                 'label' => 'Settings',
                 'url' => 'my-plugin/settings',
-                'permission' => 'myPlugin:manageSettings',
+                'permissionsAll' => ['myPlugin:manageSettings'],
             ],
         ];
 
@@ -223,42 +226,46 @@ The most-used layout. Extends `cp-table` and provides filters, search, sort, pag
             { label: myHelper.fullName, url: url('my-plugin') },
         ],
     },
-    tabs: [
-        {id: 'overview', label: 'Overview'|t('my-plugin')},
-        {id: 'details', label: 'Details'|t('my-plugin')},
-    ],
+    tabs: {
+        overview: { label: 'Overview'|t('my-plugin') },
+        details: { label: 'Details'|t('my-plugin') },
+    },
     filters: {
-        dateRange: true,
-        sites: hasSites ? sites : false,
+        dateRange: { default: 'last30days', current: dateRange },
+        sites: { enabled: hasSites, current: siteId, sites: sites },
     },
     export: {
         permission: 'myPlugin:exportAnalytics',
         action: 'my-plugin/analytics/export',
     },
     charts: {
-        library: 'chartjs',
         prefix: 'myPlugin',
         dataEndpoint: 'my-plugin/analytics/get-data',
     },
 } %}
 
-{% block tabContent_overview %}
-    <div class="lr-analytics-stats">
-        {% include 'lindemannrock-base/_components/cards/unified-card' with {
-            title: 'Total Views'|t('my-plugin'),
-            color: '#6366f1',
-            value: stats.totalViews|number,
-        } only %}
-        {% include 'lindemannrock-base/_components/cards/unified-card' with {
-            title: 'Unique Visitors'|t('my-plugin'),
-            color: '#0ea5e9',
-            value: stats.uniqueVisitors|number,
-        } only %}
-    </div>
-    <div class="lr-analytics-charts">
-        <div class="lr-chart-container">
-            <canvas id="myPlugin-overview-chart"></canvas>
+{% block tabs %}
+    <div id="overview" class="lr-tab-content">
+        <div class="lr-analytics-stats">
+            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+                title: 'Total Views'|t('my-plugin'),
+                color: '#6366f1',
+                value: stats.totalViews|number,
+            } only %}
+            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+                title: 'Unique Visitors'|t('my-plugin'),
+                color: '#0ea5e9',
+                value: stats.uniqueVisitors|number,
+            } only %}
         </div>
+        <div class="lr-analytics-charts">
+            <div class="lr-chart-container">
+                <canvas id="myPlugin-overview-chart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div id="details" class="lr-tab-content hidden">
+        {# Details tab content #}
     </div>
 {% endblock %}
 ```
@@ -376,13 +383,13 @@ $(function() {
 | Timezone-safe SQL | `DateFormatHelper` | `DateFormatHelper::localDateExpression('dateCreated')` |
 | Color from palette | `ColorHelper` | `ColorHelper::getPaletteColor('teal')` |
 | Color set lookup | `lrSetColor` function | `{{ lrSetColor('itemStatus', 'active') }}` |
-| Export data | `ExportHelper` | `ExportHelper::export($format, $columns, $rows, $filename)` |
+| Export data | `ExportHelper` | `ExportHelper::toCsv($rows, $headers, $filename, $dateColumns)` |
 | JSON in SQL | `DbHelper` | `DbHelper::jsonExtract('metadata', 'provider')` |
 | GROUP_CONCAT | `DbHelper` | `DbHelper::groupConcat('tag', ', ')` |
 | Country name | `GeoHelper` | `GeoHelper::getCountryName('US')` |
 | Dial code | `GeoHelper` | `GeoHelper::getDialCode('DE')` → `"49"` |
 | Check plugin | `PluginHelper` | `PluginHelper::isPluginEnabled('other-plugin')` |
-| CSV import | `CsvImportHelper` | `CsvImportHelper::parseCsvFile($path)` |
+| CSV import | `CsvImportHelper` | `CsvImportHelper::parseUpload($file)` |
 
 ## Next Steps
 

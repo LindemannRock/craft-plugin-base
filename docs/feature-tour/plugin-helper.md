@@ -152,8 +152,9 @@ Translations are registered automatically during `bootstrap()`. To register manu
 // From a plugin instance
 PluginHelper::registerTranslations($plugin);
 
-// From a handle + path
+// From a handle + path (optional $category defaults to the handle)
 PluginHelper::registerTranslations('my-plugin', '/path/to/translations');
+PluginHelper::registerTranslations('my-plugin', '/path/to/translations', 'custom-category');
 ```
 
 ## Next Steps

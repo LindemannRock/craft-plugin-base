@@ -5,8 +5,8 @@
         "children": [
             "get-started/requirements",
             "get-started/installation",
-            "get-started/quickstart",
-            "get-started/configuration"
+            "get-started/configuration",
+            "get-started/quickstart"
         ]
     },
     {

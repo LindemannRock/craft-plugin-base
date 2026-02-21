@@ -36,6 +36,14 @@ Singular name without "Manager". Strips "Manager", singularizes trailing "s" (un
 $settings->getDisplayName();  // "Redirect"
 ```
 
+To bypass the automatic singularization, add a `$singularDisplayName` property to your Settings model:
+
+```php
+public string $singularDisplayName = 'Survey';
+```
+
+When set, `getDisplayName()` returns this value directly without any processing.
+
 ### getFullName()
 
 The plugin name exactly as configured.

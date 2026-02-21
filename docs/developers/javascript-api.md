@@ -59,7 +59,7 @@ var settings = window.lrViewSettings.get();
 // Save view settings
 window.lrViewSettings.save({ hiddenColumns: ['email'] });
 
-// Toggle a single column
+// Toggle a single column (DOM only — does not persist to localStorage)
 window.lrViewSettings.toggleColumn('email', true);  // show
 window.lrViewSettings.toggleColumn('email', false); // hide
 
@@ -82,8 +82,8 @@ var config = window.lrTableConfig;
 //   ajaxInterval: 30,
 //   ajaxEndpoint: '/actions/my-plugin/items/get-data',
 //   page: 1,
-//   urlParams: 'status=all&sort=dateCreated&dir=desc',
-//   viewStorageKey: 'lr-view-my-plugin-items',
+//   urlParams: {status: 'all', sort: 'dateCreated', dir: 'desc'},
+//   viewStorageKey: 'lr-table-view-my-plugin-items',
 //   ...
 // }
 ```
@@ -97,7 +97,9 @@ Available on pages using the CP Analytics Layout. Requires Chart.js (bundled wit
 | Global | Type | Description |
 |--------|------|-------------|
 | `window.lrChartColors` | `string[]` | 12-color palette for chart datasets |
+| `window.lrChartInstances` | `object` | Chart instance store (keyed by `prefix-canvasId`) |
 | `window.lrAnalyticsConfig` | `object` | Current analytics configuration |
+| `window.currentTab` | `string` | Currently active tab ID (set by CP Analytics Layout) |
 | `window.lrLoadChartData(type, callback, extraParams)` | `function` | Fetch chart data via AJAX |
 | `window.lrCreateChart(canvasId, type, data, options)` | `function` | Create a Chart.js chart |
 | `window.lrDestroyCharts(prefix)` | `function` | Destroy all charts for a prefix |
@@ -168,7 +170,8 @@ var chart = window.lrCreateChart('canvas-id', 'bar', chartData, {
 Defaults applied:
 - `responsive: true`
 - `maintainAspectRatio` — `true` for doughnut/pie, `false` for line/bar
-- Y-axis begins at zero with integer ticks for line/bar charts
+- Legend position — `bottom` for doughnut/pie, `top` for line/bar
+- Y-axis begins at zero with integer ticks (`stepSize: 1`, `precision: 0`) for line/bar charts
 - Destroys any existing chart on the same canvas before creating
 
 ### `lrDestroyCharts`
@@ -181,7 +184,7 @@ window.lrDestroyCharts('myPlugin');
 
 ### `lrGetChart`
 
-Retrieve a chart instance for programmatic updates.
+Retrieve a chart instance for programmatic updates. The `prefix` argument is optional — when omitted, falls back to `lrAnalyticsConfig.prefix`.
 
 ```javascript
 var chart = window.lrGetChart('daily-chart');
@@ -189,6 +192,9 @@ if (chart) {
     chart.data.datasets[0].data = newData;
     chart.update();
 }
+
+// With explicit prefix
+var chart = window.lrGetChart('daily-chart', 'myPlugin');
 ```
 
 ## Events
@@ -241,10 +247,10 @@ The JavaScript loads through Craft's asset bundle system — you don't need to i
 
 | Asset Bundle | Loaded By | Provides |
 |--------------|-----------|----------|
-| `AnalyticsAsset` | CP Analytics Layout | Chart.js + `lrChartColors`, `lrLoadChartData`, `lrCreateChart`, `lrDestroyCharts`, `lrGetChart`, `lrAnalyticsInit` |
-| `ComponentsAsset` | CP Table Layout, CP Analytics Layout | Config tooltip behavior |
+| `AnalyticsAsset` | CP Analytics Layout, Analytics Panel partial | Chart.js + `lrChartColors`, `lrLoadChartData`, `lrCreateChart`, `lrDestroyCharts`, `lrGetChart`, `lrAnalyticsInit` |
+| `ComponentsAsset` | CP Table Layout, CP Analytics Layout, Analytics Panel partial | Config tooltip behavior |
 
-The table selection and view settings JS is embedded directly in the CP Table Layout template, not in a separate asset bundle.
+The table globals (`lrTableSelection`, `lrViewSettings`, `lrBuildUrl`, `lrTableConfig`) are embedded directly in the CP Table Layout template, not in a separate asset bundle.
 
 ## Next Steps
 

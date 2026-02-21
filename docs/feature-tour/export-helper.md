@@ -20,6 +20,9 @@ ExportHelper::isFormatEnabled('xlsx');   // Same as 'excel'
 // List all enabled formats
 ExportHelper::getEnabledFormats();       // ['csv', 'excel']
 
+// Full resolved config (merges plugin + base configs)
+ExportHelper::getConfig('my-plugin');   // ['excel' => true, 'csv' => true, 'json' => false]
+
 // Options for select fields (order: Excel, CSV, JSON)
 ExportHelper::getFormatOptions();
 // [['value' => 'xlsx', 'label' => 'Excel (.xlsx)'], ['value' => 'csv', 'label' => 'CSV (.csv)']]
@@ -94,7 +97,7 @@ return ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated'], [
 
 Excel files include styled headers, auto-sized columns, frozen header row, auto-filter, alternating row colors, and thin borders.
 
-### Multi-Sheet Excel
+### Multi-Sheet Excel @since(5.13.1)
 
 ```php
 return ExportHelper::toExcelMulti([
@@ -112,7 +115,7 @@ return ExportHelper::toExcelMulti([
 ], 'full-export.xlsx');
 ```
 
-### ZIP Archive
+### ZIP Archive @since(5.13.1)
 
 Bundle multiple files into a ZIP download.
 
@@ -139,6 +142,20 @@ if (empty($rows)) {
 // Or throw an exception (for API exports)
 ExportHelper::assertNotEmpty($rows);  // Throws BadRequestHttpException
 ```
+
+## Date Column Formatting
+
+Format date columns manually when you need the formatted data without sending a download response:
+
+```php
+// For CSV/Excel: formats to local time Y-m-d H:i:s
+$rows = ExportHelper::formatDateColumns($rows, ['dateCreated', 'dateUpdated']);
+
+// For JSON/API: formats to ISO 8601 with timezone offset
+$rows = ExportHelper::formatDateColumnsForApi($rows, ['dateCreated']);
+```
+
+The `toCsv`, `toJson`, and `toExcel` methods call these internally when you pass `$dateColumns`, so you only need these for custom export logic.
 
 ## Security
 

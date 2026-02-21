@@ -38,7 +38,8 @@ $codes = GeoHelper::getAllDialCodes();
 GeoHelper::getCountryWithDialCode('KW');  // "Kuwait (+965)"
 ```
 
-> **Note:** Some dial codes are shared by multiple countries (e.g., `1` for US and CA, `44` for GB and GG).
+> [!NOTE]
+> Some dial codes are shared by multiple countries (e.g., `1` for US and CA, `44` for GB and GG).
 
 ## Structured Country Data
 

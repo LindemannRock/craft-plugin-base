@@ -56,7 +56,7 @@ The base module registers five Twig extensions. All functions and filters are pr
 
 ### ColorExtension
 
-**10 functions:**
+**9 functions:**
 
 | Function | Purpose |
 |----------|---------|
@@ -64,7 +64,6 @@ The base module registers five Twig extensions. All functions and filters are pr
 | `lrPaletteColorNames()` | List all palette color names |
 | `lrColorSet(name)` | Get entire color set |
 | `lrSetColor(set, key)` | Get specific color from set |
-| `lrColor(set, key)` | Alias for `lrSetColor` |
 | `lrHasColorSet(name)` | Check if a color set exists |
 | `lrAvailableColorSets()` | List all color set names |
 | `lrNeutralColor()` | Neutral gray (`#aab6c1`) |

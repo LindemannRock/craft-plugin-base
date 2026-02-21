@@ -172,7 +172,7 @@ return [
 ];
 ```
 
-Resolution order: root level → environment-specific → wildcard (`*`).
+Resolution order: config root level → environment-specific → wildcard (`*`) → database `pluginName` setting.
 
 ## Without Logging
 

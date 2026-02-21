@@ -51,15 +51,25 @@ class AnalyticsService extends Component
 ```php
 $info = $this->detectDeviceInfo($userAgent);
 // Returns: [
-//     'deviceType' => 'desktop',     // desktop, smartphone, tablet, bot, etc.
-//     'browser' => 'Chrome',
-//     'browserVersion' => '120.0',
+//     'userAgent' => 'Mozilla/5.0 ...',
+//     'deviceType' => 'desktop',       // desktop, smartphone, tablet, bot, etc.
+//     'deviceBrand' => 'Apple',
+//     'deviceModel' => 'MacBook Pro',
 //     'osName' => 'Windows',
 //     'osVersion' => '11',
+//     'browser' => 'Chrome',
+//     'browserVersion' => '120.0',
+//     'browserEngine' => 'Blink',
+//     'clientType' => 'browser',
 //     'isRobot' => false,
+//     'isMobileApp' => false,
 //     'botName' => null,
-//     'language' => 'en',            // If includeLanguage is true
-//     'platform' => 'x64',          // If includePlatform is true
+//     'isMobile' => false,
+//     'isTablet' => false,
+//     'isDesktop' => true,
+//     'platform' => 'x64',            // If includePlatform is true
+//     'vendor' => 'Apple',
+//     'language' => 'en',             // If includeLanguage is true
 // ]
 
 // Without user agent (uses current request)

@@ -45,10 +45,7 @@ if ($settings->isOverriddenByConfig('backends.algolia.enabled')) {
 }
 ```
 
-The method checks these locations in order:
-1. Root level: `return ['setting' => 'value']`
-2. Environment-specific: `return ['production' => ['setting' => 'value']]`
-3. Wildcard: `return ['*' => ['setting' => 'value']]`
+The method checks the resolved config array returned by Craft's `getConfigFromFile()`. Craft handles environment-specific (`production`, `dev`) and wildcard (`*`) merging internally — by the time `isOverriddenByConfig()` runs, the config is already flattened to a single array for the current environment. The check is a simple `array_key_exists()` on the resolved config (or dot-notation traversal for nested keys).
 
 ## Template Integration
 
@@ -92,10 +89,12 @@ public function rules(): array
 }
 ```
 
-When `devMode` is off:
-- `debug` is automatically changed to `info`
-- If the value came from the database, the correction is saved back
-- If the value came from a config file, a warning is logged
+When `devMode` is off and `logLevel` is `'debug'`, the validator corrects it to `'info'` **in memory only**. The user's `'debug'` preference is preserved in the database so it takes effect again when `devMode` is re-enabled.
+
+Behavior by source:
+
+- **Value from config file** — corrects in-memory, logs a session-deduplicated warning suggesting you update `config/{plugin-handle}.php`.
+- **Value from database** — corrects in-memory only (does not write back to the database), logs a session-deduplicated warning.
 
 ## Next Steps
 

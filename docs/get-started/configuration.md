@@ -10,7 +10,7 @@ Create `config/lindemannrock-base.php` in your project:
 <?php
 
 return [
-    'timeFormat' => '12',
+    'timeFormat' => '24',
     'monthFormat' => 'short',
     'dateOrder' => 'dmy',
     'dateSeparator' => '/',
@@ -26,7 +26,8 @@ return [
 ];
 ```
 
-> **Note:** The example above shows the sample config template (`src/config.php`). The "Default" column below shows what the code uses when no config file is present — these may differ from the sample values.
+> [!NOTE]
+> The example above shows the sample config template (`src/config.php`). The "Default" column below shows what the code uses when no config file is present — these may differ from the sample values.
 
 ## Settings Reference
 
