@@ -76,7 +76,7 @@
     {% set valueColors = lrSetColor(colorSet, value) %}
     {% if valueColors.color == defaultColors.color %}
         {# Try lowercase value as fallback #}
-        {% set valueColors = lrColor(colorSet, value|lower) %}
+        {% set valueColors = lrSetColor(colorSet, value|lower) %}
     {% endif %}
 
     {# Check if color set has a CSS class defined #}
