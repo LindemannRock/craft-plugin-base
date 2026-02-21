@@ -78,6 +78,8 @@ trait EditionTrait
      * Use for free-only plugins or as the free tier in a tiered plugin.
      * Named "standard" (not "free") to sound professional and allow
      * adding paid tiers later without renaming.
+     *
+     * @since 5.0.0
      */
     public const EDITION_STANDARD = 'standard';
 
@@ -86,6 +88,8 @@ trait EditionTrait
      *
      * Use as the lower paid tier when offering two paid options.
      * Typically includes core functionality without advanced features.
+     *
+     * @since 5.0.0
      */
     public const EDITION_LITE = 'lite';
 
@@ -94,6 +98,8 @@ trait EditionTrait
      *
      * Use as the top tier with all features enabled.
      * Should include everything from lower tiers plus premium features.
+     *
+     * @since 5.0.0
      */
     public const EDITION_PRO = 'pro';
 

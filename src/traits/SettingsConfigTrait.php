@@ -103,7 +103,6 @@ trait SettingsConfigTrait
      * @param array $array The array to check
      * @param array $parts The key parts (from exploding dot notation)
      * @return bool True if the nested key exists
-     * @since 5.9.0
      */
     private static function hasNestedKey(array $array, array $parts): bool
     {

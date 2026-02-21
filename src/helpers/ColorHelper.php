@@ -45,11 +45,15 @@ class ColorHelper
 {
     /**
      * Neutral/unselected color used for filter items that are not selected
+     *
+     * @since 5.8.0
      */
     public const NEUTRAL_COLOR = '#aab6c1';
 
     /**
      * Default color for unknown values
+     *
+     * @since 5.8.0
      */
     public const DEFAULT_COLOR = [
         'class' => 'default',
@@ -65,6 +69,7 @@ class ColorHelper
      * Custom colors can be added here - they just won't have a CSS class.
      *
      * @var array<string, array{class: string, color: string, rgb: string, text: string}>
+     * @since 5.8.0
      */
     public const PALETTE = [
         'teal' => [

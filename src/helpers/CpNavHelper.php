@@ -88,7 +88,6 @@ class CpNavHelper
      * @param Model|null $settings
      * @param array $section
      * @return bool
-     * @since 5.14.0
      */
     private static function isSectionAccessible(User $user, ?Model $settings, array $section): bool
     {

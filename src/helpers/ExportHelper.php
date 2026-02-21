@@ -718,7 +718,6 @@ class ExportHelper
      *
      * @param mixed $value The cell value to sanitize
      * @return mixed The sanitized value
-     * @since 5.9.0
      */
     private static function sanitizeCellValue(mixed $value): mixed
     {
@@ -759,7 +758,6 @@ class ExportHelper
      *
      * @param array $row The row data
      * @return array The sanitized row
-     * @since 5.9.0
      */
     private static function sanitizeRow(array $row): array
     {

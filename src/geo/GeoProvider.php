@@ -31,6 +31,7 @@ class GeoProvider
      * Built-in provider configurations
      *
      * @var array<string, array<string, mixed>>
+     * @since 5.7.0
      */
     public const PROVIDERS = [
         'ipapi.co' => [
