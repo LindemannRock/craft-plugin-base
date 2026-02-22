@@ -1,4 +1,4 @@
-# PluginHelper
+# PluginHelper @since(5.0.0)
 
 Central initialization for LindemannRock plugins. The `bootstrap()` method replaces several lines of boilerplate with a single call that registers the base module, sets up Twig extensions, configures logging, and registers color sets.
 
@@ -91,7 +91,7 @@ return [
 ];
 ```
 
-## Plugin Detection
+## Plugin Detection @since(5.9.0)
 
 Check if other plugins are installed before using their APIs:
 
@@ -120,7 +120,7 @@ In Twig:
 {{ lrPluginName('search-manager') }}
 ```
 
-## Cache Paths
+## Cache Paths @since(5.5.0)
 
 Build consistent cache paths for plugins:
 
@@ -132,7 +132,7 @@ $basePath = PluginHelper::getCacheBasePath($this);
 $devicePath = PluginHelper::getCachePath($this, 'device');
 ```
 
-## Cache Key Helpers
+## Cache Key Helpers @since(5.14.0)
 
 Build consistent cache keys and Redis key sets:
 
@@ -144,7 +144,7 @@ $prefix = PluginHelper::getCacheKeyPrefix('redirect-manager', 'device');
 $keySet = PluginHelper::getCacheKeySet('redirect-manager', 'device');
 ```
 
-## Translation Registration
+## Translation Registration @since(5.14.0)
 
 Translations are registered automatically during `bootstrap()`. To register manually:
 

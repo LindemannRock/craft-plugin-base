@@ -1,4 +1,4 @@
-# SettingsPersistenceTrait
+# SettingsPersistenceTrait @since(5.0.0)
 
 Saves and loads plugin settings from a dedicated database table instead of Craft's project config. This avoids project config merge conflicts and gives full control over settings storage.
 

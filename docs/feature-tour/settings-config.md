@@ -1,4 +1,4 @@
-# SettingsConfigTrait
+# SettingsConfigTrait @since(5.0.0)
 
 Detects when settings are overridden by a config file and shows lock icons in the CP. Also provides log level validation that prevents `debug` logging in production.
 

@@ -1,4 +1,4 @@
-# DateFormatHelper
+# DateFormatHelper @since(5.8.0)
 
 Centralized date/time formatting for all LindemannRock plugins. Converts dates to Craft's configured timezone, formats them for display, database storage, API responses, and filenames — all driven by a single config file.
 

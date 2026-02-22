@@ -1,4 +1,4 @@
-# GeoLookupTrait
+# GeoLookupTrait @since(5.7.0)
 
 IP geolocation for service classes. Resolves IP addresses to country, city, and region data using configurable providers.
 

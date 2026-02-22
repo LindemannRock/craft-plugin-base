@@ -1,4 +1,4 @@
-# DbHelper
+# DbHelper @since(5.15.0)
 
 DB-agnostic SQL expressions for operations that differ between MySQL and PostgreSQL. Use these instead of writing MySQL-specific SQL like `JSON_EXTRACT` or `GROUP_CONCAT`.
 

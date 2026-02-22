@@ -1,4 +1,4 @@
-# ExportHelper
+# ExportHelper @since(5.8.0)
 
 Centralized CSV, JSON, and Excel export for all LindemannRock plugins. Handles format availability, filename generation, date column formatting, and formula injection protection.
 

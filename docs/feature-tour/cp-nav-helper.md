@@ -1,4 +1,4 @@
-# CpNavHelper
+# CpNavHelper @since(5.14.0)
 
 Builds CP subnav arrays and determines default routes based on permissions, settings flags, and custom conditions. Centralizes the logic that decides which sidebar items a user can see.
 

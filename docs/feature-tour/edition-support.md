@@ -1,4 +1,4 @@
-# EditionTrait
+# EditionTrait @since(5.0.0)
 
 Standardized edition support for plugins with Lite/Standard/Pro tiers. Provides helper methods for checking editions, gating features, and building comparison UIs.
 

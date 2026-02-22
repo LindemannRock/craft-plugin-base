@@ -1,4 +1,4 @@
-# DateRangeHelper
+# DateRangeHelper @since(5.2.0)
 
 Standard date range parsing for analytics, logs, and any date-filtered CP pages. Converts range names like `'last30days'` into UTC date bounds and applies them to database queries.
 

@@ -1,4 +1,4 @@
-# DeviceDetectionTrait
+# DeviceDetectionTrait @since(5.14.0)
 
 User-agent parsing for device type, browser, and OS detection. Uses the [Matomo Device Detector](https://github.com/matomo-org/device-detector) library with optional caching.
 

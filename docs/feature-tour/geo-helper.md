@@ -1,4 +1,4 @@
-# GeoHelper
+# GeoHelper @since(5.3.0)
 
 Country names, dial codes, phone number validation, and country select options. Uses ISO 3166-1 alpha-2 country codes.
 
@@ -20,7 +20,7 @@ GeoHelper::isValidCountryCode('US');   // true
 GeoHelper::isValidCountryCode('ZZ');   // false
 ```
 
-## Dial Codes
+## Dial Codes @since(5.7.0)
 
 Dial codes are returned as strings without the `+` prefix. The `+` is added only in display formatting.
 
@@ -41,7 +41,7 @@ GeoHelper::getCountryWithDialCode('KW');  // "Kuwait (+965)"
 > [!NOTE]
 > Some dial codes are shared by multiple countries (e.g., `1` for US and CA, `44` for GB and GG).
 
-## Structured Country Data
+## Structured Country Data @since(5.16.0)
 
 Get all countries with their dial codes as structured objects, sorted by country name.
 
@@ -54,7 +54,7 @@ $data = GeoHelper::getCountryDialCodeData();
 // ]
 ```
 
-## Country Select Options
+## Country Select Options @since(5.7.0)
 
 Generate options for dropdown fields with country name and dial code.
 
@@ -71,7 +71,7 @@ $options = GeoHelper::getCountryDialCodeOptions(true);
 // [['label' => 'All Countries', 'value' => '*'], ['label' => 'Afghanistan (+93)', ...], ...]
 ```
 
-## Phone Number Validation
+## Phone Number Validation @since(5.7.0)
 
 Check if a phone number matches an allowed list of country dial codes.
 

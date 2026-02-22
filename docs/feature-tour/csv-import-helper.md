@@ -1,4 +1,4 @@
-# CsvImportHelper
+# CsvImportHelper @since(5.14.0)
 
 Parses CSV file uploads with automatic delimiter detection, file validation, and row limits. Handles UTF-8 BOM stripping and common MIME type variations.
 

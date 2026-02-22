@@ -1,4 +1,4 @@
-# SettingsDisplayNameTrait
+# SettingsDisplayNameTrait @since(5.0.0)
 
 Provides standardized plugin name helper methods for Settings models. Strips "Manager" suffixes, singularizes, and pluralizes names for consistent use throughout the plugin UI.
 
