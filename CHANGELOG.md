@@ -1,5 +1,28 @@
 # Changelog
 
+## [5.17.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.16.0...v5.17.0) (2026-02-22)
+
+
+### Features
+
+* **CsvImportHelper:** add stripFormulaEscapePrefix method documentation ([5838bbd](https://github.com/LindemannRock/craft-plugin-base/commit/5838bbd04cdab39f03319b7ddf3498fc6bb87d5e))
+
+
+### Bug Fixes
+
+* **badge.twig:** correct function call for value color fallback ([f88df98](https://github.com/LindemannRock/craft-plugin-base/commit/f88df98412632ce2b482ba12542e887d44492876))
+* **ColorHelper:** add default class to DEFAULT_COLOR constant ([b10df2f](https://github.com/LindemannRock/craft-plugin-base/commit/b10df2f3284863905005e7ab6ef380edb42b6a94))
+* **composer.json:** update handle to match naming convention ([45e6e1e](https://github.com/LindemannRock/craft-plugin-base/commit/45e6e1e46883f0f469a3b24c7f290724e86cf38a))
+* **CsvImportHelper:** clarify handling of single-column CSVs in parseUpload ([0066155](https://github.com/LindemannRock/craft-plugin-base/commit/0066155749e6aeb1bb75d53fc37d8e5b97e99f0a))
+* **DateRangeHelper:** adjust date calculations to use Craft's timezone ([50f9a4e](https://github.com/LindemannRock/craft-plugin-base/commit/50f9a4e97f0763bcc3cd18f43df21fe166d193bd))
+* **DeviceDetection:** ensure atomic file writes for cached device info ([eec3b4b](https://github.com/LindemannRock/craft-plugin-base/commit/eec3b4bf0f85bac4c21676c59297c84c022b4462))
+* **ExportHelper:** handle errors when reading generated Excel files ([7aa4318](https://github.com/LindemannRock/craft-plugin-base/commit/7aa4318fb224d8cd1274d4883bb4127eabf0ca21))
+* **ExportHelper:** prevent formula injection in Excel exports ([3a63c03](https://github.com/LindemannRock/craft-plugin-base/commit/3a63c036209bfb715cdc941693330f05d96ce736))
+* **GeoLookup:** redact API key and IP address in sanitized URLs ([a0f38b7](https://github.com/LindemannRock/craft-plugin-base/commit/a0f38b7ed838e4bac85f7c69ebdae5da2b11d033))
+* **PluginHelper:** sanitize plugin ID for config file path ([4b621c4](https://github.com/LindemannRock/craft-plugin-base/commit/4b621c41949a363c54574fe902d366ff95a3efbc))
+* **SettingsDisplayNameTrait:** update display name exceptions ([ad35df0](https://github.com/LindemannRock/craft-plugin-base/commit/ad35df0455d79e3269b6515f1120805e926298c3))
+* **SettingsPersistenceTrait:** handle JSON encoding errors in saveToDatabase ([03d2e5e](https://github.com/LindemannRock/craft-plugin-base/commit/03d2e5e7615a2feeba1fc2bc2848ae1415890bdd))
+
 ## [5.16.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.15.0...v5.16.0) (2026-02-17)
 
 
