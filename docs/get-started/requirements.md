@@ -1,12 +1,11 @@
 # Requirements
 
-## Craft CMS
+## System Requirements
 
-LindemannRock Base requires Craft CMS 5.0 or greater.
-
-## PHP
-
-LindemannRock Base requires PHP 8.2 or greater.
+| Requirement | Version |
+|-------------|---------|
+| [Craft CMS](https://craftcms.com/) | 5.0+ |
+| [PHP](https://php.net/) | 8.2+ |
 
 ## Module Type
 
@@ -18,7 +17,7 @@ You do not need to install or enable it manually — any LindemannRock plugin th
 
 The following packages are installed automatically via Composer:
 
-| Package | Purpose |
-|---------|---------|
-| `matomo/device-detector` ^6.4 | User-agent parsing for device detection (DeviceDetectionTrait) |
-| `phpoffice/phpspreadsheet` ^3.0 or ^5.0 | Excel (.xlsx) export support (ExportHelper) |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| [matomo/device-detector](https://github.com/matomo-org/device-detector) | ^6.4 | User-agent parsing for device detection (DeviceDetectionTrait) |
+| [phpoffice/phpspreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) | ^3.0 \|\| ^5.0 | Excel (.xlsx) export support (ExportHelper) |
