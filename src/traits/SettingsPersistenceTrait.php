@@ -54,7 +54,6 @@ trait SettingsPersistenceTrait
      * Example: 'redirectmanager_settings' (not '{{%redirectmanager_settings}}')
      *
      * @return string
-     * @since 5.0.0
      */
     abstract protected static function tableName(): string;
 
@@ -65,7 +64,6 @@ trait SettingsPersistenceTrait
      * Database stores booleans as 0/1, this converts to true/false.
      *
      * @return array
-     * @since 5.0.0
      */
     protected static function booleanFields(): array
     {
@@ -79,7 +77,6 @@ trait SettingsPersistenceTrait
      * Ensures fields are actual integers, not strings.
      *
      * @return array
-     * @since 5.0.0
      */
     protected static function integerFields(): array
     {
@@ -93,7 +90,6 @@ trait SettingsPersistenceTrait
      * Ensures fields are actual floats, not strings.
      *
      * @return array
-     * @since 5.0.0
      */
     protected static function floatFields(): array
     {
@@ -107,7 +103,6 @@ trait SettingsPersistenceTrait
      * Use for complex settings like arrays of patterns, custom configurations, etc.
      *
      * @return array
-     * @since 5.0.0
      */
     protected static function jsonFields(): array
     {
@@ -121,7 +116,6 @@ trait SettingsPersistenceTrait
      * These fields will be excluded from saveToDatabase().
      *
      * @return array
-     * @since 5.0.0
      */
     protected static function excludeFromSave(): array
     {
@@ -136,7 +130,6 @@ trait SettingsPersistenceTrait
      *
      * @param static|null $settings Optional existing settings instance to populate
      * @return static Settings instance with values from database (or defaults)
-     * @since 5.0.0
      */
     public static function loadFromDatabase(?self $settings = null): self
     {
@@ -217,7 +210,6 @@ trait SettingsPersistenceTrait
      * Validates before saving. Excludes config-overridden fields.
      *
      * @return bool True on success, false on failure
-     * @since 5.0.0
      */
     public function saveToDatabase(): bool
     {

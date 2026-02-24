@@ -50,7 +50,6 @@ trait DeviceDetectionTrait
      * @param string|null $userAgent
      * @param array<string, mixed> $overrideConfig
      * @return array<string, mixed>
-     * @since 5.14.0
      */
     protected function detectDeviceInfo(?string $userAgent = null, array $overrideConfig = []): array
     {
@@ -75,7 +74,6 @@ trait DeviceDetectionTrait
      * Detect language based on device detection config.
      *
      * @param array<string, mixed> $overrideConfig
-     * @since 5.14.0
      */
     protected function detectLanguageFromConfig(array $overrideConfig = []): string
     {
@@ -101,7 +99,6 @@ trait DeviceDetectionTrait
      * @param array<string, mixed> $data
      * @param class-string $class
      * @param array<string, string> $map Map of target => source keys
-     * @since 5.14.0
      */
     protected function buildDeviceModel(array $data, string $class, array $map = []): object
     {
@@ -116,7 +113,6 @@ trait DeviceDetectionTrait
      * Override in your service to provide plugin-specific settings.
      *
      * @return array<string, mixed>
-     * @since 5.14.0
      */
     protected function getDeviceDetectionConfig(): array
     {

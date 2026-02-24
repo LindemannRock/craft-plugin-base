@@ -23,15 +23,11 @@ class CsvImportHelper
 {
     /**
      * Default maximum rows allowed for CSV imports
-     *
-     * @since 5.14.0
      */
     public const DEFAULT_MAX_ROWS = 4000;
 
     /**
      * Default maximum file size in bytes (5 MB)
-     *
-     * @since 5.14.0
      */
     public const DEFAULT_MAX_BYTES = 5242880;
 
@@ -48,7 +44,6 @@ class CsvImportHelper
      *   - detectDelimiter: Whether to auto-detect delimiter (default: true)
      * @return array{headers: array, allRows: array, rowCount: int, delimiter: string}
      * @throws \RuntimeException If validation fails or file cannot be parsed
-     * @since 5.14.0
      */
     public static function parseUpload(UploadedFile $file, array $options = []): array
     {

@@ -38,7 +38,6 @@ class PluginNameHelper
      * Constructor
      *
      * @param PluginInterface $plugin The plugin instance
-     * @since 5.0.0
      */
     public function __construct(PluginInterface $plugin)
     {
@@ -49,7 +48,6 @@ class PluginNameHelper
      * Get display name (singular, without "Manager")
      *
      * @return string
-     * @since 5.0.0
      */
     public function getDisplayName(): string
     {
@@ -64,7 +62,6 @@ class PluginNameHelper
      * Get plural display name (without "Manager")
      *
      * @return string
-     * @since 5.0.0
      */
     public function getPluralDisplayName(): string
     {
@@ -79,7 +76,6 @@ class PluginNameHelper
      * Get full plugin name (as configured)
      *
      * @return string
-     * @since 5.0.0
      */
     public function getFullName(): string
     {
@@ -94,7 +90,6 @@ class PluginNameHelper
      * Get lowercase display name (singular)
      *
      * @return string
-     * @since 5.0.0
      */
     public function getLowerDisplayName(): string
     {
@@ -109,7 +104,6 @@ class PluginNameHelper
      * Get lowercase plural display name
      *
      * @return string
-     * @since 5.0.0
      */
     public function getPluralLowerDisplayName(): string
     {
@@ -154,7 +148,6 @@ class PluginNameHelper
      *
      * @param string $name Property name
      * @return string|null
-     * @since 5.0.0
      */
     public function __get(string $name): ?string
     {

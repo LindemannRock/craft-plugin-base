@@ -45,15 +45,11 @@ class ColorHelper
 {
     /**
      * Neutral/unselected color used for filter items that are not selected
-     *
-     * @since 5.8.0
      */
     public const NEUTRAL_COLOR = '#aab6c1';
 
     /**
      * Default color for unknown values
-     *
-     * @since 5.8.0
      */
     public const DEFAULT_COLOR = [
         'class' => 'default',
@@ -69,7 +65,6 @@ class ColorHelper
      * Custom colors can be added here - they just won't have a CSS class.
      *
      * @var array<string, array{class: string, color: string, rgb: string, text: string}>
-     * @since 5.8.0
      */
     public const PALETTE = [
         'teal' => [
@@ -363,7 +358,6 @@ class ColorHelper
      *
      * @param string $name The color name (teal, gray, orange, red, blue, pink, etc.)
      * @return array{class: string, color: string, rgb: string, text: string}
-     * @since 5.8.0
      */
     public static function getPaletteColor(string $name): array
     {
@@ -374,7 +368,6 @@ class ColorHelper
      * Get all available palette color names
      *
      * @return string[]
-     * @since 5.8.0
      */
     public static function getPaletteColorNames(): array
     {
@@ -386,7 +379,6 @@ class ColorHelper
      *
      * @param string $setName Name of the color set
      * @return array<string, array{color: string, rgb: string, text: string}> Color set or empty array
-     * @since 5.8.0
      */
     public static function getColorSet(string $setName): array
     {
@@ -400,7 +392,6 @@ class ColorHelper
      * @param string $setName Name of the color set
      * @param string $key Key within the color set
      * @return array{color: string, rgb: string, text: string} Color definition or default
-     * @since 5.8.0
      */
     public static function getSetColor(string $setName, string $key): array
     {
@@ -414,7 +405,6 @@ class ColorHelper
      * Used for filter items that are not currently selected
      *
      * @return string Hex color code
-     * @since 5.8.0
      */
     public static function getNeutralColor(): string
     {
@@ -425,7 +415,6 @@ class ColorHelper
      * Get default color for unknown values
      *
      * @return array{color: string, rgb: string, text: string}
-     * @since 5.8.0
      */
     public static function getDefaultColor(): array
     {
@@ -437,7 +426,6 @@ class ColorHelper
      *
      * @param string $setName Name of the color set
      * @return bool
-     * @since 5.8.0
      */
     public static function hasColorSet(string $setName): bool
     {
@@ -449,7 +437,6 @@ class ColorHelper
      * Get all available color set names
      *
      * @return string[]
-     * @since 5.8.0
      */
     public static function getAvailableColorSets(): array
     {
@@ -465,7 +452,6 @@ class ColorHelper
      *
      * @param string $setName Name of the color set
      * @param array<string, array{class?: string, color: string, rgb: string, text: string}> $colors Color definitions
-     * @since 5.8.0
      */
     public static function registerColorSet(string $setName, array $colors): void
     {
@@ -482,7 +468,6 @@ class ColorHelper
      * @param string $value Filter value
      * @param string|null $currentFilter Currently selected filter value
      * @return string Hex color code
-     * @since 5.8.0
      */
     public static function getFilterColor(string $setName, string $value, ?string $currentFilter): string
     {

@@ -74,7 +74,6 @@ class PluginHelper
      *   - 'registerTranslations': bool to auto-register translations (default true)
      *   - 'translationCategory': string override for translation category (default plugin id)
      *   - 'translationBasePath': string override for translation base path (default {plugin}/translations)
-     * @since 5.0.0
      */
     public static function bootstrap(
         PluginInterface $plugin,
@@ -173,7 +172,6 @@ class PluginHelper
      * ```
      *
      * @param PluginInterface $plugin The plugin instance
-     * @since 5.0.0
      */
     public static function applyPluginNameFromConfig(PluginInterface $plugin): void
     {

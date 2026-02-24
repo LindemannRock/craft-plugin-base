@@ -95,7 +95,6 @@ class DateTimeExtension extends AbstractExtension
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public function formatDatetime(
         mixed $date,
@@ -114,7 +113,6 @@ class DateTimeExtension extends AbstractExtension
      * @param bool|null $showSeconds
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public function formatCompactDatetime(mixed $date, ?bool $showSeconds = null, bool $isUtc = true): ?string
     {
@@ -129,7 +127,6 @@ class DateTimeExtension extends AbstractExtension
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public function formatDate(
         mixed $date,
@@ -148,7 +145,6 @@ class DateTimeExtension extends AbstractExtension
      * @param bool|null $showSeconds
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public function formatTime(
         mixed $date,
@@ -165,7 +161,6 @@ class DateTimeExtension extends AbstractExtension
      * @param mixed $date
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public function formatShortDate(mixed $date, bool $isUtc = true): ?string
     {
@@ -178,7 +173,6 @@ class DateTimeExtension extends AbstractExtension
      * @param mixed $date
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public function formatRelative(mixed $date, bool $isUtc = true): ?string
     {
@@ -190,7 +184,6 @@ class DateTimeExtension extends AbstractExtension
      *
      * @param mixed $date
      * @return string|null
-     * @since 5.8.0
      */
     public function toDateTimeString(mixed $date): ?string
     {
@@ -202,7 +195,6 @@ class DateTimeExtension extends AbstractExtension
      *
      * @param mixed $date
      * @return string|null
-     * @since 5.8.0
      */
     public function toApiString(mixed $date): ?string
     {
@@ -215,7 +207,6 @@ class DateTimeExtension extends AbstractExtension
      * @param mixed $date
      * @param bool $includeTime
      * @return string
-     * @since 5.8.0
      */
     public function toFilenameString(mixed $date = null, bool $includeTime = true): string
     {

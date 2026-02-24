@@ -50,7 +50,6 @@ class DbHelper
      * @param string $path The JSON key to extract (e.g., 'source', 'clickType')
      * @return string Raw SQL expression string (use inside select/where clauses)
      * @throws \InvalidArgumentException if column or path contains unsafe characters
-     * @since 5.15.0
      */
     public static function jsonExtract(string $column, string $path): string
     {
@@ -80,7 +79,6 @@ class DbHelper
      * @param string|null $alias Optional column alias for SELECT clauses
      * @return Expression
      * @throws \InvalidArgumentException if column, path, or alias contains unsafe characters
-     * @since 5.15.0
      */
     public static function jsonExtractExpression(string $column, string $path, ?string $alias = null): Expression
     {
@@ -104,7 +102,6 @@ class DbHelper
      * @param string $separator The separator between values (default ',')
      * @return string Raw SQL expression string
      * @throws \InvalidArgumentException if expression contains unsafe characters
-     * @since 5.15.0
      */
     public static function groupConcat(string $expression, string $separator = ','): string
     {

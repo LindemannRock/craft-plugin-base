@@ -53,7 +53,6 @@ trait SettingsDisplayNameTrait
      * - "Survey Categories" -> "Survey Category" (ies -> y)
      *
      * @return string
-     * @since 5.0.0
      */
     public function getDisplayName(): string
     {
@@ -142,7 +141,6 @@ trait SettingsDisplayNameTrait
      * - "Short Links" -> "Short Links"
      *
      * @return string
-     * @since 5.0.0
      */
     public function getFullName(): string
     {
@@ -160,7 +158,6 @@ trait SettingsDisplayNameTrait
      * - "Icon Manager" -> "Icons"
      *
      * @return string
-     * @since 5.0.0
      */
     public function getPluralDisplayName(): string
     {
@@ -185,7 +182,6 @@ trait SettingsDisplayNameTrait
      * - "Short Links" -> "short link"
      *
      * @return string
-     * @since 5.0.0
      */
     public function getLowerDisplayName(): string
     {
@@ -202,7 +198,6 @@ trait SettingsDisplayNameTrait
      * - "Short Links" -> "short links"
      *
      * @return string
-     * @since 5.0.0
      */
     public function getPluralLowerDisplayName(): string
     {

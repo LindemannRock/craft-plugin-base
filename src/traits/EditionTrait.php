@@ -78,8 +78,6 @@ trait EditionTrait
      * Use for free-only plugins or as the free tier in a tiered plugin.
      * Named "standard" (not "free") to sound professional and allow
      * adding paid tiers later without renaming.
-     *
-     * @since 5.0.0
      */
     public const EDITION_STANDARD = 'standard';
 
@@ -88,8 +86,6 @@ trait EditionTrait
      *
      * Use as the lower paid tier when offering two paid options.
      * Typically includes core functionality without advanced features.
-     *
-     * @since 5.0.0
      */
     public const EDITION_LITE = 'lite';
 
@@ -98,8 +94,6 @@ trait EditionTrait
      *
      * Use as the top tier with all features enabled.
      * Should include everything from lower tiers plus premium features.
-     *
-     * @since 5.0.0
      */
     public const EDITION_PRO = 'pro';
 
@@ -116,7 +110,6 @@ trait EditionTrait
      * - Three tiers: return [self::EDITION_STANDARD, self::EDITION_LITE, self::EDITION_PRO]
      *
      * @return string[]
-     * @since 5.0.0
      */
     public static function editions(): array
     {
@@ -130,7 +123,6 @@ trait EditionTrait
      * Check if the current edition is Standard (free tier)
      *
      * @return bool
-     * @since 5.0.0
      */
     public function isStandard(): bool
     {
@@ -141,7 +133,6 @@ trait EditionTrait
      * Check if the current edition is Lite
      *
      * @return bool
-     * @since 5.0.0
      */
     public function isLite(): bool
     {
@@ -152,7 +143,6 @@ trait EditionTrait
      * Check if the current edition is Pro
      *
      * @return bool
-     * @since 5.0.0
      */
     public function isPro(): bool
     {
@@ -168,7 +158,6 @@ trait EditionTrait
      *
      * @param string $edition The minimum required edition
      * @return bool
-     * @since 5.0.0
      */
     public function isAtLeast(string $edition): bool
     {
@@ -184,7 +173,6 @@ trait EditionTrait
      *
      * @param string $edition The edition to compare against
      * @return bool
-     * @since 5.0.0
      */
     public function isBelow(string $edition): bool
     {
@@ -206,7 +194,6 @@ trait EditionTrait
      * @param string $edition The minimum required edition
      * @param string|null $featureName Optional feature name for error message
      * @throws ForbiddenHttpException If the current edition is below the required edition
-     * @since 5.0.0
      */
     public function requireEdition(string $edition, ?string $featureName = null): void
     {
@@ -238,7 +225,6 @@ trait EditionTrait
      *
      * @param string|null $edition Edition constant, or null for current edition
      * @return string Capitalized edition name (e.g., "Standard", "Lite", "Pro")
-     * @since 5.0.0
      */
     public function getEditionName(?string $edition = null): string
     {
@@ -253,7 +239,6 @@ trait EditionTrait
      * Get the current edition handle
      *
      * @return string The current edition (e.g., 'standard', 'lite', 'pro')
-     * @since 5.0.0
      */
     public function getEditionHandle(): string
     {
@@ -266,11 +251,34 @@ trait EditionTrait
      * Useful for conditionally showing edition-related UI.
      *
      * @return bool True if more than one edition is available
-     * @since 5.0.0
      */
     public function hasMultipleEditions(): bool
     {
         return count(static::editions()) > 1;
+    }
+
+    /**
+     * Compare two arbitrary editions (not the active one)
+     *
+     * Unlike `isAtLeast()` which compares against the active edition,
+     * this compares any two edition strings against the editions() hierarchy.
+     * Useful inside `getEditionFeatures()` to build comparison tables.
+     *
+     * @param string $edition The edition to check
+     * @param string $minEdition The minimum required edition
+     * @return bool True if $edition is at least $minEdition in the hierarchy
+     */
+    protected static function editionIsAtLeast(string $edition, string $minEdition): bool
+    {
+        $editions = static::editions();
+        $editionIndex = array_search($edition, $editions, true);
+        $minIndex = array_search($minEdition, $editions, true);
+
+        if ($editionIndex === false || $minIndex === false) {
+            return false;
+        }
+
+        return $editionIndex >= $minIndex;
     }
 
     /**
@@ -285,7 +293,7 @@ trait EditionTrait
      *         'CSV export' => true,
      *     ];
      *
-     *     if ($this->is($edition, '>=', self::EDITION_PRO)) {
+     *     if (static::editionIsAtLeast($edition, self::EDITION_PRO)) {
      *         $features['Cloud backups'] = true;
      *         $features['CLI commands'] = true;
      *     }
@@ -296,7 +304,6 @@ trait EditionTrait
      *
      * @param string $edition The edition to get features for
      * @return array<string, bool> Feature names mapped to availability
-     * @since 5.0.0
      */
     public function getEditionFeatures(string $edition): array
     {
@@ -311,7 +318,6 @@ trait EditionTrait
      *
      * @param string $featureName The feature to check
      * @return bool True if the feature is available
-     * @since 5.0.0
      */
     public function hasFeature(string $featureName): bool
     {

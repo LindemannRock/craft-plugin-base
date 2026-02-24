@@ -58,7 +58,6 @@ trait SettingsConfigTrait
      * Example: 'redirect-manager' for config/redirect-manager.php
      *
      * @return string
-     * @since 5.0.0
      */
     abstract protected static function pluginHandle(): string;
 
@@ -75,7 +74,6 @@ trait SettingsConfigTrait
      *
      * @param string $attribute The setting attribute name or dot-notation path
      * @return bool True if the setting is defined in config file
-     * @since 5.0.0
      */
     public function isOverriddenByConfig(string $attribute): bool
     {
@@ -140,7 +138,6 @@ trait SettingsConfigTrait
      * @param string $attribute The attribute being validated
      * @param array|null $params Validation parameters
      * @param mixed $validator The validator instance
-     * @since 5.0.0
      */
     public function validateLogLevel($attribute, $params, $validator): void
     {

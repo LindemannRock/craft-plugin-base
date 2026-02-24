@@ -28,7 +28,6 @@ class CpNavHelper
      * @param Model|null $settings Plugin settings (DB-backed)
      * @param array $sections Section definitions
      * @return array
-     * @since 5.14.0
      */
     public static function buildSubnav(User $user, ?Model $settings, array $sections): array
     {
@@ -63,7 +62,6 @@ class CpNavHelper
      * @param Model|null $settings Plugin settings (DB-backed)
      * @param array $sections Section definitions
      * @return string|null
-     * @since 5.14.0
      */
     public static function firstAccessibleRoute(User $user, ?Model $settings, array $sections): ?string
     {

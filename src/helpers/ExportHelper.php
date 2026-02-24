@@ -79,7 +79,6 @@ class ExportHelper
      *
      * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return array
-     * @since 5.8.0
      */
     public static function getConfig(?string $pluginHandle = null): array
     {
@@ -116,7 +115,6 @@ class ExportHelper
      * @param string $format 'csv', 'json', 'excel', 'xlsx', or 'xls'
      * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return bool
-     * @since 5.8.0
      */
     public static function isFormatEnabled(string $format, ?string $pluginHandle = null): bool
     {
@@ -132,7 +130,6 @@ class ExportHelper
      *
      * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return array ['csv', 'json', 'excel']
-     * @since 5.8.0
      */
     public static function getEnabledFormats(?string $pluginHandle = null): array
     {
@@ -164,7 +161,6 @@ class ExportHelper
      * ```
      *
      * @return array Array of options with 'value' and 'label' keys
-     * @since 5.8.0
      */
     public static function getFormatOptions(): array
     {
@@ -201,7 +197,6 @@ class ExportHelper
      * @param array $rows Data rows to check
      * @param string|null $message Custom error message
      * @throws BadRequestHttpException If rows are empty
-     * @since 5.8.0
      */
     public static function assertNotEmpty(array $rows, ?string $message = null): void
     {
@@ -218,7 +213,6 @@ class ExportHelper
      * @param string $filename Output filename
      * @param array $dateColumns Column keys to format as database datetime
      * @return Response
-     * @since 5.8.0
      */
     public static function toCsv(
         array $rows,
@@ -239,7 +233,6 @@ class ExportHelper
      * @param array $dateColumns Column keys to format as ISO 8601
      * @param bool $pretty Pretty print JSON
      * @return Response
-     * @since 5.8.0
      */
     public static function toJson(
         array $data,
@@ -271,7 +264,6 @@ class ExportHelper
      * @param array $dateColumns Column keys to format as database datetime
      * @param array $options Additional options (sheetTitle, freezeHeader, autoFilter, columnWidths)
      * @return Response
-     * @since 5.8.0
      */
     public static function toExcel(
         array $rows,
@@ -616,7 +608,6 @@ class ExportHelper
      * @param array|string|null $partsOrExtension Array of parts or extension string
      * @param string|null $extension File extension (when using parts array)
      * @return string Generated filename
-     * @since 5.8.0
      */
     public static function filename(
         object|string $pluginOrPrefix,
@@ -664,7 +655,6 @@ class ExportHelper
      * @param array $rows Data rows
      * @param array $dateColumns Column keys containing dates
      * @return array Rows with formatted dates
-     * @since 5.8.0
      */
     public static function formatDateColumns(array $rows, array $dateColumns): array
     {
@@ -691,7 +681,6 @@ class ExportHelper
      * @param array $rows Data rows
      * @param array $dateColumns Column keys containing dates
      * @return array Rows with formatted dates
-     * @since 5.8.0
      */
     public static function formatDateColumnsForApi(array $rows, array $dateColumns): array
     {

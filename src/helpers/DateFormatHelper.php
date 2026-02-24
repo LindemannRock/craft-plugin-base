@@ -65,7 +65,6 @@ class DateFormatHelper
      * Get configuration from config/lindemannrock-base.php
      *
      * @return array
-     * @since 5.8.0
      */
     public static function getConfig(): array
     {
@@ -80,7 +79,6 @@ class DateFormatHelper
      * Get time format preference
      *
      * @return string '12' or '24'
-     * @since 5.8.0
      */
     public static function getTimeFormat(): string
     {
@@ -91,7 +89,6 @@ class DateFormatHelper
      * Get date order preference
      *
      * @return string 'dmy', 'mdy', or 'ymd'
-     * @since 5.8.0
      */
     public static function getDateOrder(): string
     {
@@ -102,7 +99,6 @@ class DateFormatHelper
      * Get date separator preference
      *
      * @return string '/', '-', or '.'
-     * @since 5.8.0
      */
     public static function getDateSeparator(): string
     {
@@ -113,7 +109,6 @@ class DateFormatHelper
      * Get default showSeconds preference
      *
      * @return bool
-     * @since 5.8.0
      */
     public static function getShowSeconds(): bool
     {
@@ -124,7 +119,6 @@ class DateFormatHelper
      * Get month format preference
      *
      * @return string 'numeric', 'short', or 'long'
-     * @since 5.8.0
      */
     public static function getMonthFormat(): string
     {
@@ -133,8 +127,6 @@ class DateFormatHelper
 
     /**
      * Clear cached config (useful for testing)
-     *
-     * @since 5.8.0
      */
     public static function clearConfigCache(): void
     {
@@ -156,7 +148,6 @@ class DateFormatHelper
      * @param DateTime|string|null $date
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return DateTime|null
-     * @since 5.8.0
      */
     public static function toCraftTimezone(DateTime|string|null $date, bool $isUtc = true): ?DateTime
     {
@@ -286,7 +277,6 @@ class DateFormatHelper
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public static function formatDatetime(
         DateTime|string|null $date,
@@ -317,7 +307,6 @@ class DateFormatHelper
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null Example: "Jan 23, 15:45" or "23 Jan 15:45"
-     * @since 5.8.0
      */
     public static function formatCompactDatetime(
         DateTime|string|null $date,
@@ -335,7 +324,6 @@ class DateFormatHelper
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public static function formatDate(
         DateTime|string|null $date,
@@ -452,7 +440,6 @@ class DateFormatHelper
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public static function formatTime(
         DateTime|string|null $date,
@@ -489,7 +476,6 @@ class DateFormatHelper
      * @param DateTime|string|null $date
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null Example: "Jan 22"
-     * @since 5.8.0
      */
     public static function formatShortDate(DateTime|string|null $date, bool $isUtc = true): ?string
     {
@@ -507,7 +493,6 @@ class DateFormatHelper
      * @param DateTime|string|null $date
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
-     * @since 5.8.0
      */
     public static function formatRelative(DateTime|string|null $date, bool $isUtc = true): ?string
     {
@@ -531,7 +516,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22 15:45:32"
-     * @since 5.8.0
      */
     public static function toDateTimeString(DateTime|string|null $date): ?string
     {
@@ -555,7 +539,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22"
-     * @since 5.8.0
      */
     public static function toDateString(DateTime|string|null $date): ?string
     {
@@ -579,7 +562,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22 00:00:00"
-     * @since 5.8.0
      */
     public static function toDayStartString(DateTime|string|null $date): ?string
     {
@@ -603,7 +585,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22 23:59:59"
-     * @since 5.8.0
      */
     public static function toDayEndString(DateTime|string|null $date): ?string
     {
@@ -631,7 +612,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return string|null "2026-01-22T15:45:32+00:00"
-     * @since 5.8.0
      */
     public static function toApiString(DateTime|string|null $date): ?string
     {
@@ -660,7 +640,6 @@ class DateFormatHelper
      * @param DateTime|string|null $date Defaults to now if null
      * @param bool $includeTime Whether to include time portion
      * @return string "2026-01-22-154532" or "2026-01-22"
-     * @since 5.8.0
      */
     public static function toFilenameString(
         DateTime|string|null $date = null,
@@ -691,7 +670,6 @@ class DateFormatHelper
      * Get current datetime in Craft timezone
      *
      * @return DateTime
-     * @since 5.8.0
      */
     public static function now(): DateTime
     {
@@ -704,7 +682,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return bool
-     * @since 5.8.0
      */
     public static function isToday(DateTime|string|null $date): bool
     {
@@ -722,7 +699,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return bool
-     * @since 5.8.0
      */
     public static function isPast(DateTime|string|null $date): bool
     {
@@ -739,7 +715,6 @@ class DateFormatHelper
      *
      * @param DateTime|string|null $date
      * @return bool
-     * @since 5.8.0
      */
     public static function isFuture(DateTime|string|null $date): bool
     {

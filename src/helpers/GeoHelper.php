@@ -591,7 +591,6 @@ class GeoHelper
      *
      * @param string $countryCode Two-letter country code (e.g., 'US', 'GB')
      * @return string Country name, or the original code if not found
-     * @since 5.3.0
      */
     public static function getCountryName(string $countryCode): string
     {
@@ -608,7 +607,6 @@ class GeoHelper
      * Get all countries as an array
      *
      * @return array<string, string> Country codes mapped to names
-     * @since 5.3.0
      */
     public static function getAllCountries(): array
     {
@@ -620,7 +618,6 @@ class GeoHelper
      *
      * @param string $countryCode Two-letter country code
      * @return bool True if valid ISO 3166-1 alpha-2 code
-     * @since 5.3.0
      */
     public static function isValidCountryCode(string $countryCode): bool
     {

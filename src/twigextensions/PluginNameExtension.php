@@ -53,7 +53,6 @@ class PluginNameExtension extends AbstractExtension implements GlobalsInterface
      *
      * @param PluginInterface $plugin The plugin instance
      * @param string $variableName The Twig global variable name (e.g., 'redirectHelper')
-     * @since 5.0.0
      */
     public function __construct(PluginInterface $plugin, string $variableName)
     {
