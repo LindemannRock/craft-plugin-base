@@ -110,7 +110,7 @@ public function getAnalytics(): array
 
 ## Feature Comparison
 
-Override `getEditionFeatures()` to provide edition comparison data:
+Override `getEditionFeatures()` to provide edition comparison data. Use `editionIsAtLeast()` to compare the given edition against the hierarchy (unlike `isAtLeast()`, which checks the *active* edition):
 
 ```php
 public function getEditionFeatures(string $edition): array
@@ -120,7 +120,7 @@ public function getEditionFeatures(string $edition): array
         'CSV export' => true,
     ];
 
-    if ($this->is($edition, '>=', self::EDITION_PRO)) {
+    if (static::editionIsAtLeast($edition, self::EDITION_PRO)) {
         $features['Analytics dashboard'] = true;
         $features['API access'] = true;
         $features['CLI commands'] = true;

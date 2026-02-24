@@ -107,31 +107,31 @@ $defaultRoute = CpNavHelper::firstAccessibleRoute($user, $settings, $sections);
 
 ```php
 // In your Plugin class
-public function getCpNavItems(): array
+public function getCpNavItem(): ?array
 {
-    $navItems = parent::getCpNavItems();
-    $navItems['subnav'] = CpNavHelper::buildSubnav(
-        Craft::$app->getUser(),
-        $this->getSettings(),
-        $this->getSections()
-    );
-    return $navItems;
+    $item = parent::getCpNavItem();
+
+    if ($item) {
+        $settings = $this->getSettings();
+        $user = Craft::$app->getUser();
+        $sections = $this->getCpSections($settings);
+
+        $item['subnav'] = CpNavHelper::buildSubnav($user, $settings, $sections);
+
+        if (empty($item['subnav'])) {
+            return null;
+        }
+    }
+
+    return $item;
 }
 
-public function getCpUrl(): ?string
-{
-    return CpNavHelper::firstAccessibleRoute(
-        Craft::$app->getUser(),
-        $this->getSettings(),
-        $this->getSections()
-    );
-}
-
-private function getSections(): array
+private function getCpSections(Settings $settings): array
 {
     return [
-        ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => 'my-plugin', ...],
-        ['key' => 'logs', 'label' => 'Logs', 'url' => 'my-plugin/logs', ...],
+        ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => 'my-plugin'],
+        ['key' => 'logs', 'label' => 'Logs', 'url' => 'my-plugin/logs', 'permissionsAny' => ['myPlugin:manageLogs']],
+        ['key' => 'settings', 'label' => 'Settings', 'url' => 'my-plugin/settings', 'permissionsAll' => ['myPlugin:manageSettings']],
     ];
 }
 ```

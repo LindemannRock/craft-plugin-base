@@ -61,6 +61,14 @@ $geoData = $this->lookupGeoIp($ip, [
 | `provider` | `string` | `'ip-api.com'` | Geo lookup provider |
 | `apiKey` | `string\|null` | `null` | API key (if provider requires one) |
 
+### Available Providers
+
+| Provider | Free Tier | Protocol | Notes |
+|----------|-----------|----------|-------|
+| `ip-api.com` | 45 requests/min | HTTP (free), HTTPS (with API key) | Default provider |
+| `ipapi.co` | 1,000 requests/day | HTTPS | No API key required for free tier |
+| `ipinfo.io` | 50,000 requests/month | HTTPS | Requires free API key |
+
 ## Typical Usage
 
 ```php

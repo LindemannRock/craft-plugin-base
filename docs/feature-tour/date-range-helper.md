@@ -17,13 +17,15 @@ Standard date range parsing for analytics, logs, and any date-filtered CP pages.
 | `lastYear` | January 1st of last year to January 1st of current year |
 | `all` | No date filter (returns all records) |
 
-## Getting the Default Range
+## Getting the Default Range @since(5.3.0)
 
 The default date range resolves through a priority chain:
 
-1. Plugin-specific config: `defaultDateRange` in `config/{plugin-handle}.php`
-2. Base config: `defaultDateRange` in `config/lindemannrock-base.php`
-3. Hardcoded fallback: `'last30days'`
+1. Plugin config: `defaultDateRange` in `config/{plugin-handle}.php`
+2. Plugin config: `analytics.defaultDateRange` (legacy key)
+3. Base config: `defaultDateRange` in `config/lindemannrock-base.php`
+4. Base config: `analytics.defaultDateRange` (legacy key)
+5. Hardcoded fallback: `'last30days'`
 
 ```php
 use lindemannrock\base\helpers\DateRangeHelper;
@@ -96,7 +98,7 @@ $days = DateRangeHelper::getDaysCount('thisMonth');   // Day of month (1–31)
 $days = DateRangeHelper::getDaysCount('lastYear');    // 365 or 366
 ```
 
-## Dropdown Options
+## Dropdown Options @since(5.3.0)
 
 Get options for date range dropdowns in templates.
 
