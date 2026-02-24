@@ -20,7 +20,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **CsvImportHelper** — CSV upload parsing with configurable options
 - **CpNavHelper** — CP subnav building with permission checks
 - **Device Detection** — standardized UA parsing via Matomo DeviceDetector
-- **GeoLookup** — IP geolocation via MaxMind or ip-api
+- **GeoLookup** — IP geolocation via configurable providers (ip-api.com, ipapi.co, ipinfo.io)
 - **CP Table Layout** — reusable table pages with filters, search, pagination, and AJAX refresh
 - **CP Analytics Layout** — analytics dashboards with tabs, charts, stat boxes, and date filters
 - **Twig Extensions** — 30+ filters and functions for dates, colors, exports, geo, and plugin detection
