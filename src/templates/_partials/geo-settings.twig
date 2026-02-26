@@ -25,9 +25,9 @@
     name: 'settings[geoProvider]',
     value: settings.geoProvider ?? 'ip-api.com',
     options: {
-        'ip-api.com': 'ip-api.com (HTTP free, HTTPS paid)',
-        'ipapi.co': 'ipapi.co (HTTPS, 1k/day free)',
-        'ipinfo.io': 'ipinfo.io (HTTPS, 50k/month free)',
+        'ip-api.com': 'ip-api.com (HTTP free, HTTPS paid)'|t(pluginHandle),
+        'ipapi.co': 'ipapi.co (HTTPS, 1k/day free)'|t(pluginHandle),
+        'ipinfo.io': 'ipinfo.io (HTTPS, 50k/month free)'|t(pluginHandle),
     },
     disabled: settings.isOverriddenByConfig('geoProvider'),
     warning: settings.isOverriddenByConfig('geoProvider') ?
