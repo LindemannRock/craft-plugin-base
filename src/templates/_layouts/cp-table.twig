@@ -159,6 +159,15 @@
 {% set urlParams = {} %}
 {% for filter in filters %}
     {% set urlParams = urlParams|merge({(filter.param): filter.current}) %}
+    {% if filter.groups ?? false %}
+        {% for group in filter.groups %}
+            {% set groupParam = group.param ?? filter.param %}
+            {% set groupCurrent = group.current ?? filter.current %}
+            {% if groupCurrent is not same as(null) and groupCurrent != '' %}
+                {% set urlParams = urlParams|merge({(groupParam): groupCurrent}) %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {% endfor %}
 {% set urlParams = urlParams|merge({
     search: searchValue,
