@@ -19,8 +19,8 @@
 {% import "_includes/forms" as forms %}
 
 {{ forms.selectField({
-    label: 'Geo Provider'|t('base'),
-    instructions: 'Select the geo IP lookup provider. HTTPS providers recommended for privacy.'|t('base'),
+    label: 'Geo Provider'|t(pluginHandle),
+    instructions: 'Select the geo IP lookup provider. HTTPS providers recommended for privacy.'|t(pluginHandle),
     id: 'geoProvider',
     name: 'settings[geoProvider]',
     value: settings.geoProvider ?? 'ip-api.com',
@@ -31,13 +31,12 @@
     },
     disabled: settings.isOverriddenByConfig('geoProvider'),
     warning: settings.isOverriddenByConfig('geoProvider') ?
-        ("This is being overridden by the <code>geoProvider</code> setting in <code>config/" ~ pluginHandle ~ ".php</code>.")|t('base')|raw : null,
+        ("This is being overridden by the <code>geoProvider</code> setting in <code>config/" ~ pluginHandle ~ ".php</code>.")|t(pluginHandle)|raw : null,
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'API Key'|t('base'),
-    instructions: 'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).'|t('base'),
-    tip: 'This can begin with an environment variable. <a href="https://craftcms.com/docs/5.x/configure.html#env" target="_blank" rel="noopener">Learn more</a>'|t('base'),
+    label: 'API Key'|t(pluginHandle),
+    instructions: 'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).'|t(pluginHandle),
     id: 'geoApiKey',
     name: 'settings[geoApiKey]',
     value: settings.geoApiKey,
@@ -45,12 +44,12 @@
     placeholder: '$IP_API_KEY',
     disabled: settings.isOverriddenByConfig('geoApiKey'),
     warning: settings.isOverriddenByConfig('geoApiKey') ?
-        ("This is being overridden by the <code>geoApiKey</code> setting in <code>config/" ~ pluginHandle ~ ".php</code>.")|t('base')|raw : null,
+        ("This is being overridden by the <code>geoApiKey</code> setting in <code>config/" ~ pluginHandle ~ ".php</code>.")|t(pluginHandle)|raw : null,
 }) }}
 
 <div id="geo-http-warning" class="{{ (settings.geoProvider ?? 'ip-api.com') != 'ip-api.com' or settings.geoApiKey ? 'hidden' : '' }}" style="margin-top: 24px;">
     {% include 'lindemannrock-base/_components/info-box' with {
-        message: '<span id="geo-warning-message">' ~ "ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io."|t('base') ~ '</span>',
+        message: '<span id="geo-warning-message">' ~ "ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io."|t(pluginHandle) ~ '</span>',
         type: 'warning',
         margin: 'none'
     } %}
@@ -58,7 +57,7 @@
 
 <div id="geo-provider-info">
     {% include 'lindemannrock-base/_components/info-box' with {
-        message: '<span id="geo-provider-info-message"><strong>ip-api.com:</strong> HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.</span>',
+        message: '<span id="geo-provider-info-message">' ~ "ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key."|t(pluginHandle) ~ '</span>',
         type: 'info',
         margin: 'top'
     } %}
@@ -74,17 +73,17 @@
     const providerConfig = {
         'ip-api.com': {
             placeholder: '$IP_API_KEY',
-            info: '<strong>ip-api.com:</strong> HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.',
+            info: {{ "ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key."|t(pluginHandle)|json_encode|raw }},
             showHttpWarning: true
         },
         'ipapi.co': {
             placeholder: '$IPAPI_CO_KEY',
-            info: '<strong>ipapi.co:</strong> HTTPS with 1,000 free requests/day. API key optional (increases rate limits).',
+            info: {{ "ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits)."|t(pluginHandle)|json_encode|raw }},
             showHttpWarning: false
         },
         'ipinfo.io': {
             placeholder: '$IPINFO_IO_KEY',
-            info: '<strong>ipinfo.io:</strong> HTTPS with 50,000 free requests/month. API key optional (increases rate limits).',
+            info: {{ "ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits)."|t(pluginHandle)|json_encode|raw }},
             showHttpWarning: false
         }
     };
