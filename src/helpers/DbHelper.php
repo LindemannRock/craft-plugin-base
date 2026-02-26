@@ -98,22 +98,26 @@ class DbHelper
      * MySQL:      GROUP_CONCAT(expression SEPARATOR separator)
      * PostgreSQL: STRING_AGG(expression::text, separator)
      *
-     * @param string $expression The SQL expression to aggregate
+     * @param string|Expression $expression The SQL expression to aggregate
      * @param string $separator The separator between values (default ',')
      * @return string Raw SQL expression string
      * @throws \InvalidArgumentException if expression contains unsafe characters
      */
-    public static function groupConcat(string $expression, string $separator = ','): string
+    public static function groupConcat(string|Expression $expression, string $separator = ','): string
     {
-        self::validateExpression($expression);
+        $expressionSql = $expression instanceof Expression ? $expression->expression : $expression;
+        if (!($expression instanceof Expression)) {
+            self::validateExpression($expressionSql);
+        }
+
         $quotedSeparator = str_replace("'", "''", $separator);
 
         if (Craft::$app->getDb()->getIsMysql()) {
-            return "GROUP_CONCAT($expression SEPARATOR '$quotedSeparator')";
+            return "GROUP_CONCAT($expressionSql SEPARATOR '$quotedSeparator')";
         }
 
         // PostgreSQL
-        return "STRING_AGG(($expression)::text, '$quotedSeparator')";
+        return "STRING_AGG(($expressionSql)::text, '$quotedSeparator')";
     }
 
     /**
