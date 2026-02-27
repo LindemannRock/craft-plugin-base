@@ -1,0 +1,38 @@
+{#
+ # Reusable error summary for settings/edit pages.
+ #
+ # Params:
+ # - errors: map of field => [messages]
+ # - linkMode: 'field-id' (default) or 'data-key'
+ # - translationCategory: translation domain (default: 'app')
+ #}
+{% set errors = errors ?? {} %}
+{% set linkMode = linkMode ?? 'field-id' %}
+{% set translationCategory = translationCategory ?? 'app' %}
+
+{% set errorCount = 0 %}
+{% for fieldErrors in errors %}
+    {% set errorCount = errorCount + fieldErrors|length %}
+{% endfor %}
+
+{% if errorCount > 0 %}
+    <div class="error-summary" tabindex="-1">
+        <div>
+            <span class="notification-icon" data-icon="alert" aria-label="{{ 'error'|t(translationCategory) }}" role="img"></span>
+            <h2>{{ 'Found {count, number} {count, plural, =1{error} other{errors}}'|t(translationCategory, {count: errorCount}) }}</h2>
+        </div>
+        <ul class="errors">
+            {% for field, fieldErrors in errors %}
+                {% for error in fieldErrors %}
+                    <li>
+                        {% if linkMode == 'data-key' %}
+                            <a href="#" data-field-error-key="{{ field }}">{{ error }}</a>
+                        {% else %}
+                            <a href="#{{ field }}-field" data-field-error-key="{{ field }}">{{ error }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
