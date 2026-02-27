@@ -22,6 +22,7 @@ class StoragePathValidator extends Validator
      * @var bool Whether to block webroot/web-accessible storage paths
      */
     public bool $preventWebroot = true;
+    public bool $requireAlias = false;
 
     public function validateAttribute($model, $attribute): void
     {
@@ -34,6 +35,26 @@ class StoragePathValidator extends Validator
             $model->addError(
                 $attribute,
                 Craft::t($this->translationCategory, 'Path cannot contain parent directory traversal ("..").')
+            );
+            return;
+        }
+
+        if (preg_match('/^@web(root)?(?:\/|$)/i', $value) === 1) {
+            $model->addError(
+                $attribute,
+                Craft::t($this->translationCategory, 'Path cannot use @web or @webroot because those are web-accessible.')
+            );
+            return;
+        }
+
+        if ($this->requireAlias && !str_starts_with($value, '@')) {
+            $model->addError(
+                $attribute,
+                Craft::t(
+                    $this->translationCategory,
+                    'Path must start with one of: {aliases}.',
+                    ['aliases' => implode(', ', $this->allowedAliases)]
+                )
             );
             return;
         }
@@ -67,6 +88,14 @@ class StoragePathValidator extends Validator
             $model->addError(
                 $attribute,
                 Craft::t($this->translationCategory, 'Invalid path: {error}', ['error' => $e->getMessage()])
+            );
+            return;
+        }
+
+        if (filter_var($resolvedPath, FILTER_VALIDATE_URL) !== false) {
+            $model->addError(
+                $attribute,
+                Craft::t($this->translationCategory, 'Path must resolve to a local filesystem path, not a URL.')
             );
             return;
         }
