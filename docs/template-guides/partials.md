@@ -188,7 +188,7 @@ Renders a provider select, API key input, HTTP warning for ip-api.com free tier,
 ```twig
 {% include 'lindemannrock-base/_partials/geo-settings' with {
     settings: settings,
-    pluginHandle: 'search-manager',
+    translationCategory: 'search-manager',
 } %}
 ```
 

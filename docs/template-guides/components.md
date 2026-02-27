@@ -695,19 +695,18 @@ window.lrPhoneInput.sanitize('+1 (202) 555-1234')  // '12025551234'
 
 Error banner for settings pages when IP hash salt is missing but analytics is enabled. Shows copy-to-clipboard commands for generating the salt.
 
-**Path:** `lindemannrock-base/_components/ip-salt-error`
+**Path:** `lindemannrock-base/_partials/ip-salt-error`
 
 ```twig
-{% include 'lindemannrock-base/_components/ip-salt-error' with {
-    pluginHandle: 'redirect-manager',
-    envVarName: 'REDIRECT_MANAGER_IP_SALT',
+{% include 'lindemannrock-base/_partials/ip-salt-error' with {
+    translationCategory: 'redirect-manager',
 } %}
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `pluginHandle` | `string` | Plugin handle to check settings |
-| `envVarName` | `string` | Environment variable name for the salt |
+| `translationCategory` | `string` | Plugin translation category (also used as plugin ID lookup) |
+| `envVarName` | `string` | Optional env var name override (defaults to `<CATEGORY>_IP_SALT`) |
 
 The banner only renders when `enableAnalytics` is `true` and the salt is missing or still set to the raw variable reference.
 
