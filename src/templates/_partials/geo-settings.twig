@@ -30,6 +30,7 @@
         'ipapi.co': 'ipapi.co (HTTPS, 1k/day free)'|t(translationCategory),
         'ipinfo.io': 'ipinfo.io (HTTPS, 50k/month free)'|t(translationCategory),
     },
+    errors: settings.getErrors('geoProvider'),
     disabled: settings.isOverriddenByConfig('geoProvider'),
     warning: settings.isOverriddenByConfig('geoProvider') ?
         ("This is being overridden by the <code>geoProvider</code> setting in <code>config/" ~ translationCategory ~ ".php</code>.")|t(translationCategory)|raw : null,
@@ -43,6 +44,7 @@
     value: settings.geoApiKey,
     suggestEnvVars: true,
     placeholder: '$IP_API_KEY',
+    errors: settings.getErrors('geoApiKey'),
     disabled: settings.isOverriddenByConfig('geoApiKey'),
     warning: settings.isOverriddenByConfig('geoApiKey') ?
         ("This is being overridden by the <code>geoApiKey</code> setting in <code>config/" ~ translationCategory ~ ".php</code>.")|t(translationCategory)|raw : null,
