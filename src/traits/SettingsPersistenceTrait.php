@@ -211,10 +211,10 @@ trait SettingsPersistenceTrait
      *
      * @return bool True on success, false on failure
      */
-    public function saveToDatabase(): bool
+    public function saveToDatabase(?array $attributesToValidate = null): bool
     {
         // Validate settings first
-        if (!$this->validate()) {
+        if (!$this->validate($attributesToValidate)) {
             Craft::error('Settings validation failed: ' . json_encode($this->getErrors()), __METHOD__);
             return false;
         }
