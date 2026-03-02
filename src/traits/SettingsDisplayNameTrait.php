@@ -61,8 +61,11 @@ trait SettingsDisplayNameTrait
             return $this->singularDisplayName;
         }
 
-        // Strip "Manager" or "manager" from the name and trim whitespace
+        // Strip "Manager" or "manager" from the name, but only if other words remain
         $name = trim(str_replace([' Manager', ' manager'], '', $this->pluginName));
+        if ($name === '') {
+            return trim($this->pluginName);
+        }
 
         return self::singularize($name);
     }
@@ -161,8 +164,11 @@ trait SettingsDisplayNameTrait
      */
     public function getPluralDisplayName(): string
     {
-        // Strip "Manager" or "manager" from the name and trim whitespace
+        // Strip "Manager" or "manager" from the name, but only if other words remain
         $name = trim(str_replace([' Manager', ' manager'], '', $this->pluginName));
+        if ($name === '') {
+            $name = trim($this->pluginName);
+        }
 
         // Add 's' if not already ending in 's' (case-insensitive check)
         if (!str_ends_with(strtolower($name), 's')) {
