@@ -342,10 +342,11 @@ class ColorHelper
             'backupReason' => [
                 'import' => self::PALETTE['blue'],
                 'restore' => self::PALETTE['orange'],
-                'manual' => self::PALETTE['teal'],
+                'manual' => self::PALETTE['cyan'],
                 'scheduled' => self::PALETTE['purple'],
-                'maintenance' => self::PALETTE['gray'],
+                'clean' => self::PALETTE['yellow'],
                 'clear' => self::PALETTE['red'],
+                'maintenance' => self::PALETTE['gray'],
                 'other' => self::PALETTE['gray'],
             ],
         ];
