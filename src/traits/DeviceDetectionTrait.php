@@ -55,12 +55,12 @@ trait DeviceDetectionTrait
     {
         $config = array_replace($this->getDeviceDetectionConfig(), $overrideConfig);
 
-        // Prefer plugin logging if available
+        // Prefer plugin logging if available — use closures to preserve protected visibility
         if (!isset($config['logWarning']) && method_exists($this, 'logWarning')) {
-            $config['logWarning'] = [$this, 'logWarning'];
+            $config['logWarning'] = fn(string $msg, array $ctx = []) => $this->logWarning($msg, $ctx);
         }
         if (!isset($config['logError']) && method_exists($this, 'logError')) {
-            $config['logError'] = [$this, 'logError'];
+            $config['logError'] = fn(string $msg, array $ctx = []) => $this->logError($msg, $ctx);
         }
 
         if ($this->deviceDetection === null || !empty($overrideConfig)) {
@@ -79,11 +79,12 @@ trait DeviceDetectionTrait
     {
         $config = array_replace($this->getDeviceDetectionConfig(), $overrideConfig);
 
+        // Use closures to preserve protected visibility
         if (!isset($config['logWarning']) && method_exists($this, 'logWarning')) {
-            $config['logWarning'] = [$this, 'logWarning'];
+            $config['logWarning'] = fn(string $msg, array $ctx = []) => $this->logWarning($msg, $ctx);
         }
         if (!isset($config['logError']) && method_exists($this, 'logError')) {
-            $config['logError'] = [$this, 'logError'];
+            $config['logError'] = fn(string $msg, array $ctx = []) => $this->logError($msg, $ctx);
         }
 
         if ($this->deviceDetection === null || !empty($overrideConfig)) {
