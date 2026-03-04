@@ -27,6 +27,7 @@
             "feature-tour/geo-helper",
             "feature-tour/geo-lookup",
             "feature-tour/device-detection",
+            "feature-tour/queue-ttr",
             "feature-tour/db-helper",
             "feature-tour/csv-import-helper",
             "feature-tour/cp-nav-helper"

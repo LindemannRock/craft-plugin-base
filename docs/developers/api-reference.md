@@ -278,6 +278,17 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `detectDeviceInfo(?string $ua, array $config)` | `array` | Detect device/browser/OS |
+
+### QueueTtrTrait
+
+[Full docs](../feature-tour/queue-ttr.md) — Shared queue TTR for long-running jobs.
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `queueTtrSeconds()` | `int` | Override per job TTR in seconds (default `1800`) |
+| `getTtr()` | `int` | Returns queue TTR used by retryable jobs |
+
+> `getTtr()` is used by yii2-queue when the job implements `RetryableJobInterface`.
 | `detectLanguageFromConfig(array $overrideConfig = [])` | `string` | Detect browser language |
 | `buildDeviceModel(array $data, string $class, array $map)` | `object` | Map detection data to model |
 | `getDeviceDetectionConfig(): array` | `array` | Return config (default: `[]`) |

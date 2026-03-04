@@ -28,6 +28,7 @@ Reusable traits for Settings models and plugin classes:
 - **[EditionTrait](edition-support.md)** — Plugin editions (Lite/Standard/Pro)
 - **[DeviceDetectionTrait](device-detection.md)** — User-agent parsing for device, browser, and OS detection
 - **[GeoLookupTrait](geo-lookup.md)** — IP geolocation in service classes
+- **[QueueTtrTrait](queue-ttr.md)** — Shared queue TTR (`getTtr()`) with per-job override support
 
 ### Twig Extensions
 
