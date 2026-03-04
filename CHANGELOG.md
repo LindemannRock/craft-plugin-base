@@ -1,5 +1,27 @@
 # Changelog
 
+## [5.18.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.17.0...v5.18.0) (2026-03-04)
+
+
+### Features
+
+* **traits:** add QueueTtrTrait for shared TTR implementation in queue jobs ([9c893fb](https://github.com/LindemannRock/craft-plugin-base/commit/9c893fb2bb03c3463a20cbcbace4d803d5bba688))
+* **validators:** add RoutePrefixValidator, TemplatePathValidator, and UrlOrPathValidator ([8f2c741](https://github.com/LindemannRock/craft-plugin-base/commit/8f2c741ddf33b9403c5b6924f32ff2c3c227ff6b))
+* **validators:** add StoragePathValidator for validating storage paths ([38a58f1](https://github.com/LindemannRock/craft-plugin-base/commit/38a58f1c44f63d5c4234530f281d05b900e2854b))
+
+
+### Bug Fixes
+
+* **ColorHelper:** update color mappings for backup reasons ([21b69ae](https://github.com/LindemannRock/craft-plugin-base/commit/21b69ae326bf416fb3fe2caa7b6b728f2b1b0c57))
+* **cp-table:** enhance URL parameter handling for filter groups ([fe824f9](https://github.com/LindemannRock/craft-plugin-base/commit/fe824f9b43d7b72078af4fbd0946da76e07bdd73))
+* **DbHelper:** update groupConcat to accept Expression type ([7091bfb](https://github.com/LindemannRock/craft-plugin-base/commit/7091bfbcdc6041ce263ca2623a5337ccc5738e73))
+* **geo-settings:** add error handling for geoProvider and geoApiKey fields ([7708145](https://github.com/LindemannRock/craft-plugin-base/commit/7708145a391e761025e77d0c2e83bf8420129326))
+* **geo-settings:** update geo provider options with translation support ([6968184](https://github.com/LindemannRock/craft-plugin-base/commit/6968184288b08c1bce4acacc78d524a8d0e97cd2))
+* normalize error-summary partial i18n domain handling ([9d465d3](https://github.com/LindemannRock/craft-plugin-base/commit/9d465d3a03dc7a4fa35829d320ef35ef2726ca41))
+* **traits:** improve display name handling in SettingsDisplayNameTrait ([9f95e26](https://github.com/LindemannRock/craft-plugin-base/commit/9f95e265ce67bcf3b239985e4426e031622100ec))
+* **traits:** improve logging configuration in DeviceDetectionTrait ([c941435](https://github.com/LindemannRock/craft-plugin-base/commit/c941435e37137b903199d0831b446eb05f0d965f))
+* **validators:** enhance StoragePathValidator error handling ([ccf5f1d](https://github.com/LindemannRock/craft-plugin-base/commit/ccf5f1dbf3af74fa2cbeae147670c4d414476184))
+
 ## [5.17.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.16.0...v5.17.0) (2026-02-22)
 
 
