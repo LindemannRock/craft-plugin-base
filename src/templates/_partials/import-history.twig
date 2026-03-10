@@ -1,0 +1,59 @@
+{#
+ # Import History Partial
+ #
+ # Parameters:
+ # - sectionId: container id (default: import-history)
+ # - title: section title
+ # - importHistory: rows with formattedDate, user, filename, formattedSize, imported, failed
+ # - canClearHistory: whether clear button is shown
+ # - clearButtonId: clear button id (default: clear-logs-btn)
+ # - clearLabel: clear button label
+ # - emptyMessage: empty state text
+ # - translationCategory: plugin translation category
+ #}
+
+{% set sectionId = sectionId ?? 'import-history' %}
+{% set title = title ?? 'Import History'|t('app') %}
+{% set importHistory = importHistory ?? [] %}
+{% set canClearHistory = canClearHistory ?? false %}
+{% set clearButtonId = clearButtonId ?? 'clear-logs-btn' %}
+{% set clearLabel = clearLabel ?? 'Clear history'|t('app') %}
+{% set emptyMessage = emptyMessage ?? 'No import history yet.'|t('app') %}
+{% set translationCategory = translationCategory ?? 'app' %}
+
+<div id="{{ sectionId }}" class="hidden">
+    <h2>{{ title }}</h2>
+    {% if importHistory|length and canClearHistory %}
+        <div style="margin: 0 0 1rem auto;">
+            <button type="button" class="btn" id="{{ clearButtonId }}">{{ clearLabel }}</button>
+        </div>
+    {% endif %}
+    {% if importHistory|length %}
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'Date'|t(translationCategory) }}</th>
+                    <th>{{ 'Created By'|t(translationCategory) }}</th>
+                    <th>{{ 'Filename'|t(translationCategory) }}</th>
+                    <th>{{ 'Size'|t(translationCategory) }}</th>
+                    <th>{{ 'Imported'|t(translationCategory) }}</th>
+                    <th>{{ 'Failed'|t(translationCategory) }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in importHistory %}
+                    <tr>
+                        <td>{{ item.formattedDate }}</td>
+                        <td>{{ item.user }}</td>
+                        <td>{{ item.filename ?? '-' }}</td>
+                        <td><code style="font-size: 11px;">{{ item.formattedSize }}</code></td>
+                        <td><strong>{{ item.imported|number_format }}</strong></td>
+                        <td>{{ item.failed|number_format }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="light" style="text-align: center; padding: 40px;">{{ emptyMessage }}</p>
+    {% endif %}
+</div>

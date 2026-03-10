@@ -1,0 +1,42 @@
+{#
+ # Import History JS Partial (for use inside {% js %} ... {% endjs %})
+ #
+ # Parameters:
+ # - tabStorageKey: session storage key (default: showHistoryTab)
+ # - tabSelector: tab anchor selector (default: a[href="#import-history"])
+ # - clearButtonId: clear button id (default: clear-logs-btn)
+ # - clearAction: Craft action path (required)
+ # - confirmMessage: confirm dialog text
+ # - clearErrorMessage: fallback error message
+ #}
+
+{% set tabStorageKey = tabStorageKey ?? 'showHistoryTab' %}
+{% set tabSelector = tabSelector ?? 'a[href="#import-history"]' %}
+{% set clearButtonId = clearButtonId ?? 'clear-logs-btn' %}
+{% set clearAction = clearAction ?? '' %}
+{% set confirmMessage = confirmMessage ?? 'Are you sure you want to clear all import logs? This action cannot be undone.'|t('app') %}
+{% set clearErrorMessage = clearErrorMessage ?? 'Failed to clear history.'|t('app') %}
+
+if (sessionStorage.getItem('{{ tabStorageKey|e('js') }}') === 'true') {
+    sessionStorage.removeItem('{{ tabStorageKey|e('js') }}');
+    const historyTab = document.querySelector('{{ tabSelector|e('js') }}');
+    if (historyTab) {
+        historyTab.click();
+    }
+}
+
+document.getElementById('{{ clearButtonId|e('js') }}')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (!confirm('{{ confirmMessage|e('js') }}')) {
+        return;
+    }
+
+    Craft.sendActionRequest('POST', '{{ clearAction|e('js') }}')
+        .then(() => {
+            sessionStorage.setItem('{{ tabStorageKey|e('js') }}', 'true');
+            window.location.reload(true);
+        })
+        .catch((error) => {
+            Craft.cp.displayError(error.response?.data?.error || '{{ clearErrorMessage|e('js') }}');
+        });
+});
