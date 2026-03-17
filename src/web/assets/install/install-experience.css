@@ -1,0 +1,463 @@
+.lr-install-experience {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.lr-install-experience.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lr-install-experience__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--lr-install-accent) 18%, transparent), transparent 40%),
+    rgba(8, 15, 28, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.lr-install-experience__canvas-wrap,
+.lr-install-experience__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.lr-install-experience__dialog {
+  position: relative;
+  width: min(960px, calc(100vw - 32px));
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(249, 251, 253, 0.99), rgba(243, 247, 250, 0.98));
+  box-shadow:
+    0 28px 90px rgba(8, 15, 28, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  transform: translateY(14px) scale(0.98);
+  transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lr-install-experience.is-visible .lr-install-experience__dialog {
+  transform: translateY(0) scale(1);
+}
+
+.lr-install-experience__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #536171;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.lr-install-experience__close:hover {
+  background: rgba(255, 255, 255, 0.98);
+  color: #172433;
+  transform: translateY(-1px);
+}
+
+.lr-install-experience__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 400px;
+  padding: 48px 48px 18px;
+}
+
+.lr-install-experience__hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  z-index: 2;
+  color: #eff6ff;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--lr-install-sidebar, #0f172a) 18%, #0b1220),
+      color-mix(in srgb, var(--lr-install-sidebar, #0f172a) 8%, #111c30)
+    );
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lr-install-experience__hero-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.lr-install-experience__hero-art {
+  position: relative;
+  flex: 1;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
+}
+
+.lr-install-experience__hero-icon {
+  position: relative;
+  z-index: 3;
+  width: min(190px, 68%);
+  max-height: 190px;
+  filter: drop-shadow(0 20px 48px rgba(0, 0, 0, 0.28));
+}
+
+.lr-install-experience__hero-icon svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+}
+
+.lr-install-experience__hero-bgmark,
+.lr-install-experience__hero-fallback-mark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lr-install-experience__hero-bgmark {
+  z-index: 1;
+  opacity: 0.1;
+  transform: translate(var(--lr-bgmark-x, 0%), var(--lr-bgmark-y, 6%)) scale(var(--lr-bgmark-scale, 4.2)) rotate(var(--lr-bgmark-rotate, -8deg));
+  transform-origin: center;
+}
+
+.lr-install-experience__hero-bgmark svg,
+.lr-install-experience__hero-fallback-mark svg {
+  width: 92%;
+  height: auto;
+  max-width: 520px;
+}
+
+.lr-install-experience__hero-bgmark path {
+  fill: rgba(255, 255, 255, 0.92);
+}
+
+.lr-install-experience__hero-fallback-mark {
+  z-index: 2;
+  opacity: 0.22;
+}
+
+.lr-install-experience__hero-fallback-mark path {
+  fill: rgba(255, 255, 255, 0.95);
+}
+
+.lr-install-experience__hero-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--lr-install-sidebar, #0f172a) 8%, transparent),
+      rgba(8, 13, 24, 0.16)
+    );
+}
+
+.lr-install-experience__eyebrow {
+  margin: 0 0 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--lr-install-ui, #0f172a) 48%, #6a7280);
+}
+
+.lr-install-experience__dialog h2 {
+  margin: 0;
+  font-size: clamp(44px, 5.4vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: #0f1720;
+}
+
+.lr-install-experience__version {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #7a8794;
+}
+
+.lr-install-experience__body {
+  max-width: 42ch;
+  margin: 18px 0 0;
+  font-size: 17px;
+  line-height: 1.62;
+  color: #53687b;
+}
+
+.lr-install-experience__meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.lr-install-experience__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 23, 32, 0.08);
+  color: #1c2a38;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.lr-install-experience__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.lr-install-experience__actions .btn.submit {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--lr-install-ui, #0f172a) 92%, #0f172a),
+    color-mix(in srgb, var(--lr-install-ui, #0f172a) 68%, #0f172a)
+  ) !important;
+  border-color: color-mix(in srgb, var(--lr-install-ui, #0f172a) 66%, #0f172a) !important;
+  color: #fff !important;
+  min-height: 42px;
+  padding-inline: 18px;
+  box-shadow:
+    0 10px 24px color-mix(in srgb, var(--lr-install-ui, #0f172a) 22%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.lr-install-experience__actions .btn.submit:hover,
+.lr-install-experience__actions .btn.submit:focus {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--lr-install-ui, #0f172a) 100%, #0f172a),
+    color-mix(in srgb, var(--lr-install-ui, #0f172a) 76%, #0f172a)
+  ) !important;
+  border-color: color-mix(in srgb, var(--lr-install-ui, #0f172a) 76%, #0f172a) !important;
+  color: #fff !important;
+}
+
+.lr-install-experience__brand-panel {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(16, 24, 40, 0.08);
+  margin-inline: -48px;
+  padding-inline: 48px;
+}
+
+.lr-install-experience__brand-credit {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lr-install-experience__brand-credit:hover {
+  text-decoration: none;
+}
+
+.lr-install-experience__brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  min-height: 28px;
+  padding: 0;
+}
+
+.lr-install-experience__brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lr-install-experience__brand-logo svg {
+  width: 25px;
+  height: 13px;
+}
+
+.lr-install-experience__brand-logo path {
+  fill: #6b7280;
+}
+
+.lr-install-experience__glow {
+  position: absolute;
+  top: -140px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--lr-install-accent) 34%, #fff), transparent 70%);
+  opacity: 0.9;
+  z-index: 0;
+}
+
+.lr-install-experience__shapes {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.lr-install-experience__shapes span {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lr-install-accent) 24%, white);
+  opacity: 0.7;
+}
+
+.lr-install-experience__shapes span:nth-child(1) {
+  top: 42px;
+  right: 150px;
+  width: 180px;
+  height: 180px;
+}
+
+.lr-install-experience__shapes span:nth-child(2) {
+  bottom: -30px;
+  left: -30px;
+  width: 160px;
+  height: 160px;
+}
+
+.lr-install-experience__shapes span:nth-child(3) {
+  top: 88px;
+  left: 52%;
+  width: 14px;
+  height: 170px;
+  border-radius: 999px;
+  transform: rotate(38deg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lr-install-accent) 32%, white), transparent);
+}
+
+.lr-install-experience__glow {
+  top: 24px;
+  right: 24px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--lr-install-accent) 18%, white), transparent 74%);
+}
+
+.lr-install-experience__shapes span:nth-child(1) {
+  top: 24px;
+  left: 24px;
+  width: 120px;
+  height: 120px;
+  background: color-mix(in srgb, var(--lr-install-accent) 8%, white);
+}
+
+.lr-install-experience__shapes span:nth-child(2) {
+  bottom: 24px;
+  right: 28px;
+  width: 140px;
+  height: 140px;
+  background: color-mix(in srgb, var(--lr-install-accent) 8%, white);
+}
+
+.lr-install-experience__shapes span:nth-child(3) {
+  top: 24px;
+  left: 28%;
+  width: 1px;
+  height: calc(100% - 48px);
+  transform: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lr-install-accent) 10%, white), rgba(15, 23, 32, 0));
+}
+
+@media (max-width: 640px) {
+  .lr-install-experience__content {
+    min-height: 0;
+    padding: 28px 22px 24px;
+  }
+
+  .lr-install-experience__brand-panel {
+    margin-inline: -22px;
+    padding-inline: 22px;
+  }
+
+  .lr-install-experience__close {
+    top: 12px;
+    right: 12px;
+  }
+
+  .lr-install-experience__dialog {
+    grid-template-columns: 1fr;
+  }
+
+  .lr-install-experience__hero {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .lr-install-experience__hero-head {
+    padding-inline: 20px;
+  }
+
+  .lr-install-experience__hero-head {
+    padding-top: 18px;
+    padding-bottom: 14px;
+  }
+
+  .lr-install-experience__hero-foot {
+    padding-top: 16px;
+    padding-bottom: 18px;
+  }
+
+  .lr-install-experience__hero-art {
+    min-height: 180px;
+    padding: 2.5rem;
+  }
+
+  .lr-install-experience__dialog h2 {
+    max-width: none;
+    font-size: clamp(40px, 11vw, 56px);
+  }
+
+  .lr-install-experience__actions {
+    flex-direction: column;
+  }
+
+  .lr-install-experience__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

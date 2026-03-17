@@ -1,0 +1,83 @@
+{% set experience = experience ?? {} %}
+{% set accent = experience.accent ?? '#0f766e' %}
+{% set sidebarColor = experience.sidebarColor ?? experience.iconColor ?? accent %}
+{% set uiColor = experience.uiColor ?? sidebarColor %}
+{% set theme = experience.theme ?? 'classic' %}
+
+<div
+    id="lr-install-experience"
+    class="lr-install-experience"
+    aria-hidden="true"
+    style="--lr-install-accent: {{ accent }}; --lr-install-sidebar: {{ sidebarColor }}; --lr-install-ui: {{ uiColor }};"
+>
+    <div class="lr-install-experience__backdrop" data-lr-install-close></div>
+    <div class="lr-install-experience__canvas-wrap" aria-hidden="true">
+        <canvas class="lr-install-experience__canvas"></canvas>
+    </div>
+    <section class="lr-install-experience__dialog" role="dialog" aria-modal="true" aria-labelledby="lr-install-experience-title">
+        <button type="button" class="lr-install-experience__close" aria-label="Close dialog" data-lr-install-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <div class="lr-install-experience__glow"></div>
+        <div class="lr-install-experience__shapes" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="lr-install-experience__hero" aria-hidden="true">
+            <div class="lr-install-experience__hero-body">
+                <div class="lr-install-experience__hero-art">
+                    <div class="lr-install-experience__hero-bgmark" aria-hidden="true">
+                        <svg viewBox="0 -334.195 1350.04 1350.04" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="#E52521">
+                                <path d="M1.01 19.05l262.32 653.89c2.11 5.26 7.21 8.71 12.88 8.71h256.56c5.73 0 10.87-3.52 12.94-8.86l126.36-325.54c1.25-3.22 1.25-6.79.01-10.01L545.71 8.9c-2.06-5.36-7.21-8.9-12.96-8.9H13.9c-9.83 0-16.55 9.93-12.89 19.05Z"/>
+                                <path d="M1073.82 0H817.26c-5.73 0-10.87 3.52-12.94 8.86L677.96 334.4c-1.25 3.22-1.25 6.79-.01 10.01l126.39 328.35c2.06 5.36 7.21 8.9 12.96 8.9h518.86c9.83 0 16.54-9.93 12.88-19.05L1086.71 8.71C1084.6 3.45 1079.5 0 1073.82 0Z"/>
+                            </g>
+                        </svg>
+                    </div>
+                    {% if experience.iconSvg ?? null %}
+                        <div class="lr-install-experience__hero-icon">
+                            {{ experience.iconSvg|raw }}
+                        </div>
+                    {% else %}
+                        <div class="lr-install-experience__hero-fallback-mark" aria-hidden="true">
+                            <svg viewBox="0 -334.195 1350.04 1350.04" xmlns="http://www.w3.org/2000/svg">
+                                <g fill="#E52521">
+                                    <path d="M1.01 19.05l262.32 653.89c2.11 5.26 7.21 8.71 12.88 8.71h256.56c5.73 0 10.87-3.52 12.94-8.86l126.36-325.54c1.25-3.22 1.25-6.79.01-10.01L545.71 8.9c-2.06-5.36-7.21-8.9-12.96-8.9H13.9c-9.83 0-16.55 9.93-12.89 19.05Z"/>
+                                    <path d="M1073.82 0H817.26c-5.73 0-10.87 3.52-12.94 8.86L677.96 334.4c-1.25 3.22-1.25 6.79-.01 10.01l126.39 328.35c2.06 5.36 7.21 8.9 12.96 8.9h518.86c9.83 0 16.54-9.93 12.88-19.05L1086.71 8.71C1084.6 3.45 1079.5 0 1073.82 0Z"/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="lr-install-experience__content">
+            <p class="lr-install-experience__eyebrow">{{ experience.eyebrow ?? 'Installed successfully' }}</p>
+            <h2 id="lr-install-experience-title">{{ experience.headline ?? 'Plugin installed' }}</h2>
+            {% if experience.pluginVersion ?? null %}
+                <p class="lr-install-experience__version">Version {{ experience.pluginVersion }}</p>
+            {% endif %}
+            <p class="lr-install-experience__body">{{ experience.body ?? '' }}</p>
+            <div class="lr-install-experience__actions">
+                <a class="btn submit" href="{{ cpUrl(experience.ctaUrl ?? experience.redirectUri ?? '') }}">
+                    {{ experience.ctaLabel ?? 'Continue' }}
+                </a>
+            </div>
+            <div class="lr-install-experience__brand-panel">
+                <a class="lr-install-experience__brand-credit" href="https://lindemannrock.com" target="_blank" rel="noopener">
+                    <span class="lr-install-experience__brand-pill">
+                        <span class="lr-install-experience__brand-logo" aria-hidden="true">
+                            <svg viewBox="0 -.186 1350.04 682.02" xmlns="http://www.w3.org/2000/svg">
+                                <g>
+                                    <path d="M1.01 19.05l262.32 653.89c2.11 5.26 7.21 8.71 12.88 8.71h256.56c5.73 0 10.87-3.52 12.94-8.86l126.36-325.54c1.25-3.22 1.25-6.79.01-10.01L545.71 8.9c-2.06-5.36-7.21-8.9-12.96-8.9H13.9c-9.83 0-16.55 9.93-12.89 19.05Z"></path>
+                                    <path d="M1073.82 0H817.26c-5.73 0-10.87 3.52-12.94 8.86L677.96 334.4c-1.25 3.22-1.25 6.79-.01 10.01l126.39 328.35c2.06 5.36 7.21 8.9 12.96 8.9h518.86c9.83 0 16.54-9.93 12.88-19.05L1086.71 8.71C1084.6 3.45 1079.5 0 1073.82 0Z"></path>
+                                </g>
+                            </svg>
+                        </span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
