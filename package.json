@@ -1,17 +1,12 @@
 {
   "name": "lindemannrock-base",
   "version": "1.0.0",
-  "description": "Build tools for LindemannRock Plugin Base",
+  "private": true,
   "scripts": {
-    "build:install": "esbuild src/web/assets/install/install-experience.src.js --bundle --format=iife --platform=browser --outfile=src/web/assets/install/install-experience.js && esbuild src/web/assets/install/install-experience.src.js --bundle --format=iife --platform=browser --minify --outfile=src/web/assets/install/install-experience.min.js",
-    "minify": "npm run minify:js && npm run minify:css",
-    "minify:js": "terser src/web/assets/analytics/analytics.js -o src/web/assets/analytics/analytics.min.js -c -m && terser src/web/assets/components/components.js -o src/web/assets/components/components.min.js -c -m && npm run build:install",
-    "minify:css": "cleancss -o src/web/assets/components/components.min.css src/web/assets/components/components.css && cleancss -o src/web/assets/install/install-experience.min.css src/web/assets/install/install-experience.css"
+    "build": "cd src/web/assets && npm run build",
+    "build:analytics": "cd src/web/assets && npm run build:analytics",
+    "build:components": "cd src/web/assets && npm run build:components",
+    "build:install": "cd src/web/assets && npm run build:install"
   },
-  "devDependencies": {
-    "canvas-confetti": "^1.9.4",
-    "clean-css-cli": "^5.6.3",
-    "esbuild": "^0.27.4",
-    "terser": "^5.31.6"
-  }
+  "license": "Proprietary"
 }

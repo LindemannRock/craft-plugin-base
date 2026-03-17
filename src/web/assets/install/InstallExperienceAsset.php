@@ -21,17 +21,15 @@ class InstallExperienceAsset extends AssetBundle
      */
     public function init(): void
     {
-        $devMode = \Craft::$app->getConfig()->getGeneral()->devMode;
-
-        $this->sourcePath = __DIR__;
+        $this->sourcePath = __DIR__ . '/dist';
         $this->depends = [
             CpAsset::class,
         ];
         $this->css = [
-            $devMode ? 'install-experience.css' : 'install-experience.min.css',
+            'css/install-experience.css',
         ];
         $this->js = [
-            $devMode ? 'install-experience.js' : 'install-experience.min.js',
+            'js/install-experience.js',
         ];
 
         parent::init();

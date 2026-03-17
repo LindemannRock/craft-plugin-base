@@ -261,7 +261,7 @@ Files:
 
 - `src/web/assets/install/install-experience.src.js` — source file
 - `src/web/assets/install/install-experience.js` — bundled dev build
-- `src/web/assets/install/install-experience.min.js` — bundled production build
+- `src/web/assets/install/dist/js/install-experience.js` — bundled production build
 
 The bundle is generated via:
 
@@ -269,7 +269,7 @@ The bundle is generated via:
 npm run build:install
 ```
 
-In production, `InstallExperienceAsset` loads `install-experience.min.js`; in `devMode` it loads `install-experience.js`.
+`InstallExperienceAsset` now always loads the canonical bundled file at `src/web/assets/install/dist/js/install-experience.js`.
 
 ## Next Steps
 

@@ -8,14 +8,12 @@
 
 namespace lindemannrock\base\web\assets\components;
 
-use Craft;
 use craft\web\AssetBundle;
 
 /**
  * Components Asset Bundle
  *
  * Provides styles for all base plugin components (cards, etc.).
- * Uses minified version in production mode.
  *
  * Usage in templates:
  * {% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
@@ -30,15 +28,13 @@ class ComponentsAsset extends AssetBundle
      */
     public function init(): void
     {
-        $this->sourcePath = __DIR__;
-
-        $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
+        $this->sourcePath = __DIR__ . '/dist';
 
         $this->css = [
-            $devMode ? 'components.css' : 'components.min.css',
+            'css/components.css',
         ];
         $this->js = [
-            $devMode ? 'components.js' : 'components.min.js',
+            'js/components.js',
         ];
 
         parent::init();

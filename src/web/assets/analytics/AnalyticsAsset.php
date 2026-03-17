@@ -8,14 +8,12 @@
 
 namespace lindemannrock\base\web\assets\analytics;
 
-use Craft;
 use craft\web\AssetBundle;
 
 /**
  * Analytics Asset Bundle
  *
  * Provides Chart.js and analytics helper functions for CP analytics pages.
- * Uses minified versions in production mode.
  *
  * @author LindemannRock
  * @since 5.8.0
@@ -27,14 +25,12 @@ class AnalyticsAsset extends AssetBundle
      */
     public function init(): void
     {
-        $this->sourcePath = __DIR__;
-
-        $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
+        $this->sourcePath = __DIR__ . '/dist';
 
         // Chart.js library + our helpers
         $this->js = [
-            $devMode ? 'chart.umd.js' : 'chart.umd.min.js',
-            $devMode ? 'analytics.js' : 'analytics.min.js',
+            'js/chart.umd.min.js',
+            'js/analytics.js',
         ];
 
         parent::init();
