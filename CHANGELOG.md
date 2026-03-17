@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.19.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.0...v5.19.1) (2026-03-17)
+
+
+### Bug Fixes
+
+* **PluginHelper:** simplify global variable registration in Twig ([b988d8b](https://github.com/LindemannRock/craft-plugin-base/commit/b988d8bf3a2bc7aa34451cc69346b31e72d109aa))
+
 ## [5.19.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.18.0...v5.19.0) (2026-03-17)
 
 
