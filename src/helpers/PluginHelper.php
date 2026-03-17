@@ -154,11 +154,7 @@ class PluginHelper
             \craft\web\View::class,
             \craft\web\View::EVENT_AFTER_CREATE_TWIG,
             static function(CreateTwigEvent $event) use ($plugin, $helperVariableName) {
-                $twig = $event->twig;
-
-                if (!array_key_exists($helperVariableName, $twig->getGlobals())) {
-                    $twig->addGlobal($helperVariableName, new PluginNameHelper($plugin));
-                }
+                $event->twig->addGlobal($helperVariableName, new PluginNameHelper($plugin));
             }
         );
 
