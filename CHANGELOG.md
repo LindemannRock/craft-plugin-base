@@ -1,5 +1,20 @@
 # Changelog
 
+## [5.19.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.18.0...v5.19.0) (2026-03-17)
+
+
+### Features
+
+* add import history partial with parameters and structure ([ab1e03b](https://github.com/LindemannRock/craft-plugin-base/commit/ab1e03b4a0fcdbe3de8f488c33f8321245ced836))
+* **helpers:** add JsonHelper class for safe JSON encoding ([e6585f8](https://github.com/LindemannRock/craft-plugin-base/commit/e6585f85a78e711fc40885e07f6c88e86d80a563))
+* **install-experience:** add install experience assets and functionality ([e6b6f02](https://github.com/LindemannRock/craft-plugin-base/commit/e6b6f022f3583cd8b03155a029ed95e2176289c0))
+
+
+### Miscellaneous Chores
+
+* **assets:** add package.json for asset management and build scripts ([dea148c](https://github.com/LindemannRock/craft-plugin-base/commit/dea148c4c14da9e78b882c0f6be3b57947a33830))
+* **package:** update dependencies and add build script ([91f847c](https://github.com/LindemannRock/craft-plugin-base/commit/91f847c50be5f9475f4b54cea1dc98d82860ff33))
+
 ## [5.18.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.17.0...v5.18.0) (2026-03-04)
 
 
