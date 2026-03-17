@@ -10,10 +10,11 @@ namespace lindemannrock\base\helpers;
 
 use Craft;
 use craft\base\PluginInterface;
+use craft\events\CreateTwigEvent;
 use lindemannrock\base\Base;
-use lindemannrock\base\twigextensions\PluginNameExtension;
 use lindemannrock\base\twigextensions\PluginNameHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
+use yii\base\Event;
 
 /**
  * Plugin Helper
@@ -54,6 +55,57 @@ use lindemannrock\logginglibrary\LoggingLibrary;
 class PluginHelper
 {
     /**
+     * Resolve the plugin version from the plugin package metadata.
+     *
+     * The canonical source is the plugin's composer.json.
+     *
+     * @param PluginInterface $plugin
+     * @return string|null
+     */
+    public static function getPluginVersion(PluginInterface $plugin): ?string
+    {
+        $metadata = self::getPluginComposerMetadata($plugin);
+        if (!is_array($metadata)) {
+            return null;
+        }
+
+        $version = trim((string)($metadata['version'] ?? ''));
+        return $version !== '' ? $version : null;
+    }
+
+    /**
+     * Read the plugin package composer metadata.
+     *
+     * @param PluginInterface $plugin
+     * @return array|null
+     */
+    public static function getPluginComposerMetadata(PluginInterface $plugin): ?array
+    {
+        try {
+            $reflection = new \ReflectionClass($plugin);
+            $pluginFile = $reflection->getFileName();
+            if ($pluginFile === false) {
+                return null;
+            }
+
+            $composerPath = dirname(dirname($pluginFile)) . '/composer.json';
+            if (!is_file($composerPath) || !is_readable($composerPath)) {
+                return null;
+            }
+
+            $json = file_get_contents($composerPath);
+            if (!is_string($json) || trim($json) === '') {
+                return null;
+            }
+
+            $data = json_decode($json, true);
+            return is_array($data) ? $data : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Bootstrap the base module and configure common functionality
      *
      * This single method replaces:
@@ -74,6 +126,16 @@ class PluginHelper
      *   - 'registerTranslations': bool to auto-register translations (default true)
      *   - 'translationCategory': string override for translation category (default plugin id)
      *   - 'translationBasePath': string override for translation base path (default {plugin}/translations)
+     *   - 'installExperience': bool|array to enable the one-time CP install welcome experience
+     *     Dev preview URL: ?lrInstallPreview={plugin-handle} on any plugin CP page
+     *     Example: [
+     *       'headline' => 'Canvas Studio is ready',
+     *       'body' => 'Start by creating your first document or theme.',
+     *       'redirectUri' => 'canvas-studio',
+     *       'ctaLabel' => 'Open Canvas Studio',
+     *       'ctaUrl' => 'canvas-studio',
+     *       'accent' => '#0f766e',
+     *     ]
      */
     public static function bootstrap(
         PluginInterface $plugin,
@@ -85,16 +147,17 @@ class PluginHelper
         // Register base module (idempotent - safe to call multiple times)
         Base::register();
 
-        // Register global variable directly via Twig (avoids extension class name conflicts)
-        \yii\base\Event::on(
+        // Register the helper global when each Twig environment is created.
+        // This avoids late addGlobal() timing issues and avoids extension
+        // class-name collisions between multiple plugins.
+        Event::on(
             \craft\web\View::class,
-            \craft\web\View::EVENT_BEFORE_RENDER_TEMPLATE,
-            function() use ($plugin, $helperVariableName) {
-                static $registered = [];
-                if (!isset($registered[$helperVariableName])) {
-                    $twig = Craft::$app->view->getTwig();
+            \craft\web\View::EVENT_AFTER_CREATE_TWIG,
+            static function(CreateTwigEvent $event) use ($plugin, $helperVariableName) {
+                $twig = $event->twig;
+
+                if (!array_key_exists($helperVariableName, $twig->getGlobals())) {
                     $twig->addGlobal($helperVariableName, new PluginNameHelper($plugin));
-                    $registered[$helperVariableName] = true;
                 }
             }
         );
@@ -145,6 +208,12 @@ class PluginHelper
             $category = is_string($options['translationCategory'] ?? null) ? $options['translationCategory'] : null;
             $basePath = is_string($options['translationBasePath'] ?? null) ? $options['translationBasePath'] : null;
             self::registerTranslations($plugin, $basePath, $category);
+        }
+
+        // Register one-time CP install experience
+        if (($options['installExperience'] ?? true) !== false) {
+            $installOptions = is_array($options['installExperience'] ?? null) ? $options['installExperience'] : [];
+            InstallExperienceHelper::register($plugin, $installOptions);
         }
     }
 
