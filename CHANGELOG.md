@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.20.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.1...v5.20.0) (2026-03-17)
+
+
+### Features
+
+* **AnalyticsIpHelper:** add IP preprocessing and anonymization helper class ([e71a144](https://github.com/LindemannRock/craft-plugin-base/commit/e71a144014e143a0975e4dc240d945513f9a1d4b))
+
 ## [5.19.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.0...v5.19.1) (2026-03-17)
 
 
