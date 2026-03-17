@@ -1,6 +1,6 @@
 # PluginHelper @since(5.0.0)
 
-Central initialization for LindemannRock plugins. The `bootstrap()` method replaces several lines of boilerplate with a single call that registers the base module, sets up Twig extensions, configures logging, and registers color sets.
+Central initialization for LindemannRock plugins. The `bootstrap()` method replaces several lines of boilerplate with a single call that registers the base module, sets up Twig extensions, configures logging, registers color sets, and can optionally trigger the shared post-install CP experience.
 
 ## bootstrap()
 
@@ -41,6 +41,7 @@ public function init(): void
 3. **Configures LoggingLibrary** — sets up log viewer with permissions, log level, and items per page
 4. **Registers color sets** — makes plugin-specific colors available for badges and filters
 5. **Registers translations** — auto-discovers `translations/` directory (enabled by default)
+6. **Registers the install experience** — enables the shared one-time CP install modal unless disabled
 
 ### Parameters
 
@@ -61,8 +62,27 @@ public function init(): void
 | `registerTranslations` | `bool` | `true` | Auto-register translations |
 | `translationCategory` | `string` | plugin id | Translation category override |
 | `translationBasePath` | `string` | `{plugin}/translations` | Translation path override |
+| `installExperience` | `bool|array` | `true` | Enable/configure the shared post-install CP modal |
 
 See [Bootstrapping](../developers/bootstrapping.md) for a complete guide.
+
+## Plugin Metadata @since(5.0.0)
+
+Read plugin package metadata from the plugin's `composer.json`:
+
+```php
+$version = PluginHelper::getPluginVersion($this);
+$metadata = PluginHelper::getPluginComposerMetadata($this);
+```
+
+`getPluginVersion()` uses the plugin package as the canonical source of truth, so version does not need to be duplicated in the plugin class.
+
+Typical uses:
+
+- install experience metadata
+- about pages
+- settings footers
+- diagnostics and support output
 
 ## Plugin Name Override
 

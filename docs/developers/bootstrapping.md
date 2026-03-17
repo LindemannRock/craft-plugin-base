@@ -4,13 +4,14 @@ How `PluginHelper::bootstrap()` initializes the base module for your plugin. Thi
 
 ## What Bootstrap Does
 
-When you call `PluginHelper::bootstrap()`, it performs five actions in order:
+When you call `PluginHelper::bootstrap()`, it performs six actions in order:
 
 1. **Registers the base module** — calls `Base::register()` (idempotent, safe to call from multiple plugins)
 2. **Registers a Twig global** — adds a `PluginNameHelper` instance as a Twig variable (e.g., `redirectHelper`)
 3. **Configures logging** — sets up [LoggingLibrary](https://github.com/lindemannrock/craft-logging-library) integration (when permissions are provided and the library is installed)
 4. **Registers color sets** — adds plugin-specific color sets to [ColorHelper](../feature-tour/color-helper.md) for badges and filters
 5. **Registers translations** — sets up `PhpMessageSource` for the plugin's `translations/` directory (enabled by default)
+6. **Registers the install experience** — enables the shared one-time CP install modal for CP installs unless disabled
 
 ## Basic Usage
 
@@ -124,6 +125,54 @@ Override the translation category or base path:
 ```
 
 By default, the category is the plugin's `id` and the base path is `{pluginBasePath}/translations`.
+
+### installExperience
+
+Enable or customize the shared post-install CP modal:
+
+```php
+'installExperience' => [
+    'headline' => 'Canvas Studio',
+    'body' => 'Start shaping documents, fonts, and themes from one place.',
+    'redirectUri' => 'canvas-studio',
+    'ctaLabel' => 'Open Canvas Studio',
+    'ctaUrl' => 'canvas-studio',
+    'accent' => '#c2410c',
+    'sidebarColor' => '#820EFF',
+    'uiColor' => '#820EFF',
+    'confettiPreset' => 'surprise',
+],
+```
+
+Set to `false` to disable it entirely:
+
+```php
+'installExperience' => false,
+```
+
+Supported keys:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `headline` | `string` | Main modal headline |
+| `body` | `string` | Supporting body copy |
+| `redirectUri` | `string` | CP URL to redirect to after install |
+| `ctaLabel` | `string` | Primary button label |
+| `ctaUrl` | `string` | Primary button URL |
+| `accent` | `string` | Accent color fallback |
+| `sidebarColor` | `string` | Left rail/background color |
+| `uiColor` | `string` | CTA/eyebrow/confetti color override |
+| `confettiPreset` | `string` | `surprise`, `spray`, `shower`, `fireworks`, `rain`, or `fountains` |
+
+### Dev Preview
+
+With `devMode` enabled, preview the install experience without reinstalling the plugin:
+
+```text
+/admin/tailwind-manager?lrInstallPreview=tailwind-manager
+```
+
+The query string value must match the plugin handle.
 
 ## The Twig Global
 

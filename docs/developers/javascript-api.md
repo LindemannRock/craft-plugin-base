@@ -1,6 +1,6 @@
 # JavaScript API
 
-The base module ships two JavaScript assets that expose global functions and events for plugin developers. These load automatically when a plugin uses the [CP Table Layout](../template-guides/cp-table-layout.md) or [CP Analytics Layout](../template-guides/cp-analytics-layout.md).
+The base module ships JavaScript assets that expose global functions and events for plugin developers. The main shared assets load automatically when a plugin uses the [CP Table Layout](../template-guides/cp-table-layout.md) or [CP Analytics Layout](../template-guides/cp-analytics-layout.md).
 
 ## Table Selection API
 
@@ -249,8 +249,27 @@ The JavaScript loads through Craft's asset bundle system — you don't need to i
 |--------------|-----------|----------|
 | `AnalyticsAsset` | CP Analytics Layout, Analytics Panel partial | Chart.js + `lrChartColors`, `lrLoadChartData`, `lrCreateChart`, `lrDestroyCharts`, `lrGetChart`, `lrAnalyticsInit` |
 | `ComponentsAsset` | CP Table Layout, CP Analytics Layout, Analytics Panel partial | Config tooltip behavior |
+| `InstallExperienceAsset` | Shared post-install CP modal | `window.LrInstallExperience` + preset-driven confetti animation |
 
 The table globals (`lrTableSelection`, `lrViewSettings`, `lrBuildUrl`, `lrTableConfig`) are embedded directly in the CP Table Layout template, not in a separate asset bundle.
+
+## Install Experience Asset
+
+The install experience uses a dedicated asset bundle and is not part of the table or analytics layout stack.
+
+Files:
+
+- `src/web/assets/install/install-experience.src.js` — source file
+- `src/web/assets/install/install-experience.js` — bundled dev build
+- `src/web/assets/install/install-experience.min.js` — bundled production build
+
+The bundle is generated via:
+
+```bash
+npm run build:install
+```
+
+In production, `InstallExperienceAsset` loads `install-experience.min.js`; in `devMode` it loads `install-experience.js`.
 
 ## Next Steps
 

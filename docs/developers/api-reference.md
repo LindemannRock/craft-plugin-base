@@ -155,11 +155,23 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | `isPluginInstalled(string $handle)` | `bool` | Plugin installed? |
 | `getPlugin(string $handle)` | `?PluginInterface` | Get plugin instance |
 | `getPluginName(string $handle, ?string $fallback)` | `string` | Plugin display name |
+| `getPluginVersion(PluginInterface $plugin)` | `?string` | Get plugin version from `composer.json` |
+| `getPluginComposerMetadata(PluginInterface $plugin)` | `?array` | Read plugin package metadata from `composer.json` |
 | `getCacheBasePath(PluginInterface $plugin)` | `string` | Cache base directory |
 | `getCachePath(PluginInterface $plugin, string $type)` | `string` | Typed cache directory |
 | `getCacheKeyPrefix(string $handle, string $type)` | `string` | Cache key prefix |
 | `getCacheKeySet(string $handle, string $type)` | `string` | Redis key set name |
 | `registerTranslations($plugin, ?string $path, ?string $cat)` | `void` | Register translation source |
+
+### JsonHelper
+
+`lindemannrock\base\helpers\JsonHelper`
+
+Small helper for safely embedding JSON into inline HTML/JS contexts.
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `htmlSafeJson(mixed $value)` | `string` | JSON-encode a value using HTML-safe flags for inline script/template output |
 
 ### DbHelper
 
