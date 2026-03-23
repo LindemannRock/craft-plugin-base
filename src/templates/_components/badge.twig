@@ -112,13 +112,13 @@
         {# Use Craft's built-in status classes #}
         {# dot class is for the inner status dot, defaults to resolvedClass if not specified #}
         {% set dotClass = resolvedDot ?? resolvedClass %}
-        <span class="status-label {{ resolvedClass }}">
+        <span class="status-label {{ resolvedClass }}" style="white-space: nowrap;">
             <span class="status {{ dotClass }}"></span>
             <span class="status-label-text">{{ label }}</span>
         </span>
     {% else %}
         {# Use custom colors with inline styles #}
-        <span class="status-label" style="background: rgba({{ resolvedRgb }}, 0.12);">
+        <span class="status-label" style="background: rgba({{ resolvedRgb }}, 0.12); white-space: nowrap;">
             <span class="status" style="background: {{ resolvedColor }};"></span>
             <span class="status-label-text" style="color: {{ resolvedText }};">{{ label }}</span>
         </span>
