@@ -13,6 +13,7 @@ namespace lindemannrock\base;
 use Craft;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\web\View;
+use lindemannrock\base\helpers\PluginHelper;
 use lindemannrock\base\twigextensions\ColorExtension;
 use lindemannrock\base\twigextensions\DateTimeExtension;
 use lindemannrock\base\twigextensions\ExportExtension;
@@ -72,6 +73,9 @@ class Base extends Module
                 $event->roots['lindemannrock-base'] = __DIR__ . '/templates';
             }
         );
+
+        // Register base translation category for shared UI copy.
+        PluginHelper::registerTranslations('lindemannrock-base', __DIR__ . '/translations');
 
         // Register Twig extensions
         // Note: registerTwigExtension() queues extensions - no need to check if Twig exists
