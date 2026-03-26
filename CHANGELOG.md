@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.20.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.0...v5.20.1) (2026-03-26)
+
+
+### Bug Fixes
+
+* **badge:** add nowrap style to status label spans ([5b3e1d6](https://github.com/LindemannRock/craft-plugin-base/commit/5b3e1d60a6b0d41addb2a5a83fd3bba391bbc265))
+
 ## [5.20.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.1...v5.20.0) (2026-03-17)
 
 
