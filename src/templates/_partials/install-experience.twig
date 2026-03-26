@@ -15,7 +15,7 @@
         <canvas class="lr-install-experience__canvas"></canvas>
     </div>
     <section class="lr-install-experience__dialog" role="dialog" aria-modal="true" aria-labelledby="lr-install-experience-title">
-        <button type="button" class="lr-install-experience__close" aria-label="Close dialog" data-lr-install-close>
+        <button type="button" class="lr-install-experience__close" aria-label="{{ 'Close dialog'|t('lindemannrock-base') }}" data-lr-install-close>
             <span aria-hidden="true">&times;</span>
         </button>
         <div class="lr-install-experience__glow"></div>
@@ -53,15 +53,15 @@
             </div>
         </div>
         <div class="lr-install-experience__content">
-            <p class="lr-install-experience__eyebrow">{{ experience.eyebrow ?? 'Installed successfully' }}</p>
-            <h2 id="lr-install-experience-title">{{ experience.headline ?? 'Plugin installed' }}</h2>
+            <p class="lr-install-experience__eyebrow">{{ experience.eyebrow ?? ('Installed successfully'|t('lindemannrock-base')) }}</p>
+            <h2 id="lr-install-experience-title">{{ experience.headline ?? ('Plugin installed'|t('lindemannrock-base')) }}</h2>
             {% if experience.pluginVersion ?? null %}
-                <p class="lr-install-experience__version">Version {{ experience.pluginVersion }}</p>
+                <p class="lr-install-experience__version">{{ 'Version'|t('lindemannrock-base') }} {{ experience.pluginVersion }}</p>
             {% endif %}
             <p class="lr-install-experience__body">{{ experience.body ?? '' }}</p>
             <div class="lr-install-experience__actions">
                 <a class="btn submit" href="{{ cpUrl(experience.ctaUrl ?? experience.redirectUri ?? '') }}">
-                    {{ experience.ctaLabel ?? 'Continue' }}
+                    {{ experience.ctaLabel ?? ('Continue'|t('lindemannrock-base')) }}
                 </a>
             </div>
             <div class="lr-install-experience__brand-panel">

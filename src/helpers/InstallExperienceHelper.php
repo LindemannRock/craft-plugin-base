@@ -120,8 +120,8 @@ class InstallExperienceHelper
             'pluginVersion' => PluginHelper::getPluginVersion($plugin),
             'redirectUri' => $redirectUri,
             'headline' => (string)($options['headline'] ?? ($pluginName . ' is installed')),
-            'body' => (string)($options['body'] ?? 'Everything is wired up. You can start configuring the plugin right away.'),
-            'eyebrow' => (string)($options['eyebrow'] ?? 'Installed successfully'),
+            'body' => (string)($options['body'] ?? Craft::t('lindemannrock-base', 'Everything is wired up. You can start configuring the plugin right away.')),
+            'eyebrow' => (string)($options['eyebrow'] ?? Craft::t('lindemannrock-base', 'Installed successfully')),
             'ctaLabel' => (string)($options['ctaLabel'] ?? self::resolveCtaLabel($plugin)),
             'ctaUrl' => $ctaUrl,
             'secondaryLabel' => (string)($options['secondaryLabel'] ?? 'Close'),
@@ -169,14 +169,14 @@ class InstallExperienceHelper
     private static function resolveCtaLabel(PluginInterface $plugin): string
     {
         if (property_exists($plugin, 'hasCpSection') && $plugin->hasCpSection) {
-            return 'Open plugin';
+            return Craft::t('lindemannrock-base', 'Open plugin');
         }
 
         if (property_exists($plugin, 'hasCpSettings') && $plugin->hasCpSettings) {
-            return 'Open settings';
+            return Craft::t('lindemannrock-base', 'Open settings');
         }
 
-        return 'Continue';
+        return Craft::t('lindemannrock-base', 'Continue');
     }
 
     /**
