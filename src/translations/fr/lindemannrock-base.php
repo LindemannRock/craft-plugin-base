@@ -7,6 +7,7 @@
  */
 
 return [
+    // Plugin meta
     'Installed successfully' => 'Installé avec succès',
     'Plugin installed' => 'Plugin installé',
     'Version' => 'Version',
