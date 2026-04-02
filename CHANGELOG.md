@@ -1,5 +1,21 @@
 # Changelog
 
+## [5.21.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.1...v5.21.0) (2026-04-02)
+
+
+### Features
+
+* **translations:** add Arabic, Spanish, French, and Dutch translations for plugin messages ([0188418](https://github.com/LindemannRock/craft-plugin-base/commit/0188418b4f53ae5415914a003c033bed904d0db9))
+* **translations:** add Danish, Italian, Japanese, Norwegian, Portuguese, and Swedish translations for plugin messages ([53147eb](https://github.com/LindemannRock/craft-plugin-base/commit/53147eb491eb344eb76b8434f4b52de6d2c60874))
+* **translations:** add German translations for plugin messages ([a1767d1](https://github.com/LindemannRock/craft-plugin-base/commit/a1767d192a66fe7bd2533b3df930a5801aef0258))
+
+
+### Bug Fixes
+
+* **base:** register translation category for shared UI copy ([06c6419](https://github.com/LindemannRock/craft-plugin-base/commit/06c6419ac6cc304c810d1a6e870dbfa4b4a2ef6d))
+* **ExportHelper:** update error message translation for export failure ([d5ca474](https://github.com/LindemannRock/craft-plugin-base/commit/d5ca4748d3aab6542dc7fcb184c063df2f395c58))
+* **install-experience:** translate static text in install experience ([5ffd896](https://github.com/LindemannRock/craft-plugin-base/commit/5ffd89655ea035409f207c932993c58abcc787c8))
+
 ## [5.20.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.0...v5.20.1) (2026-03-26)
 
 
