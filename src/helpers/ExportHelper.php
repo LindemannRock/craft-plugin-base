@@ -201,7 +201,7 @@ class ExportHelper
     public static function assertNotEmpty(array $rows, ?string $message = null): void
     {
         if (empty($rows)) {
-            throw new BadRequestHttpException($message ?? Craft::t('app', 'Nothing to export.'));
+            throw new BadRequestHttpException($message ?? Craft::t('lindemannrock-base', 'Nothing to export.'));
         }
     }
 

@@ -72,16 +72,16 @@ class DateRangeHelper
     public static function getOptions(string $format = 'array'): array
     {
         $options = [
-            'today' => Craft::t('app', 'Today'),
-            'yesterday' => Craft::t('app', 'Yesterday'),
-            'last7days' => Craft::t('app', 'Last 7 days'),
-            'last30days' => Craft::t('app', 'Last 30 days'),
-            'last90days' => Craft::t('app', 'Last 90 days'),
-            'thisMonth' => Craft::t('app', 'This month'),
-            'lastMonth' => Craft::t('app', 'Last month'),
-            'thisYear' => Craft::t('app', 'This year'),
-            'lastYear' => Craft::t('app', 'Last year'),
-            'all' => Craft::t('app', 'All time'),
+            'today' => Craft::t('lindemannrock-base', 'Today'),
+            'yesterday' => Craft::t('lindemannrock-base', 'Yesterday'),
+            'last7days' => Craft::t('lindemannrock-base', 'Last 7 days'),
+            'last30days' => Craft::t('lindemannrock-base', 'Last 30 days'),
+            'last90days' => Craft::t('lindemannrock-base', 'Last 90 days'),
+            'thisMonth' => Craft::t('lindemannrock-base', 'This month'),
+            'lastMonth' => Craft::t('lindemannrock-base', 'Last month'),
+            'thisYear' => Craft::t('lindemannrock-base', 'This year'),
+            'lastYear' => Craft::t('lindemannrock-base', 'Last year'),
+            'all' => Craft::t('lindemannrock-base', 'All time'),
         ];
 
         if ($format === 'assoc') {
