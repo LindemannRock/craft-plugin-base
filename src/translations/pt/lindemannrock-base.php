@@ -7,7 +7,7 @@
  */
 
 return [
-    // Plugin meta
+    // Install experience
     'Installed successfully' => 'Instalado com sucesso',
     'Plugin installed' => 'Plugin instalado',
     'Version' => 'Versão',
@@ -16,4 +16,76 @@ return [
     'Open settings' => 'Abrir configurações',
     'Close dialog' => 'Fechar diálogo',
     'Everything is wired up. You can start configuring the plugin right away.' => 'Tudo está pronto. Você pode começar a configurar o plugin imediatamente.',
+
+    // Date ranges
+    'Today' => 'Hoje',
+    'Yesterday' => 'Ontem',
+    'Last 7 days' => 'Últimos 7 dias',
+    'Last 30 days' => 'Últimos 30 dias',
+    'Last 90 days' => 'Últimos 90 dias',
+    'This month' => 'Este mês',
+    'Last month' => 'Mês passado',
+    'This year' => 'Este ano',
+    'Last year' => 'Ano passado',
+    'All time' => 'Todo o período',
+
+    // Export + editions
+    'Nothing to export.' => 'Nada para exportar.',
+    '{feature} requires the {edition} edition.' => '{feature} requer a edição {edition}.',
+    'This feature requires the {edition} edition.' => 'Este recurso requer a edição {edition}.',
+    'Export' => 'Export',
+    'Export as Excel' => 'Exportar como Excel',
+    'Export as CSV' => 'Exportar como CSV',
+    'Export as JSON' => 'Exportar como JSON',
+
+    // Search + filters
+    'Search' => 'Pesquisar',
+    'Search...' => 'Pesquisar...',
+    'Clear' => 'Limpar',
+    'Clear search' => 'Limpar pesquisa',
+    'All' => 'Todos',
+
+    // Table view + pagination
+    'No items found.' => 'Nenhum item encontrado.',
+    'View' => 'Visualizar',
+    'Sort by' => 'Ordenar por',
+    'Sort attribute' => 'Atributo de ordenação',
+    'Sort direction' => 'Direção de ordenação',
+    'Sort ascending' => 'Ordem crescente',
+    'Sort descending' => 'Ordem decrescente',
+    'Table Columns' => 'Colunas da tabela',
+    'Use defaults' => 'Usar padrões',
+    'Close' => 'Fechar',
+    'New' => 'Novo',
+    'Action' => 'Ação',
+    'Actions' => 'Ações',
+    'Select all' => 'Selecionar tudo',
+    'Select' => 'Selecionar',
+    'Cannot modify config items' => 'Não é possível modificar itens de configuração',
+    'Previous Page' => 'Página anterior',
+    'Next Page' => 'Próxima página',
+    'no' => 'não',
+    'of' => 'de',
+    'Auto-refresh' => 'Atualização automática',
+
+    // Import + backups
+    'Import from CSV' => 'Importar de CSV',
+    'CSV File' => 'Arquivo CSV',
+    'CSV Delimiter' => 'Delimitador CSV',
+    'Auto (detect)' => 'Auto (detectar)',
+    'Comma (,)' => 'Vírgula (,)',
+    'Semicolon (;)' => 'Ponto e vírgula (;)',
+    'Tab' => 'Tabulação',
+    'Pipe (|)' => 'Pipe (|)',
+    'Create Backup Before Import' => 'Criar backup antes de importar',
+    'Upload & Map Columns' => 'Fazer upload e mapear colunas',
+    'CSV Import' => 'Importação CSV',
+    'Alternate Import' => 'Importação alternativa',
+    'Import History' => 'Histórico de importações',
+    'Clear history' => 'Limpar histórico',
+    'No import history yet.' => 'Ainda não há histórico de importações.',
+    'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Tem certeza de que deseja limpar todos os registros de importação? Esta ação não pode ser desfeita.',
+    'Failed to clear history.' => 'Falha ao limpar o histórico.',
+    'Loading backup history...' => 'Carregando histórico de backups...',
+    'No backups found.' => 'Nenhum backup encontrado.',
 ];
