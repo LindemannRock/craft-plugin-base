@@ -30,7 +30,7 @@
         {% if filter.icon ?? false %}
             <span class="icon" data-icon="{{ filter.icon }}"></span>
         {% endif %}
-        {{ currentOption.label ?? filter.label ?? 'All'|t('app') }}
+        {{ currentOption.label ?? filter.label ?? 'All'|t('lindemannrock-base') }}
     </button>
     <div class="menu" {% if filter.menuStyle ?? false %}style="{{ filter.menuStyle }}"{% endif %}>
         <ul>

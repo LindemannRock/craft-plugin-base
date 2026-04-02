@@ -13,12 +13,12 @@
  #}
 
 {% set sectionId = sectionId ?? 'import-history' %}
-{% set title = title ?? 'Import History'|t('app') %}
+{% set title = title ?? 'Import History'|t('lindemannrock-base') %}
 {% set importHistory = importHistory ?? [] %}
 {% set canClearHistory = canClearHistory ?? false %}
 {% set clearButtonId = clearButtonId ?? 'clear-logs-btn' %}
-{% set clearLabel = clearLabel ?? 'Clear history'|t('app') %}
-{% set emptyMessage = emptyMessage ?? 'No import history yet.'|t('app') %}
+{% set clearLabel = clearLabel ?? 'Clear history'|t('lindemannrock-base') %}
+{% set emptyMessage = emptyMessage ?? 'No import history yet.'|t('lindemannrock-base') %}
 {% set translationCategory = translationCategory ?? 'app' %}
 
 <div id="{{ sectionId }}" class="hidden">

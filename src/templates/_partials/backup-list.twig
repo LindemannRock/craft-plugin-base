@@ -10,8 +10,8 @@
  #}
 
 {% set idPrefix = idPrefix ?? 'backup' %}
-{% set loadingMessage = loadingMessage ?? 'Loading backup history...'|t('app') %}
-{% set emptyMessage = emptyMessage ?? 'No backups found.'|t('app') %}
+{% set loadingMessage = loadingMessage ?? 'Loading backup history...'|t('lindemannrock-base') %}
+{% set emptyMessage = emptyMessage ?? 'No backups found.'|t('lindemannrock-base') %}
 
 <div id="{{ idPrefix }}-list-loading" class="centeralign">
     <div class="spinner big"></div>

@@ -88,7 +88,7 @@
 
 {# Search #}
 {% set searchConfig = config.search ?? {} %}
-{% set searchPlaceholder = searchConfig.placeholder ?? 'Search...'|t('app') %}
+{% set searchPlaceholder = searchConfig.placeholder ?? 'Search...'|t('lindemannrock-base') %}
 {% set searchValue = searchConfig.value ?? craft.app.request.getParam('search', '') %}
 
 {# Sorting - get from config or URL #}
@@ -100,7 +100,7 @@
 {% set tableConf = config.table ?? {} %}
 {% set columns = tableConf.columns ?? [] %}
 {% set items = tableConf.items ?? [] %}
-{% set emptyMessage = tableConf.emptyMessage ?? 'No items found.'|t('app') %}
+{% set emptyMessage = tableConf.emptyMessage ?? 'No items found.'|t('lindemannrock-base') %}
 {% set expandableEnabled = tableConf.expandable ?? false %}
 
 {# View button configuration - only enabled when there are hideable columns #}
@@ -192,20 +192,20 @@
         {% if viewEnabled %}
             <div class="btngroup">
                 <button type="button" class="btn menubtn" data-icon="sliders" id="lr-view-btn">
-                    {{ 'View'|t('app') }}
+                    {{ 'View'|t('lindemannrock-base') }}
                 </button>
                 <div class="menu menu--disclosure lr-view-menu padded" id="lr-view-menu">
                     <div class="meta">
                         {# Sort By Section #}
                         {% if sortableColumns|length > 0 %}
                             <fieldset class="field sort-field">
-                                <legend class="visually-hidden" data-label="{{ 'Sort by'|t('app') }}">{{ 'Sort by'|t('app') }}</legend>
-                                <div class="heading"><legend>{{ 'Sort by'|t('app') }}</legend></div>
+                                <legend class="visually-hidden" data-label="{{ 'Sort by'|t('lindemannrock-base') }}">{{ 'Sort by'|t('lindemannrock-base') }}</legend>
+                                <div class="heading"><legend>{{ 'Sort by'|t('lindemannrock-base') }}</legend></div>
                                 <div class="input">
                                     <div class="flex">
                                         <div class="flex-grow">
                                             <div class="select fullwidth">
-                                                <select id="lr-sort-field" aria-label="{{ 'Sort attribute'|t('app') }}">
+                                                <select id="lr-sort-field" aria-label="{{ 'Sort attribute'|t('lindemannrock-base') }}">
                                                     {% for col in sortableColumns %}
                                                         <option value="{{ col.key }}" {{ currentSort == col.key ? 'selected' : '' }}>
                                                             {{ col.label }}
@@ -214,9 +214,9 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <section class="btngroup btngroup--exclusive" aria-label="{{ 'Sort direction'|t('app') }}">
-                                            <button type="button" class="btn {{ currentDir == 'asc' ? 'active' : '' }}" title="{{ 'Sort ascending'|t('app') }}" aria-label="{{ 'Sort ascending'|t('app') }}" aria-pressed="{{ currentDir == 'asc' ? 'true' : 'false' }}" data-icon="asc" data-dir="asc"></button>
-                                            <button type="button" class="btn {{ currentDir == 'desc' ? 'active' : '' }}" title="{{ 'Sort descending'|t('app') }}" aria-label="{{ 'Sort descending'|t('app') }}" aria-pressed="{{ currentDir == 'desc' ? 'true' : 'false' }}" data-icon="desc" data-dir="desc"></button>
+                                        <section class="btngroup btngroup--exclusive" aria-label="{{ 'Sort direction'|t('lindemannrock-base') }}">
+                                            <button type="button" class="btn {{ currentDir == 'asc' ? 'active' : '' }}" title="{{ 'Sort ascending'|t('lindemannrock-base') }}" aria-label="{{ 'Sort ascending'|t('lindemannrock-base') }}" aria-pressed="{{ currentDir == 'asc' ? 'true' : 'false' }}" data-icon="asc" data-dir="asc"></button>
+                                            <button type="button" class="btn {{ currentDir == 'desc' ? 'active' : '' }}" title="{{ 'Sort descending'|t('lindemannrock-base') }}" aria-label="{{ 'Sort descending'|t('lindemannrock-base') }}" aria-pressed="{{ currentDir == 'desc' ? 'true' : 'false' }}" data-icon="desc" data-dir="desc"></button>
                                         </section>
                                     </div>
                                 </div>
@@ -226,8 +226,8 @@
                         {# Table Columns Section #}
                         {% if hideableColumns|length > 0 %}
                             <fieldset class="field table-columns-field">
-                                <legend class="visually-hidden" data-label="{{ 'Table Columns'|t('app') }}">{{ 'Table Columns'|t('app') }}</legend>
-                                <div class="heading"><legend>{{ 'Table Columns'|t('app') }}</legend></div>
+                                <legend class="visually-hidden" data-label="{{ 'Table Columns'|t('lindemannrock-base') }}">{{ 'Table Columns'|t('lindemannrock-base') }}</legend>
+                                <div class="heading"><legend>{{ 'Table Columns'|t('lindemannrock-base') }}</legend></div>
                                 <div class="input">
                                     <div class="checkbox-select">
                                         {% for col in hideableColumns %}
@@ -243,9 +243,9 @@
                     </div>
                     <div class="flex menu-footer">
                         <div class="flex-grow">
-                            <button type="button" class="light" id="lr-view-defaults">{{ 'Use defaults'|t('app') }}</button>
+                            <button type="button" class="light" id="lr-view-defaults">{{ 'Use defaults'|t('lindemannrock-base') }}</button>
                         </div>
-                        <button type="button" class="btn" id="lr-view-close">{{ 'Close'|t('app') }}</button>
+                        <button type="button" class="btn" id="lr-view-close">{{ 'Close'|t('lindemannrock-base') }}</button>
                     </div>
                 </div>
             </div>
@@ -255,7 +255,7 @@
         {% if newButton and (not newButton.permission or currentUser.can(newButton.permission)) %}
             <a href="{{ newButton.url }}" class="btn submit add icon" id="lr-new-btn">
                 <span class="lr-label-full">{{ newButton.label }}</span>
-                <span class="lr-label-short" style="display: none;">{{ 'New'|t('app') }}</span>
+                <span class="lr-label-short" style="display: none;">{{ 'New'|t('lindemannrock-base') }}</span>
             </a>
         {% endif %}
     </div>
@@ -278,7 +278,7 @@
                         {# Checkbox header #}
                         {% if checkboxesEnabled %}
                             <th class="lr-checkbox-cell selectallcontainer">
-                                <div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="{{ 'Select all'|t('app') }}"></div>
+                                <div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="{{ 'Select all'|t('lindemannrock-base') }}"></div>
                             </th>
                         {% endif %}
 
@@ -306,7 +306,7 @@
 
                         {# Actions column header #}
                         {% if rowActionsEnabled %}
-                            <th class="thin" style="width: 60px;">{{ 'Actions'|t('app') }}</th>
+                            <th class="thin" style="width: 60px;">{{ 'Actions'|t('lindemannrock-base') }}</th>
                         {% endif %}
                     </tr>
                 </thead>
@@ -321,7 +321,7 @@
                                 {# Checkbox cell #}
                                 {% if checkboxesEnabled %}
                                     <td class="lr-checkbox-cell">
-                                        <div class="checkbox" title="{{ 'Select'|t('app') }}" tabindex="0" aria-checked="false" role="checkbox"></div>
+                                        <div class="checkbox" title="{{ 'Select'|t('lindemannrock-base') }}" tabindex="0" aria-checked="false" role="checkbox"></div>
                                     </td>
                                 {% endif %}
 
@@ -375,19 +375,19 @@
         <div class="light">
             <div class="flex pagination">
                 <nav class="flex" aria-label="{{ itemLabel.plural }} pagination">
-                    <button type="button" class="page-link prev-page {{ page <= 1 ? 'disabled' : '' }}" {{ page <= 1 ? 'disabled' : '' }} title="{{ 'Previous Page'|t('app') }}"></button>
-                    <button type="button" class="page-link next-page {{ page >= totalPages ? 'disabled' : '' }}" {{ page >= totalPages ? 'disabled' : '' }} title="{{ 'Next Page'|t('app') }}"></button>
+                    <button type="button" class="page-link prev-page {{ page <= 1 ? 'disabled' : '' }}" {{ page <= 1 ? 'disabled' : '' }} title="{{ 'Previous Page'|t('lindemannrock-base') }}"></button>
+                    <button type="button" class="page-link next-page {{ page >= totalPages ? 'disabled' : '' }}" {{ page >= totalPages ? 'disabled' : '' }} title="{{ 'Next Page'|t('lindemannrock-base') }}"></button>
                 </nav>
                 <div class="page-info">
                     {% set endRange = min(offset + limit, totalCount) %}
                     {% if totalCount == 0 %}
-                        {{ 'no'|t('app') }} {{ itemLabel.plural }}
+                        {{ 'no'|t('lindemannrock-base') }} {{ itemLabel.plural }}
                     {% else %}
-                        {{ (offset + 1)|number_format }} – {{ endRange|number_format }} {{ 'of'|t('app') }} {{ totalCount|number_format }} {{ totalCount == 1 ? itemLabel.singular : itemLabel.plural }}
+                        {{ (offset + 1)|number_format }} – {{ endRange|number_format }} {{ 'of'|t('lindemannrock-base') }} {{ totalCount|number_format }} {{ totalCount == 1 ? itemLabel.singular : itemLabel.plural }}
                     {% endif %}
                     {# AJAX refresh notice (inline with page info) #}
                     {% if ajaxEnabled and ajaxInterval > 0 %}
-                        <span class="lr-refresh-notice" id="lr-refresh-notice" title="{{ 'Auto-refresh'|t('app') }}">
+                        <span class="lr-refresh-notice" id="lr-refresh-notice" title="{{ 'Auto-refresh'|t('lindemannrock-base') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M13.5 8a5.5 5.5 0 1 1-1.5-3.8M13.5 2v4h-4"/>
                             </svg>

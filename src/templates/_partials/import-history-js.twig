@@ -14,8 +14,8 @@
 {% set tabSelector = tabSelector ?? 'a[href="#import-history"]' %}
 {% set clearButtonId = clearButtonId ?? 'clear-logs-btn' %}
 {% set clearAction = clearAction ?? '' %}
-{% set confirmMessage = confirmMessage ?? 'Are you sure you want to clear all import logs? This action cannot be undone.'|t('app') %}
-{% set clearErrorMessage = clearErrorMessage ?? 'Failed to clear history.'|t('app') %}
+{% set confirmMessage = confirmMessage ?? 'Are you sure you want to clear all import logs? This action cannot be undone.'|t('lindemannrock-base') %}
+{% set clearErrorMessage = clearErrorMessage ?? 'Failed to clear history.'|t('lindemannrock-base') %}
 
 if (sessionStorage.getItem('{{ tabStorageKey|e('js') }}') === 'true') {
     sessionStorage.removeItem('{{ tabStorageKey|e('js') }}');

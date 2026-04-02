@@ -38,36 +38,36 @@
 {% set formId = formId ?? '' %}
 {% set wrapForm = wrapForm ?? true %}
 {% set includeCsrf = includeCsrf ?? wrapForm %}
-{% set title = title ?? 'Import from CSV'|t('app') %}
+{% set title = title ?? 'Import from CSV'|t('lindemannrock-base') %}
 {% set description = description ?? '' %}
 {% set csvFormatTip = csvFormatTip ?? null %}
 {% set csvDescription = csvDescription ?? null %}
 {% set secondaryDescription = secondaryDescription ?? null %}
-{% set fileLabel = fileLabel ?? 'CSV File'|t('app') %}
+{% set fileLabel = fileLabel ?? 'CSV File'|t('lindemannrock-base') %}
 {% set fileInstructions = fileInstructions ?? '' %}
 {% set fileId = fileId ?? 'csvFile' %}
 {% set fileName = fileName ?? 'csvFile' %}
-{% set delimiterLabel = delimiterLabel ?? 'CSV Delimiter'|t('app') %}
+{% set delimiterLabel = delimiterLabel ?? 'CSV Delimiter'|t('lindemannrock-base') %}
 {% set delimiterInstructions = delimiterInstructions ?? '' %}
 {% set delimiterValue = delimiterValue ?? 'auto' %}
 {% set delimiterOptions = delimiterOptions ?? {
-    'auto': 'Auto (detect)'|t('app'),
-    ',': 'Comma (,)'|t('app'),
-    ';': 'Semicolon (;)'|t('app'),
-    "\t": 'Tab'|t('app'),
-    '|': 'Pipe (|)'|t('app'),
+    'auto': 'Auto (detect)'|t('lindemannrock-base'),
+    ',': 'Comma (,)'|t('lindemannrock-base'),
+    ';': 'Semicolon (;)'|t('lindemannrock-base'),
+    "\t": 'Tab'|t('lindemannrock-base'),
+    '|': 'Pipe (|)'|t('lindemannrock-base'),
 } %}
 {% set showBackupToggle = showBackupToggle ?? false %}
-{% set backupLabel = backupLabel ?? 'Create Backup Before Import'|t('app') %}
+{% set backupLabel = backupLabel ?? 'Create Backup Before Import'|t('lindemannrock-base') %}
 {% set backupInstructions = backupInstructions ?? '' %}
 {% set backupEnabled = backupEnabled ?? true %}
 {% set backupOnImport = backupOnImport ?? true %}
 {% set backupWarning = backupWarning ?? null %}
-{% set submitLabel = submitLabel ?? 'Upload & Map Columns'|t('app') %}
+{% set submitLabel = submitLabel ?? 'Upload & Map Columns'|t('lindemannrock-base') %}
 {% set infoBoxMessage = infoBoxMessage ?? null %}
 {% set showModeSwitch = showModeSwitch ?? false %}
-{% set primaryLabel = primaryLabel ?? 'CSV Import'|t('app') %}
-{% set secondaryLabel = secondaryLabel ?? 'Alternate Import'|t('app') %}
+{% set primaryLabel = primaryLabel ?? 'CSV Import'|t('lindemannrock-base') %}
+{% set secondaryLabel = secondaryLabel ?? 'Alternate Import'|t('lindemannrock-base') %}
 {% set secondaryHtml = secondaryHtml ?? null %}
 {% set modeDefault = modeDefault ?? 'csv' %}
 {% set toggleId = toggleId ?? (formId ? formId ~ '-mode-switch' : 'csv-import-mode-switch') %}

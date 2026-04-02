@@ -20,13 +20,13 @@
            placeholder="{{ placeholder }}"
            autocomplete="off"
            dir="ltr"
-           aria-label="{{ 'Search'|t('app') }}"
+           aria-label="{{ 'Search'|t('lindemannrock-base') }}"
            {% if value %}autofocus{% endif %}>
     <button type="button"
             class="clear-btn lr-clear-btn {{ value ? '' : 'hidden' }}"
-            title="{{ 'Clear'|t('app') }}"
+            title="{{ 'Clear'|t('lindemannrock-base') }}"
             role="button"
-            aria-label="{{ 'Clear search'|t('app') }}"></button>
+            aria-label="{{ 'Clear search'|t('lindemannrock-base') }}"></button>
 
     {# Hidden inputs to maintain filter state #}
     {% for filter in filters %}

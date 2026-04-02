@@ -90,8 +90,8 @@
         <td class="thin" style="text-align: right;">
             <button type="button"
                     class="btn {{ actions.icon ? 'icon ' ~ actions.icon : '' }} {{ actions.class ?? '' }}"
-                    title="{{ actions.label ?? actions.title ?? 'Action'|t('app') }}"
-                    aria-label="{{ actions.label ?? actions.title ?? 'Action'|t('app') }}"
+                    title="{{ actions.label ?? actions.title ?? 'Action'|t('lindemannrock-base') }}"
+                    aria-label="{{ actions.label ?? actions.title ?? 'Action'|t('lindemannrock-base') }}"
                     {% if actions.jsAction is defined and actions.jsAction %}
                         data-action="{{ actions.jsAction }}"
                         data-id="{{ item.id ?? '' }}"
@@ -177,7 +177,7 @@
                 <button type="button"
                         class="btn menubtn"
                         {% if actions.icon is defined and actions.icon %}data-icon="{{ actions.icon }}"{% endif %}
-                        title="{{ actions.title ?? 'Actions'|t('app') }}">
+                        title="{{ actions.title ?? 'Actions'|t('lindemannrock-base') }}">
                     {% if actions.label is defined and actions.label %}{{ actions.label }}{% endif %}
                 </button>
                 <div class="menu">

@@ -204,12 +204,12 @@ trait EditionTrait
         $editionLabel = ucfirst($edition);
 
         if ($featureName !== null) {
-            $message = Craft::t('app', '{feature} requires the {edition} edition.', [
+            $message = Craft::t('lindemannrock-base', '{feature} requires the {edition} edition.', [
                 'feature' => $featureName,
                 'edition' => $editionLabel,
             ]);
         } else {
-            $message = Craft::t('app', 'This feature requires the {edition} edition.', [
+            $message = Craft::t('lindemannrock-base', 'This feature requires the {edition} edition.', [
                 'edition' => $editionLabel,
             ]);
         }

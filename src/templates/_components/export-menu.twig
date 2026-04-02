@@ -63,23 +63,23 @@
 
         <div class="btngroup" id="{{ menuId }}">
             <button type="button" class="btn menubtn" data-icon="download">
-                <span class="lr-export-label">{{ "Export"|t('app') }}</span>
+                <span class="lr-export-label">{{ "Export"|t('lindemannrock-base') }}</span>
             </button>
             <div class="menu" data-align="right">
                 <ul>
                     {% if lrExportEnabled('excel', pluginHandle) %}
                         <li>
-                            <a href="#" data-lr-export="{{ menuId }}" data-format="excel">{{ "Export as Excel"|t('app') }}</a>
+                            <a href="#" data-lr-export="{{ menuId }}" data-format="excel">{{ "Export as Excel"|t('lindemannrock-base') }}</a>
                         </li>
                     {% endif %}
                     {% if lrExportEnabled('csv', pluginHandle) %}
                         <li>
-                            <a href="#" data-lr-export="{{ menuId }}" data-format="csv">{{ "Export as CSV"|t('app') }}</a>
+                            <a href="#" data-lr-export="{{ menuId }}" data-format="csv">{{ "Export as CSV"|t('lindemannrock-base') }}</a>
                         </li>
                     {% endif %}
                     {% if lrExportEnabled('json', pluginHandle) %}
                         <li>
-                            <a href="#" data-lr-export="{{ menuId }}" data-format="json">{{ "Export as JSON"|t('app') }}</a>
+                            <a href="#" data-lr-export="{{ menuId }}" data-format="json">{{ "Export as JSON"|t('lindemannrock-base') }}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -103,7 +103,7 @@
             {% if selectionAware %}
             var menuEl = document.getElementById('{{ menuId }}');
             var label = menuEl ? menuEl.querySelector('.lr-export-label') : null;
-            var defaultLabel = '{{ "Export"|t('app')|e('js') }}';
+            var defaultLabel = '{{ "Export"|t('lindemannrock-base')|e('js') }}';
             var conf = window._lrExportConfigs['{{ menuId }}'];
 
             function updateExportLabel(ids) {
