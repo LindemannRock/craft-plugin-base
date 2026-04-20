@@ -6,6 +6,8 @@ Detects when settings are overridden by a config file and shows lock icons in th
 
 When a setting is defined in `config/{plugin-handle}.php`, it takes precedence over the database value. The trait lets you detect this and show a visual indicator in the CP settings UI.
 
+The trait only detects config overrides. For DB-backed settings models, use `PluginHelper::applyConfigOverridesToSettings()` when loading settings so the model values also reflect the config file.
+
 ## Setup
 
 ```php
@@ -75,6 +77,23 @@ Typical pattern for a settings field:
 
 When both traits are used together, `saveToDatabase()` automatically skips fields that are overridden by the config file. This prevents database writes from overwriting config-defined values.
 
+When loading DB-backed settings, apply config overrides after loading from the database:
+
+```php
+use craft\base\Model;
+use lindemannrock\base\helpers\PluginHelper;
+
+protected function createSettingsModel(): ?Model
+{
+    return PluginHelper::applyConfigOverridesToSettings(
+        Settings::loadFromDatabase(),
+        'my-plugin'
+    );
+}
+```
+
+This keeps config-defined fields visible in the Settings model while `saveToDatabase()` still prevents those fields from being persisted back to the database.
+
 ## Log Level Validation
 
 The trait includes a validator that prevents `debug` logging when `devMode` is disabled:
@@ -100,4 +119,5 @@ Behavior by source:
 
 - [SettingsPersistenceTrait](settings-persistence.md) — database storage for settings
 - [SettingsDisplayNameTrait](settings-display-name.md) — custom plugin display names
+- [PluginHelper](plugin-helper.md) — applying config overrides to DB-backed settings models
 - [Configuration](../get-started/configuration.md) — base plugin config reference

@@ -151,6 +151,7 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 |--------|---------|-------------|
 | `bootstrap($plugin, $helper, $viewPerms, $dlPerms, $opts)` | `void` | Initialize base module |
 | `applyPluginNameFromConfig(PluginInterface $plugin)` | `void` | Override name from config |
+| `applyConfigOverridesToSettings(Model $settings, string $handle, array $skipKeys = [])` | `Model` | Merge config file values into a DB-backed Settings model |
 | `isPluginEnabled(string $handle)` | `bool` | Plugin installed and enabled? |
 | `isPluginInstalled(string $handle)` | `bool` | Plugin installed? |
 | `getPlugin(string $handle)` | `?PluginInterface` | Get plugin instance |

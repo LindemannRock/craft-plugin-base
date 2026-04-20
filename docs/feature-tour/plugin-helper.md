@@ -111,6 +111,44 @@ return [
 ];
 ```
 
+## Settings Config Overrides @since(5.16.0)
+
+For DB-backed settings models, also merge config file values into the Settings model itself:
+
+```php
+use craft\base\Model;
+use lindemannrock\base\helpers\PluginHelper;
+use lindemannrock\myplugin\models\Settings;
+
+protected function createSettingsModel(): ?Model
+{
+    return PluginHelper::applyConfigOverridesToSettings(
+        Settings::loadFromDatabase(),
+        'my-plugin'
+    );
+}
+```
+
+This keeps `$settings->getFullName()` and other settings-derived labels aligned with Craft's plugin name in `/admin/settings`.
+
+Why this matters:
+
+- `applyPluginNameFromConfig($this)` updates `$plugin->name`
+- CP nav labels, permission headings, breadcrumbs, widgets, and templates commonly use `$settings->getFullName()`
+- `applyConfigOverridesToSettings()` makes the Settings model config-aware, so both paths resolve to the same configured value
+
+You can skip nested config keys that are handled elsewhere:
+
+```php
+PluginHelper::applyConfigOverridesToSettings($settings, 'search-manager', [
+    'indices',
+    'backends',
+    'transformers',
+]);
+```
+
+Use this with [SettingsConfigTrait](settings-config.md) and [SettingsPersistenceTrait](settings-persistence.md) when a plugin stores settings in its own database table.
+
 ## Plugin Detection @since(5.9.0)
 
 Check if other plugins are installed before using their APIs:

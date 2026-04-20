@@ -223,6 +223,20 @@ return [
 
 Resolution order: config root level → environment-specific → wildcard (`*`) → database `pluginName` setting.
 
+If your plugin uses DB-backed settings via `SettingsPersistenceTrait`, also apply config overrides when loading the Settings model:
+
+```php
+protected function createSettingsModel(): ?Model
+{
+    return PluginHelper::applyConfigOverridesToSettings(
+        Settings::loadFromDatabase(),
+        'redirect-manager'
+    );
+}
+```
+
+This keeps `$plugin->name` and `$settings->getFullName()` aligned. Without this, `/admin/settings` can show the configured plugin name while CP nav labels or permission headings still show the database/default name.
+
 ## Without Logging
 
 If your plugin doesn't need logging integration, omit the permission arrays:
