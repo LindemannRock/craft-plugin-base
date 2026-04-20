@@ -9,6 +9,7 @@
 namespace lindemannrock\base\helpers;
 
 use Craft;
+use craft\base\Model;
 use craft\base\PluginInterface;
 use craft\events\CreateTwigEvent;
 use lindemannrock\base\Base;
@@ -285,6 +286,45 @@ class PluginHelper
         } catch (\Throwable $e) {
             // Silently ignore - plugin continues with default name
         }
+    }
+
+    /**
+     * Apply plugin config file overrides to a Settings model.
+     *
+     * This keeps DB-backed settings models aligned with Craft's config priority:
+     * config/{plugin-handle}.php values override database values in memory.
+     *
+     * @template T of Model
+     *
+     * @param T $settings Settings model to mutate
+     * @param string $pluginHandle Plugin handle / config filename without .php
+     * @param array<int, string> $skipKeys Config keys handled outside the flat Settings model
+     * @return T
+     * @since 5.16.0
+     */
+    public static function applyConfigOverridesToSettings(Model $settings, string $pluginHandle, array $skipKeys = []): Model
+    {
+        try {
+            $config = Craft::$app->getConfig()->getConfigFromFile($pluginHandle);
+        } catch (\Throwable) {
+            return $settings;
+        }
+
+        if (!is_array($config)) {
+            return $settings;
+        }
+
+        foreach ($config as $key => $value) {
+            if (!is_string($key) || in_array($key, $skipKeys, true)) {
+                continue;
+            }
+
+            if (property_exists($settings, $key)) {
+                $settings->$key = $value;
+            }
+        }
+
+        return $settings;
     }
 
     /**
