@@ -19,5 +19,5 @@ The following packages are installed automatically via Composer:
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| [matomo/device-detector](https://github.com/matomo-org/device-detector) | ^6.4 | User-agent parsing for device detection (DeviceDetectionTrait) |
-| [phpoffice/phpspreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) | ^3.0 \|\| ^5.0 | Excel (.xlsx) export support (ExportHelper) |
+| [matomo/device-detector](https://github.com/matomo-org/device-detector) | 6.4+ | User-agent parsing for device detection (DeviceDetectionTrait) |
+| [phpoffice/phpspreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) | 3.0+ or 5.0+ | Excel (.xlsx) export support (ExportHelper) |

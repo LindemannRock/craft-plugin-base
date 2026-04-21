@@ -107,3 +107,7 @@ return [
 - [DateFormatHelper](../feature-tour/date-format-helper.md) — how date/time formatting works in PHP
 - [ExportHelper](../feature-tour/export-helper.md) — CSV, JSON, and Excel exports
 - [Twig Filters & Functions](../template-guides/twig-filters-functions.md) — using date formatting in templates
+
+## Translations
+
+LindemannRock Base includes translations for 12 languages. See [Translations](../resources/translations.md) for the full list and override instructions.
