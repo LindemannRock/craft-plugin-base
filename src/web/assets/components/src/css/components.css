@@ -810,6 +810,18 @@ a.lr-unified-card-link:active {
     margin-top: 30px;
 }
 
+.lr-mb-16 {
+    margin-bottom: 16px;
+}
+
+.lr-mb-24 {
+    margin-bottom: 24px;
+}
+
+.lr-mb-30 {
+    margin-bottom: 30px;
+}
+
 .lr-word-cloud {
     height: 300px;
     position: relative;
