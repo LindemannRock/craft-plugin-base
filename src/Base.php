@@ -18,6 +18,7 @@ use lindemannrock\base\twigextensions\ColorExtension;
 use lindemannrock\base\twigextensions\DateTimeExtension;
 use lindemannrock\base\twigextensions\ExportExtension;
 use lindemannrock\base\twigextensions\GeoExtension;
+use lindemannrock\base\twigextensions\LabelExtension;
 use lindemannrock\base\twigextensions\PluginExtension;
 use yii\base\Event;
 use yii\base\Module;
@@ -83,6 +84,7 @@ class Base extends Module
         Craft::$app->getView()->registerTwigExtension(new ColorExtension());
         Craft::$app->getView()->registerTwigExtension(new ExportExtension());
         Craft::$app->getView()->registerTwigExtension(new GeoExtension());
+        Craft::$app->getView()->registerTwigExtension(new LabelExtension());
         Craft::$app->getView()->registerTwigExtension(new PluginExtension());
 
         self::$registered = true;
