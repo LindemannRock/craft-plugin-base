@@ -300,7 +300,7 @@ class PluginHelper
      * @param string $pluginHandle Plugin handle / config filename without .php
      * @param array<int, string> $skipKeys Config keys handled outside the flat Settings model
      * @return T
-     * @since 5.16.0
+     * @since 5.22.0
      */
     public static function applyConfigOverridesToSettings(Model $settings, string $pluginHandle, array $skipKeys = []): Model
     {
