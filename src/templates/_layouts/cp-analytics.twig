@@ -177,7 +177,7 @@
                                 {% for option in filter.options %}
                                     <li>
                                         <a href="#"
-                                           data-{{ filter.param }}="{{ option.value }}"
+                                           data-value="{{ option.value }}"
                                            class="lr-custom-filter-option {{ filter.current == option.value ? 'sel' : '' }}"
                                            data-param="{{ filter.param }}">
                                             {{ option.label }}
@@ -523,7 +523,7 @@
                 if (option) {
                     e.preventDefault();
                     var param = option.dataset.param;
-                    var value = option.dataset[param];
+                    var value = option.dataset.value;
                     var url = new URL(window.location);
                     if (value && value !== 'all') {
                         url.searchParams.set(param, value);
