@@ -30,7 +30,8 @@
             "feature-tour/queue-ttr",
             "feature-tour/db-helper",
             "feature-tour/csv-import-helper",
-            "feature-tour/cp-nav-helper"
+            "feature-tour/cp-nav-helper",
+            "feature-tour/label-helper"
         ]
     },
     {

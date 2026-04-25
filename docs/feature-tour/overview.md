@@ -18,6 +18,7 @@ Utility classes for common operations:
 - **[DbHelper](db-helper.md)** — DB-agnostic JSON extraction and GROUP_CONCAT
 - **[CsvImportHelper](csv-import-helper.md)** — CSV file upload parsing with automatic delimiter detection
 - **[CpNavHelper](cp-nav-helper.md)** — CP navigation building for plugin sub-pages
+- **[LabelHelper](label-helper.md)** — Strip numbering and truncate long field labels for compact UI contexts
 
 ### PHP Traits
 
@@ -41,6 +42,7 @@ Filters and functions available in all CP templates after bootstrap:
 - **Export functions** — `lrExportEnabled()`, `lrExportFormats()`, `lrExportFormatOptions()`
 - **Geo functions** — `lrCountries()`, `lrCountryName()`, `lrCountryDialCodeData()`, `lrDialCode()`, `lrCountryWithDialCode()`, `lrValidCountryCode()`
 - **Plugin functions** — `lrPluginInstalled()`, `lrPluginEnabled()`, `lrPluginName()`
+- **Label filters** — `|lrShortLabel`
 
 See [Twig Filters & Functions](../template-guides/twig-filters-functions.md) for the complete reference.
 

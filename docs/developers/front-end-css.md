@@ -141,7 +141,7 @@ Flexible card with alignment variants, badges, and sub-boxes. Combines features 
 |-------|-------------|
 | `.lr-analytics-charts` | Chart grid (auto-fit, min 280px) |
 | `.lr-analytics-charts.two-columns` | Fixed two-column chart grid |
-| `.lr-chart-container` | White bordered chart wrapper |
+| `.lr-chart-container` | White bordered chart wrapper (`display: flex; flex-direction: column`). When the last child is a height-utility (`.lr-chart-height-200/250/300`) or `.lr-chart-center`, it receives `flex: 1` automatically — the chart canvas expands to fill remaining vertical space when the card is grid-stretched. |
 | `.lr-chart-container.full-width` | Spans full grid width |
 | `.lr-chart-canvas` | Full-width canvas (`width: 100% !important; height: 100% !important`) |
 | `.lr-chart-loading` | Loading state (centered, 200px min height) |
@@ -167,7 +167,7 @@ Flexible card with alignment variants, badges, and sub-boxes. Combines features 
 | `.lr-chart-height-200` | 200px |
 | `.lr-chart-height-250` | 250px |
 | `.lr-chart-height-300` | 300px |
-| `.lr-chart-center` | Flex centered, max 260px width and height on canvas |
+| `.lr-chart-center` | Flex centered, max 300px width and height on canvas |
 
 ### Tab Content
 
@@ -280,6 +280,9 @@ Display config file contents on hover.
 |-------|-------------|
 | `.lr-mt-24` | `margin-top: 24px` |
 | `.lr-mt-30` | `margin-top: 30px` |
+| `.lr-mb-16` | `margin-bottom: 16px` |
+| `.lr-mb-24` | `margin-bottom: 24px` |
+| `.lr-mb-30` | `margin-bottom: 30px` |
 | `.lr-inline-flex` | Inline flex with centered items |
 | `.lr-gap-4` | `gap: 4px` |
 | `.lr-border-top-muted` | `border-top: 2px solid #e5e7eb` |

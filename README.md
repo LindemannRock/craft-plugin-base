@@ -19,6 +19,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **DbHelper** — DB-agnostic JSON extraction and GROUP_CONCAT
 - **CsvImportHelper** — CSV upload parsing with configurable options
 - **CpNavHelper** — CP subnav building with permission checks
+- **LabelHelper** — strip numbering and truncate long field labels for compact UI contexts (`|lrShortLabel` Twig filter)
 - **Device Detection** — standardized UA parsing via Matomo DeviceDetector
 - **GeoLookup** — IP geolocation via configurable providers (ip-api.com, ipapi.co, ipinfo.io)
 - **CP Table Layout** — reusable table pages with filters, search, pagination, and AJAX refresh

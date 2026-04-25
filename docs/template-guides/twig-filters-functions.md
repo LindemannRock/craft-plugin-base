@@ -166,6 +166,23 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 {{ lrPluginName('missing-plugin', 'Fallback Name') }} {# "Fallback Name" if not found #}
 ```
 
+## Label Filters
+
+### |lrShortLabel @since(5.22.0)
+
+Shortens a long label for compact UI contexts — dropdown options, table headers, tabs. Strips leading numbering, collapses whitespace, and truncates with an ellipsis. A trailing parenthetical suffix is preserved so entries stay distinguishable.
+
+```twig
+{{ field.label|lrShortLabel }}        {# default 60 chars #}
+{{ field.label|lrShortLabel(40) }}    {# custom max length #}
+```
+
+| Filter | Parameters | Description |
+|--------|------------|-------------|
+| `lrShortLabel` | `maxLength=60` | Strip numbering and truncate label |
+
+See [LabelHelper](../feature-tour/label-helper.md) for full details.
+
 ## Plugin Helper Variable
 
 Each plugin registers a Twig global via `PluginHelper::bootstrap()`. This variable provides display name methods from [SettingsDisplayNameTrait](../feature-tour/settings-display-name.md):
