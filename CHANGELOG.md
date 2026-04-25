@@ -1,5 +1,23 @@
 # Changelog
 
+## [5.22.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.21.0...v5.22.0) (2026-04-25)
+
+
+### Features
+
+* add config override merge helper for settings models ([6d70416](https://github.com/LindemannRock/craft-plugin-base/commit/6d704168e7a9d2a74c65985ee7055d1a0895fff1))
+* **css:** add flex properties to chart containers for better layout ([b014951](https://github.com/LindemannRock/craft-plugin-base/commit/b01495182124636f68db7160d402f1f4ed6e7b10))
+* **css:** add margin utility classes for consistent spacing ([f42203b](https://github.com/LindemannRock/craft-plugin-base/commit/f42203bc2ffb7e00f60e4fca5f35c4d61a6be6c2))
+* **twigextensions:** add LabelExtension for formatting user-facing labels ([9c6b7b8](https://github.com/LindemannRock/craft-plugin-base/commit/9c6b7b81986f8c49d8c20b5f76637ce10b2e6435))
+
+
+### Bug Fixes
+
+* **cp:** correct data attribute usage in custom filter options ([67a843e](https://github.com/LindemannRock/craft-plugin-base/commit/67a843e7e30b4385756fc17d5542e61a28c7fe5b))
+* **css:** increase max dimensions for chart center canvas ([d78743c](https://github.com/LindemannRock/craft-plugin-base/commit/d78743c2186183aa8f7d410e64a68280501589ac))
+* drop PAT requirement for release-please — use built-in GITHUB_TOKEN ([bafd0f6](https://github.com/LindemannRock/craft-plugin-base/commit/bafd0f6a9f3a387f58188e0c450b3c3fd9f3f00d))
+* **helper:** update version in applyConfigOverridesToSettings method ([c09cd6b](https://github.com/LindemannRock/craft-plugin-base/commit/c09cd6b77c151283f5680bb73bbbeff735cb93b9))
+
 ## [5.21.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.1...v5.21.0) (2026-04-02)
 
 
