@@ -796,8 +796,8 @@ a.lr-unified-card-link:active {
 }
 
 .lr-chart-center canvas {
-    max-width: 260px;
-    max-height: 260px;
+    max-width: 300px;
+    max-height: 300px;
     width: 100% !important;
     height: 100% !important;
 }
