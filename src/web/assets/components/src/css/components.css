@@ -591,6 +591,18 @@ a.lr-unified-card-link:active {
     padding: 24px;
     min-width: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* When a chart-height utility is the last child of a chart-container, let it
+   grow to fill remaining vertical space (so trend/bar charts match donut card
+   heights when grid-stretched as siblings). */
+.lr-chart-container > .lr-chart-height-200:last-child,
+.lr-chart-container > .lr-chart-height-250:last-child,
+.lr-chart-container > .lr-chart-height-300:last-child,
+.lr-chart-container > .lr-chart-center:last-child {
+    flex: 1;
 }
 
 .lr-chart-container.full-width {
