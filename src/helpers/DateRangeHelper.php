@@ -25,11 +25,16 @@ class DateRangeHelper
      * Get the default date range from config.
      *
      * Resolution order:
-     * 1. Plugin config: defaultDateRange (root level)
-     * 2. Plugin config: analytics.defaultDateRange (legacy/backwards compat)
-     * 3. Base config: defaultDateRange (root level)
-     * 4. Base config: analytics.defaultDateRange (legacy)
-     * 5. Hardcoded default: 'last30days'
+     * 1. Plugin Settings model: $settings->defaultDateRange (when the property
+     *    exists). Plugins using SettingsConfigTrait already merge config-file
+     *    overrides onto the model, so this single read encodes config-wins →
+     *    UI value → property default.
+     * 2. Plugin config file: defaultDateRange (root level) — fallback for
+     *    plugins that don't yet expose the setting on their Settings model.
+     * 3. Plugin config file: analytics.defaultDateRange (legacy/backwards compat)
+     * 4. Base config: defaultDateRange (root level)
+     * 5. Base config: analytics.defaultDateRange (legacy)
+     * 6. Hardcoded default: 'last30days'
      *
      * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return string The default date range (e.g., 'last30days')
@@ -37,14 +42,27 @@ class DateRangeHelper
      */
     public static function getDefaultDateRange(?string $pluginHandle = null): string
     {
-        // Check plugin-specific config first
         if ($pluginHandle) {
+            // Prefer the plugin's Settings model when the property exists.
+            // SettingsConfigTrait ensures config-file values already override
+            // the saved/UI value on the model.
+            $plugin = Craft::$app->plugins->getPlugin($pluginHandle);
+            if ($plugin !== null) {
+                $settings = $plugin->getSettings();
+                if ($settings !== null && property_exists($settings, 'defaultDateRange')) {
+                    $value = $settings->defaultDateRange;
+                    if (is_string($value) && $value !== '') {
+                        return $value;
+                    }
+                }
+            }
+
+            // Fallback for plugins that haven't added defaultDateRange to
+            // their Settings model yet — read directly from the config file.
             $pluginConfig = Craft::$app->getConfig()->getConfigFromFile($pluginHandle);
-            // Root level takes priority
             if (isset($pluginConfig['defaultDateRange'])) {
                 return $pluginConfig['defaultDateRange'];
             }
-            // Legacy: analytics.defaultDateRange
             if (isset($pluginConfig['analytics']['defaultDateRange'])) {
                 return $pluginConfig['analytics']['defaultDateRange'];
             }
@@ -52,11 +70,9 @@ class DateRangeHelper
 
         // Fall back to base config
         $config = Craft::$app->getConfig()->getConfigFromFile('lindemannrock-base');
-        // Root level takes priority
         if (isset($config['defaultDateRange'])) {
             return $config['defaultDateRange'];
         }
-        // Legacy: analytics.defaultDateRange
         return $config['analytics']['defaultDateRange'] ?? 'last30days';
     }
 
