@@ -360,6 +360,58 @@ class PluginHelper
     }
 
     /**
+     * Returns Craft's cache component when it's a Redis-backed Yii cache, else null.
+     *
+     * Use this whenever a plugin's settings indicate Redis cache storage but the code
+     * needs to call low-level Redis commands (`SADD`, `SMEMBERS`, `SCARD`, `DEL`, etc.)
+     * directly via `$cache->redis->executeCommand(...)`. Those commands silently no-op
+     * when Craft's cache component isn't actually Redis (e.g. admin selected "Redis"
+     * in plugin settings but Craft's `config/app.php` has no Redis component, or the
+     * Redis component was removed during a deploy).
+     *
+     * Logs a warning to the `lindemannrock-base` log category once per request per
+     * plugin context when a misconfiguration is detected. Subsequent calls in the same
+     * request stay silent to avoid log spam.
+     *
+     * Typical usage:
+     * ```php
+     * if ($settings->cacheStorageMethod === 'redis') {
+     *     $redis = PluginHelper::getRedisCacheOrLog('my-plugin');
+     *     if ($redis === null) {
+     *         return true; // misconfig already logged; treat as graceful no-op
+     *     }
+     *     $redis->redis->executeCommand('SADD', [$keySet, $key]);
+     * }
+     * ```
+     *
+     * @param string $pluginContext Short identifier for the calling plugin (used in log message)
+     * @return \yii\redis\Cache|null
+     * @since 5.23.0
+     */
+    public static function getRedisCacheOrLog(string $pluginContext): ?\yii\redis\Cache
+    {
+        $cache = Craft::$app->cache;
+        if ($cache instanceof \yii\redis\Cache) {
+            return $cache;
+        }
+
+        // Log once per request per plugin context to avoid spam
+        static $logged = [];
+        if (!isset($logged[$pluginContext])) {
+            Craft::warning(
+                "{$pluginContext}: cacheStorageMethod=redis configured, but Craft's cache " .
+                'component is ' . get_class($cache) . " (not yii\\redis\\Cache). Redis cache " .
+                'operations silently no-op. Either configure Redis in config/app.php, or ' .
+                'change the plugin setting to file storage.',
+                'lindemannrock-base'
+            );
+            $logged[$pluginContext] = true;
+        }
+
+        return null;
+    }
+
+    /**
      * Register translations for a plugin
      *
      * Convenience method to register translation messages.
