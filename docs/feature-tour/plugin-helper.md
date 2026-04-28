@@ -202,6 +202,46 @@ $prefix = PluginHelper::getCacheKeyPrefix('redirect-manager', 'device');
 $keySet = PluginHelper::getCacheKeySet('redirect-manager', 'device');
 ```
 
+## Redis Cache Safeguard @since(5.23.0)
+
+When a plugin is configured to use Redis cache storage but Craft's underlying cache
+component isn't actually Redis (admin selected "Redis" in plugin settings but
+`config/app.php` has no Redis component, deploy mishap, env-var drift, etc.), any
+direct Redis commands silently no-op — leading to stale stats forever with no log.
+
+Use `getRedisCacheOrLog()` whenever your plugin's code needs to call low-level Redis
+commands directly via `$cache->redis->executeCommand(...)` (e.g. `SADD`, `SMEMBERS`,
+`SCARD`, `DEL`, `SREM`):
+
+```php
+if ($settings->cacheStorageMethod === 'redis') {
+    $redis = PluginHelper::getRedisCacheOrLog('my-plugin');
+    if ($redis === null) {
+        return true; // misconfig already logged, treat as graceful no-op
+    }
+
+    $redis->redis->executeCommand('SADD', [$keySet, $cacheKey]);
+}
+```
+
+When a misconfiguration is detected, the helper logs **once per request per plugin
+context** to the `lindemannrock-base` log category, e.g.:
+
+```
+my-plugin: cacheStorageMethod=redis configured, but Craft's cache component is
+yii\caching\FileCache (not yii\redis\Cache). Redis cache operations silently
+no-op. Either configure Redis in config/app.php, or change the plugin setting
+to file storage.
+```
+
+Subsequent calls in the same request stay silent to avoid log spam. Behaviour for
+correctly-configured installs is unchanged — zero extra logs, zero overhead beyond
+a single `instanceof` check.
+
+When you don't need this: `$cache->set()`, `$cache->get()`, `$cache->delete()` work
+correctly through any cache backend. Only direct `->redis->executeCommand(...)` calls
+require the safeguard.
+
 ## Translation Registration @since(5.14.0)
 
 Translations are registered automatically during `bootstrap()`. To register manually:
