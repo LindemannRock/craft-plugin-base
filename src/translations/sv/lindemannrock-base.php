@@ -88,4 +88,19 @@ return [
     'Failed to clear history.' => 'Det gick inte att rensa historiken.',
     'Loading backup history...' => 'Laddar säkerhetskopieringshistorik...',
     'No backups found.' => 'Inga säkerhetskopior hittades.',
+
+    // Geo provider settings (shared via _partials/geo-settings.twig)
+    'Geo Provider' => 'Geo-leverantör',
+    'Select the geo IP lookup provider. HTTPS providers recommended for privacy.' => 'Välj leverantör för geo-IP-uppslag. HTTPS-leverantörer rekommenderas av integritetsskäl.',
+    'ip-api.com (HTTP free, HTTPS paid)' => 'ip-api.com (HTTP gratis, HTTPS betald)',
+    'ipapi.co (HTTPS, 1k/day free)' => 'ipapi.co (HTTPS, 1 000/dag gratis)',
+    'ipinfo.io (HTTPS, 50k/month free)' => 'ipinfo.io (HTTPS, 50 000/månad gratis)',
+    'API Key' => 'API-nyckel',
+    'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).' => 'Valfritt. Krävs för betalda nivåer (aktiverar HTTPS för ip-api.com Pro).',
+    'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.' => 'Det här åsidosätts av inställningen <code>geoProvider</code> i <code>config/{handle}.php</code>.',
+    'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.' => 'Det här åsidosätts av inställningen <code>geoApiKey</code> i <code>config/{handle}.php</code>.',
+    'ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io.' => 'ip-api.com:s gratisplan använder HTTP. IP-adresser överförs okrypterade. Lägg till en API-nyckel för HTTPS (Pro-nivå) eller byt till ipapi.co/ipinfo.io.',
+    'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: HTTP gratisplan (45 förfrågningar/min). Lägg till API-nyckel för HTTPS (Pro-nivå, $13/month). IP-adresser överförs okrypterade utan API-nyckel.',
+    'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS med 1 000 gratis förfrågningar/dag. API-nyckel är valfri (ökar hastighetsgränser).',
+    'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS med 50 000 gratis förfrågningar/månad. API-nyckel är valfri (ökar hastighetsgränser).',
 ];

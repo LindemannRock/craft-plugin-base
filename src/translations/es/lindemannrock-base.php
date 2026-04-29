@@ -88,4 +88,19 @@ return [
     'Failed to clear history.' => 'Error al borrar el historial.',
     'Loading backup history...' => 'Cargando historial de copias de seguridad...',
     'No backups found.' => 'No se encontraron copias de seguridad.',
+
+    // Geo provider settings (shared via _partials/geo-settings.twig)
+    'Geo Provider' => 'Proveedor de geolocalización',
+    'Select the geo IP lookup provider. HTTPS providers recommended for privacy.' => 'Seleccione el proveedor de búsqueda de IP geográfica. Se recomiendan proveedores HTTPS por privacidad.',
+    'ip-api.com (HTTP free, HTTPS paid)' => 'ip-api.com (HTTP gratuito, HTTPS de pago)',
+    'ipapi.co (HTTPS, 1k/day free)' => 'ipapi.co (HTTPS, 1k/día gratuito)',
+    'ipinfo.io (HTTPS, 50k/month free)' => 'ipinfo.io (HTTPS, 50k/mes gratuito)',
+    'API Key' => 'Clave API',
+    'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).' => 'Opcional. Necesaria para los planes de pago (activa HTTPS para ip-api.com Pro).',
+    'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.' => 'Esto está siendo sobreescrito por la configuración <code>geoProvider</code> en <code>config/{handle}.php</code>.',
+    'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.' => 'Esto está siendo sobreescrito por la configuración <code>geoApiKey</code> en <code>config/{handle}.php</code>.',
+    'ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io.' => 'El plan gratuito de ip-api.com usa HTTP. Las direcciones IP se transmitirán sin cifrar. Añada una clave API para HTTPS (plan Pro) o cambie a ipapi.co/ipinfo.io.',
+    'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: plan gratuito HTTP (45 solicitudes/min). Añada una clave API para HTTPS (plan Pro, $13/month). Las direcciones IP se transmiten sin cifrar sin clave API.',
+    'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS con 1.000 solicitudes gratuitas/día. Clave API opcional (aumenta los límites de velocidad).',
+    'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS con 50.000 solicitudes gratuitas/mes. Clave API opcional (aumenta los límites de velocidad).',
 ];

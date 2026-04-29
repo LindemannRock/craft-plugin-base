@@ -6,39 +6,39 @@
  *
  * Required variables:
  * - settings: Plugin settings model with geoProvider, geoApiKey
- * - translationCategory: Plugin translation category for overrides/messages (e.g., 'search-manager')
+ * - pluginHandle: Plugin handle used in config-override warning messages (e.g., 'search-manager')
  *
  * Usage:
  * {% include 'lindemannrock-base/_partials/geo-settings' with {
  *     settings: settings,
- *     translationCategory: 'search-manager'
+ *     pluginHandle: 'search-manager'
  * } %}
  */
 #}
 
 {% import "_includes/forms" as forms %}
-{% set translationCategory = translationCategory ?? 'app' %}
+{% set pluginHandle = pluginHandle ?? 'app' %}
 
 {{ forms.selectField({
-    label: 'Geo Provider'|t(translationCategory),
-    instructions: 'Select the geo IP lookup provider. HTTPS providers recommended for privacy.'|t(translationCategory),
+    label: 'Geo Provider'|t('lindemannrock-base'),
+    instructions: 'Select the geo IP lookup provider. HTTPS providers recommended for privacy.'|t('lindemannrock-base'),
     id: 'geoProvider',
     name: 'settings[geoProvider]',
     value: settings.geoProvider ?? 'ip-api.com',
     options: {
-        'ip-api.com': 'ip-api.com (HTTP free, HTTPS paid)'|t(translationCategory),
-        'ipapi.co': 'ipapi.co (HTTPS, 1k/day free)'|t(translationCategory),
-        'ipinfo.io': 'ipinfo.io (HTTPS, 50k/month free)'|t(translationCategory),
+        'ip-api.com': 'ip-api.com (HTTP free, HTTPS paid)'|t('lindemannrock-base'),
+        'ipapi.co': 'ipapi.co (HTTPS, 1k/day free)'|t('lindemannrock-base'),
+        'ipinfo.io': 'ipinfo.io (HTTPS, 50k/month free)'|t('lindemannrock-base'),
     },
     errors: settings.getErrors('geoProvider'),
     disabled: settings.isOverriddenByConfig('geoProvider'),
     warning: settings.isOverriddenByConfig('geoProvider') ?
-        ("This is being overridden by the <code>geoProvider</code> setting in <code>config/" ~ translationCategory ~ ".php</code>.")|t(translationCategory)|raw : null,
+        'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {handle: pluginHandle})|raw : null,
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'API Key'|t(translationCategory),
-    instructions: 'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).'|t(translationCategory),
+    label: 'API Key'|t('lindemannrock-base'),
+    instructions: 'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).'|t('lindemannrock-base'),
     id: 'geoApiKey',
     name: 'settings[geoApiKey]',
     value: settings.geoApiKey,
@@ -47,12 +47,12 @@
     errors: settings.getErrors('geoApiKey'),
     disabled: settings.isOverriddenByConfig('geoApiKey'),
     warning: settings.isOverriddenByConfig('geoApiKey') ?
-        ("This is being overridden by the <code>geoApiKey</code> setting in <code>config/" ~ translationCategory ~ ".php</code>.")|t(translationCategory)|raw : null,
+        'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {handle: pluginHandle})|raw : null,
 }) }}
 
 <div id="geo-http-warning" class="{{ (settings.geoProvider ?? 'ip-api.com') != 'ip-api.com' or settings.geoApiKey ? 'hidden' : '' }}" style="margin-top: 24px;">
     {% include 'lindemannrock-base/_components/info-box' with {
-        message: '<span id="geo-warning-message">' ~ "ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io."|t(translationCategory) ~ '</span>',
+        message: '<span id="geo-warning-message">' ~ 'ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io.'|t('lindemannrock-base') ~ '</span>',
         type: 'warning',
         margin: 'none'
     } %}
@@ -60,7 +60,7 @@
 
 <div id="geo-provider-info">
     {% include 'lindemannrock-base/_components/info-box' with {
-        message: '<span id="geo-provider-info-message">' ~ "ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key."|t(translationCategory) ~ '</span>',
+        message: '<span id="geo-provider-info-message">' ~ 'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.'|t('lindemannrock-base') ~ '</span>',
         type: 'info',
         margin: 'top'
     } %}
@@ -76,17 +76,17 @@
     const providerConfig = {
         'ip-api.com': {
             placeholder: '$IP_API_KEY',
-            info: {{ "ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key."|t(translationCategory)|json_encode|raw }},
+            info: {{ 'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.'|t('lindemannrock-base')|json_encode|raw }},
             showHttpWarning: true
         },
         'ipapi.co': {
             placeholder: '$IPAPI_CO_KEY',
-            info: {{ "ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits)."|t(translationCategory)|json_encode|raw }},
+            info: {{ 'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).'|t('lindemannrock-base')|json_encode|raw }},
             showHttpWarning: false
         },
         'ipinfo.io': {
             placeholder: '$IPINFO_IO_KEY',
-            info: {{ "ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits)."|t(translationCategory)|json_encode|raw }},
+            info: {{ 'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).'|t('lindemannrock-base')|json_encode|raw }},
             showHttpWarning: false
         }
     };

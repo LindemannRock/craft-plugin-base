@@ -88,4 +88,19 @@ return [
     'Failed to clear history.' => 'Failed to clear history.',
     'Loading backup history...' => 'Loading backup history...',
     'No backups found.' => 'No backups found.',
+
+    // Geo provider settings (shared via _partials/geo-settings.twig)
+    'Geo Provider' => 'Geo Provider',
+    'Select the geo IP lookup provider. HTTPS providers recommended for privacy.' => 'Select the geo IP lookup provider. HTTPS providers recommended for privacy.',
+    'ip-api.com (HTTP free, HTTPS paid)' => 'ip-api.com (HTTP free, HTTPS paid)',
+    'ipapi.co (HTTPS, 1k/day free)' => 'ipapi.co (HTTPS, 1k/day free)',
+    'ipinfo.io (HTTPS, 50k/month free)' => 'ipinfo.io (HTTPS, 50k/month free)',
+    'API Key' => 'API Key',
+    'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).' => 'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).',
+    'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.' => 'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.',
+    'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.' => 'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.',
+    'ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io.' => 'ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io.',
+    'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.',
+    'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).',
+    'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).',
 ];

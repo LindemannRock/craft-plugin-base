@@ -88,4 +88,19 @@ return [
     'Failed to clear history.' => 'Verlauf konnte nicht geleert werden.',
     'Loading backup history...' => 'Sicherungsverlauf wird geladen...',
     'No backups found.' => 'Keine Sicherungen gefunden.',
+
+    // Geo provider settings (shared via _partials/geo-settings.twig)
+    'Geo Provider' => 'Geo-Anbieter',
+    'Select the geo IP lookup provider. HTTPS providers recommended for privacy.' => 'Geo-IP-Suchanbieter auswählen. HTTPS-Anbieter werden aus Datenschutzgründen empfohlen.',
+    'ip-api.com (HTTP free, HTTPS paid)' => 'ip-api.com (HTTP kostenlos, HTTPS kostenpflichtig)',
+    'ipapi.co (HTTPS, 1k/day free)' => 'ipapi.co (HTTPS, 1k/Tag kostenlos)',
+    'ipinfo.io (HTTPS, 50k/month free)' => 'ipinfo.io (HTTPS, 50k/Monat kostenlos)',
+    'API Key' => 'API-Schlüssel',
+    'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).' => 'Optional. Erforderlich für kostenpflichtige Tarife (aktiviert HTTPS für ip-api.com Pro).',
+    'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.' => 'Diese Einstellung wird durch <code>geoProvider</code> in <code>config/{handle}.php</code> überschrieben.',
+    'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.' => 'Diese Einstellung wird durch <code>geoApiKey</code> in <code>config/{handle}.php</code> überschrieben.',
+    'ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io.' => 'ip-api.com Free-Tarif verwendet HTTP. IP-Adressen werden unverschlüsselt übertragen. Fügen Sie einen API-Schlüssel für HTTPS (Pro-Tarif) hinzu oder wechseln Sie zu ipapi.co/ipinfo.io.',
+    'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: HTTP Free-Tarif (45 Anfragen/Min). API-Schlüssel für HTTPS hinzufügen (Pro-Tarif, 13 $/Monat). IP-Adressen werden ohne API-Schlüssel unverschlüsselt übertragen.',
+    'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS mit 1.000 kostenlosen Anfragen/Tag. API-Schlüssel optional (erhöht Ratenlimits).',
+    'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS mit 50.000 kostenlosen Anfragen/Monat. API-Schlüssel optional (erhöht Ratenlimits).',
 ];

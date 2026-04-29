@@ -88,4 +88,19 @@ return [
     'Failed to clear history.' => 'فشل مسح السجل.',
     'Loading backup history...' => 'جارٍ تحميل سجل النسخ الاحتياطية...',
     'No backups found.' => 'لم يتم العثور على نسخ احتياطية.',
+
+    // Geo provider settings (shared via _partials/geo-settings.twig)
+    'Geo Provider' => 'مزوّد الموقع الجغرافي',
+    'Select the geo IP lookup provider. HTTPS providers recommended for privacy.' => 'اختر مزوّد البحث عن الموقع الجغرافي بواسطة IP. يُوصى باستخدام مزوّدي HTTPS للحفاظ على الخصوصية.',
+    'ip-api.com (HTTP free, HTTPS paid)' => 'ip-api.com (HTTP مجاني، HTTPS مدفوع)',
+    'ipapi.co (HTTPS, 1k/day free)' => 'ipapi.co (HTTPS، 1000 طلب/يوم مجانًا)',
+    'ipinfo.io (HTTPS, 50k/month free)' => 'ipinfo.io (HTTPS، 50,000 طلب/شهر مجانًا)',
+    'API Key' => 'مفتاح API',
+    'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).' => 'اختياري. مطلوب للخطط المدفوعة (يتيح HTTPS لـ ip-api.com Pro).',
+    'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة إعداد <code>geoProvider</code> في <code>config/{handle}.php</code>.',
+    'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة إعداد <code>geoApiKey</code> في <code>config/{handle}.php</code>.',
+    'ip-api.com free tier uses HTTP. IP addresses will be transmitted unencrypted. Add an API key for HTTPS (Pro tier) or switch to ipapi.co/ipinfo.io.' => 'تستخدم الخطة المجانية لـ ip-api.com بروتوكول HTTP. ستُرسل عناوين IP بدون تشفير. أضف مفتاح API للحصول على HTTPS (خطة Pro) أو انتقل إلى ipapi.co/ipinfo.io.',
+    'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: الخطة المجانية تعمل بـ HTTP (45 طلب/دقيقة). أضف مفتاح API للحصول على HTTPS (خطة Pro، $13/month). تُرسل عناوين IP بدون تشفير في غياب مفتاح API.',
+    'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS مع 1,000 طلب مجاني يوميًا. مفتاح API اختياري (يرفع حدود الاستخدام).',
+    'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS مع 50,000 طلب مجاني شهريًا. مفتاح API اختياري (يرفع حدود الاستخدام).',
 ];
