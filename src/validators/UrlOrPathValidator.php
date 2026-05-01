@@ -10,6 +10,8 @@ use yii\validators\Validator;
 
 /**
  * Validates values that can be either an absolute HTTP(S) URL or a site-relative path.
+ *
+ * @since 5.18.0
  */
 class UrlOrPathValidator extends Validator
 {

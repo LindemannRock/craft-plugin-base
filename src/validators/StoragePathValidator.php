@@ -8,6 +8,8 @@ use yii\validators\Validator;
 
 /**
  * Validates local storage path values used in plugin settings.
+ *
+ * @since 5.18.0
  */
 class StoragePathValidator extends Validator
 {

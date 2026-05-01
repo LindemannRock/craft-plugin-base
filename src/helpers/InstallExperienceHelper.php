@@ -19,6 +19,8 @@ use yii\base\Event;
 
 /**
  * Registers a one-time CP welcome experience after plugin install.
+ *
+ * @since 5.19.0
  */
 class InstallExperienceHelper
 {

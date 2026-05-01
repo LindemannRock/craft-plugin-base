@@ -10,6 +10,8 @@ namespace lindemannrock\base\helpers;
 
 /**
  * JSON helpers used by base assets and templates.
+ *
+ * @since 5.19.0
  */
 class JsonHelper
 {

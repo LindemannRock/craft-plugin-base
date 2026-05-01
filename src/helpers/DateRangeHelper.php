@@ -17,7 +17,7 @@ use craft\helpers\Db;
  *
  * Centralizes date range parsing for analytics queries.
  *
- * @since 5.2.0
+ * @since 5.14.0
  */
 class DateRangeHelper
 {
@@ -38,7 +38,6 @@ class DateRangeHelper
      *
      * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return string The default date range (e.g., 'last30days')
-     * @since 5.3.0
      */
     public static function getDefaultDateRange(?string $pluginHandle = null): string
     {
@@ -83,7 +82,6 @@ class DateRangeHelper
      *
      * @param string $format 'array' returns [{value, label}], 'assoc' returns {value: label}
      * @return array
-     * @since 5.3.0
      */
     public static function getOptions(string $format = 'array'): array
     {

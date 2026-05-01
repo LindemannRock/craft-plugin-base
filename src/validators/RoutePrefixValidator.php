@@ -7,6 +7,8 @@ use yii\validators\Validator;
 
 /**
  * Validates URL route prefix formatting (no leading/trailing slash, no empty segments).
+ *
+ * @since 5.18.0
  */
 class RoutePrefixValidator extends Validator
 {

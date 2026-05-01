@@ -8,6 +8,8 @@ use yii\validators\Validator;
 
 /**
  * Validates template path values (relative path, no traversal/absolute/url formats).
+ *
+ * @since 5.18.0
  */
 class TemplatePathValidator extends Validator
 {

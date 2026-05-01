@@ -62,6 +62,7 @@ class PluginHelper
      *
      * @param PluginInterface $plugin
      * @return string|null
+     * @since 5.19.0
      */
     public static function getPluginVersion(PluginInterface $plugin): ?string
     {
@@ -79,6 +80,7 @@ class PluginHelper
      *
      * @param PluginInterface $plugin
      * @return array|null
+     * @since 5.19.0
      */
     public static function getPluginComposerMetadata(PluginInterface $plugin): ?array
     {
