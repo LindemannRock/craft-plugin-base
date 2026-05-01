@@ -645,14 +645,18 @@ class DateFormatHelper
         DateTime|string|null $date = null,
         bool $includeTime = true,
     ): string {
+        $tz = new DateTimeZone(Craft::$app->getTimeZone());
+
         if ($date === null) {
-            $date = new DateTime();
+            $date = new DateTime('now', $tz);
         } elseif (is_string($date)) {
             try {
-                $date = new DateTime($date);
+                $date = new DateTime($date, $tz);
             } catch (\Exception) {
-                $date = new DateTime();
+                $date = new DateTime('now', $tz);
             }
+        } else {
+            $date = (clone $date)->setTimezone($tz);
         }
 
         if ($includeTime) {
