@@ -54,7 +54,6 @@ class DbHelper
      * @param string|string[] $path A single key, or an array of keys for nested extraction
      * @return string Raw SQL expression string (use inside select/where clauses)
      * @throws \InvalidArgumentException if column or any path segment contains unsafe characters
-     * @since 5.15.0
      */
     public static function jsonExtract(string $column, string|array $path): string
     {
