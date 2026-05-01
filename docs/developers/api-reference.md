@@ -181,8 +181,8 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `jsonExtract(string $column, string $path)` | `string` | Raw SQL string for JSON extraction |
-| `jsonExtractExpression(string $column, string $path, ?string $alias)` | `Expression` | Yii Expression for JSON extraction, with optional alias |
+| `jsonExtract(string $column, string\|string[] $path)` | `string` | Raw SQL string for JSON extraction. Pass an array for nested paths |
+| `jsonExtractExpression(string $column, string\|string[] $path, ?string $alias)` | `Expression` | Yii Expression for JSON extraction, with optional alias. Pass an array for nested paths |
 | `groupConcat(string $expression, string $separator)` | `string` | DB-agnostic GROUP_CONCAT / STRING_AGG |
 
 ### CsvImportHelper

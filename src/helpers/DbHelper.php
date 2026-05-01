@@ -46,26 +46,44 @@ class DbHelper
      * MySQL:      JSON_UNQUOTE(JSON_EXTRACT(column, '$.key'))
      * PostgreSQL: column->>'key'
      *
+     * Pass an array for nested paths. Each segment is treated as a single key
+     * (segments are NOT split on dots), so keys containing dots or other
+     * special characters round-trip safely.
+     *
      * @param string $column The JSON column name (e.g., 'metadata' or 'a.metadata')
-     * @param string $path The JSON key to extract (e.g., 'source', 'clickType')
+     * @param string|string[] $path A single key, or an array of keys for nested extraction
      * @return string Raw SQL expression string (use inside select/where clauses)
-     * @throws \InvalidArgumentException if column or path contains unsafe characters
+     * @throws \InvalidArgumentException if column or any path segment contains unsafe characters
+     * @since 5.15.0
      */
-    public static function jsonExtract(string $column, string $path): string
+    public static function jsonExtract(string $column, string|array $path): string
     {
         self::validateIdentifier($column, 'column');
-        self::validateIdentifier($path, 'path');
 
-        // If path contains special characters (hyphens, dots), quote it for MySQL
-        $needsQuoting = (bool) preg_match('/[^a-zA-Z0-9_]/', $path);
+        $segments = is_array($path) ? array_values($path) : [$path];
+        if ($segments === []) {
+            throw new \InvalidArgumentException('jsonExtract path must contain at least one segment.');
+        }
+        foreach ($segments as $segment) {
+            self::validateIdentifier($segment, 'path');
+        }
 
         if (Craft::$app->getDb()->getIsMysql()) {
-            $jsonPath = $needsQuoting ? "$.\"$path\"" : "$.$path";
+            $jsonPath = '$';
+            foreach ($segments as $segment) {
+                $needsQuoting = (bool) preg_match('/[^a-zA-Z0-9_]/', $segment);
+                $jsonPath .= $needsQuoting ? '."' . $segment . '"' : '.' . $segment;
+            }
             return "JSON_UNQUOTE(JSON_EXTRACT($column, '$jsonPath'))";
         }
 
-        // PostgreSQL
-        return "$column->>'$path'";
+        // PostgreSQL: column->'a'->'b'->>'c' for nested, column->>'key' for single
+        $last = array_pop($segments);
+        $sql = $column;
+        foreach ($segments as $segment) {
+            $sql .= "->'$segment'";
+        }
+        return $sql . "->>'$last'";
     }
 
     /**
@@ -75,12 +93,12 @@ class DbHelper
      * query builder methods like ->select() and ->where().
      *
      * @param string $column The JSON column name (e.g., 'metadata' or 'a.metadata')
-     * @param string $path The JSON key to extract (e.g., 'source', 'clickType')
+     * @param string|string[] $path A single key, or an array of keys for nested extraction
      * @param string|null $alias Optional column alias for SELECT clauses
      * @return Expression
      * @throws \InvalidArgumentException if column, path, or alias contains unsafe characters
      */
-    public static function jsonExtractExpression(string $column, string $path, ?string $alias = null): Expression
+    public static function jsonExtractExpression(string $column, string|array $path, ?string $alias = null): Expression
     {
         $sql = self::jsonExtract($column, $path);
 

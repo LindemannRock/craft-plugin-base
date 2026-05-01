@@ -30,6 +30,15 @@ DbHelper::jsonExtract('metadata', 'utm-source');
 // MySQL: JSON_UNQUOTE(JSON_EXTRACT(metadata, '$."utm-source"'))
 ```
 
+Pass an array for nested paths @since(5.23.0). Each segment is treated as a single key — segments are NOT split on dots, so keys containing dots or hyphens round-trip safely:
+
+```php
+// Nested extraction (e.g. Formie submission content keyed by field UID)
+DbHelper::jsonExtract('content', ['cc27f796-8ab2-46d8-92e3-885d504037e0', 'date']);
+// MySQL:      JSON_UNQUOTE(JSON_EXTRACT(content, '$."cc27f796-8ab2-46d8-92e3-885d504037e0".date'))
+// PostgreSQL: content->'cc27f796-8ab2-46d8-92e3-885d504037e0'->>'date'
+```
+
 ### jsonExtractExpression()
 
 Returns a `yii\db\Expression` for use in query builder methods.
