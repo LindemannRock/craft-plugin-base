@@ -454,6 +454,10 @@ class ExportHelper
         $content = file_get_contents($tempFile);
         unlink($tempFile);
 
+        if ($content === false) {
+            throw new \yii\web\BadRequestHttpException('Failed to read generated ZIP file.');
+        }
+
         return self::createResponse($content, $filename, 'application/zip');
     }
 
