@@ -19,7 +19,7 @@ use craft\web\AssetBundle;
  * {% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
  *
  * @author LindemannRock
- * @since 5.5.0
+ * @since 5.14.0
  */
 class ComponentsAsset extends AssetBundle
 {

@@ -11,7 +11,7 @@
  * Centralized settings for all LindemannRock plugins.
  * These settings affect display in templates, AJAX responses, and exports.
  *
- * @since 5.0.0
+ * @since 5.14.0
  */
 
 return [

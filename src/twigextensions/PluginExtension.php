@@ -33,7 +33,7 @@ use Twig\TwigFunction;
  * ```
  *
  * @author LindemannRock
- * @since 5.9.0
+ * @since 5.10.0
  */
 class PluginExtension extends AbstractExtension
 {

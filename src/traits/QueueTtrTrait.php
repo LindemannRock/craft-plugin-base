@@ -29,7 +29,7 @@ namespace lindemannrock\base\traits;
  * ```
  *
  * @author LindemannRock
- * @since 5.17.0
+ * @since 5.18.0
  */
 trait QueueTtrTrait
 {

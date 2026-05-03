@@ -68,7 +68,7 @@ use yii\web\ForbiddenHttpException;
  * ```
  *
  * @author LindemannRock
- * @since 5.0.0
+ * @since 5.5.0
  */
 trait EditionTrait
 {
