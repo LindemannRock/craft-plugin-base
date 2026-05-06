@@ -1,5 +1,22 @@
 # Changelog
 
+## [5.23.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.22.0...v5.23.0) (2026-05-06)
+
+
+### Features
+
+* add plugin credit functionality with dynamic color changes ([a5a2915](https://github.com/LindemannRock/craft-plugin-base/commit/a5a29152f6ee4b4be7649007b611b3f19d76b50f))
+* **DateFormatHelper:** improve date handling with timezone support ([7691f31](https://github.com/LindemannRock/craft-plugin-base/commit/7691f3160c93be3042c90db4da75b6f8381503d4))
+* **DateRangeHelper:** enhance default date range retrieval logic ([1d5a017](https://github.com/LindemannRock/craft-plugin-base/commit/1d5a017d43d6b5a26f0764f4d3468009cc093699))
+* **db:** support nested JSON extraction with array paths in jsonExtract ([3f64556](https://github.com/LindemannRock/craft-plugin-base/commit/3f64556dce41481e10edb32eddd277b2fedf2b39))
+* **helper:** add method to retrieve Redis cache with logging for misconfigurations ([0a0c31f](https://github.com/LindemannRock/craft-plugin-base/commit/0a0c31f619200ae11b51ce607b244c19837f6ffb))
+* **translations:** add geo provider settings translations for multiple languages ([94b1164](https://github.com/LindemannRock/craft-plugin-base/commit/94b1164392006cbd919468460e29ec296377638c))
+
+
+### Bug Fixes
+
+* **ExportHelper:** handle failure in reading generated ZIP file ([64c9e43](https://github.com/LindemannRock/craft-plugin-base/commit/64c9e43aea85fc2beb33bbbfa8b14d4db15243ad))
+
 ## [5.22.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.21.0...v5.22.0) (2026-04-25)
 
 
