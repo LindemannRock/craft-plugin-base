@@ -28,6 +28,7 @@ return [
     'This year' => 'Dette år',
     'Last year' => 'Forrige år',
     'All time' => 'Hele perioden',
+    'Custom Range' => 'Brugerdefineret interval',
 
     // Export + editions
     'Nothing to export.' => 'Intet at eksportere.',

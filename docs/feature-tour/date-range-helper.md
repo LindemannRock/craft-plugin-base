@@ -16,6 +16,9 @@ Standard date range parsing for analytics, logs, and any date-filtered CP pages.
 | `thisYear` | January 1st of current year to now |
 | `lastYear` | January 1st of last year to January 1st of current year |
 | `all` | No date filter (returns all records) |
+| `custom` | Uses caller-provided start/end dates |
+
+`custom` is opt-in for dropdowns and query helpers. Plugins decide whether to expose custom date fields in their own UI.
 
 ## Getting the Default Range @since(5.3.0)
 
@@ -67,6 +70,9 @@ $bounds = DateRangeHelper::getBounds('lastMonth');
 
 $bounds = DateRangeHelper::getBounds('all');
 // Returns: ['start' => null, 'end' => null]
+
+$bounds = DateRangeHelper::getBounds('custom', null, '2026-01-01', '2026-01-31');
+// Returns start of Jan 1 to start of Feb 1, converted to UTC
 ```
 
 Bounds are calculated in the site's timezone and then converted to UTC for database queries. You can pass a custom timezone:
@@ -86,6 +92,9 @@ DateRangeHelper::applyToQuery($query, 'last30days');
 
 // With a custom column name
 DateRangeHelper::applyToQuery($query, 'last7days', 'sentAt');
+
+// With custom start/end dates
+DateRangeHelper::applyToQuery($query, 'custom', 'sentAt', null, '2026-01-01', '2026-01-31');
 ```
 
 ## Counting Days in a Range
@@ -110,6 +119,10 @@ $options = DateRangeHelper::getOptions();
 // Associative array (value => label)
 $options = DateRangeHelper::getOptions('assoc');
 // ['today' => 'Today', 'yesterday' => 'Yesterday', ...]
+
+// Include an opt-in custom range option
+$options = DateRangeHelper::getOptions('array', true);
+// [..., ['value' => 'custom', 'label' => 'Custom Range']]
 ```
 
 ## Typical Controller Pattern

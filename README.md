@@ -17,6 +17,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **ExportHelper** — CSV, JSON, and Excel export with configurable format availability
 - **GeoHelper** — ISO 3166-1 country lookups, dial codes, and phone validation
 - **DbHelper** — DB-agnostic JSON extraction and GROUP_CONCAT
+- **BooleanHelper** — normalize boolean-like config, env, POST, and HTML attribute values
 - **CsvImportHelper** — CSV upload parsing with configurable options
 - **CpNavHelper** — CP subnav building with permission checks
 - **LabelHelper** — strip numbering and truncate long field labels for compact UI contexts (`|lrShortLabel` Twig filter)

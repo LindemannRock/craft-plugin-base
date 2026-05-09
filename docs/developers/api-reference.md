@@ -97,10 +97,10 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `getDefaultDateRange(?string $handle)` | `string` | Default date range from config |
-| `getOptions(string $format = 'array')` | `array` | Date range options for dropdowns |
+| `getOptions(string $format = 'array', bool $includeCustom = false)` | `array` | Date range options for dropdowns |
 | `normalize(?string $range, ?string $default)` | `string` | Normalize range key; `$default` falls back to config |
-| `getBounds(string $range, ?DateTimeZone $tz)` | `array` | `['start' => ?DateTime, 'end' => ?DateTime]` in UTC |
-| `applyToQuery(Query $query, string $dateRange, string $column, ?DateTimeZone $tz)` | `void` | Add date range WHERE to query |
+| `getBounds(string $range, ?DateTimeZone $tz, DateTime|string|null $customStart, DateTime|string|null $customEnd)` | `array` | `['start' => ?DateTime, 'end' => ?DateTime]` in UTC |
+| `applyToQuery(Query $query, string $dateRange, string $column, ?DateTimeZone $tz, DateTime|string|null $customStart, DateTime|string|null $customEnd)` | `void` | Add date range WHERE to query |
 | `getDaysCount(string $range)` | `int` | Number of days in range |
 
 ### ExportHelper
@@ -173,6 +173,17 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `htmlSafeJson(mixed $value)` | `string` | JSON-encode a value using HTML-safe flags for inline script/template output |
+
+### BooleanHelper
+
+`lindemannrock\base\helpers\BooleanHelper`
+[Full docs](../feature-tour/boolean-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `normalize(mixed $value, bool $default = false)` | `bool` | Normalize boolean-like values from config, env, POST, and HTML attributes |
+| `isBooleanLike(mixed $value)` | `bool` | Check whether a value is a recognized boolean-like value |
+| `toStyleValue(mixed $value, bool $default = false)` | `string` | Normalize a boolean-like value to `'1'` or `'0'` for style config |
 
 ### DbHelper
 

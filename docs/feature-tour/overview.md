@@ -15,6 +15,7 @@ Utility classes for common operations:
 - **[GeoHelper](geo-helper.md)** — Country names, dial codes, phone validation, and country select options
 - **[PluginHelper](plugin-helper.md)** — Plugin bootstrap, cache paths/keys, Redis cache safeguard, and cross-plugin detection
 - **Shared install experience** — One-time CP install modal with version metadata, branding, and preset-driven confetti
+- **[BooleanHelper](boolean-helper.md)** — Normalize boolean-like config, env, POST, and HTML attribute values
 - **[DbHelper](db-helper.md)** — DB-agnostic JSON extraction and GROUP_CONCAT
 - **[CsvImportHelper](csv-import-helper.md)** — CSV file upload parsing with automatic delimiter detection
 - **[CpNavHelper](cp-nav-helper.md)** — CP navigation building for plugin sub-pages

@@ -81,9 +81,10 @@ class DateRangeHelper
      * Returns an array of options suitable for Twig templates.
      *
      * @param string $format 'array' returns [{value, label}], 'assoc' returns {value: label}
+     * @param bool $includeCustom Whether to include a Custom Range option
      * @return array
      */
-    public static function getOptions(string $format = 'array'): array
+    public static function getOptions(string $format = 'array', bool $includeCustom = false): array
     {
         $options = [
             'today' => Craft::t('lindemannrock-base', 'Today'),
@@ -97,6 +98,10 @@ class DateRangeHelper
             'lastYear' => Craft::t('lindemannrock-base', 'Last year'),
             'all' => Craft::t('lindemannrock-base', 'All time'),
         ];
+
+        if ($includeCustom) {
+            $options['custom'] = Craft::t('lindemannrock-base', 'Custom Range');
+        }
 
         if ($format === 'assoc') {
             return $options;
@@ -134,8 +139,12 @@ class DateRangeHelper
      *
      * @return array{start: \DateTime|null, end: \DateTime|null}
      */
-    public static function getBounds(string $dateRange, ?\DateTimeZone $tz = null): array
-    {
+    public static function getBounds(
+        string $dateRange,
+        ?\DateTimeZone $tz = null,
+        \DateTime|string|null $customStart = null,
+        \DateTime|string|null $customEnd = null,
+    ): array {
         $dateRange = self::normalize($dateRange);
         $tz = $tz ?? new \DateTimeZone(Craft::$app->getTimeZone());
 
@@ -143,6 +152,13 @@ class DateRangeHelper
         $end = null;
 
         switch ($dateRange) {
+            case 'custom':
+                $start = self::normalizeCustomDate($customStart, $tz);
+                $start?->setTime(0, 0, 0);
+
+                $end = self::normalizeCustomDate($customEnd, $tz);
+                $end?->modify('+1 day')->setTime(0, 0, 0);
+                break;
             case 'today':
                 $start = new \DateTime('now', $tz);
                 $start->setTime(0, 0, 0);
@@ -194,7 +210,13 @@ class DateRangeHelper
                 return ['start' => null, 'end' => null];
         }
 
-        $start->setTimezone(new \DateTimeZone('UTC'));
+        if (!$start && !$end) {
+            return ['start' => null, 'end' => null];
+        }
+
+        if ($start) {
+            $start->setTimezone(new \DateTimeZone('UTC'));
+        }
         if ($end) {
             $end->setTimezone(new \DateTimeZone('UTC'));
         }
@@ -205,9 +227,15 @@ class DateRangeHelper
     /**
      * Apply a date range filter to a query.
      */
-    public static function applyToQuery(Query $query, string $dateRange, string $column = 'dateCreated', ?\DateTimeZone $tz = null): void
-    {
-        $bounds = self::getBounds($dateRange, $tz);
+    public static function applyToQuery(
+        Query $query,
+        string $dateRange,
+        string $column = 'dateCreated',
+        ?\DateTimeZone $tz = null,
+        \DateTime|string|null $customStart = null,
+        \DateTime|string|null $customEnd = null,
+    ): void {
+        $bounds = self::getBounds($dateRange, $tz, $customStart, $customEnd);
 
         if ($bounds['start']) {
             $query->andWhere(['>=', $column, Db::prepareDateForDb($bounds['start'])]);
@@ -262,5 +290,21 @@ class DateRangeHelper
             'last90days' => 90,
             default => 30,
         };
+    }
+
+    private static function normalizeCustomDate(\DateTime|string|null $date, \DateTimeZone $tz): ?\DateTime
+    {
+        if ($date instanceof \DateTime) {
+            $date = clone $date;
+            $date->setTimezone($tz);
+
+            return $date;
+        }
+
+        if (!is_string($date) || trim($date) === '') {
+            return null;
+        }
+
+        return new \DateTime($date, $tz);
     }
 }

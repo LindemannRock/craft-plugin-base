@@ -28,6 +28,7 @@ return [
     'This year' => 'هذا العام',
     'Last year' => 'العام الماضي',
     'All time' => 'كل الوقت',
+    'Custom Range' => 'نطاق مخصص',
 
     // Export + editions
     'Nothing to export.' => 'لا يوجد شيء للتصدير.',

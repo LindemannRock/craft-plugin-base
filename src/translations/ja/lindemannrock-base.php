@@ -28,6 +28,7 @@ return [
     'This year' => '今年',
     'Last year' => '昨年',
     'All time' => '全期間',
+    'Custom Range' => 'カスタム範囲',
 
     // Export + editions
     'Nothing to export.' => 'エクスポートするものがありません。',

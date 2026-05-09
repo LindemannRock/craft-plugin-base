@@ -28,6 +28,7 @@ return [
     'This year' => 'Dette året',
     'Last year' => 'Forrige år',
     'All time' => 'Hele perioden',
+    'Custom Range' => 'Egendefinert område',
 
     // Export + editions
     'Nothing to export.' => 'Ingenting å eksportere.',

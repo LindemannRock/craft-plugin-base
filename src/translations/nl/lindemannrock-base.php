@@ -28,6 +28,7 @@ return [
     'This year' => 'Dit jaar',
     'Last year' => 'Vorig jaar',
     'All time' => 'Alle tijd',
+    'Custom Range' => 'Aangepast bereik',
 
     // Export + editions
     'Nothing to export.' => 'Niets te exporteren.',

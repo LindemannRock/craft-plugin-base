@@ -28,6 +28,7 @@ return [
     'This year' => 'Cette année',
     'Last year' => 'L\'année dernière',
     'All time' => 'Toute la période',
+    'Custom Range' => 'Plage personnalisée',
 
     // Export + editions
     'Nothing to export.' => 'Rien à exporter.',

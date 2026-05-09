@@ -28,6 +28,7 @@ return [
     'This year' => 'Det här året',
     'Last year' => 'Förra året',
     'All time' => 'Hela perioden',
+    'Custom Range' => 'Anpassat intervall',
 
     // Export + editions
     'Nothing to export.' => 'Inget att exportera.',

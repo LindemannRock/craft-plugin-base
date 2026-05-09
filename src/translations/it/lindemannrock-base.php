@@ -28,6 +28,7 @@ return [
     'This year' => 'Quest\'anno',
     'Last year' => 'L\'anno scorso',
     'All time' => 'Tutto il periodo',
+    'Custom Range' => 'Intervallo personalizzato',
 
     // Export + editions
     'Nothing to export.' => 'Niente da esportare.',

@@ -77,6 +77,9 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 
 {% set options = lrDateRangeOptions('assoc') %}
 {# {'today': 'Today', 'yesterday': 'Yesterday', ...} #}
+
+{% set options = lrDateRangeOptions('array', true) %}
+{# Includes {'value': 'custom', 'label': 'Custom Range'} as the final option #}
 ```
 
 ## Color Functions
