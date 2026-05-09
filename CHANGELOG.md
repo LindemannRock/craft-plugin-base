@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.24.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.23.0...v5.24.0) (2026-05-09)
+
+
+### Features
+
+* **boolean-helper:** add BooleanHelper for normalizing boolean-like values ([9a3578f](https://github.com/LindemannRock/craft-plugin-base/commit/9a3578f7b6a009b2e82908c420f4175d1e9a5e23))
+
 ## [5.23.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.22.0...v5.23.0) (2026-05-06)
 
 
