@@ -335,23 +335,29 @@
         });
     }
 
-    // Row action handlers
-    document.querySelectorAll('[data-action="delete"]').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const id = this.dataset.id;
+    // Row action handlers — single delegated listener on `document`, narrowed
+    // by `a[data-action]` + an explicit action-name allowlist. preventDefault
+    // only after the match so unrelated `data-action` elements stay default.
+    // See: plugins/base/docs/template-guides/cp-table-index-pattern.md
+    document.addEventListener('click', function(e) {
+        const trigger = e.target.closest('a[data-action]');
+        if (!trigger) return;
+
+        const action = trigger.dataset.action;
+        if (action !== 'delete' && action !== 'duplicate') return;
+
+        const id = trigger.dataset.id;
+        e.preventDefault();
+
+        if (action === 'delete') {
             if (confirm('Delete this item?')) {
+                // Craft.sendActionRequest('POST', 'my-plugin/items/delete', { data: { id: id } })
                 console.log('Would delete:', id);
             }
-        });
-    });
-
-    document.querySelectorAll('[data-action="duplicate"]').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const id = this.dataset.id;
+        } else if (action === 'duplicate') {
+            // Craft.sendActionRequest('POST', 'my-plugin/items/duplicate', { data: { id: id } })
             console.log('Would duplicate:', id);
-        });
+        }
     });
     </script>
 {% endblock %}
