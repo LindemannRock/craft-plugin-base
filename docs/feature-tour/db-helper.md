@@ -89,6 +89,35 @@ $query->select([
 ->groupBy('userId');
 ```
 
+## Text Casting @since(5.25.0)
+
+Cast a value to text/string for safe composition with text functions or COALESCE across mixed-type columns.
+
+### castToText()
+
+```php
+$sql = DbHelper::castToText('id');
+// MySQL:      CAST(id AS CHAR)
+// PostgreSQL: (id)::text
+```
+
+Useful when a `COALESCE()` must fall back between a text column and a non-text column — the non-text side needs an explicit cast or PostgreSQL will reject the mixed-type expression. Common pattern: dedup a fan-out by composite identity:
+
+```php
+// "One row per search action" — sessionId when set, row id otherwise
+$identity = "COALESCE(sessionId, " . DbHelper::castToText('id') . ")";
+$query->select(["COUNT(DISTINCT $identity) as actions"]);
+// MySQL:      COUNT(DISTINCT COALESCE(sessionId, CAST(id AS CHAR)))
+// PostgreSQL: COUNT(DISTINCT COALESCE(sessionId, (id)::text))
+```
+
+Accepts an `Expression` for composed inputs:
+
+```php
+$inner = new Expression('IFNULL(id, 0)');
+$sql = DbHelper::castToText($inner);
+```
+
 ## Next Steps
 
 - [DateFormatHelper](date-format-helper.md) — DB-agnostic timezone SQL expressions

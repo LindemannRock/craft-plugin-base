@@ -195,6 +195,7 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `jsonExtract(string $column, string\|string[] $path)` | `string` | Raw SQL string for JSON extraction. Pass an array for nested paths |
 | `jsonExtractExpression(string $column, string\|string[] $path, ?string $alias)` | `Expression` | Yii Expression for JSON extraction, with optional alias. Pass an array for nested paths |
 | `groupConcat(string $expression, string $separator)` | `string` | DB-agnostic GROUP_CONCAT / STRING_AGG |
+| `castToText(string\|Expression $expression)` @since(5.25.0) | `string` | DB-agnostic CAST to text — `CAST(expr AS CHAR)` on MySQL, `(expr)::text` on PostgreSQL |
 
 ### CsvImportHelper
 

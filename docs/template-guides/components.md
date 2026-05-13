@@ -726,6 +726,59 @@ No parameters. Include at the bottom of settings pages.
 
 ---
 
+## Secret Reveal @since(5.25.0)
+
+One-time secret reveal banner — for moments where a plugin generates a credential the operator must capture immediately because it is never re-displayed (API keys, OAuth tokens, signing keys, webhook secrets, etc.).
+
+Renders a read-only monospace input with the secret + a Copy button. Click the input to select all text; click Copy to put it in the clipboard. Internally wraps the [Info Box](#info-box) component so visual treatment stays consistent with other banners.
+
+**Path:** `lindemannrock-base/_components/secret-reveal`
+
+```twig
+{% include 'lindemannrock-base/_components/secret-reveal' with {
+    secret: plaintextValue,
+    title: 'Copy this key now — it will never be shown again.'|t('your-plugin'),
+    helpText: 'We only store a hash. If you lose this value you will need to create a new credential.'|t('your-plugin'),
+    type: 'success',
+    margin: 'bottom',
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `secret` | `string` | *(required)* | The value to reveal + copy |
+| `title` | `string` | *(required)* | Bold heading shown above the input |
+| `helpText` | `string` | *(none)* | Neutral paragraph shown below the input |
+| `type` | `string` | `'success'` | `info-box` type — `'success'`, `'info'`, `'warning'` |
+| `margin` | `string` | `'bottom'` | `info-box` margin — `'top'`, `'bottom'`, `'both'`, `'none'` |
+| `copyLabel` | `string` | `'Copy'` | Copy button label (defaults to `lindemannrock-base` translation) |
+| `copiedLabel` | `string` | `'Copied!'` | Post-click feedback label |
+| `boxId` | `string` | *(auto)* | Unique id for JS targeting — auto-generated when absent |
+
+### Behaviour
+
+- **Click input** → text selects (keyboard users can `Cmd/Ctrl+C` without using the button).
+- **Click Copy** → `navigator.clipboard.writeText`; falls back to `document.execCommand('copy')` when the Clipboard API is unavailable (older browsers, insecure contexts).
+- **Visual feedback** → button text briefly becomes `Copied!` and gains Craft's `submit` class for 2 seconds, then reverts.
+- **Scope** → each instance gets a unique `boxId` and an IIFE-wrapped event handler. Multiple secret-reveals on the same page coexist with no shared state.
+- **No persistence** → the component does not retain the secret. The caller must show it exactly once (typically via session flash on a post-create redirect) and never render the value again.
+
+### Caller responsibilities
+
+The component renders whatever `secret` you pass in. The caller is responsible for:
+
+- **Storing the plaintext exactly once.** Typical pattern: write the plaintext to a session flash in the controller's save action, redirect to the edit page, consume the flash with `Craft.$app.session.getFlash(...)` in the controller, pass it to the template under a one-shot variable like `newPlaintext`. Render the component conditioned on that variable being present.
+- **Never re-rendering the value.** Edit of an existing record must not re-emit the secret — only the hash is stored, and there is nothing to re-emit.
+- **Translating the `title` and `helpText`.** Component chrome (`Copy`, `Copied!`, error toast) uses `lindemannrock-base` translations; plugin-specific message text uses the caller's translation category.
+
+### Reference usage
+
+- Search Manager — API Keys edit page (post-creation reveal banner)
+
+---
+
 ## Next Steps
 
 - [CP Table Layout](cp-table-layout.md) — uses filters, badges, row-actions, search, and export-menu
