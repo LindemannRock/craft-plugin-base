@@ -110,6 +110,36 @@ class DbHelper
     }
 
     /**
+     * Returns a DB-agnostic expression that casts a value to text/string.
+     *
+     * MySQL:      CAST(expression AS CHAR)
+     * PostgreSQL: (expression)::text
+     *
+     * Useful when an expression must be compared as text or composed with
+     * text functions — for example, a COALESCE() that falls back from a
+     * string column to an integer column needs the integer cast to text
+     * for a stable return type across drivers.
+     *
+     * @param string|Expression $expression The SQL expression to cast
+     * @return string Raw SQL expression string
+     * @throws \InvalidArgumentException if expression contains unsafe characters
+     * @since 5.25.0
+     */
+    public static function castToText(string|Expression $expression): string
+    {
+        $expressionSql = $expression instanceof Expression ? $expression->expression : $expression;
+        if (!($expression instanceof Expression)) {
+            self::validateExpression($expressionSql);
+        }
+
+        if (Craft::$app->getDb()->getIsMysql()) {
+            return "CAST($expressionSql AS CHAR)";
+        }
+
+        return "($expressionSql)::text";
+    }
+
+    /**
      * Returns a DB-agnostic expression to concatenate grouped values.
      *
      * MySQL:      GROUP_CONCAT(expression SEPARATOR separator)
