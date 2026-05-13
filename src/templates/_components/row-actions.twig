@@ -63,9 +63,13 @@
  #     - permission: Per-action permission
  #     - showIf: Show only if this is true
  #     - hideIf: Hide if this is true
+ #     - disabled: Render as non-interactive span (no anchor, no data-* attrs).
+ #         The consuming template's delegated click handler never matches.
+ #         Pair with `title:` to explain why (e.g. `title: disabled ? '…' : null`).
  #     - class: CSS class (e.g., 'error' for destructive)
  #     - jsAction: JavaScript action name (triggers 'lr:rowAction' event)
  #     - confirm: Confirmation message before action
+ #     - title: Tooltip text (rendered on hover; honored for enabled + disabled)
  #     - type: 'divider' for separator
  #}
 
@@ -185,6 +189,20 @@
                         {% for menuItem in cleanedItems %}
                             {% if (menuItem.type is defined) and menuItem.type == 'divider' %}
                                 <li><hr class="padded"></li>
+                            {% elseif menuItem.disabled is defined and menuItem.disabled %}
+                                {# Disabled items render as a non-interactive span: no anchor,
+                                   no href, no data-action / data-id / data-confirm. The
+                                   consuming template's delegated `a[data-action]` click handler
+                                   never matches, so disabling is effective without any JS-side
+                                   guard. Pair with `title:` so the caller can explain why. #}
+                                {% set disabledClass = 'menu-item-disabled' ~ ((menuItem.class is defined and menuItem.class) ? ' ' ~ menuItem.class : '') %}
+                                <li>
+                                    <span class="{{ disabledClass }}"
+                                          aria-disabled="true"
+                                          {% if menuItem.title is defined and menuItem.title %}title="{{ menuItem.title }}"{% endif %}>
+                                        {{ menuItem.label ?? '' }}
+                                    </span>
+                                </li>
                             {% else %}
                                 <li>
                                     <a href="{{ menuItem.url ?? '#' }}"
