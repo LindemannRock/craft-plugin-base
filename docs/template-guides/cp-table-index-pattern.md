@@ -221,6 +221,30 @@ If a table has **no `sortable: true` columns** AND the underlying data source al
 
 The doc's examples use `$this->asJson(['success' => …, 'message' => …, 'error' => …])` because that's the search-manager idiom. Craft also ships `asSuccess()` / `asFailure()` helpers that produce the same envelope shape with less code. **Follow the plugin's own convention** — don't gratuitously rewrite an existing `asJson` call site to `asSuccess`, and don't gratuitously rewrite an existing `asSuccess` site to manual `asJson`. The contract with the JS client is the response shape, not which helper produced it.
 
+### `newButton` is pre-gated, not key-gated
+
+`newButton` follows the same rule as `checkboxes` and row actions: **pre-gate via the `canX` boolean passed from the controller; omit the `permission:` key.**
+
+```twig
+{# ✓ Canonical — pre-gated from controller, no permission: key. #}
+newButton: canCreate ? {
+    url: url('my-plugin/things/create'),
+    label: 'New Thing'|t('my-plugin'),
+} : null,
+
+{# ✗ Redundant. The layout's permission: check is bypassed entirely
+     when canCreate is false (newButton is null), so the key adds
+     nothing. When canCreate is true, the user has the permission
+     anyway, so the layout's check is a no-op too. #}
+newButton: canCreate ? {
+    url: url('my-plugin/things/create'),
+    label: 'New Thing'|t('my-plugin'),
+    permission: 'myPlugin:createThings',
+} : null,
+```
+
+The layout still **honors** `permission:` if a caller passes it (back-compat with the layout-only idiom from before pre-gating became canonical), but a pre-gating caller should not. Two checks for the same condition is belt-and-suspenders that masks the convention.
+
 ## Template Anatomy
 
 The template is **purely presentational** — it builds `tableConfig` and renders blocks. It does **not** parse query params, filter, sort, or paginate.

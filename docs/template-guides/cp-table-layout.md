@@ -179,7 +179,7 @@ footerActions: [
 |-----|------|-------------|
 | `url` | `string` | URL for the "New" button |
 | `label` | `string` | Button label |
-| `permission` | `string` | Required permission to show button |
+| `permission` | `string` | Required permission to show button. **Honored but redundant when the caller pre-gates** (`newButton: canCreate ? {…} : null`) — and pre-gating is the canonical shape, see [CP Table Index-Page Pattern](cp-table-index-pattern.md) → "`newButton` is pre-gated, not key-gated". Kept here for back-compat with layout-only callers from before pre-gating became canonical. |
 
 ### ajax
 
