@@ -329,6 +329,44 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 
 ---
 
+## Testing Utilities
+
+`lindemannrock\base\testing\`
+[Full docs](../feature-tour/testing.md) — PHPUnit integration test scaffolding.
+
+### IntegrationTestCase
+
+`lindemannrock\base\testing\IntegrationTestCase` (abstract)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `cleanupExternalState()` | `void` | Override hook for non-DB cleanup (Redis, filesystem, external backends). |
+| `swapPluginComponent(string $handle, string $componentId, object $stub)` | `void` | Swap a plugin service component for a stub, auto-restored in `tearDown` (LIFO). |
+| `countRows(string $table, array $where = [])` | `int` | Generic row count by table + where. |
+| `fetchRow(string $table, array $where)` | `?array` | Single-row fetch, or null. |
+| `purgeRowsByMarker(string $table, string $column, string $prefix)` | `void` | Delete rows whose marker column starts with the given prefix. |
+| `drainQueueJob(BaseJob $job, callable $isDone, int $maxIterations = 50)` | `void` | Run a queueable job until `$isDone()` is true, capped to surface hangs. |
+
+### StubConsoleRequest
+
+`lindemannrock\base\testing\StubConsoleRequest` (final, extends `craft\console\Request`)
+
+Test double that adds web-only accessors (`getUserIP`, `getUserAgent`, `getReferrer`) to Craft's console request. **Install via `Craft::$app->set('request', new StubConsoleRequest(...))`** in `setUp` and restore manually in `tearDown` — it's a Craft-level component, not a plugin component, so `swapPluginComponent()` doesn't apply. Keeps `getIsConsoleRequest()` honest under the harness.
+
+### StubWebRequest
+
+`lindemannrock\base\testing\StubWebRequest` (final, extends `yii\web\Request`)
+
+Same three accessors as `StubConsoleRequest`, but extends Yii's web request. **Pass directly as a method argument** when the service under test type-hints `yii\web\Request` (or `craft\web\Request`). Never install on `Craft::$app->set('request', …)` — a web request on a console-bootstrapped Craft fools mode-detection.
+
+### bootstrap()
+
+`lindemannrock\base\testing\bootstrap(?string $projectRoot = null): void` — initialise Craft as a console application from a test bootstrap file. Auto-detects the project root when `$projectRoot` is null.
+
+For the cross-plugin workflow recipe, see [`plugins/_docs/guides/testing.md`](../../../_docs/guides/testing.md).
+
+---
+
 ## Next Steps
 
 - [Bootstrapping](bootstrapping.md) — how to initialize the base module

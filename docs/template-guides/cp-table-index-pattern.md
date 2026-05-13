@@ -211,6 +211,16 @@ private function compareNullableDates(?\DateTime $a, ?\DateTime $b): int
 | `page` | `max(1, (int) ...)` so negative/zero/garbage becomes page 1. |
 | `limit` | `max(1, (int) plugin->getSettings()->itemsPerPage)` so the per-page count matches the rest of the plugin's CP. |
 
+### When sort/dir plumbing can be omitted
+
+If a table has **no `sortable: true` columns** AND the underlying data source already returns rows in a deterministic, useful order (e.g. `sortOrder ASC, name ASC` from a position-managed taxonomy), the controller can omit `$validSortFields` / `$sort` / `$dir` and the template can omit the `sort:` key on `tableConfig`. The other orchestration steps (param allowlists for filters, search clamp, pagination) still apply.
+
+**When in doubt, ask before omitting.** A table with zero sortable columns is unusual enough to merit a check — "the agent silently dropped sort plumbing" and "the original template was missing sortable columns it should have had" look identical from the outside. The agent should not decide which case it is silently.
+
+### JSON envelopes: `asJson` vs `asSuccess` / `asFailure`
+
+The doc's examples use `$this->asJson(['success' => …, 'message' => …, 'error' => …])` because that's the search-manager idiom. Craft also ships `asSuccess()` / `asFailure()` helpers that produce the same envelope shape with less code. **Follow the plugin's own convention** — don't gratuitously rewrite an existing `asJson` call site to `asSuccess`, and don't gratuitously rewrite an existing `asSuccess` site to manual `asJson`. The contract with the JS client is the response shape, not which helper produced it.
+
 ## Template Anatomy
 
 The template is **purely presentational** — it builds `tableConfig` and renders blocks. It does **not** parse query params, filter, sort, or paginate.

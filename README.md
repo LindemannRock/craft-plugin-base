@@ -27,6 +27,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **CP Analytics Layout** — analytics dashboards with tabs, charts, stat boxes, and date filters
 - **Twig Extensions** — 30+ filters and functions for dates, colors, exports, geo, and plugin detection
 - **15 Twig Components** — badge, stat-box, info-box, export-menu, row-actions, filters, and more
+- **Testing Utilities** — `IntegrationTestCase` abstract base with component swap/restore, generic DB helpers, marker cleanup, queue drain, and an external-state cleanup hook; plus a `bootstrap()` function and `phpunit.xml.dist` template for quick test-suite setup in consumer plugins
 
 ## Requirements
 

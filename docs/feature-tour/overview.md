@@ -47,6 +47,14 @@ Filters and functions available in all CP templates after bootstrap:
 
 See [Twig Filters & Functions](../template-guides/twig-filters-functions.md) for the complete reference.
 
+### Testing Utilities
+
+Shared scaffolding for PHPUnit integration tests against a live Craft install:
+
+- **[Testing](testing.md)** — `IntegrationTestCase` abstract base (component swap/restore, generic DB helpers, marker cleanup, queue drain, `cleanupExternalState()` hook), `bootstrap()` function (Craft console init with optional explicit project root), and `phpunit.xml.dist.template` for copy-once suite setup
+
+See the cross-plugin maintainer guide in [`plugins/_docs/guides/testing.md`](../../../_docs/guides/testing.md) for the workflow recipe.
+
 ### CP Layouts & Components
 
 Reusable Twig templates for building consistent CP pages:
