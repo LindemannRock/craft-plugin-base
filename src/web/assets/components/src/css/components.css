@@ -1127,6 +1127,21 @@ a.lr-unified-card-link:active {
     border-bottom: 1px solid #e3e5e8;
 }
 
+/* Row-action menu — disabled items.
+   Rendered by `_components/row-actions.twig` when `disabled: true` is set on
+   a menu item. A non-interactive span replaces the anchor (no href, no
+   data-action / data-id / data-confirm), so delegated click handlers in the
+   consuming template never match. The visual treatment matches Craft's
+   convention of muted, non-pointer disabled affordances. */
+.menu-item-disabled {
+    display: block;
+    padding: 8px 14px;
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: inherit;
+    user-select: none;
+}
+
 /* View menu */
 .lr-view-menu {
     min-width: 280px;
