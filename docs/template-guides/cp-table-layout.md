@@ -375,6 +375,7 @@ See [JavaScript API](../developers/javascript-api.md#table-selection-api) for th
 
 ## Next Steps
 
+- [CP Table Index-Page Pattern](cp-table-index-pattern.md) — architectural rules for controller / template / row-action JS around this layout
 - [Components](components.md) — badge, row-actions, filter, and export-menu components
 - [CP Analytics Layout](cp-analytics-layout.md) — analytics dashboard layout
 - [JavaScript API](../developers/javascript-api.md) — global functions and events

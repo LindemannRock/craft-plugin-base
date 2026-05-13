@@ -460,6 +460,8 @@ Per-row action buttons or dropdown menus with permission handling and conditiona
 | `permission` | `string` | Per-action permission |
 | `showIf` | `bool` | Show only if `true` |
 | `hideIf` | `bool` | Hide if `true` |
+| `disabled` | `bool` | Render as a non-interactive `<span class="menu-item-disabled" aria-disabled="true">` instead of an `<a>`. No `href`, no `data-action` / `data-id` / `data-confirm` attributes — the consuming template's delegated click handler never matches. Pair with `title:` to explain why (e.g. `title: disabled ? 'Reason it’s disabled' : null`). |
+| `title` | `string` | Tooltip text. Rendered on hover for both enabled and disabled items, so the same key can host “what this does” or “why it’s currently disabled”. |
 | `class` | `string` | CSS class (`'error'` for destructive actions) |
 | `jsAction` | `string` | JS action name (fires `lr:rowAction` event) |
 | `confirm` | `string` | Confirmation message before action |
