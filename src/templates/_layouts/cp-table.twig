@@ -281,7 +281,7 @@
         {% endif %}
 
         {# New button #}
-        {% if newButton and (not newButton.permission or currentUser.can(newButton.permission)) %}
+        {% if newButton and ((newButton.permission is not defined) or (not newButton.permission) or currentUser.can(newButton.permission)) %}
             <a href="{{ newButton.url }}" class="btn submit add icon" id="lr-new-btn">
                 <span class="lr-label-full">{{ newButton.label }}</span>
                 <span class="lr-label-short" style="display: none;">{{ 'New'|t('lindemannrock-base') }}</span>
