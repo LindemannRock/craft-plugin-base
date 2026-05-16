@@ -11,6 +11,7 @@ Utility classes for common operations:
 - **[ColorHelper](color-helper.md)** — 18 palette colors, 15 built-in color sets, and custom color set registration for badges and filters
 - **[DateFormatHelper](date-format-helper.md)** — Configurable date/time formatting for display, exports, and DB-agnostic timezone-aware SQL
 - **[DateRangeHelper](date-range-helper.md)** — Standard date ranges (today, last 7 days, etc.) with bounds calculation and query integration
+- **[ScheduleHelper](schedule-helper.md)** — Cron-style scheduling for recurring queue jobs (daily, daily2am, weekly, monthly, etc.) with TZ-aware next-run calculation, dropdown options, and validation allowlist
 - **[ExportHelper](export-helper.md)** — CSV, JSON, and Excel exports with configurable format availability and date formatting
 - **[GeoHelper](geo-helper.md)** — Country names, dial codes, phone validation, and country select options
 - **[PluginHelper](plugin-helper.md)** — Plugin bootstrap, cache paths/keys, Redis cache safeguard, and cross-plugin detection

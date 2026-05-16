@@ -439,6 +439,53 @@ function postAction(action, data) {
 }
 ```
 
+### Bulk fan-out when no server-side bulk endpoint exists
+
+The canonical bulk shape posts to a single `bulk-delete` / `bulk-enable` endpoint that takes an array of IDs. When the plugin has no such endpoint (only a single-row endpoint exists), it's acceptable to **fan out from the client via `Promise.all`** as an interim shape:
+
+```js
+document.getElementById('lr-bulk-delete-btn')?.addEventListener('click', function() {
+    const ids = selectedIds();
+    if (!ids.length) return;
+    if (!confirm(T.bulkDeleteConfirmTemplate.replace('{count}', ids.length))) return;
+
+    let deleted = 0;
+    const errors = [];
+    const promises = ids.map(function(id) {
+        return Craft.sendActionRequest('POST', 'my-plugin/things/delete', {
+            data: { id: id },
+        }).then(function(response) {
+            if (response.data.success) {
+                deleted++;
+            } else {
+                errors.push(response.data.error || T.deleteFailed);
+            }
+        }).catch(function() {
+            errors.push(T.deleteFailed);
+        });
+    });
+
+    Promise.all(promises).then(function() {
+        if (deleted > 0) {
+            Craft.cp.displayNotice(T.bulkDeletedTemplate.replace('{count}', deleted));
+        }
+        errors.forEach(function(err) { Craft.cp.displayError(err); });
+        if (deleted > 0) {
+            setTimeout(function() { window.location.reload(); }, 500);
+        }
+    });
+});
+```
+
+This is **pattern-conformant**, not a divergence — the JS still goes through the canonical delegated/scoped/allowlisted shape, the controller still validates per-row, the only difference is N requests instead of one. Acceptable when:
+
+- the per-page selection ceiling (`itemsPerPage`) is bounded (typically < 100 rows per page), and
+- the underlying endpoint is idempotent / safe to call concurrently.
+
+**Promote to a server-side bulk endpoint when:** selection ceilings rise, the per-row endpoint has heavy side effects (cache invalidation, logging, etc.) that would benefit from batching, or response-time across the fan-out becomes user-visible.
+
+References in the repo: `search-manager/templates/widgets/styles/index.twig` (bulk-delete fan-out over `delete-style`) and `redirect-manager/templates/dashboard/index.twig` (bulk-delete fan-out over `/analytics/delete`). Both flagged in their plugin's `.internal/todo.md` as candidates for promotion if usage justifies it.
+
 ## Paired Controller-Side JSON Branch
 
 A redirect-returning controller action paired with `Craft.sendActionRequest` is functionally correct but wasteful: the AJAX client transparently follows the 302, the server renders the redirect target (often a full index page) just for the JS to throw the HTML away and call `window.location.reload()`. Two server renders per click.
@@ -477,20 +524,48 @@ public function actionDelete(?int $thingId = null): ?Response
 
 For bulk actions that are **AJAX-only by design** (no non-AJAX caller exists), `requireAcceptsJson()` at the top is fine — no redirect path needed.
 
-## In-Memory vs SQL-Paginated
+## Where the Filter / Sort / Paginate Work Lives
 
-| | In-memory | SQL-paginated |
+The orchestration **contract** is the invariant; *where* the work physically happens is a plugin-local placement decision driven by the existing data layer.
+
+### The contract (invariant)
+
+Every implementation must satisfy all four:
+
+1. **Allowlist-validated params.** `$validSortFields`, `$validStatuses`, etc. — every param that controls filtering or sorting goes through an explicit allowlist in the controller. Off-list values snap to a documented default.
+2. **`totalCount` computed after filter, before slice.** The pager reflects the visible-after-filter set, not the underlying table.
+3. **Presentational template.** Receives an already-sliced collection plus filter/sort state. No `getParam`, no `|filter` / `|sort` / `|slice` orchestration in Twig.
+4. **Permission booleans pre-computed.** `canEdit`, `canDelete`, etc. resolved once in the controller and passed in; no `currentUser.can(...)` calls in Twig.
+
+If those four hold, the implementation is pattern-conformant regardless of where the SQL/PHP split point lands.
+
+### Common realizations
+
+The three shapes that show up in practice — pick whichever fits the plugin's existing structure:
+
+| Realization | When to use | Reference |
 |---|---|---|
-| **Reference** | `ApiKeysController` | `PendingSyncsController` + `PendingSyncRepository` |
-| **Approx. ceiling** | < ~1,000 rows | Unbounded |
-| **Filter** | `array_filter` | `WHERE` clause in repository |
-| **Sort** | `usort` with `match` over allowlist | `ORDER BY` with allowlist-validated column name |
-| **Paginate** | `array_slice($items, $offset, $limit)` after `count()` | `LIMIT $limit OFFSET $offset` + separate `COUNT(*)` query |
-| **Total count** | `count($filtered)` after filter, before slice | Repository returns `['rows' => ..., 'total' => ...]` |
+| **All in-memory** (`findAll()` → `array_filter` → `usort` → `array_slice`) | Small datasets (< ~1,000 rows), no existing query/repo layer for this domain. | `search-manager/ApiKeysController::actionIndex` |
+| **All SQL** (`WHERE` + `ORDER BY` + `LIMIT/OFFSET` + separate `COUNT(*)`) | Unbounded growth, or in-memory load is already noticeable. The SQL can live in a **repository method** (`PendingSyncRepository::search()`) when the plugin has a repo convention, or **inline `craft\db\Query`** in the controller when it doesn't. Both forms satisfy the contract. | `search-manager/PendingSyncsController` (repo); `redirect-manager/RedirectsController::actionIndex` (inline) |
+| **Hybrid: SQL filter+sort, in-memory slice** | The plugin already has a service / query method that returns filtered rows but doesn't paginate. The filtered set is bounded enough that loading it isn't a problem. Promoting to full SQL pagination would mean a non-trivial refactor outside migration scope. | `translation-manager/TranslationsController::actionIndex` (calls `TranslationsService::getTranslations()` then `array_slice`s) |
 
-**Switch to SQL when in-memory hurts:** load times noticeable, memory pressure shows up, or the row count is operator-controlled and could realistically grow past a few thousand. Don't pre-optimise — `findAll()` + `array_slice` is fine for hundreds of rows.
+**None of the three is more canonical than the others** — they're concrete realizations of the same contract. The choice is driven by the plugin's existing data layer, not by a pattern preference. A migration that picks the wrong placement for the plugin's structure produces awkward code; the right placement is invisible.
 
-**Sort-column allowlist enforcement for the SQL variant lives in the repository**, not the controller, so the SQL surface validates its own inputs. The controller still validates the param against `$validSortFields` so an off-list value doesn't even reach the repo.
+**Switch from in-memory to SQL (or hybrid) when in-memory hurts:** load times noticeable, memory pressure shows up, or the row count is operator-controlled and could realistically grow past a few thousand. Don't pre-optimise — `findAll()` + `array_slice` is fine for hundreds of rows.
+
+**Sort-column allowlist enforcement.** Whichever realization you pick, the controller's `$validSortFields` allowlist runs *before* the value reaches the SQL or `usort` layer. The downstream layer can do its own validation as defence in depth, but the controller is the primary gate.
+
+### Filters on computed (non-column) fields
+
+Sometimes a filter dimension isn't backed by a stored column — it's computed per row from other data (e.g. `requestType` derived from request headers, or `expired` derived from `dateExpired < now()`). The contract still applies:
+
+- Validate the param against an allowlist in the controller as usual.
+- Run the post-fetch filter via `array_filter` over the *result of the upstream query*, not over `findAll()`.
+- Compute `totalCount` *after* the computed-field filter, before slice.
+
+The upstream query pulls a wider result set than the final visible page, the computed filter narrows it, and the paginator slices the narrowed set. Acceptable when the unfiltered upstream result is bounded (e.g. by a date range or a base `WHERE` clause); otherwise consider whether the computed field should be materialised as a column so the filter can move into SQL.
+
+This is just the hybrid realization above, applied to one filter dimension instead of all of them.
 
 ## Migration Checklist
 
@@ -500,12 +575,12 @@ For each existing CP index page that doesn't follow this pattern:
 
 1. **Read the current state.** Note what's in Twig today: which params are parsed, which filters, which sort branches, what page/limit defaults.
 2. **Move param parsing + allowlist validation to `actionIndex`.** Each filter param gets its own `$validX` allowlist; off-list → default. `sort` gets `$validSortFields`. `dir` snaps to `'asc'`/`'desc'`. `page = max(1, …)`. `limit = max(1, settings->itemsPerPage)`.
-3. **Move filter/sort/paginate to the controller.** Use `array_filter` + `usort` for in-memory; hand validated filters to a repository `search()` for SQL. Extract `sortX()` + `compareNullableDates()` as **private controller methods** if they reduce repetition within the file.
+3. **Move filter/sort/paginate to the canonical contract.** Pick the realization that fits the plugin's existing data layer — in-memory (`array_filter` + `usort` + `array_slice`), all-SQL (repository method OR inline `craft\db\Query`), or hybrid (SQL filter+sort then in-memory `array_slice`). All three satisfy the contract; see "Where the Filter / Sort / Paginate Work Lives" above. Extract `sortX()` + `compareNullableDates()` as **private controller methods** if they reduce repetition within the file.
 4. **Compute `totalCount` after filter, before slice.** Pass it through to the template.
 5. **Strip the corresponding Twig logic.** No more `craft.app.request.getParam(...)` for filter/sort/page params. No more `|filter`/`|sort`/`|slice` chains. The template receives the already-sliced collection.
 6. **Pass permission booleans (`canEdit`, `canDelete`, etc.) from the controller** to the template instead of calling `currentUser.can(...)` repeatedly in Twig.
 7. **Rewrite row-action JS.** Replace `querySelectorAll('[data-action]').forEach(...)` with a single delegated `document.addEventListener('click', ...)` listener, narrowed by `closest('a[data-action]')` + explicit action-name allowlist. `preventDefault()` only after the match.
-8. **Swap hand-rolled form submits for `Craft.sendActionRequest`** where applicable. Saves ~25 lines per file, no CSRF plumbing, consistent error UX.
+8. **Swap hand-rolled form submits for `Craft.sendActionRequest`** where applicable. Saves ~25 lines per file, no CSRF plumbing, consistent error UX. **Exception: file-download endpoints.** If the controller streams a binary response (CSV / Excel / PDF / etc.) via `Content-Disposition: attachment`, keep the hand-rolled `<form>` POST. `Craft.sendActionRequest` is XHR-only — the browser won't trigger Save-As on its response. Document the exception inline in the template so a future agent doesn't reflexively convert it.
 9. **Add JSON branches to action endpoints called via `Craft.sendActionRequest`** if they currently only redirect. Use `$request->getAcceptsJson()` to branch. AJAX-only endpoints can `requireAcceptsJson()` at the top.
 10. **Run `composer phpstan` + `composer fix-cs`** in the affected plugin. Both must be 0 errors.
 11. **Verify in the browser.** Click every row action and every bulk action; confirm filter/sort/paginate / search input still works; confirm pagination still shows the filtered total count.

@@ -25,10 +25,16 @@ Works with table aliases and special characters in keys:
 DbHelper::jsonExtract('a.metadata', 'clickType');
 // MySQL: JSON_UNQUOTE(JSON_EXTRACT(a.metadata, '$.clickType'))
 
+// With Craft table-prefix syntax
+DbHelper::jsonExtract('{{%formie_submissions}}.content', $fieldUid);
+// Resolves {{%formie_submissions}} before validating the column reference.
+
 // Keys with hyphens get quoted for MySQL
 DbHelper::jsonExtract('metadata', 'utm-source');
 // MySQL: JSON_UNQUOTE(JSON_EXTRACT(metadata, '$."utm-source"'))
 ```
+
+When building Yii-quoted column references, do not nest Craft table-prefix syntax inside `[[...]]`. Yii's expansion order can corrupt the column-reference parser. Prefer either a query-builder alias such as `s.content` / `[[s.content]]`, or pass `{{%table}}.column` directly to `DbHelper::jsonExtract()`.
 
 Pass an array for nested paths @since(5.23.0). Each segment is treated as a single key — segments are NOT split on dots, so keys containing dots or hyphens round-trip safely:
 

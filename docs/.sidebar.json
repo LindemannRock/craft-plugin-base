@@ -22,6 +22,7 @@
             "feature-tour/edition-support",
             "feature-tour/date-format-helper",
             "feature-tour/date-range-helper",
+            "feature-tour/schedule-helper",
             "feature-tour/color-helper",
             "feature-tour/export-helper",
             "feature-tour/geo-helper",
