@@ -272,20 +272,44 @@ class ExportHelper
         array $dateColumns = [],
         array $options = [],
     ): Response {
-        // Format date columns if specified
+        $content = self::excelContent($rows, $headers, $dateColumns, $options);
+
+        return self::createResponse(
+            $content,
+            $filename,
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+    }
+
+    /**
+     * Build Excel (.xlsx) content from rows and headers
+     *
+     * Use this when you need the raw spreadsheet bytes (writing to file storage,
+     * bundling into a ZIP, attaching to an email). For an HTTP download, use {@see toExcel()}.
+     *
+     * @param array $rows Data rows to export
+     * @param array $headers Column headers
+     * @param array $dateColumns Column keys to format as database datetime
+     * @param array $options Sheet options (sheetTitle, freezeHeader, autoFilter, columnWidths)
+     * @return string Excel (.xlsx) file bytes
+     * @since 5.25.0
+     */
+    public static function excelContent(
+        array $rows,
+        array $headers,
+        array $dateColumns = [],
+        array $options = [],
+    ): string {
         if (!empty($dateColumns)) {
             $rows = self::formatDateColumns($rows, $dateColumns);
         }
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
-        // Set sheet title
         $sheetTitle = $options['sheetTitle'] ?? 'Export';
         $sheet->setTitle(self::sanitizeSheetTitle($sheetTitle));
         self::writeSheet($sheet, $rows, $headers, $options);
 
-        // Write to temp file
         $tempFile = tempnam(sys_get_temp_dir(), 'excel_export_');
         $writer = new Xlsx($spreadsheet);
         $writer->save($tempFile);
@@ -293,20 +317,14 @@ class ExportHelper
         $content = file_get_contents($tempFile);
         unlink($tempFile);
 
-        if ($content === false) {
-            $spreadsheet->disconnectWorksheets();
-            throw new \yii\web\BadRequestHttpException('Failed to read generated Excel file.');
-        }
-
-        // Clean up
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
 
-        return self::createResponse(
-            $content,
-            $filename,
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        );
+        if ($content === false) {
+            throw new \yii\web\BadRequestHttpException('Failed to read generated Excel file.');
+        }
+
+        return $content;
     }
 
     /**
@@ -383,6 +401,8 @@ class ExportHelper
      * @param array $rows Data rows to export
      * @param array $headers Column headers
      * @param array $dateColumns Column keys to format as database datetime
+     * @param string $delimiter CSV field delimiter @since 5.25.0
+     * @param string $enclosure CSV field enclosure character @since 5.25.0
      * @return string CSV string
      * @since 5.13.1
      */
@@ -390,6 +410,8 @@ class ExportHelper
         array $rows,
         array $headers,
         array $dateColumns = [],
+        string $delimiter = ',',
+        string $enclosure = '"',
     ): string {
         // Format date columns if specified
         if (!empty($dateColumns)) {
@@ -397,10 +419,10 @@ class ExportHelper
         }
 
         $output = fopen('php://temp', 'r+');
-        fputcsv($output, $headers);
+        fputcsv($output, $headers, $delimiter, $enclosure);
 
         foreach ($rows as $row) {
-            fputcsv($output, self::sanitizeRow(array_values($row)));
+            fputcsv($output, self::sanitizeRow(array_values($row)), $delimiter, $enclosure);
         }
 
         rewind($output);

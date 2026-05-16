@@ -117,16 +117,45 @@ return ExportHelper::toExcelMulti([
 
 ### ZIP Archive @since(5.13.1)
 
-Bundle multiple files into a ZIP download.
+Bundle multiple files into a ZIP download. Use the content-only helpers (`csvContent` / `excelContent`) to build the pieces, then `toZip` to package them.
 
 ```php
 $csvContent = ExportHelper::csvContent($rows, $headers, ['dateCreated']);
+$xlsxContent = ExportHelper::excelContent($rows, $headers, ['dateCreated']);
 
 return ExportHelper::toZip([
     ['name' => 'users.csv', 'content' => $csvContent],
+    ['name' => 'users.xlsx', 'content' => $xlsxContent],
     ['name' => 'metadata.json', 'content' => json_encode($meta)],
 ], 'export-bundle.zip');
 ```
+
+## Content-Only Methods @since(5.25.0)
+
+Use `csvContent()` and `excelContent()` when you need the raw file bytes instead of an HTTP `Response`. Typical use cases: queued background exports that write to disk, bundling into a ZIP, attaching to an email, storing in an asset volume.
+
+```php
+// Raw CSV bytes
+$csv = ExportHelper::csvContent($rows, $headers, ['dateCreated']);
+
+// Custom delimiter / enclosure (e.g. semicolon-separated for European locales)
+$csv = ExportHelper::csvContent($rows, $headers, ['dateCreated'], ';', '"');
+
+// Raw XLSX bytes
+$xlsx = ExportHelper::excelContent($rows, $headers, ['dateCreated'], [
+    'sheetTitle' => 'Users',
+    'freezeHeader' => true,
+    'autoFilter' => true,
+]);
+
+// Write to file storage
+file_put_contents('/path/to/export.xlsx', $xlsx);
+
+// Or attach to an email
+$message->attachContent($xlsx, ['fileName' => 'users.xlsx', 'contentType' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+```
+
+`csvContent()` and `excelContent()` apply the same formula-injection sanitization, header styling, and date formatting as the `Response`-returning methods — `toCsv()` and `toExcel()` are thin wrappers around them.
 
 ## Empty Data Handling
 

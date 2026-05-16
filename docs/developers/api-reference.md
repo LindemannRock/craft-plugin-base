@@ -117,9 +117,10 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | `filename($settings, $parts, ?string $ext)` | `string` | Generate export filename |
 | `assertNotEmpty(array $data, ?string $message = null)` | `void` | Throw if data is empty |
 | `toCsv(array $rows, array $headers, string $file, array $dateCols)` | `Response` | CSV download response |
-| `csvContent(array $rows, array $headers, array $dateCols)` | `string` | Build CSV string without sending response |
+| `csvContent(array $rows, array $headers, array $dateCols, string $delimiter = ',', string $enclosure = '"')` | `string` | Build CSV string without sending response (delimiter/enclosure @since(5.25.0)) |
 | `toJson(array $rows, string $file, array $dateCols, bool $pretty = true)` | `Response` | JSON download response |
 | `toExcel(array $rows, array $headers, string $file, array $dateCols, array $opts)` | `Response` | Excel download response |
+| `excelContent(array $rows, array $headers, array $dateCols, array $opts)` | `string` | Build XLSX bytes without sending response @since(5.25.0) |
 | `toExcelMulti(array $sheets, string $file)` | `Response` | Multi-sheet Excel workbook |
 | `toZip(array $files, string $file)` | `Response` | ZIP archive download |
 | `formatDateColumns(array $rows, array $dateCols)` | `array` | Format dates for CSV/Excel (Craft TZ, `Y-m-d H:i:s`) |
