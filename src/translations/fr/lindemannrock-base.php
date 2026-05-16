@@ -30,6 +30,19 @@ return [
     'All time' => 'Toute la période',
     'Custom Range' => 'Plage personnalisée',
 
+    // Schedule options
+    'Disabled' => 'Désactivé',
+    'Every 6 Hours' => 'Toutes les 6 heures',
+    'Every 12 Hours' => 'Toutes les 12 heures',
+    'Daily' => 'Quotidien',
+    'Daily at 2:00 AM' => 'Tous les jours à 02:00',
+    'Weekly' => 'Hebdomadaire',
+    'Monthly' => 'Mensuel',
+    'Every 2 Months' => 'Tous les 2 mois',
+    'Quarterly' => 'Trimestriel',
+    'Every 6 Months' => 'Tous les 6 mois',
+    'Yearly' => 'Annuel',
+
     // Export + editions
     'Nothing to export.' => 'Rien à exporter.',
     '{feature} requires the {edition} edition.' => '{feature} nécessite l\'édition {edition}.',

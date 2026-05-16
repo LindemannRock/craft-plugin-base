@@ -30,6 +30,19 @@ return [
     'All time' => 'كل الوقت',
     'Custom Range' => 'نطاق مخصص',
 
+    // Schedule options
+    'Disabled' => 'معطّل',
+    'Every 6 Hours' => 'كل 6 ساعات',
+    'Every 12 Hours' => 'كل 12 ساعة',
+    'Daily' => 'يومياً',
+    'Daily at 2:00 AM' => 'يومياً في 02:00',
+    'Weekly' => 'أسبوعياً',
+    'Monthly' => 'شهرياً',
+    'Every 2 Months' => 'كل شهرين',
+    'Quarterly' => 'ربع سنوي',
+    'Every 6 Months' => 'كل 6 أشهر',
+    'Yearly' => 'سنوياً',
+
     // Export + editions
     'Nothing to export.' => 'لا يوجد شيء للتصدير.',
     '{feature} requires the {edition} edition.' => '{feature} يتطلب إصدار {edition}.',

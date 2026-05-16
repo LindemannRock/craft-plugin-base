@@ -30,6 +30,19 @@ return [
     'All time' => 'Alle tijd',
     'Custom Range' => 'Aangepast bereik',
 
+    // Schedule options
+    'Disabled' => 'Uitgeschakeld',
+    'Every 6 Hours' => 'Elke 6 uur',
+    'Every 12 Hours' => 'Elke 12 uur',
+    'Daily' => 'Dagelijks',
+    'Daily at 2:00 AM' => 'Dagelijks om 02:00',
+    'Weekly' => 'Wekelijks',
+    'Monthly' => 'Maandelijks',
+    'Every 2 Months' => 'Elke 2 maanden',
+    'Quarterly' => 'Per kwartaal',
+    'Every 6 Months' => 'Elke 6 maanden',
+    'Yearly' => 'Jaarlijks',
+
     // Export + editions
     'Nothing to export.' => 'Niets te exporteren.',
     '{feature} requires the {edition} edition.' => '{feature} vereist de {edition}-editie.',

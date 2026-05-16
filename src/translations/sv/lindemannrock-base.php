@@ -30,6 +30,19 @@ return [
     'All time' => 'Hela perioden',
     'Custom Range' => 'Anpassat intervall',
 
+    // Schedule options
+    'Disabled' => 'Inaktiverad',
+    'Every 6 Hours' => 'Var 6:e timme',
+    'Every 12 Hours' => 'Var 12:e timme',
+    'Daily' => 'Dagligen',
+    'Daily at 2:00 AM' => 'Dagligen kl. 02:00',
+    'Weekly' => 'Veckovis',
+    'Monthly' => 'Månadsvis',
+    'Every 2 Months' => 'Varannan månad',
+    'Quarterly' => 'Kvartalsvis',
+    'Every 6 Months' => 'Var sjätte månad',
+    'Yearly' => 'Årsvis',
+
     // Export + editions
     'Nothing to export.' => 'Inget att exportera.',
     '{feature} requires the {edition} edition.' => '{feature} kräver {edition}-utgåvan.',

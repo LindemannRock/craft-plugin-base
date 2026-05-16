@@ -30,6 +30,19 @@ return [
     'All time' => 'All time',
     'Custom Range' => 'Custom Range',
 
+    // Schedule options
+    'Disabled' => 'Disabled',
+    'Every 6 Hours' => 'Every 6 Hours',
+    'Every 12 Hours' => 'Every 12 Hours',
+    'Daily' => 'Daily',
+    'Daily at 2:00 AM' => 'Daily at 2:00 AM',
+    'Weekly' => 'Weekly',
+    'Monthly' => 'Monthly',
+    'Every 2 Months' => 'Every 2 Months',
+    'Quarterly' => 'Quarterly',
+    'Every 6 Months' => 'Every 6 Months',
+    'Yearly' => 'Yearly',
+
     // Export + editions
     'Nothing to export.' => 'Nothing to export.',
     '{feature} requires the {edition} edition.' => '{feature} requires the {edition} edition.',

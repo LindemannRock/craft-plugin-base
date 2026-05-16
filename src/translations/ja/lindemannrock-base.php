@@ -30,6 +30,19 @@ return [
     'All time' => '全期間',
     'Custom Range' => 'カスタム範囲',
 
+    // Schedule options
+    'Disabled' => '無効',
+    'Every 6 Hours' => '6 時間ごと',
+    'Every 12 Hours' => '12 時間ごと',
+    'Daily' => '毎日',
+    'Daily at 2:00 AM' => '毎日 02:00',
+    'Weekly' => '毎週',
+    'Monthly' => '毎月',
+    'Every 2 Months' => '2 か月ごと',
+    'Quarterly' => '四半期ごと',
+    'Every 6 Months' => '6 か月ごと',
+    'Yearly' => '毎年',
+
     // Export + editions
     'Nothing to export.' => 'エクスポートするものがありません。',
     '{feature} requires the {edition} edition.' => '{feature} には {edition} エディションが必要です。',

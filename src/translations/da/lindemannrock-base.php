@@ -30,6 +30,19 @@ return [
     'All time' => 'Hele perioden',
     'Custom Range' => 'Brugerdefineret interval',
 
+    // Schedule options
+    'Disabled' => 'Deaktiveret',
+    'Every 6 Hours' => 'Hver 6. time',
+    'Every 12 Hours' => 'Hver 12. time',
+    'Daily' => 'Dagligt',
+    'Daily at 2:00 AM' => 'Dagligt kl. 02:00',
+    'Weekly' => 'Ugentligt',
+    'Monthly' => 'Månedligt',
+    'Every 2 Months' => 'Hver 2. måned',
+    'Quarterly' => 'Kvartalsvis',
+    'Every 6 Months' => 'Hver 6. måned',
+    'Yearly' => 'Årligt',
+
     // Export + editions
     'Nothing to export.' => 'Intet at eksportere.',
     '{feature} requires the {edition} edition.' => '{feature} kræver {edition}-udgaven.',
