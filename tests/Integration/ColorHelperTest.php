@@ -1,0 +1,79 @@
+<?php
+/**
+ * LindemannRock Plugin Base
+ *
+ * @link      https://lindemannrock.com
+ * @copyright Copyright (c) 2026 LindemannRock
+ */
+
+declare(strict_types=1);
+
+namespace lindemannrock\base\tests\Integration;
+
+use lindemannrock\base\helpers\ColorHelper;
+use lindemannrock\base\testing\IntegrationTestCase;
+use ReflectionClass;
+
+/**
+ * Pins the contract for {@see ColorHelper}.
+ *
+ * @since 5.25.0
+ */
+final class ColorHelperTest extends IntegrationTestCase
+{
+    public function testGetPaletteColorShapeAndExpectedMembership(): void
+    {
+        $red = ColorHelper::getPaletteColor('red');
+
+        // Documented shape: exactly four keys — class, color, rgb, text. NO
+        // 'dot' key. Dots only appear on a handful of color sets via
+        // array_merge() inside initialize(), never on the bare palette entry.
+        self::assertSame(['class', 'color', 'rgb', 'text'], array_keys($red));
+        self::assertArrayNotHasKey('dot', $red);
+
+        $names = ColorHelper::getPaletteColorNames();
+
+        // Palette is the documented 18-color set. If a future PR adds or
+        // removes a color this test fires so docs/CLAUDE.md can be updated
+        // alongside the change.
+        self::assertCount(18, $names);
+        self::assertContains('emerald', $names);
+        self::assertContains('fuchsia', $names);
+        self::assertContains('sky', $names);
+        self::assertNotContains('white', $names);
+        self::assertNotContains('black', $names);
+        self::assertNotContains('brown', $names);
+
+        // Unknown name falls back to DEFAULT_COLOR (the documented contract,
+        // not throw-on-miss).
+        self::assertSame(ColorHelper::DEFAULT_COLOR, ColorHelper::getPaletteColor('not-a-color'));
+    }
+
+    public function testRegisterColorSetRoundTrip(): void
+    {
+        $set = [
+            'active' => ColorHelper::getPaletteColor('teal'),
+            'inactive' => ColorHelper::getPaletteColor('gray'),
+        ];
+
+        try {
+            self::assertFalse(ColorHelper::hasColorSet('__base_test_status'));
+
+            ColorHelper::registerColorSet('__base_test_status', $set);
+
+            self::assertTrue(ColorHelper::hasColorSet('__base_test_status'));
+            self::assertSame($set, ColorHelper::getColorSet('__base_test_status'));
+            self::assertSame($set['active'], ColorHelper::getSetColor('__base_test_status', 'active'));
+        } finally {
+            // ColorHelper::$colorSets is a per-process static, so a registered
+            // set leaks into every subsequent test in the same PHPUnit run.
+            // Drop the test set via reflection so the suite stays
+            // order-independent.
+            $reflection = new ReflectionClass(ColorHelper::class);
+            $colorSets = $reflection->getProperty('colorSets');
+            $current = $colorSets->getValue();
+            unset($current['__base_test_status']);
+            $colorSets->setValue(null, $current);
+        }
+    }
+}

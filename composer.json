@@ -44,10 +44,16 @@
             "lindemannrock\\base\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "lindemannrock\\base\\tests\\": "tests/"
+        }
+    },
     "scripts": {
         "phpstan": "phpstan --ansi --memory-limit=1G",
         "check-cs": "ecs check --ansi",
-        "fix-cs": "ecs check --fix --ansi"
+        "fix-cs": "ecs check --fix --ansi",
+        "test": "phpunit --colors=always"
     },
     "extra": {
         "name": "LindemannRock Plugin Base",
