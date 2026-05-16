@@ -49,6 +49,13 @@ final class DbHelperTest extends IntegrationTestCase
             DbHelper::jsonExtract('metadata', ['outer', 'inner']),
         );
 
+        // Craft table-prefix syntax is resolved before identifier validation.
+        $formieSubmissionsTable = Craft::$app->getDb()->getSchema()->getRawTableName('{{%formie_submissions}}');
+        self::assertSame(
+            "JSON_UNQUOTE(JSON_EXTRACT({$formieSubmissionsTable}.content, '$.fieldUid'))",
+            DbHelper::jsonExtract('{{%formie_submissions}}.content', 'fieldUid'),
+        );
+
         // Validator rejects unsafe path segments — stops a future caller from
         // sneaking SQL through `$path`.
         $this->expectException(\InvalidArgumentException::class);
