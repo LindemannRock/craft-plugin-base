@@ -50,13 +50,14 @@ class DbHelper
      * (segments are NOT split on dots), so keys containing dots or other
      * special characters round-trip safely.
      *
-     * @param string $column The JSON column name (e.g., 'metadata' or 'a.metadata')
+     * @param string $column The JSON column name (e.g., 'metadata', 'a.metadata', or '{{%table}}.metadata')
      * @param string|string[] $path A single key, or an array of keys for nested extraction
      * @return string Raw SQL expression string (use inside select/where clauses)
      * @throws \InvalidArgumentException if column or any path segment contains unsafe characters
      */
     public static function jsonExtract(string $column, string|array $path): string
     {
+        $column = self::normalizeColumnReference($column);
         self::validateIdentifier($column, 'column');
 
         $segments = is_array($path) ? array_values($path) : [$path];
@@ -91,7 +92,7 @@ class DbHelper
      * Same as jsonExtract() but returns a yii\db\Expression for use in
      * query builder methods like ->select() and ->where().
      *
-     * @param string $column The JSON column name (e.g., 'metadata' or 'a.metadata')
+     * @param string $column The JSON column name (e.g., 'metadata', 'a.metadata', or '{{%table}}.metadata')
      * @param string|string[] $path A single key, or an array of keys for nested extraction
      * @param string|null $alias Optional column alias for SELECT clauses
      * @return Expression
@@ -179,6 +180,24 @@ class DbHelper
                 "Invalid $label for SQL expression: '$value'. Only alphanumeric characters, underscores, dots, hyphens, backticks, and brackets are allowed."
             );
         }
+    }
+
+    /**
+     * Resolve Craft table-prefix syntax before validating column references.
+     */
+    private static function normalizeColumnReference(string $column): string
+    {
+        if (!str_contains($column, '{{%')) {
+            return $column;
+        }
+
+        $normalized = preg_replace_callback(
+            '/\{\{%[a-zA-Z0-9_]+\}\}/',
+            static fn(array $matches): string => Craft::$app->getDb()->getSchema()->getRawTableName($matches[0]),
+            $column
+        );
+
+        return $normalized ?? $column;
     }
 
     /**
