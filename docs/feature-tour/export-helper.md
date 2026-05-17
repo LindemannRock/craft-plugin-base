@@ -190,6 +190,22 @@ The `toCsv`, `toJson`, and `toExcel` methods call these internally when you pass
 
 ExportHelper automatically sanitizes cell values to prevent CSV/Excel formula injection. Values starting with `=`, `@`, `\t`, `\r`, or `\n` are prefixed with a single quote. Values starting with `+` or `-` are allowed only when they are numeric (e.g., phone numbers like `+1234567890`).
 
+### Custom Writers @since(5.25.0)
+
+If you build your own spreadsheet writer (multi-sheet workbook, custom styling, etc.) and can't route through `toExcel()` / `excelContent()`, use `isDangerousValue()` to apply the same guard inline:
+
+```php
+foreach ($row as $value) {
+    if (ExportHelper::isDangerousValue($value)) {
+        $sheet->setCellValueExplicit($cellRef, $value, DataType::TYPE_STRING);
+    } else {
+        $sheet->setCellValue($cellRef, $value);
+    }
+}
+```
+
+`TYPE_STRING` tells PhpSpreadsheet to treat the value as a literal string regardless of leading characters — no visible quote prefix, fully formula-safe.
+
 ## Typical Controller Pattern
 
 ```php

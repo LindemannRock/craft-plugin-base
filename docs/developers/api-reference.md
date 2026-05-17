@@ -121,6 +121,7 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | `toJson(array $rows, string $file, array $dateCols, bool $pretty = true)` | `Response` | JSON download response |
 | `toExcel(array $rows, array $headers, string $file, array $dateCols, array $opts)` | `Response` | Excel download response |
 | `excelContent(array $rows, array $headers, array $dateCols, array $opts)` | `string` | Build XLSX bytes without sending response @since(5.25.0) |
+| `isDangerousValue(mixed $value)` | `bool` | Check if a cell value would trigger formula injection (for callers building their own spreadsheet writer) @since(5.25.0) |
 | `toExcelMulti(array $sheets, string $file)` | `Response` | Multi-sheet Excel workbook |
 | `toZip(array $files, string $file)` | `Response` | ZIP archive download |
 | `formatDateColumns(array $rows, array $dateCols)` | `array` | Format dates for CSV/Excel (Craft TZ, `Y-m-d H:i:s`) |
