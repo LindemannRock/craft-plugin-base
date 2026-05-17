@@ -787,8 +787,9 @@ class ExportHelper
      *
      * @param mixed $value The cell value to check
      * @return bool True if the value is potentially dangerous
+     * @since 5.25.0 (made public)
      */
-    private static function isDangerousValue(mixed $value): bool
+    public static function isDangerousValue(mixed $value): bool
     {
         if (!is_string($value) || $value === '') {
             return false;
