@@ -981,6 +981,10 @@ a.lr-unified-card-link:active {
     background: #fef2f2;
 }
 
+.lr-row--neutral {
+    background: #f7f7f7;
+}
+
 .data tbody tr.lr-row--info {
     --hover-bg-color: #dbeafe;
     --selected-bg-color: #bfdbfe;
@@ -999,6 +1003,11 @@ a.lr-unified-card-link:active {
 .data tbody tr.lr-row--danger {
     --hover-bg-color: #fee2e2;
     --selected-bg-color: #fecaca;
+}
+
+.data tbody tr.lr-row--neutral {
+    --hover-bg-color: #e5e7eb;
+    --selected-bg-color: #d1d5db;
 }
 
 .data tbody tr.lr-row--info:hover,
@@ -1021,6 +1030,11 @@ a.lr-unified-card-link:active {
     background: #fee2e2 !important;
 }
 
+.data tbody tr.lr-row--neutral:hover,
+.lr-row--neutral.lr-clickable-row:hover {
+    background: #e5e7eb !important;
+}
+
 .data tbody tr.lr-row--info.sel,
 .data tbody tr.lr-row--info.selected {
     background: #bfdbfe !important;
@@ -1039,6 +1053,11 @@ a.lr-unified-card-link:active {
 .data tbody tr.lr-row--danger.sel,
 .data tbody tr.lr-row--danger.selected {
     background: #fecaca !important;
+}
+
+.data tbody tr.lr-row--neutral.sel,
+.data tbody tr.lr-row--neutral.selected {
+    background: #d1d5db !important;
 }
 
 .lr-context-row td {
