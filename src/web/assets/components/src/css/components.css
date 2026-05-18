@@ -960,10 +960,6 @@ a.lr-unified-card-link:active {
     transition: background 0.1s ease;
 }
 
-.lr-clickable-row:hover {
-    background: #f9fafb !important;
-}
-
 /* Row highlight tones */
 .lr-row--info {
     background: #eff6ff;
@@ -1066,8 +1062,6 @@ a.lr-unified-card-link:active {
 
 .lr-context-row .lr-context-content {
     padding: 16px;
-    background: #f9fafb;
-    border-left: 3px solid #3498db;
 }
 
 /* New button responsive */
