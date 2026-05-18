@@ -12,6 +12,31 @@
  #   errorMessage: Message to show on error
  #   reloadDelay: Delay before page reload in ms (default: 1500, use 0 to skip reload)
  #
+ # Requirements (on the button being controlled):
+ #   - For Craft's `.btn.loading` CSS to actually show a spinner, the button must
+ #     include a `.spinner.spinner-absolute` child and wrap its text in `.label`:
+ #
+ #         <button class="btn" id="my-button">
+ #             <div class="inline-flex">
+ #                 <div class="label">My Button</div>
+ #             </div>
+ #             <div class="spinner spinner-absolute">
+ #                 <span class="visually-hidden">{{ 'Loading'|t('app') }}</span>
+ #             </div>
+ #         </button>
+ #
+ #     Without these, `addClass('loading')` is a silent no-op (text stays visible,
+ #     no spinner appears). Matches Craft's pattern in
+ #     `vendor/craftcms/cms/src/templates/_includes/forms/button.twig`.
+ #
+ #   - This partial assumes jQuery is available when the script runs. Inside the
+ #     `cp-utilities` layout that holds true (the layout positions the JS after
+ #     Craft's jQuery). If you include this partial OUTSIDE `cp-utilities` (e.g.,
+ #     in a sidebar or anywhere before Craft's jQuery script tag in the body),
+ #     wrap the include in `document.addEventListener('DOMContentLoaded', …)` or
+ #     `{% js %}` — otherwise `$` will be undefined at script-run time and the
+ #     handler will silently fail to bind.
+ #
  # Example:
  #   {% include 'lindemannrock-base/_layouts/cp-utilities/_ajax-button' with {
  #       id: 'clear-cache',
