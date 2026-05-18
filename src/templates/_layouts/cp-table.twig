@@ -707,7 +707,7 @@
                 if (contextRow) {
                     const isVisible = contextRow.style.display !== 'none';
                     contextRow.style.display = isVisible ? 'none' : 'table-row';
-                    this.style.background = isVisible ? '' : '#f0f4f8';
+                    this.classList.toggle('lr-row-expanded', !isVisible);
                 }
             });
         });
