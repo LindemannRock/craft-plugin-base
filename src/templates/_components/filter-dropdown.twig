@@ -37,7 +37,7 @@
                 {{ currentOption.label ?? filter.label ?? 'All'|t('lindemannrock-base') }}
             </span>
             {% if currentOption.extra ?? false %}
-                <span style="color: var(--medium-text-color);">{{ currentOption.extra }}</span>
+                <span>{{ currentOption.extra }}</span>
             {% endif %}
         {% endif %}
     </button>
@@ -50,7 +50,7 @@
                        href="?{{ optionParams|url_encode }}">
                         {{ option.label }}
                         {% if option.extra ?? false %}
-                            <span style="color: var(--medium-text-color);">{{ option.extra }}</span>
+                            <span>{{ option.extra }}</span>
                         {% endif %}
                     </a>
                 </li>
