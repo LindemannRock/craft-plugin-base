@@ -87,20 +87,20 @@ class ColorHelper
         ],
         'orange' => [
             'class' => 'orange',
-            'color' => '#f97316',
-            'rgb' => '249, 115, 22',
+            'color' => '#fb923c',
+            'rgb' => '251, 146, 60',
             'text' => '#9a3412',
         ],
         'red' => [
             'class' => 'red',
-            'color' => '#ef4444',
-            'rgb' => '239, 68, 68',
+            'color' => '#dc2626',
+            'rgb' => '220, 38, 38',
             'text' => '#7f1d1d',
         ],
         'blue' => [
             'class' => 'blue',
-            'color' => '#3b82f6',
-            'rgb' => '59, 130, 246',
+            'color' => '#2563eb',
+            'rgb' => '37, 99, 235',
             'text' => '#1e3a8a',
         ],
         'pink' => [
@@ -117,8 +117,8 @@ class ColorHelper
         ],
         'green' => [
             'class' => 'green',
-            'color' => '#22c55e',
-            'rgb' => '34, 197, 94',
+            'color' => '#16a34a',
+            'rgb' => '22, 163, 74',
             'text' => '#166534',
         ],
         'yellow' => [
@@ -273,7 +273,7 @@ class ColorHelper
             // =================================================================
             'logLevel' => [
                 'debug' => self::PALETTE['purple'],
-                'info' => self::PALETTE['sky'],
+                'info' => self::PALETTE['blue'],
                 'warning' => self::PALETTE['orange'],
                 'error' => self::PALETTE['red'],
             ],
