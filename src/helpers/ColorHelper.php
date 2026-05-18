@@ -279,6 +279,20 @@ class ColorHelper
             ],
 
             // =================================================================
+            // LOG SOURCE - web = pink, queue = indigo, console = teal,
+            //              php-errors = rose, plugin = gray
+            // Companion to logLevel; chosen so a source dot never shares a hue
+            // with a logLevel dot when both render in the same row.
+            // =================================================================
+            'logSource' => [
+                'web' => self::PALETTE['pink'],
+                'queue' => self::PALETTE['indigo'],
+                'console' => self::PALETTE['teal'],
+                'php-errors' => self::PALETTE['rose'],
+                'plugin' => self::PALETTE['gray'],
+            ],
+
+            // =================================================================
             // PLUGIN STATUS - active = teal, disabled = gray, notInstalled = red
             // dot uses Craft's semantic classes (enabled/disabled/off) not color names
             // =================================================================
