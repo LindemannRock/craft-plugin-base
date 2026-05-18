@@ -1,0 +1,108 @@
+{#
+ # Log Level Row Styles
+ #
+ # Tints data rows by log level using the `logLevel` color set from base
+ # `ColorHelper`. Single layer per state, no JavaScript, no stacking.
+ #
+ # Mechanism — mirrors Craft's native cp-table pattern:
+ #   - The `<tr>` carries the left-border indicator + the `--hover-bg-color`
+ #     custom property (same variable Craft sets on `table.data tbody tr`).
+ #   - The `<td>` inherits the variable from its parent `<tr>` and paints
+ #     its background from it.
+ #   - Craft's `:hover` rule on TD reads the same variable for free.
+ #
+ # Three intensity tiers + a darker border for the active region:
+ #   Resting  → faint cell tint, subtle border (data rows at rest)
+ #   Active   → stronger cell tint, darker border (parent row on hover or
+ #              expanded — visual focal point of the active region)
+ #   Context  → resting-equivalent cell tint, darker border (the expanded
+ #              child row; subordinate body inside the active region)
+ #
+ # The bg-alpha hierarchy creates a focal expanded row that stands out
+ # against both resting siblings and its own context body, while the
+ # darker border on hover/expanded/context visually groups them as
+ # one "active region."
+ #
+ # States covered:
+ #   - Resting:        .lr-data-row:has(td[data-level="X"]) > td
+ #                     → rgba(level, bgAlpha)
+ #                     → border rgba(level, borderAlpha)
+ #   - Hover:          Craft's native rule on TD reads --hover-bg-color
+ #                     → rgba(level, bgActiveAlpha)
+ #                     + our :hover rule on TR
+ #                     → border rgba(level, borderActiveAlpha)
+ #   - Expanded:       .lr-data-row.lr-row-expanded:has(...) > td
+ #                     (toggled by cp-table's click-to-expand JS)
+ #                     → rgba(level, bgActiveAlpha)
+ #                     → border rgba(level, borderActiveAlpha)
+ #   - Context row:    .lr-context-row reads inherited --hover-bg-color
+ #                     and shares the parent's border-left for alignment
+ #                     → rgba(level, bgContextAlpha)
+ #                     → border rgba(level, borderActiveAlpha)
+ #
+ # Browser support for `:has()`: Chrome 105+, Safari 15.4+, Firefox 121+
+ # (all evergreen browsers Craft CP runs in).
+ #
+ # Usage:
+ # {% include 'lindemannrock-base/_partials/log-level-row-styles' %}
+ #
+ # With custom alpha values:
+ # {% include 'lindemannrock-base/_partials/log-level-row-styles' with {
+ #     bgAlpha: 0.05,
+ #     bgActiveAlpha: 0.12,
+ # } only %}
+ #
+ # Parameters (all optional):
+ # - bgAlpha (default 0.10): resting cell tint alpha
+ # - bgActiveAlpha (default 0.15): hover / expanded tint alpha (focal point)
+ # - bgContextAlpha (default 0.07): context-row tint alpha (subordinate body)
+ # - borderAlpha (default 0.30): resting left-border alpha
+ # - borderActiveAlpha (default 0.70): hover / expanded / context border alpha
+ #}
+
+{% set logLevels = lrColorSet('logLevel') %}
+{% set bgAlpha = bgAlpha ?? 0.10 %}
+{% set bgActiveAlpha = bgActiveAlpha ?? 0.15 %}
+{% set bgContextAlpha = bgContextAlpha ?? 0.07 %}
+{% set borderAlpha = borderAlpha ?? 0.30 %}
+{% set borderActiveAlpha = borderActiveAlpha ?? 0.70 %}
+
+<style>
+{% for level, palette in logLevels %}
+    /* Parent row resting: subtle border + active-state variable */
+    .lr-data-row:has(td[data-level="{{ level }}"]) {
+        border-left: 3px solid rgba({{ palette.rgb }}, {{ borderAlpha }});
+        --hover-bg-color: rgba({{ palette.rgb }}, {{ bgActiveAlpha }});
+    }
+    /* Parent row resting cell tint */
+    .lr-data-row:has(td[data-level="{{ level }}"]) > td {
+        background-color: rgba({{ palette.rgb }}, {{ bgAlpha }});
+    }
+    /* Parent row hover — border darkens to match active state */
+    .lr-data-row:has(td[data-level="{{ level }}"]):hover {
+        border-left-color: rgba({{ palette.rgb }}, {{ borderActiveAlpha }});
+    }
+    /* Parent row expanded — TD bg matches hover intensity, border stays dark */
+    .lr-data-row.lr-row-expanded:has(td[data-level="{{ level }}"]) {
+        border-left-color: rgba({{ palette.rgb }}, {{ borderActiveAlpha }});
+    }
+    .lr-data-row.lr-row-expanded:has(td[data-level="{{ level }}"]) > td {
+        background-color: rgba({{ palette.rgb }}, {{ bgActiveAlpha }});
+    }
+    /* Context row: darker border (unifies the active region with the
+       expanded parent) + lighter bg via the inherited variable */
+    .lr-data-row:has(td[data-level="{{ level }}"]) + .lr-context-row {
+        border-left: 3px solid rgba({{ palette.rgb }}, {{ borderActiveAlpha }});
+        --hover-bg-color: rgba({{ palette.rgb }}, {{ bgContextAlpha }});
+    }
+{% endfor %}
+
+    /* Context row td paints from the inherited --hover-bg-color variable,
+       scoped to context rows that follow a level-marked data row. */
+    .lr-data-row:has(td[data-level]) + .lr-context-row > td {
+        background-color: var(--hover-bg-color);
+    }
+    .lr-data-row td {
+        vertical-align: top;
+    }
+</style>
