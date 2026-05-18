@@ -1061,7 +1061,10 @@ a.lr-unified-card-link:active {
 }
 
 .lr-context-row .lr-context-content {
-    padding: 16px;
+    /* Horizontal padding keeps content off the column edges; vertical
+       padding gives a touch of breathing room from the parent row above
+       and the next data row below. */
+    padding: 12px 16px;
 }
 
 /* New button responsive */
