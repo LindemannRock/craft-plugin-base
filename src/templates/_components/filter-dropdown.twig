@@ -26,11 +26,20 @@
 {% endfor %}
 
 <div class="btngroup">
-    <button type="button" class="btn menubtn">
+    <button type="button" class="btn menubtn" title="{{ currentOption.label ?? filter.label ?? '' }}">
         {% if filter.icon ?? false %}
             <span class="icon" data-icon="{{ filter.icon }}"></span>
         {% endif %}
-        {{ currentOption.label ?? filter.label ?? 'All'|t('lindemannrock-base') }}
+        {% if currentOption.shortLabel ?? false %}
+            {{ currentOption.shortLabel }}
+        {% else %}
+            <span class="truncate" style="max-width: 200px; display: inline-block; vertical-align: bottom;">
+                {{ currentOption.label ?? filter.label ?? 'All'|t('lindemannrock-base') }}
+            </span>
+            {% if currentOption.extra ?? false %}
+                <span style="color: var(--medium-text-color);">{{ currentOption.extra }}</span>
+            {% endif %}
+        {% endif %}
     </button>
     <div class="menu" {% if filter.menuStyle ?? false %}style="{{ filter.menuStyle }}"{% endif %}>
         <ul>
@@ -41,7 +50,7 @@
                        href="?{{ optionParams|url_encode }}">
                         {{ option.label }}
                         {% if option.extra ?? false %}
-                            <span style="color: #999;">{{ option.extra }}</span>
+                            <span style="color: var(--medium-text-color);">{{ option.extra }}</span>
                         {% endif %}
                     </a>
                 </li>
