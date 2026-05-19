@@ -120,7 +120,7 @@ return [
 
     // Date format settings (shared via _partials/cascade-date-format-settings.twig + _partials/cascade-base-overrides.twig)
     'Base Plugin Overrides' => 'ベースプラグインのオーバーライド',
-    'Settings marked "グローバルデフォルトを使用" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => '「グローバルデフォルトを使用」と表示された設定は <code>config/lindemannrock-base.php</code> から継承されます。そのファイル（または特定のキー）が存在しない場合は、コードに組み込まれたデフォルト値が適用されます。',
+    'Settings marked "Use global default" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply. To customize globally, copy <code>vendor/lindemannrock/craft-plugin-base/src/config.php</code> to your project\'s <code>config/</code> directory.' => '「グローバルデフォルトを使用」と表示された設定は <code>config/lindemannrock-base.php</code> から継承されます。そのファイル（または特定のキー）が存在しない場合は、コードに組み込まれたデフォルト値が適用されます。グローバルにカスタマイズするには、<code>vendor/lindemannrock/craft-plugin-base/src/config.php</code> をプロジェクトの <code>config/</code> ディレクトリにコピーしてください。',
     'Time' => '時刻',
     'Date' => '日付',
     'Time Format' => '時刻フォーマット',
@@ -151,6 +151,7 @@ return [
 
     // Items per page field (shared via _partials/field-items-per-page.twig)
     'Items Per Page' => '1 ページあたりの件数',
+    'Number of items to display per page in lists.' => 'リストで 1 ページあたりに表示する件数です。',
 
     // Plugin name field (shared via _partials/field-plugin-name.twig)
     'Plugin Name' => 'プラグイン名',

@@ -120,7 +120,7 @@ return [
 
     // Date format settings (shared via _partials/cascade-date-format-settings.twig + _partials/cascade-base-overrides.twig)
     'Base Plugin Overrides' => 'Tilsidesættelser af basis-plugin',
-    'Settings marked "Brug global standardindstilling" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => 'Indstillinger markeret som „Brug global standardindstilling" arver fra <code>config/lindemannrock-base.php</code>. Hvis den fil (eller den specifikke nøgle) mangler, gælder de indbyggede standardværdier.',
+    'Settings marked "Use global default" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply. To customize globally, copy <code>vendor/lindemannrock/craft-plugin-base/src/config.php</code> to your project\'s <code>config/</code> directory.' => 'Indstillinger markeret som „Brug global standardindstilling" arver fra <code>config/lindemannrock-base.php</code>. Hvis den fil (eller den specifikke nøgle) mangler, gælder de indbyggede standardværdier. For global tilpasning skal du kopiere <code>vendor/lindemannrock/craft-plugin-base/src/config.php</code> til projektets <code>config/</code>-mappe.',
     'Time' => 'Tid',
     'Date' => 'Dato',
     'Time Format' => 'Tidsformat',
@@ -151,6 +151,7 @@ return [
 
     // Items per page field (shared via _partials/field-items-per-page.twig)
     'Items Per Page' => 'Elementer pr. side',
+    'Number of items to display per page in lists.' => 'Antal elementer der vises pr. side i lister.',
 
     // Plugin name field (shared via _partials/field-plugin-name.twig)
     'Plugin Name' => 'Plugin-navn',
