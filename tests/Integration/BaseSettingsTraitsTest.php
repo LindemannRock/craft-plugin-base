@@ -16,11 +16,13 @@ use lindemannrock\base\traits\DateFormatSettingsTrait;
 use lindemannrock\base\traits\DateRangeSettingsTrait;
 use lindemannrock\base\traits\ExportFormatSettingsTrait;
 use lindemannrock\base\traits\ItemsPerPageSettingsTrait;
+use lindemannrock\base\traits\LogLevelSettingsTrait;
+use lindemannrock\base\traits\PluginNameSettingsTrait;
 
 /**
- * Pins the public contracts of the four base-settings traits adopted by plugins
+ * Pins the public contracts of the six base-settings traits adopted by plugins
  * via the `_partials/cascade-base-overrides` umbrella (cascade traits) and the
- * `_partials/field-items-per-page` partial (shared-field trait).
+ * `_partials/field-*` partials (shared-field traits).
  *
  * Each trait declares its properties + helper methods that plugins merge into
  * their own Settings model's `rules()` / `attributeLabels()`. The tests below
@@ -222,6 +224,97 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
         $defaultRules = array_filter($rules, static fn(array $rule): bool => ($rule[1] ?? null) === 'default');
         self::assertCount(1, $defaultRules, 'expected exactly one default-value rule for itemsPerPage');
         self::assertSame(100, array_values($defaultRules)[0]['value']);
+    }
+
+    // ---------------------------------------------------------------------
+    // PluginNameSettingsTrait
+    // ---------------------------------------------------------------------
+
+    public function testPluginNameSettingsTraitDeclaresNoPropertyAdopterOwnsTheDefault(): void
+    {
+        // The trait deliberately does NOT declare $pluginName — each plugin's
+        // default differs ("Search Manager", "Logging Library", etc.) and stays
+        // on the plugin's own Settings class. Pin this so a future refactor
+        // that tries to centralize the default is caught immediately.
+        $traitProps = (new \ReflectionClass(PluginNameSettingsTrait::class))->getProperties();
+        self::assertSame([], $traitProps, 'PluginNameSettingsTrait must not declare any properties');
+    }
+
+    public function testPluginNameSettingsRulesRequireValueAndCap255Chars(): void
+    {
+        // Adopter must already have a `public string $pluginName` property
+        // for the trait's rules to validate against.
+        $settings = new class extends Model {
+            use PluginNameSettingsTrait;
+
+            public string $pluginName = 'Test Plugin';
+        };
+
+        $rules = $settings->pluginNameSettingsRules();
+        self::assertCount(2, $rules, 'expected required + max-length rule');
+
+        $required = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'required'));
+        $string = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'string'));
+
+        self::assertSame(['pluginName'], $required[0][0]);
+        self::assertSame(['pluginName'], $string[0][0]);
+        self::assertSame(255, $string[0]['max']);
+    }
+
+    public function testPluginNameSettingsLabelHasOneEntry(): void
+    {
+        $settings = new class extends Model {
+            use PluginNameSettingsTrait;
+
+            public string $pluginName = 'Test Plugin';
+        };
+
+        self::assertSame(['pluginName'], array_keys($settings->pluginNameSettingsLabel()));
+    }
+
+    // ---------------------------------------------------------------------
+    // LogLevelSettingsTrait
+    // ---------------------------------------------------------------------
+
+    public function testLogLevelSettingsTraitDefaultsToError(): void
+    {
+        $settings = new class extends Model {
+            use LogLevelSettingsTrait;
+        };
+
+        // 'error' is the universal default. Most plugins ship with this;
+        // a future refactor that flips it (say, to 'warning') would silently
+        // increase log volume across every adopter. Pin it.
+        self::assertSame('error', $settings->logLevel);
+    }
+
+    public function testLogLevelSettingsRulesAllowKnownLevelsAndDelegateToValidator(): void
+    {
+        $settings = new class extends Model {
+            use LogLevelSettingsTrait;
+        };
+
+        $rules = $settings->logLevelSettingsRules();
+        self::assertCount(2, $rules, 'expected in-range rule + validateLogLevel delegation');
+
+        $inRule = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'in'));
+        self::assertSame(['debug', 'info', 'warning', 'error'], $inRule[0]['range']);
+
+        // The second rule delegates to `validateLogLevel` — which lives on
+        // `SettingsConfigTrait` and handles the devMode-gated `debug` fallback.
+        // The trait's rule list assumes adopters also `use SettingsConfigTrait`.
+        $validatorRule = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'validateLogLevel'));
+        self::assertCount(1, $validatorRule, 'logLevel rules must include validateLogLevel delegation');
+        self::assertSame(['logLevel'], $validatorRule[0][0]);
+    }
+
+    public function testLogLevelSettingsLabelHasOneEntry(): void
+    {
+        $settings = new class extends Model {
+            use LogLevelSettingsTrait;
+        };
+
+        self::assertSame(['logLevel'], array_keys($settings->logLevelSettingsLabel()));
     }
 
     // ---------------------------------------------------------------------
