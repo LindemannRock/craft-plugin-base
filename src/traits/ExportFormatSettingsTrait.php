@@ -28,10 +28,10 @@ use Craft;
  *   3. Base config file:      'exports' hash
  *   4. Hardcoded fallback:    ExportHelper::DEFAULT_FORMATS
  *
- * Companion CP partial: `lindemannrock-base/_partials/export-format-settings.twig`
+ * Companion CP partial: `lindemannrock-base/_partials/cascade-export-format-settings.twig`
  * renders three selectFields (mirroring the `showSeconds` 3-state pattern: "Use
  * global default" / "Disabled" / "Enabled"). Plugins include it via the
- * `_partials/base-overrides` umbrella's `sections.exports` branch.
+ * `_partials/cascade-base-overrides` umbrella's `sections.exports` branch.
  *
  * Usage:
  * ```php
