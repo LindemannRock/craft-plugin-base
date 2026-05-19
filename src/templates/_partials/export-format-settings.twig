@@ -41,13 +41,14 @@
 {% set enabledLabel = 'Enabled'|t('lindemannrock-base') %}
 
 {% set formats = [
-    {key: 'exportsCsv', label: 'CSV Export'|t('lindemannrock-base'), instructions: 'Whether the CSV export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
-    {key: 'exportsJson', label: 'JSON Export'|t('lindemannrock-base'), instructions: 'Whether the JSON export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
-    {key: 'exportsExcel', label: 'Excel Export'|t('lindemannrock-base'), instructions: 'Whether the Excel export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
+    {key: 'exportsCsv', configKey: 'exports.csv', label: 'CSV Export'|t('lindemannrock-base'), instructions: 'Whether the CSV export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
+    {key: 'exportsJson', configKey: 'exports.json', label: 'JSON Export'|t('lindemannrock-base'), instructions: 'Whether the JSON export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
+    {key: 'exportsExcel', configKey: 'exports.excel', label: 'Excel Export'|t('lindemannrock-base'), instructions: 'Whether the Excel export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
 ] %}
 
 {% for format in formats %}
     {% if format.key in fields %}
+        {% set isOverridden = settings.isOverriddenByConfig(format.configKey) %}
         {{ forms.selectField({
             label: format.label,
             instructions: format.instructions,
@@ -59,9 +60,9 @@
                 {label: disabledLabel, value: '0'},
                 {label: enabledLabel, value: '1'},
             ],
-            disabled: settings.isOverriddenByConfig(format.key),
-            warning: settings.isOverriddenByConfig(format.key) ?
-                'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: format.key, handle: pluginHandle})|raw : null,
+            disabled: isOverridden,
+            warning: isOverridden ?
+                'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: format.configKey, handle: pluginHandle})|raw : null,
             errors: settings.getErrors(format.key),
         }) }}
     {% endif %}
