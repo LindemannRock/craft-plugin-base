@@ -149,6 +149,9 @@ return [
     'Use global default' => 'グローバルデフォルトを使用',
     'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => '<code>config/{handle}.php</code> の <code>{setting}</code> 設定によって上書きされています。',
 
+    // Items per page field (shared via _partials/items-per-page-field.twig)
+    'Items Per Page' => '1 ページあたりの件数',
+
     // Copy-to-clipboard controls — shared across any base component or partial
     // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
     'Copy' => 'コピー',

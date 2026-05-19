@@ -149,6 +149,9 @@ return [
     'Use global default' => 'Brug global standardindstilling',
     'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'Dette tilsidesættes af indstillingen <code>{setting}</code> i <code>config/{handle}.php</code>.',
 
+    // Items per page field (shared via _partials/items-per-page-field.twig)
+    'Items Per Page' => 'Elementer pr. side',
+
     // Copy-to-clipboard controls — shared across any base component or partial
     // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
     'Copy' => 'Kopiér',
