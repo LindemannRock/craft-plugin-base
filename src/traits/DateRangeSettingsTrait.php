@@ -30,9 +30,9 @@ use Craft;
  *   5. Base config file:      'analytics.defaultDateRange' (legacy)
  *   6. Hardcoded fallback:    'last30days'
  *
- * Companion CP partial: `lindemannrock-base/_partials/date-range-settings.twig`
+ * Companion CP partial: `lindemannrock-base/_partials/cascade-date-range-settings.twig`
  * renders the form field via shared `lindemannrock-base` translations. Plugins
- * include it via the `_partials/base-overrides` umbrella's `sections.dateRange`
+ * include it via the `_partials/cascade-base-overrides` umbrella's `sections.dateRange`
  * branch.
  *
  * Usage:
