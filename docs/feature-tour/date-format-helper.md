@@ -27,7 +27,7 @@ When `DateFormatHelper::getConfig()` resolves a setting, it walks four layers (h
 
 The "current plugin" is auto-detected from `Craft::$app->controller->module` when its controller belongs to a plugin — so Twig filters like `|lrTime` automatically respect per-plugin overrides without callers needing to thread a plugin handle through every call site.
 
-To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/date-format-settings.twig`. Cross-plugin rollout status is tracked in [`_docs/rollouts/date-format-settings.md`](../../../_docs/rollouts/date-format-settings.md).
+To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/date-format-settings.twig`. Cross-plugin rollout status is tracked in [`_docs/rollouts/base-settings.md`](../../../_docs/rollouts/base-settings.md).
 
 ## Display Formatting
 
