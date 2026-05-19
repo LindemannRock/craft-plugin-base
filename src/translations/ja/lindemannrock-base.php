@@ -117,4 +117,37 @@ return [
     'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: HTTP 無料プラン（45 リクエスト/分）。HTTPS には API キーを追加（Pro プラン、$13/月）。API キーなしでは IP アドレスが暗号化されずに送信されます。',
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS、1,000 リクエスト/日 無料。API キーは任意です（レート制限を増加させます）。',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS、50,000 リクエスト/月 無料。API キーは任意です（レート制限を増加させます）。',
+
+    // Date format settings (shared via _partials/date-format-settings.twig)
+    'Time Format' => '時刻フォーマット',
+    'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'このプラグイン全体での時刻の表示方法を設定します（AM/PM 付き 12 時間制または 24 時間制）。',
+    '24-hour (14:30)' => '24 時間制 (14:30)',
+    '12-hour (2:30 PM)' => '12 時間制 (2:30 PM)',
+    'Month Format' => '月のフォーマット',
+    'How months appear in dates: numeric (01), short (Jan), or long (January).' => '日付における月の表示方法を設定します：数字 (01)、略称 (Jan)、またはフル (January)。',
+    'Numeric (01)' => '数字 (01)',
+    'Short (Jan)' => '略称 (Jan)',
+    'Long (January)' => 'フル (January)',
+    'Date Order' => '日付の並び順',
+    'Order of day, month, and year in date displays.' => '日付表示における日、月、年の順序を設定します。',
+    'Day-Month-Year (31/01/2026)' => '日-月-年 (31/01/2026)',
+    'Month-Day-Year (01/31/2026)' => '月-日-年 (01/31/2026)',
+    'Year-Month-Day (2026/01/31)' => '年-月-日 (2026/01/31)',
+    'Date Separator' => '日付の区切り文字',
+    'Character between numeric date parts. Only applies when month format is numeric.' => '数字の日付部分の間の区切り文字です。月のフォーマットが数字の場合にのみ適用されます。',
+    'Slash (31/01/2026)' => 'スラッシュ (31/01/2026)',
+    'Dash (31-01-2026)' => 'ハイフン (31-01-2026)',
+    'Dot (31.01.2026)' => 'ドット (31.01.2026)',
+    'Show Seconds' => '秒を表示',
+    'Whether to include seconds in time displays by default.' => 'デフォルトで時刻表示に秒を含めるかどうかを設定します。',
+    'No (14:30)' => 'いいえ (14:30)',
+    'Yes (14:30:25)' => 'はい (14:30:25)',
+    'Use global default' => 'グローバルデフォルトを使用',
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => '<code>config/{handle}.php</code> の <code>{setting}</code> 設定によって上書きされています。',
+
+    // Copy-to-clipboard controls — shared across any base component or partial
+    // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
+    'Copy' => 'コピー',
+    'Copied!' => 'コピーしました！',
+    'Failed to copy to clipboard' => 'クリップボードへのコピーに失敗しました',
 ];

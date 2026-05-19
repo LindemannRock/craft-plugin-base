@@ -118,6 +118,33 @@ return [
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).',
 
+    // Date format settings (shared via _partials/date-format-settings.twig)
+    'Time Format' => 'Time Format',
+    'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).',
+    '24-hour (14:30)' => '24-hour (14:30)',
+    '12-hour (2:30 PM)' => '12-hour (2:30 PM)',
+    'Month Format' => 'Month Format',
+    'How months appear in dates: numeric (01), short (Jan), or long (January).' => 'How months appear in dates: numeric (01), short (Jan), or long (January).',
+    'Numeric (01)' => 'Numeric (01)',
+    'Short (Jan)' => 'Short (Jan)',
+    'Long (January)' => 'Long (January)',
+    'Date Order' => 'Date Order',
+    'Order of day, month, and year in date displays.' => 'Order of day, month, and year in date displays.',
+    'Day-Month-Year (31/01/2026)' => 'Day-Month-Year (31/01/2026)',
+    'Month-Day-Year (01/31/2026)' => 'Month-Day-Year (01/31/2026)',
+    'Year-Month-Day (2026/01/31)' => 'Year-Month-Day (2026/01/31)',
+    'Date Separator' => 'Date Separator',
+    'Character between numeric date parts. Only applies when month format is numeric.' => 'Character between numeric date parts. Only applies when month format is numeric.',
+    'Slash (31/01/2026)' => 'Slash (31/01/2026)',
+    'Dash (31-01-2026)' => 'Dash (31-01-2026)',
+    'Dot (31.01.2026)' => 'Dot (31.01.2026)',
+    'Show Seconds' => 'Show Seconds',
+    'Whether to include seconds in time displays by default.' => 'Whether to include seconds in time displays by default.',
+    'No (14:30)' => 'No (14:30)',
+    'Yes (14:30:25)' => 'Yes (14:30:25)',
+    'Use global default' => 'Use global default',
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.',
+
     // Copy-to-clipboard controls — shared across any base component or partial
     // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
     'Copy' => 'Copy',

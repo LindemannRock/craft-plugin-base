@@ -117,4 +117,37 @@ return [
     'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: piano gratuito HTTP (45 richieste/min). Aggiungere una API Key per HTTPS (piano Pro, $13/month). Gli indirizzi IP sono trasmessi senza cifratura senza API Key.',
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS con 1.000 richieste gratuite/giorno. API Key facoltativa (aumenta i limiti di utilizzo).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS con 50.000 richieste gratuite/mese. API Key facoltativa (aumenta i limiti di utilizzo).',
+
+    // Date format settings (shared via _partials/date-format-settings.twig)
+    'Time Format' => 'Formato ora',
+    'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'Definisce come vengono visualizzate le ore in questo plugin (12 ore con AM/PM o 24 ore).',
+    '24-hour (14:30)' => '24 ore (14:30)',
+    '12-hour (2:30 PM)' => '12 ore (2:30 PM)',
+    'Month Format' => 'Formato mese',
+    'How months appear in dates: numeric (01), short (Jan), or long (January).' => 'Definisce come appaiono i mesi nelle date: numerico (01), abbreviato (Jan) o esteso (January).',
+    'Numeric (01)' => 'Numerico (01)',
+    'Short (Jan)' => 'Abbreviato (Jan)',
+    'Long (January)' => 'Esteso (January)',
+    'Date Order' => 'Ordine della data',
+    'Order of day, month, and year in date displays.' => 'Ordine di giorno, mese e anno nelle visualizzazioni di data.',
+    'Day-Month-Year (31/01/2026)' => 'Giorno-Mese-Anno (31/01/2026)',
+    'Month-Day-Year (01/31/2026)' => 'Mese-Giorno-Anno (01/31/2026)',
+    'Year-Month-Day (2026/01/31)' => 'Anno-Mese-Giorno (2026/01/31)',
+    'Date Separator' => 'Separatore di data',
+    'Character between numeric date parts. Only applies when month format is numeric.' => 'Carattere tra le parti numeriche della data. Si applica solo quando il formato del mese è numerico.',
+    'Slash (31/01/2026)' => 'Barra (31/01/2026)',
+    'Dash (31-01-2026)' => 'Trattino (31-01-2026)',
+    'Dot (31.01.2026)' => 'Punto (31.01.2026)',
+    'Show Seconds' => 'Mostra secondi',
+    'Whether to include seconds in time displays by default.' => 'Determina se i secondi vengono inclusi per impostazione predefinita nelle visualizzazioni dell\'ora.',
+    'No (14:30)' => 'No (14:30)',
+    'Yes (14:30:25)' => 'Sì (14:30:25)',
+    'Use global default' => 'Usa il valore predefinito globale',
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'Questa impostazione è sovrascritta dall\'opzione <code>{setting}</code> in <code>config/{handle}.php</code>.',
+
+    // Copy-to-clipboard controls — shared across any base component or partial
+    // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
+    'Copy' => 'Copia',
+    'Copied!' => 'Copiato!',
+    'Failed to copy to clipboard' => 'Copia negli appunti non riuscita',
 ];

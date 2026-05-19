@@ -117,4 +117,37 @@ return [
     'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: HTTP gratisplan (45 förfrågningar/min). Lägg till API-nyckel för HTTPS (Pro-nivå, $13/month). IP-adresser överförs okrypterade utan API-nyckel.',
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS med 1 000 gratis förfrågningar/dag. API-nyckel är valfri (ökar hastighetsgränser).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS med 50 000 gratis förfrågningar/månad. API-nyckel är valfri (ökar hastighetsgränser).',
+
+    // Date format settings (shared via _partials/date-format-settings.twig)
+    'Time Format' => 'Tidsformat',
+    'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'Anger hur tider visas i detta plugin (12-timmarformat med AM/PM eller 24-timmarformat).',
+    '24-hour (14:30)' => '24-timmar (14:30)',
+    '12-hour (2:30 PM)' => '12-timmar (2:30 PM)',
+    'Month Format' => 'Månadsformat',
+    'How months appear in dates: numeric (01), short (Jan), or long (January).' => 'Anger hur månader visas i datum: numeriskt (01), förkortat (Jan) eller fullständigt (January).',
+    'Numeric (01)' => 'Numeriskt (01)',
+    'Short (Jan)' => 'Förkortat (Jan)',
+    'Long (January)' => 'Fullständigt (January)',
+    'Date Order' => 'Datumordning',
+    'Order of day, month, and year in date displays.' => 'Ordning för dag, månad och år i datumvisningar.',
+    'Day-Month-Year (31/01/2026)' => 'Dag-Månad-År (31/01/2026)',
+    'Month-Day-Year (01/31/2026)' => 'Månad-Dag-År (01/31/2026)',
+    'Year-Month-Day (2026/01/31)' => 'År-Månad-Dag (2026/01/31)',
+    'Date Separator' => 'Datumseparator',
+    'Character between numeric date parts. Only applies when month format is numeric.' => 'Tecken mellan numeriska datumsdelar. Gäller endast när månadsformatet är numeriskt.',
+    'Slash (31/01/2026)' => 'Snedstreck (31/01/2026)',
+    'Dash (31-01-2026)' => 'Bindestreck (31-01-2026)',
+    'Dot (31.01.2026)' => 'Punkt (31.01.2026)',
+    'Show Seconds' => 'Visa sekunder',
+    'Whether to include seconds in time displays by default.' => 'Anger om sekunder ska inkluderas som standard i tidsvisningar.',
+    'No (14:30)' => 'Nej (14:30)',
+    'Yes (14:30:25)' => 'Ja (14:30:25)',
+    'Use global default' => 'Använd globalt standardvärde',
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'Det här åsidosätts av inställningen <code>{setting}</code> i <code>config/{handle}.php</code>.',
+
+    // Copy-to-clipboard controls — shared across any base component or partial
+    // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
+    'Copy' => 'Kopiera',
+    'Copied!' => 'Kopierat!',
+    'Failed to copy to clipboard' => 'Det gick inte att kopiera till urklipp',
 ];

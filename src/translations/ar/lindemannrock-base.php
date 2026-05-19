@@ -117,4 +117,37 @@ return [
     'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: الخطة المجانية تعمل بـ HTTP (45 طلب/دقيقة). أضف مفتاح API للحصول على HTTPS (خطة Pro، $13/month). تُرسل عناوين IP بدون تشفير في غياب مفتاح API.',
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS مع 1,000 طلب مجاني يوميًا. مفتاح API اختياري (يرفع حدود الاستخدام).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS مع 50,000 طلب مجاني شهريًا. مفتاح API اختياري (يرفع حدود الاستخدام).',
+
+    // Date format settings (shared via _partials/date-format-settings.twig)
+    'Time Format' => 'تنسيق الوقت',
+    'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'يحدد كيفية عرض الأوقات في هذه الإضافة (12 ساعة مع AM/PM أو 24 ساعة).',
+    '24-hour (14:30)' => '24 ساعة (14:30)',
+    '12-hour (2:30 PM)' => '12 ساعة (2:30 PM)',
+    'Month Format' => 'تنسيق الشهر',
+    'How months appear in dates: numeric (01), short (Jan), or long (January).' => 'يحدد كيفية ظهور الأشهر في التواريخ: رقمي (01)، مختصر (Jan)، أو كامل (January).',
+    'Numeric (01)' => 'رقمي (01)',
+    'Short (Jan)' => 'مختصر (Jan)',
+    'Long (January)' => 'كامل (January)',
+    'Date Order' => 'ترتيب التاريخ',
+    'Order of day, month, and year in date displays.' => 'ترتيب اليوم والشهر والسنة في عرض التواريخ.',
+    'Day-Month-Year (31/01/2026)' => 'يوم-شهر-سنة (31/01/2026)',
+    'Month-Day-Year (01/31/2026)' => 'شهر-يوم-سنة (01/31/2026)',
+    'Year-Month-Day (2026/01/31)' => 'سنة-شهر-يوم (2026/01/31)',
+    'Date Separator' => 'فاصل التاريخ',
+    'Character between numeric date parts. Only applies when month format is numeric.' => 'الحرف الفاصل بين أجزاء التاريخ الرقمية. ينطبق فقط عندما يكون تنسيق الشهر رقميًا.',
+    'Slash (31/01/2026)' => 'شرطة مائلة (31/01/2026)',
+    'Dash (31-01-2026)' => 'شرطة (31-01-2026)',
+    'Dot (31.01.2026)' => 'نقطة (31.01.2026)',
+    'Show Seconds' => 'عرض الثواني',
+    'Whether to include seconds in time displays by default.' => 'يحدد ما إذا كانت الثواني تُدرج افتراضيًا في عروض الوقت.',
+    'No (14:30)' => 'لا (14:30)',
+    'Yes (14:30:25)' => 'نعم (14:30:25)',
+    'Use global default' => 'استخدام الإعداد الافتراضي العام',
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة إعداد <code>{setting}</code> في <code>config/{handle}.php</code>.',
+
+    // Copy-to-clipboard controls — shared across any base component or partial
+    // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
+    'Copy' => 'نسخ',
+    'Copied!' => 'تم النسخ!',
+    'Failed to copy to clipboard' => 'فشل النسخ إلى الحافظة',
 ];

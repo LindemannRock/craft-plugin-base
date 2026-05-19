@@ -117,4 +117,37 @@ return [
     'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: HTTP gratis abonnement (45 verzoeken/min). API-sleutel toevoegen voor HTTPS (Pro-abonnement, $13/maand). IP-adressen worden onversleuteld verzonden zonder API-sleutel.',
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS met 1.000 gratis verzoeken/dag. API-sleutel optioneel (verhoogt limieten).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS met 50.000 gratis verzoeken/maand. API-sleutel optioneel (verhoogt limieten).',
+
+    // Date format settings (shared via _partials/date-format-settings.twig)
+    'Time Format' => 'Tijdnotatie',
+    'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'Bepaalt hoe tijden worden weergegeven in deze plugin (12-uurs met AM/PM of 24-uurs).',
+    '24-hour (14:30)' => '24-uurs (14:30)',
+    '12-hour (2:30 PM)' => '12-uurs (2:30 PM)',
+    'Month Format' => 'Maandnotatie',
+    'How months appear in dates: numeric (01), short (Jan), or long (January).' => 'Bepaalt hoe maanden worden weergegeven in datums: numeriek (01), kort (Jan) of lang (January).',
+    'Numeric (01)' => 'Numeriek (01)',
+    'Short (Jan)' => 'Kort (Jan)',
+    'Long (January)' => 'Lang (January)',
+    'Date Order' => 'Datumvolgorde',
+    'Order of day, month, and year in date displays.' => 'Volgorde van dag, maand en jaar in datumweergaven.',
+    'Day-Month-Year (31/01/2026)' => 'Dag-Maand-Jaar (31/01/2026)',
+    'Month-Day-Year (01/31/2026)' => 'Maand-Dag-Jaar (01/31/2026)',
+    'Year-Month-Day (2026/01/31)' => 'Jaar-Maand-Dag (2026/01/31)',
+    'Date Separator' => 'Datumscheidingsteken',
+    'Character between numeric date parts. Only applies when month format is numeric.' => 'Teken tussen numerieke datumonderdelen. Geldt alleen wanneer de maandnotatie numeriek is.',
+    'Slash (31/01/2026)' => 'Schuine streep (31/01/2026)',
+    'Dash (31-01-2026)' => 'Koppelteken (31-01-2026)',
+    'Dot (31.01.2026)' => 'Punt (31.01.2026)',
+    'Show Seconds' => 'Seconden tonen',
+    'Whether to include seconds in time displays by default.' => 'Bepaalt of seconden standaard worden opgenomen in tijdweergaven.',
+    'No (14:30)' => 'Nee (14:30)',
+    'Yes (14:30:25)' => 'Ja (14:30:25)',
+    'Use global default' => 'Globale standaardinstelling gebruiken',
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'Deze instelling wordt overschreven door de instelling <code>{setting}</code> in <code>config/{handle}.php</code>.',
+
+    // Copy-to-clipboard controls — shared across any base component or partial
+    // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
+    'Copy' => 'Kopiëren',
+    'Copied!' => 'Gekopieerd!',
+    'Failed to copy to clipboard' => 'Kopiëren naar klembord mislukt',
 ];

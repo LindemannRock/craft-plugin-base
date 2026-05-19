@@ -117,4 +117,37 @@ return [
     'ip-api.com: HTTP free tier (45 requests/min). Add API key for HTTPS (Pro tier, $13/month). IP addresses transmitted unencrypted without API key.' => 'ip-api.com: HTTP gratis plan (45 forespørsler/min). Legg til API-nøkkel for HTTPS (Pro-plan, $13/måned). IP-adresser overføres ukryptert uten API-nøkkel.',
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS med 1 000 gratis forespørsler/dag. API-nøkkel valgfri (øker hastighetsgrenser).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS med 50 000 gratis forespørsler/måned. API-nøkkel valgfri (øker hastighetsgrenser).',
+
+    // Date format settings (shared via _partials/date-format-settings.twig)
+    'Time Format' => 'Tidsformat',
+    'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'Angir hvordan klokkeslett vises i dette pluginet (12-timers med AM/PM eller 24-timers).',
+    '24-hour (14:30)' => '24-timers (14:30)',
+    '12-hour (2:30 PM)' => '12-timers (2:30 PM)',
+    'Month Format' => 'Månedsformat',
+    'How months appear in dates: numeric (01), short (Jan), or long (January).' => 'Angir hvordan måneder vises i datoer: numerisk (01), forkortet (Jan) eller fullt (January).',
+    'Numeric (01)' => 'Numerisk (01)',
+    'Short (Jan)' => 'Forkortet (Jan)',
+    'Long (January)' => 'Fullt (January)',
+    'Date Order' => 'Datorekkefølge',
+    'Order of day, month, and year in date displays.' => 'Rekkefølge for dag, måned og år i datovisninger.',
+    'Day-Month-Year (31/01/2026)' => 'Dag-Måned-År (31/01/2026)',
+    'Month-Day-Year (01/31/2026)' => 'Måned-Dag-År (01/31/2026)',
+    'Year-Month-Day (2026/01/31)' => 'År-Måned-Dag (2026/01/31)',
+    'Date Separator' => 'Datoskilletegn',
+    'Character between numeric date parts. Only applies when month format is numeric.' => 'Tegn mellom numeriske datodeler. Gjelder kun når månedsformatet er numerisk.',
+    'Slash (31/01/2026)' => 'Skråstrek (31/01/2026)',
+    'Dash (31-01-2026)' => 'Bindestrek (31-01-2026)',
+    'Dot (31.01.2026)' => 'Punktum (31.01.2026)',
+    'Show Seconds' => 'Vis sekunder',
+    'Whether to include seconds in time displays by default.' => 'Angir om sekunder som standard skal inkluderes i tidsvisninger.',
+    'No (14:30)' => 'Nei (14:30)',
+    'Yes (14:30:25)' => 'Ja (14:30:25)',
+    'Use global default' => 'Bruk global standardinnstilling',
+    'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'Denne innstillingen overstyres av <code>{setting}</code> i <code>config/{handle}.php</code>.',
+
+    // Copy-to-clipboard controls — shared across any base component or partial
+    // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
+    'Copy' => 'Kopier',
+    'Copied!' => 'Kopiert!',
+    'Failed to copy to clipboard' => 'Kopiering til utklippstavlen mislyktes',
 ];
