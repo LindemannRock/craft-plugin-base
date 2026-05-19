@@ -27,7 +27,7 @@ use Craft;
  *   3. Base config file (config/lindemannrock-base.php)
  *   4. Hardcoded defaults inside DateFormatHelper getters
  *
- * Companion CP partial: `lindemannrock-base/_partials/date-format-settings.twig`
+ * Companion CP partial: `lindemannrock-base/_partials/cascade-date-format-settings.twig`
  * renders the 5 form fields with `isOverriddenByConfig` warnings using shared
  * `lindemannrock-base` translations — plugins include it once and gain the
  * full UI without per-plugin string duplication.
