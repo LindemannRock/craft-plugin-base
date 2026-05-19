@@ -118,7 +118,7 @@ return [
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS med 1 000 gratis forespørsler/dag. API-nøkkel valgfri (øker hastighetsgrenser).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS med 50 000 gratis forespørsler/måned. API-nøkkel valgfri (øker hastighetsgrenser).',
 
-    // Date format settings (shared via _partials/date-format-settings.twig + _partials/base-overrides.twig)
+    // Date format settings (shared via _partials/cascade-date-format-settings.twig + _partials/cascade-base-overrides.twig)
     'Base Plugin Overrides' => 'Overstyringer av basisplugin',
     'Settings marked "Bruk global standardinnstilling" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => 'Innstillinger merket som „Bruk global standardinnstilling" arver fra <code>config/lindemannrock-base.php</code>. Hvis den filen (eller den spesifikke nøkkelen) mangler, gjelder de innebygde standardverdiene.',
     'Time' => 'Tid',
@@ -149,14 +149,26 @@ return [
     'Use global default' => 'Bruk global standardinnstilling',
     'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'Denne innstillingen overstyres av <code>{setting}</code> i <code>config/{handle}.php</code>.',
 
-    // Items per page field (shared via _partials/items-per-page-field.twig)
+    // Items per page field (shared via _partials/field-items-per-page.twig)
     'Items Per Page' => 'Elementer per side',
 
-    // Date range settings (shared via _partials/date-range-settings.twig)
+    // Plugin name field (shared via _partials/field-plugin-name.twig)
+    'Plugin Name' => 'Plugin-navn',
+    'The name of the plugin as it appears in the Control Panel menu.' => 'Navnet på plugin-programmet slik det vises i kontrollpanelmenyen.',
+
+    // Log level field (shared via _partials/field-log-level.twig)
+    'Log Level' => 'Loggnivå',
+    'Choose what types of messages to log. Debug level requires devMode to be enabled.' => 'Velg hvilke typer meldinger som skal logges. Debug-nivå krever at devMode er aktivert.',
+    'Error (Critical errors only)' => 'Feil (kun kritiske feil)',
+    'Warning (Errors and warnings)' => 'Advarsel (feil og advarsler)',
+    'Info (General information)' => 'Info (generell informasjon)',
+    'Debug (Detailed debugging)' => 'Debug (detaljert feilsøking)',
+
+    // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'Standard datoområde',
     'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'Standard tidsvindu som brukes på analyse-, logg- og dashboardsider i dette pluginet.',
 
-    // Export format settings (shared via _partials/export-format-settings.twig)
+    // Export format settings (shared via _partials/cascade-export-format-settings.twig)
     'CSV Export' => 'CSV-eksport',
     'JSON Export' => 'JSON-eksport',
     'Excel Export' => 'Excel-eksport',

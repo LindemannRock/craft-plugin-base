@@ -118,7 +118,7 @@ return [
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS、1,000 リクエスト/日 無料。API キーは任意です（レート制限を増加させます）。',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS、50,000 リクエスト/月 無料。API キーは任意です（レート制限を増加させます）。',
 
-    // Date format settings (shared via _partials/date-format-settings.twig + _partials/base-overrides.twig)
+    // Date format settings (shared via _partials/cascade-date-format-settings.twig + _partials/cascade-base-overrides.twig)
     'Base Plugin Overrides' => 'ベースプラグインのオーバーライド',
     'Settings marked "グローバルデフォルトを使用" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => '「グローバルデフォルトを使用」と表示された設定は <code>config/lindemannrock-base.php</code> から継承されます。そのファイル（または特定のキー）が存在しない場合は、コードに組み込まれたデフォルト値が適用されます。',
     'Time' => '時刻',
@@ -149,14 +149,26 @@ return [
     'Use global default' => 'グローバルデフォルトを使用',
     'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => '<code>config/{handle}.php</code> の <code>{setting}</code> 設定によって上書きされています。',
 
-    // Items per page field (shared via _partials/items-per-page-field.twig)
+    // Items per page field (shared via _partials/field-items-per-page.twig)
     'Items Per Page' => '1 ページあたりの件数',
 
-    // Date range settings (shared via _partials/date-range-settings.twig)
+    // Plugin name field (shared via _partials/field-plugin-name.twig)
+    'Plugin Name' => 'プラグイン名',
+    'The name of the plugin as it appears in the Control Panel menu.' => 'コントロールパネルのメニューに表示されるプラグインの名前です。',
+
+    // Log level field (shared via _partials/field-log-level.twig)
+    'Log Level' => 'ログレベル',
+    'Choose what types of messages to log. Debug level requires devMode to be enabled.' => '記録するメッセージの種類を選択してください。Debug レベルには devMode の有効化が必要です。',
+    'Error (Critical errors only)' => 'エラー（重大なエラーのみ）',
+    'Warning (Errors and warnings)' => '警告（エラーと警告）',
+    'Info (General information)' => '情報（一般情報）',
+    'Debug (Detailed debugging)' => 'Debug（詳細なデバッグ）',
+
+    // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'デフォルトの日付範囲',
     'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'このプラグインのアナリティクス、ログ、およびダッシュボードページに適用されるデフォルトの期間です。',
 
-    // Export format settings (shared via _partials/export-format-settings.twig)
+    // Export format settings (shared via _partials/cascade-export-format-settings.twig)
     'CSV Export' => 'CSV エクスポート',
     'JSON Export' => 'JSON エクスポート',
     'Excel Export' => 'Excel エクスポート',

@@ -118,7 +118,7 @@ return [
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS مع 1,000 طلب مجاني يوميًا. مفتاح API اختياري (يرفع حدود الاستخدام).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS مع 50,000 طلب مجاني شهريًا. مفتاح API اختياري (يرفع حدود الاستخدام).',
 
-    // Date format settings (shared via _partials/date-format-settings.twig + _partials/base-overrides.twig)
+    // Date format settings (shared via _partials/cascade-date-format-settings.twig + _partials/cascade-base-overrides.twig)
     'Base Plugin Overrides' => 'تجاوزات الإضافة الأساسية',
     'Settings marked "استخدام الإعداد الافتراضي العام" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => 'الإعدادات المحددة بـ «استخدام الإعداد الافتراضي العام» ترث قيمها من <code>config/lindemannrock-base.php</code>. إذا كان هذا الملف (أو المفتاح المحدد) غائبًا، تُطبَّق القيم الافتراضية المضمّنة في الكود.',
     'Time' => 'الوقت',
@@ -149,14 +149,26 @@ return [
     'Use global default' => 'استخدام الإعداد الافتراضي العام',
     'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'يتم تجاوز هذا الإعداد بواسطة إعداد <code>{setting}</code> في <code>config/{handle}.php</code>.',
 
-    // Items per page field (shared via _partials/items-per-page-field.twig)
+    // Items per page field (shared via _partials/field-items-per-page.twig)
     'Items Per Page' => 'العناصر لكل صفحة',
 
-    // Date range settings (shared via _partials/date-range-settings.twig)
+    // Plugin name field (shared via _partials/field-plugin-name.twig)
+    'Plugin Name' => 'اسم الإضافة',
+    'The name of the plugin as it appears in the Control Panel menu.' => 'اسم الإضافة كما يظهر في قائمة لوحة التحكم.',
+
+    // Log level field (shared via _partials/field-log-level.twig)
+    'Log Level' => 'مستوى التسجيل',
+    'Choose what types of messages to log. Debug level requires devMode to be enabled.' => 'اختر أنواع الرسائل المراد تسجيلها. يتطلب مستوى Debug تفعيل devMode.',
+    'Error (Critical errors only)' => 'خطأ (الأخطاء الحرجة فقط)',
+    'Warning (Errors and warnings)' => 'تحذير (الأخطاء والتحذيرات)',
+    'Info (General information)' => 'معلومات (معلومات عامة)',
+    'Debug (Detailed debugging)' => 'Debug (تصحيح تفصيلي)',
+
+    // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'نطاق التاريخ الافتراضي',
     'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'الإطار الزمني الافتراضي المُطبَّق على صفحات التحليلات والسجلات ولوحة التحكم في هذا المكوِّن الإضافي.',
 
-    // Export format settings (shared via _partials/export-format-settings.twig)
+    // Export format settings (shared via _partials/cascade-export-format-settings.twig)
     'CSV Export' => 'تصدير CSV',
     'JSON Export' => 'تصدير JSON',
     'Excel Export' => 'تصدير Excel',

@@ -118,7 +118,7 @@ return [
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS con 1.000 solicitudes gratuitas/día. Clave API opcional (aumenta los límites de velocidad).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS con 50.000 solicitudes gratuitas/mes. Clave API opcional (aumenta los límites de velocidad).',
 
-    // Date format settings (shared via _partials/date-format-settings.twig + _partials/base-overrides.twig)
+    // Date format settings (shared via _partials/cascade-date-format-settings.twig + _partials/cascade-base-overrides.twig)
     'Base Plugin Overrides' => 'Anulaciones del plugin base',
     'Settings marked "Usar el valor predeterminado global" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => 'Los ajustes marcados como «Usar el valor predeterminado global» se heredan de <code>config/lindemannrock-base.php</code>. Si ese archivo (o la clave específica) no existe, se aplican los valores predeterminados codificados.',
     'Time' => 'Hora',
@@ -149,14 +149,26 @@ return [
     'Use global default' => 'Usar el valor predeterminado global',
     'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.' => 'Esto está siendo sobreescrito por la configuración <code>{setting}</code> en <code>config/{handle}.php</code>.',
 
-    // Items per page field (shared via _partials/items-per-page-field.twig)
+    // Items per page field (shared via _partials/field-items-per-page.twig)
     'Items Per Page' => 'Elementos por página',
 
-    // Date range settings (shared via _partials/date-range-settings.twig)
+    // Plugin name field (shared via _partials/field-plugin-name.twig)
+    'Plugin Name' => 'Nombre del plugin',
+    'The name of the plugin as it appears in the Control Panel menu.' => 'El nombre del plugin tal como aparece en el menú del panel de control.',
+
+    // Log level field (shared via _partials/field-log-level.twig)
+    'Log Level' => 'Nivel de registro',
+    'Choose what types of messages to log. Debug level requires devMode to be enabled.' => 'Elija qué tipos de mensajes registrar. El nivel Debug requiere que devMode esté activado.',
+    'Error (Critical errors only)' => 'Error (solo errores críticos)',
+    'Warning (Errors and warnings)' => 'Advertencia (errores y advertencias)',
+    'Info (General information)' => 'Info (información general)',
+    'Debug (Detailed debugging)' => 'Debug (depuración detallada)',
+
+    // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'Rango de fechas predeterminado',
     'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'Ventana de tiempo predeterminada aplicada a las páginas de análisis, registros y panel de este plugin.',
 
-    // Export format settings (shared via _partials/export-format-settings.twig)
+    // Export format settings (shared via _partials/cascade-export-format-settings.twig)
     'CSV Export' => 'Exportación CSV',
     'JSON Export' => 'Exportación JSON',
     'Excel Export' => 'Exportación Excel',
