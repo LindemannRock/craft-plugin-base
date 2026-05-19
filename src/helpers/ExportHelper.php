@@ -73,6 +73,28 @@ class ExportHelper
     ];
 
     /**
+     * Per-handle resolved-config cache. Keyed by plugin handle, or
+     * `__base__` when no handle is passed. Tests reset via
+     * {@see clearConfigCache()}.
+     *
+     * @var array<string, array<string, bool>>
+     */
+    private static array $configCache = [];
+
+    /**
+     * Reset the resolved-config cache.
+     *
+     * Production callers don't need this — the cache lives for one request.
+     * Tests use it to re-read the on-disk config between cases.
+     *
+     * @since 5.25.0
+     */
+    public static function clearConfigCache(): void
+    {
+        self::$configCache = [];
+    }
+
+    /**
      * Get export configuration
      *
      * Resolves the per-format enable map by layering (low → high priority).
@@ -95,6 +117,11 @@ class ExportHelper
      */
     public static function getConfig(?string $pluginHandle = null): array
     {
+        $cacheKey = $pluginHandle ?? '__base__';
+        if (isset(self::$configCache[$cacheKey])) {
+            return self::$configCache[$cacheKey];
+        }
+
         // Layer 1: hardcoded defaults
         $result = self::DEFAULT_FORMATS;
 
@@ -129,6 +156,7 @@ class ExportHelper
             }
         }
 
+        self::$configCache[$cacheKey] = $result;
         return $result;
     }
 
