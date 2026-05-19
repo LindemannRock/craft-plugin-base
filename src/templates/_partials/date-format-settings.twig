@@ -1,0 +1,114 @@
+{#
+/**
+ * Date Format Settings
+ *
+ * Renders five form fields for per-plugin date/time formatting overrides.
+ * Each value defaults to "Use global default" (empty string) which lets the
+ * value cascade from base config / hardcoded defaults via DateFormatHelper.
+ *
+ * Include this partial in plugin settings pages whose Settings model uses
+ * `lindemannrock\base\traits\DateFormatSettingsTrait`.
+ *
+ * Required variables:
+ * - settings: Plugin Settings model using DateFormatSettingsTrait
+ * - pluginHandle: Plugin handle used in config-override warning messages
+ *
+ * Usage:
+ * {% include 'lindemannrock-base/_partials/date-format-settings' with {
+ *     settings: settings,
+ *     pluginHandle: 'logging-library'
+ * } only %}
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+{% set pluginHandle = pluginHandle ?? 'app' %}
+{% set inheritLabel = 'Use global default'|t('lindemannrock-base') %}
+
+{{ forms.selectField({
+    label: 'Time Format'|t('lindemannrock-base'),
+    instructions: 'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).'|t('lindemannrock-base'),
+    id: 'timeFormat',
+    name: 'settings[timeFormat]',
+    value: settings.timeFormat,
+    options: [
+        {label: inheritLabel, value: ''},
+        {label: '24-hour (14:30)'|t('lindemannrock-base'), value: '24'},
+        {label: '12-hour (2:30 PM)'|t('lindemannrock-base'), value: '12'},
+    ],
+    disabled: settings.isOverriddenByConfig('timeFormat'),
+    warning: settings.isOverriddenByConfig('timeFormat') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'timeFormat', handle: pluginHandle})|raw : null,
+    errors: settings.getErrors('timeFormat'),
+}) }}
+
+{{ forms.selectField({
+    label: 'Month Format'|t('lindemannrock-base'),
+    instructions: 'How months appear in dates: numeric (01), short (Jan), or long (January).'|t('lindemannrock-base'),
+    id: 'monthFormat',
+    name: 'settings[monthFormat]',
+    value: settings.monthFormat,
+    options: [
+        {label: inheritLabel, value: ''},
+        {label: 'Numeric (01)'|t('lindemannrock-base'), value: 'numeric'},
+        {label: 'Short (Jan)'|t('lindemannrock-base'), value: 'short'},
+        {label: 'Long (January)'|t('lindemannrock-base'), value: 'long'},
+    ],
+    disabled: settings.isOverriddenByConfig('monthFormat'),
+    warning: settings.isOverriddenByConfig('monthFormat') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'monthFormat', handle: pluginHandle})|raw : null,
+    errors: settings.getErrors('monthFormat'),
+}) }}
+
+{{ forms.selectField({
+    label: 'Date Order'|t('lindemannrock-base'),
+    instructions: 'Order of day, month, and year in date displays.'|t('lindemannrock-base'),
+    id: 'dateOrder',
+    name: 'settings[dateOrder]',
+    value: settings.dateOrder,
+    options: [
+        {label: inheritLabel, value: ''},
+        {label: 'Day-Month-Year (31/01/2026)'|t('lindemannrock-base'), value: 'dmy'},
+        {label: 'Month-Day-Year (01/31/2026)'|t('lindemannrock-base'), value: 'mdy'},
+        {label: 'Year-Month-Day (2026/01/31)'|t('lindemannrock-base'), value: 'ymd'},
+    ],
+    disabled: settings.isOverriddenByConfig('dateOrder'),
+    warning: settings.isOverriddenByConfig('dateOrder') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'dateOrder', handle: pluginHandle})|raw : null,
+    errors: settings.getErrors('dateOrder'),
+}) }}
+
+{{ forms.selectField({
+    label: 'Date Separator'|t('lindemannrock-base'),
+    instructions: 'Character between numeric date parts. Only applies when month format is numeric.'|t('lindemannrock-base'),
+    id: 'dateSeparator',
+    name: 'settings[dateSeparator]',
+    value: settings.dateSeparator,
+    options: [
+        {label: inheritLabel, value: ''},
+        {label: 'Slash (31/01/2026)'|t('lindemannrock-base'), value: '/'},
+        {label: 'Dash (31-01-2026)'|t('lindemannrock-base'), value: '-'},
+        {label: 'Dot (31.01.2026)'|t('lindemannrock-base'), value: '.'},
+    ],
+    disabled: settings.isOverriddenByConfig('dateSeparator'),
+    warning: settings.isOverriddenByConfig('dateSeparator') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'dateSeparator', handle: pluginHandle})|raw : null,
+    errors: settings.getErrors('dateSeparator'),
+}) }}
+
+{{ forms.selectField({
+    label: 'Show Seconds'|t('lindemannrock-base'),
+    instructions: 'Whether to include seconds in time displays by default.'|t('lindemannrock-base'),
+    id: 'showSeconds',
+    name: 'settings[showSeconds]',
+    value: settings.showSeconds is null ? '' : (settings.showSeconds ? '1' : '0'),
+    options: [
+        {label: inheritLabel, value: ''},
+        {label: 'No (14:30)'|t('lindemannrock-base'), value: '0'},
+        {label: 'Yes (14:30:25)'|t('lindemannrock-base'), value: '1'},
+    ],
+    disabled: settings.isOverriddenByConfig('showSeconds'),
+    warning: settings.isOverriddenByConfig('showSeconds') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'showSeconds', handle: pluginHandle})|raw : null,
+    errors: settings.getErrors('showSeconds'),
+}) }}

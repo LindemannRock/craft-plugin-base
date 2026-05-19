@@ -9,6 +9,7 @@
 namespace lindemannrock\base\helpers;
 
 use Craft;
+use craft\base\PluginInterface;
 use DateTime;
 use DateTimeZone;
 use yii\db\Expression;
@@ -53,26 +54,113 @@ use yii\db\Expression;
 class DateFormatHelper
 {
     /**
-     * @var array|null Cached configuration
+     * @var array<string, array> Cached configuration keyed by plugin handle (or '__base__' for no-plugin context).
      */
-    private static ?array $config = null;
+    private static array $configCache = [];
+
+    /**
+     * Keys that per-plugin config or DB settings may override on top of base config.
+     * Limits the merge to date/time formatting concerns — unrelated plugin settings
+     * (e.g., itemsPerPage, pluginName) never leak into DateFormatHelper.
+     */
+    private const PLUGIN_OVERRIDABLE_KEYS = [
+        'timeFormat',
+        'monthFormat',
+        'dateOrder',
+        'dateSeparator',
+        'showSeconds',
+    ];
 
     // =========================================================================
     // CONFIGURATION
     // =========================================================================
 
     /**
-     * Get configuration from config/lindemannrock-base.php
+     * Get configuration with cascade.
      *
+     * Resolution order (high → low priority):
+     *   1. Plugin config file (config/{handle}.php)              — env overrides
+     *   2. Plugin DB settings via DateFormatSettingsTrait         — user-set in CP
+     *   3. Base config file (config/lindemannrock-base.php)       — global default
+     *   4. Hardcoded defaults                                     — getter fallbacks
+     *
+     * Plugin handle resolution:
+     *   - Explicit `$pluginHandle` argument wins.
+     *   - Otherwise auto-detected from `Craft::$app->controller->module`
+     *     when the current controller belongs to a plugin. This makes Twig
+     *     filters (`|lrTime` etc.) automatically respect the active plugin's
+     *     overrides without needing to thread the handle through every call.
+     *
+     * Result is cached per plugin handle for the lifetime of the request.
+     *
+     * @param string|null $pluginHandle Optional explicit plugin handle. If null, auto-detected.
      * @return array
      */
-    public static function getConfig(): array
+    public static function getConfig(?string $pluginHandle = null): array
     {
-        if (self::$config === null) {
-            self::$config = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
+        if ($pluginHandle === null) {
+            $pluginHandle = self::detectPluginHandle();
         }
 
-        return self::$config;
+        $cacheKey = $pluginHandle ?? '__base__';
+
+        if (!isset(self::$configCache[$cacheKey])) {
+            $merged = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
+
+            if ($pluginHandle !== null) {
+                // Layer 2: plugin DB settings (overrides base)
+                $plugin = Craft::$app->plugins->getPlugin($pluginHandle);
+                if ($plugin !== null) {
+                    $settings = $plugin->getSettings();
+                    if ($settings !== null) {
+                        foreach (self::PLUGIN_OVERRIDABLE_KEYS as $key) {
+                            if (!property_exists($settings, $key)) {
+                                continue;
+                            }
+                            $value = $settings->$key ?? null;
+                            if ($value !== null && $value !== '') {
+                                $merged[$key] = $value;
+                            }
+                        }
+                    }
+                }
+
+                // Layer 1: plugin config file (overrides DB)
+                $pluginConfig = Craft::$app->config->getConfigFromFile($pluginHandle) ?: [];
+                foreach (self::PLUGIN_OVERRIDABLE_KEYS as $key) {
+                    if (array_key_exists($key, $pluginConfig)) {
+                        $merged[$key] = $pluginConfig[$key];
+                    }
+                }
+            }
+
+            self::$configCache[$cacheKey] = $merged;
+        }
+
+        return self::$configCache[$cacheKey];
+    }
+
+    /**
+     * Detect the current plugin handle from the active controller's module.
+     *
+     * Returns null when no controller is active (console boot, etc.) or when
+     * the active controller isn't a plugin controller (Craft core CP pages).
+     *
+     * @return string|null
+     */
+    private static function detectPluginHandle(): ?string
+    {
+        $controller = Craft::$app->controller ?? null;
+        if ($controller === null) {
+            return null;
+        }
+
+        $module = $controller->module ?? null;
+        if ($module instanceof PluginInterface) {
+            return $module->getHandle();
+        }
+
+        return null;
     }
 
     /**
@@ -130,7 +218,7 @@ class DateFormatHelper
      */
     public static function clearConfigCache(): void
     {
-        self::$config = null;
+        self::$configCache = [];
     }
 
     // =========================================================================

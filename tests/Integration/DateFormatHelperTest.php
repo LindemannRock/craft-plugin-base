@@ -111,10 +111,11 @@ final class DateFormatHelperTest extends IntegrationTestCase
         // The on-disk config sets monthFormat=short / dateOrder=dmy, so the
         // documented "code defaults" only show through when the config is
         // absent. Force-empty the static cache via reflection to simulate the
-        // no-config-file path.
+        // no-config-file path. The cache key is '__base__' when no plugin is
+        // active (auto-detected from the controller, which is null in tests).
         $cache = new ReflectionClass(DateFormatHelper::class);
-        $configProperty = $cache->getProperty('config');
-        $configProperty->setValue(null, []);
+        $configProperty = $cache->getProperty('configCache');
+        $configProperty->setValue(null, ['__base__' => []]);
 
         self::assertSame('24', DateFormatHelper::getTimeFormat(), 'timeFormat default must be 24');
         self::assertSame('ymd', DateFormatHelper::getDateOrder(), 'dateOrder default must be ymd');
