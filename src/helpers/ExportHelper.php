@@ -75,28 +75,55 @@ class ExportHelper
     /**
      * Get export configuration
      *
-     * Checks plugin-specific config first, then falls back to lindemannrock-base.php.
+     * Resolves the per-format enable map by layering (low → high priority):
+     *   1. DEFAULT_FORMATS (hardcoded fallback)
+     *   2. Base config:    'exports' hash in config/lindemannrock-base.php
+     *   3. Plugin config:  'exports' hash in config/{handle}.php
+     *   4. Plugin Settings model: $settings->exportsCsv / exportsJson /
+     *      exportsExcel — when the plugin uses
+     *      `lindemannrock\base\traits\ExportFormatSettingsTrait` and the
+     *      property is non-null. Skipped silently when the trait isn't in use.
      *
      * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return array
      */
     public static function getConfig(?string $pluginHandle = null): array
     {
-        // Check plugin-specific config first
+        // Layer 1: hardcoded defaults
+        $result = self::DEFAULT_FORMATS;
+
+        // Layer 2: base config
+        $baseConfig = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
+        if (isset($baseConfig['exports']) && is_array($baseConfig['exports'])) {
+            $result = array_merge($result, $baseConfig['exports']);
+        }
+
         if ($pluginHandle) {
+            // Layer 3: plugin config file
             $pluginConfig = Craft::$app->config->getConfigFromFile($pluginHandle) ?: [];
-            if (isset($pluginConfig['exports'])) {
-                // Merge with defaults (plugin config overrides base)
-                $baseConfig = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
-                $baseExports = $baseConfig['exports'] ?? self::DEFAULT_FORMATS;
-                return array_merge($baseExports, $pluginConfig['exports']);
+            if (isset($pluginConfig['exports']) && is_array($pluginConfig['exports'])) {
+                $result = array_merge($result, $pluginConfig['exports']);
+            }
+
+            // Layer 4: plugin Settings model flat props (highest priority)
+            $plugin = Craft::$app->plugins->getPlugin($pluginHandle);
+            if ($plugin !== null) {
+                $settings = $plugin->getSettings();
+                if ($settings !== null) {
+                    if (property_exists($settings, 'exportsCsv') && $settings->exportsCsv !== null) {
+                        $result['csv'] = (bool) $settings->exportsCsv;
+                    }
+                    if (property_exists($settings, 'exportsJson') && $settings->exportsJson !== null) {
+                        $result['json'] = (bool) $settings->exportsJson;
+                    }
+                    if (property_exists($settings, 'exportsExcel') && $settings->exportsExcel !== null) {
+                        $result['excel'] = (bool) $settings->exportsExcel;
+                    }
+                }
             }
         }
 
-        // Fall back to base config
-        $config = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
-
-        return $config['exports'] ?? self::DEFAULT_FORMATS;
+        return $result;
     }
 
     /**
