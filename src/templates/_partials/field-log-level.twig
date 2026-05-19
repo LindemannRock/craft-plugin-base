@@ -1,0 +1,58 @@
+{#
+/**
+ * Log Level Field
+ *
+ * Renders a select form field for a plugin's `logLevel` setting with four
+ * options (Error / Warning / Info / Debug). The Debug option is only shown
+ * when Craft's `devMode` is enabled — matching the
+ * `SettingsConfigTrait::validateLogLevel` runtime fallback that demotes
+ * `debug` to `info` when devMode is off.
+ *
+ * Include this partial in plugin settings pages whose Settings model uses
+ * `lindemannrock\base\traits\LogLevelSettingsTrait`.
+ *
+ * Required variables:
+ * - settings: Plugin Settings model with a `$logLevel` property
+ * - pluginHandle: Plugin handle used in config-override warning messages
+ *
+ * Optional variables:
+ * - instructions: Field instructions text. Defaults to the shared base
+ *   string. Pass a plugin-specific value if your plugin needs a different
+ *   hint.
+ *
+ * Usage:
+ * {% include 'lindemannrock-base/_partials/field-log-level' with {
+ *     settings: settings,
+ *     pluginHandle: 'search-manager',
+ * } only %}
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+{% set pluginHandle = pluginHandle ?? 'app' %}
+{% set instructions = instructions ?? 'Choose what types of messages to log. Debug level requires devMode to be enabled.'|t('lindemannrock-base') %}
+
+{% set logOptions = [
+    {value: 'error', label: 'Error (Critical errors only)'|t('lindemannrock-base')},
+    {value: 'warning', label: 'Warning (Errors and warnings)'|t('lindemannrock-base')},
+    {value: 'info', label: 'Info (General information)'|t('lindemannrock-base')},
+] %}
+
+{% if craft.app.config.general.devMode %}
+    {% set logOptions = logOptions|merge([
+        {value: 'debug', label: 'Debug (Detailed debugging)'|t('lindemannrock-base')},
+    ]) %}
+{% endif %}
+
+{{ forms.selectField({
+    label: 'Log Level'|t('lindemannrock-base'),
+    instructions: instructions,
+    id: 'logLevel',
+    name: 'settings[logLevel]',
+    value: settings.logLevel,
+    options: logOptions,
+    errors: settings.getErrors('logLevel'),
+    disabled: settings.isOverriddenByConfig('logLevel'),
+    warning: settings.isOverriddenByConfig('logLevel') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'logLevel', handle: pluginHandle})|raw : null,
+}) }}

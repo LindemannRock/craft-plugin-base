@@ -1,0 +1,51 @@
+{#
+/**
+ * Plugin Name Field
+ *
+ * Renders a text-input form field for a plugin's `pluginName` setting with a
+ * shared "Plugin Name" label and a generic config-override warning that
+ * activates when the value is locked by `config/{handle}.php`.
+ *
+ * Include this partial in plugin settings pages whose Settings model uses
+ * `lindemannrock\base\traits\PluginNameSettingsTrait`.
+ *
+ * Required variables:
+ * - settings: Plugin Settings model with a `$pluginName` property
+ * - pluginHandle: Plugin handle used in config-override warning messages
+ *
+ * Optional variables:
+ * - instructions: Field instructions text. Defaults to the shared base
+ *   string. Pass a plugin-specific value if your plugin needs a different
+ *   hint (translated via the plugin's own translation category).
+ *
+ * Usage (default instructions from base):
+ * {% include 'lindemannrock-base/_partials/field-plugin-name' with {
+ *     settings: settings,
+ *     pluginHandle: 'search-manager',
+ * } only %}
+ *
+ * Usage (plugin-specific instructions):
+ * {% include 'lindemannrock-base/_partials/field-plugin-name' with {
+ *     settings: settings,
+ *     pluginHandle: 'search-manager',
+ *     instructions: 'Custom hint for this plugin'|t('search-manager'),
+ * } only %}
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+{% set pluginHandle = pluginHandle ?? 'app' %}
+{% set instructions = instructions ?? 'The name of the plugin as it appears in the Control Panel menu.'|t('lindemannrock-base') %}
+
+{{ forms.textField({
+    label: 'Plugin Name'|t('lindemannrock-base'),
+    instructions: instructions,
+    id: 'pluginName',
+    name: 'settings[pluginName]',
+    value: settings.pluginName,
+    required: true,
+    errors: settings.getErrors('pluginName'),
+    disabled: settings.isOverriddenByConfig('pluginName'),
+    warning: settings.isOverriddenByConfig('pluginName') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'pluginName', handle: pluginHandle})|raw : null,
+}) }}

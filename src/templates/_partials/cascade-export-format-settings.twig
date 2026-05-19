@@ -11,7 +11,7 @@
  * Include this partial in plugin settings pages whose Settings model uses
  * `lindemannrock\base\traits\ExportFormatSettingsTrait`.
  *
- * Most plugins should include the umbrella `_partials/base-overrides` partial
+ * Most plugins should include the umbrella `_partials/cascade-base-overrides` partial
  * with `sections.exports` instead of this one directly — the umbrella adds
  * the shared "Base Plugin Overrides" heading + cascade info-box once.
  *
@@ -25,7 +25,7 @@
  *   support a subset of formats should narrow the list.
  *
  * Usage (standalone — without the umbrella):
- * {% include 'lindemannrock-base/_partials/export-format-settings' with {
+ * {% include 'lindemannrock-base/_partials/cascade-export-format-settings' with {
  *     settings: settings,
  *     pluginHandle: 'search-manager',
  *     fields: ['exportsCsv', 'exportsJson', 'exportsExcel'],

@@ -10,9 +10,9 @@
  * Sub-partials currently supported (see _docs/rollouts/base-settings.md
  * for the cross-plugin rollout tracker):
  *
- *   dateFormat → _partials/date-format-settings.twig
- *   dateRange  → _partials/date-range-settings.twig
- *   exports    → _partials/export-format-settings.twig
+ *   dateFormat → _partials/cascade-date-format-settings.twig
+ *   dateRange  → _partials/cascade-date-range-settings.twig
+ *   exports    → _partials/cascade-export-format-settings.twig
  *
  * Required variables:
  * - settings: Plugin Settings model
@@ -30,10 +30,10 @@
  *
  * Per-section options (passed inside the `sections` hash):
  *   sections.dateFormat.fields → whitelist of fields to render. Defaults to
- *     all 5. See _partials/date-format-settings.twig for the field list.
+ *     all 5. See _partials/cascade-date-format-settings.twig for the field list.
  *
  * Usage:
- * {% include 'lindemannrock-base/_partials/base-overrides' with {
+ * {% include 'lindemannrock-base/_partials/cascade-base-overrides' with {
  *     settings: settings,
  *     pluginHandle: 'logging-library',
  *     sections: {
@@ -42,7 +42,7 @@
  * } only %}
  *
  * With every section (when more land):
- * {% include 'lindemannrock-base/_partials/base-overrides' with {
+ * {% include 'lindemannrock-base/_partials/cascade-base-overrides' with {
  *     settings: settings,
  *     pluginHandle: 'shortlink-manager',
  *     sections: {
@@ -72,7 +72,7 @@
 {% endif %}
 
 {% if sections.dateFormat is defined %}
-    {% include 'lindemannrock-base/_partials/date-format-settings' with {
+    {% include 'lindemannrock-base/_partials/cascade-date-format-settings' with {
         settings: settings,
         pluginHandle: pluginHandle,
         fields: sections.dateFormat.fields ?? ['timeFormat', 'showSeconds', 'monthFormat', 'dateOrder', 'dateSeparator'],
@@ -80,14 +80,14 @@
 {% endif %}
 
 {% if sections.dateRange is defined %}
-    {% include 'lindemannrock-base/_partials/date-range-settings' with {
+    {% include 'lindemannrock-base/_partials/cascade-date-range-settings' with {
         settings: settings,
         pluginHandle: pluginHandle,
     } only %}
 {% endif %}
 
 {% if sections.exports is defined %}
-    {% include 'lindemannrock-base/_partials/export-format-settings' with {
+    {% include 'lindemannrock-base/_partials/cascade-export-format-settings' with {
         settings: settings,
         pluginHandle: pluginHandle,
         fields: sections.exports.fields ?? ['exportsCsv', 'exportsJson', 'exportsExcel'],

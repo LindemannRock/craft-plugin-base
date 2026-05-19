@@ -10,7 +10,7 @@
  * Include this partial in plugin settings pages whose Settings model uses
  * `lindemannrock\base\traits\DateFormatSettingsTrait`.
  *
- * Most plugins should include the umbrella `_partials/base-overrides` partial
+ * Most plugins should include the umbrella `_partials/cascade-base-overrides` partial
  * instead of this one directly — the umbrella adds the shared "Base Plugin
  * Overrides" heading + cascade info-box once.
  *
@@ -26,7 +26,7 @@
  *   have no visible effect.
  *
  * Usage (standalone — without the umbrella):
- * {% include 'lindemannrock-base/_partials/date-format-settings' with {
+ * {% include 'lindemannrock-base/_partials/cascade-date-format-settings' with {
  *     settings: settings,
  *     pluginHandle: 'logging-library',
  *     fields: ['timeFormat', 'showSeconds'],

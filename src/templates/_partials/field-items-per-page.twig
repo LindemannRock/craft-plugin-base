@@ -10,7 +10,7 @@
  * Include this partial in plugin settings pages whose Settings model uses
  * `lindemannrock\base\traits\ItemsPerPageSettingsTrait`.
  *
- * Unlike `_partials/base-overrides` (which is reserved for cascade overrides
+ * Unlike `_partials/cascade-base-overrides` (which is reserved for cascade overrides
  * of base defaults), this partial is a stand-alone shared field — it does not
  * imply any "Use global default" inheritance from `config/lindemannrock-base.php`.
  *
@@ -20,7 +20,7 @@
  * - instructions: Plugin-specific instructions text (translated by the caller)
  *
  * Usage:
- * {% include 'lindemannrock-base/_partials/items-per-page-field' with {
+ * {% include 'lindemannrock-base/_partials/field-items-per-page' with {
  *     settings: settings,
  *     pluginHandle: 'logging-library',
  *     instructions: 'Number of log entries to display per page in the log viewers'|t('logging-library'),
