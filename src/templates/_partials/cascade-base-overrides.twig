@@ -65,7 +65,7 @@
 
 {% if showInfoBox %}
 {% include 'lindemannrock-base/_components/info-box' with {
-    message: 'Settings marked "Use global default" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.'|t('lindemannrock-base')|raw,
+    message: 'Settings marked "Use global default" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply. To customize globally, copy <code>vendor/lindemannrock/craft-plugin-base/src/config.php</code> to your project\'s <code>config/</code> directory.'|t('lindemannrock-base')|raw,
     type: 'info',
     margin: 'bottom',
 } only %}
