@@ -152,6 +152,19 @@ return [
     // Items per page field (shared via _partials/items-per-page-field.twig)
     'Items Per Page' => 'Elementer pr. side',
 
+    // Date range settings (shared via _partials/date-range-settings.twig)
+    'Default Date Range' => 'Standarddatointerval',
+    'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'Standardtidsvindue der anvendes på analyse-, log- og dashboardsider i dette plugin.',
+
+    // Export format settings (shared via _partials/export-format-settings.twig)
+    'CSV Export' => 'CSV-eksport',
+    'JSON Export' => 'JSON-eksport',
+    'Excel Export' => 'Excel-eksport',
+    'Whether the CSV export option appears in this plugin\'s export menus.' => 'Bestemmer om CSV-eksportindstillingen vises i eksportmenuerne for dette plugin.',
+    'Whether the JSON export option appears in this plugin\'s export menus.' => 'Bestemmer om JSON-eksportindstillingen vises i eksportmenuerne for dette plugin.',
+    'Whether the Excel export option appears in this plugin\'s export menus.' => 'Bestemmer om Excel-eksportindstillingen vises i eksportmenuerne for dette plugin.',
+    'Enabled' => 'Aktiveret',
+
     // Copy-to-clipboard controls — shared across any base component or partial
     // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
     'Copy' => 'Kopiér',
