@@ -1,0 +1,254 @@
+<?php
+/**
+ * LindemannRock Plugin Base
+ *
+ * @link      https://lindemannrock.com
+ * @copyright Copyright (c) 2026 LindemannRock
+ */
+
+declare(strict_types=1);
+
+namespace lindemannrock\base\tests\Integration;
+
+use craft\base\Model;
+use lindemannrock\base\testing\IntegrationTestCase;
+use lindemannrock\base\traits\DateFormatSettingsTrait;
+use lindemannrock\base\traits\DateRangeSettingsTrait;
+use lindemannrock\base\traits\ExportFormatSettingsTrait;
+use lindemannrock\base\traits\ItemsPerPageSettingsTrait;
+
+/**
+ * Pins the public contracts of the four base-settings traits adopted by plugins
+ * via the `_partials/cascade-base-overrides` umbrella (cascade traits) and the
+ * `_partials/field-items-per-page` partial (shared-field trait).
+ *
+ * Each trait declares its properties + helper methods that plugins merge into
+ * their own Settings model's `rules()` / `attributeLabels()`. The tests below
+ * pin the property defaults, the rule shape (validator names + ranges), and
+ * the label keys used by `Craft::t('lindemannrock-base', …)`. A regression in
+ * any of these surfaces would silently break every adopting plugin.
+ *
+ * @since 5.25.0
+ */
+final class BaseSettingsTraitsTest extends IntegrationTestCase
+{
+    // ---------------------------------------------------------------------
+    // DateFormatSettingsTrait
+    // ---------------------------------------------------------------------
+
+    public function testDateFormatSettingsTraitPropertiesDefaultToNullForCascade(): void
+    {
+        $settings = new class extends Model {
+            use DateFormatSettingsTrait;
+        };
+
+        // All five properties must be nullable and default to null — null is
+        // the sentinel for "inherit from base config / hardcoded default" that
+        // DateFormatHelper's cascade keys off of.
+        self::assertNull($settings->timeFormat, 'timeFormat default must be null');
+        self::assertNull($settings->monthFormat, 'monthFormat default must be null');
+        self::assertNull($settings->dateOrder, 'dateOrder default must be null');
+        self::assertNull($settings->dateSeparator, 'dateSeparator default must be null');
+        self::assertNull($settings->showSeconds, 'showSeconds default must be null');
+    }
+
+    public function testDateFormatSettingsRulesReturnsExpectedRangesAndValidators(): void
+    {
+        $settings = new class extends Model {
+            use DateFormatSettingsTrait;
+        };
+
+        $rules = $settings->dateFormatSettingsRules();
+        $byAttribute = self::indexRulesByFirstAttribute($rules);
+
+        self::assertSame(['12', '24'], $byAttribute['timeFormat']['range'], "timeFormat range pins the 12/24 contract");
+        self::assertSame(['numeric', 'short', 'long'], $byAttribute['monthFormat']['range']);
+        self::assertSame(['dmy', 'mdy', 'ymd'], $byAttribute['dateOrder']['range']);
+        self::assertSame(['/', '-', '.'], $byAttribute['dateSeparator']['range']);
+        self::assertSame('boolean', $byAttribute['showSeconds']['validator']);
+
+        // skipOnEmpty must be true on every rule — the partial submits '' for
+        // "Use global default" and the controller's reflection coercion turns
+        // that into null. The skipOnEmpty contract is what keeps validation
+        // from rejecting null/'' values.
+        foreach (['timeFormat', 'monthFormat', 'dateOrder', 'dateSeparator', 'showSeconds'] as $attribute) {
+            self::assertTrue(
+                $byAttribute[$attribute]['skipOnEmpty'] ?? false,
+                "{$attribute} rule must have skipOnEmpty=true so the 'Use global default' empty submit doesn't fail validation",
+            );
+        }
+    }
+
+    public function testDateFormatSettingsLabelsReturnAllFiveAttributes(): void
+    {
+        $settings = new class extends Model {
+            use DateFormatSettingsTrait;
+        };
+
+        $labels = $settings->dateFormatSettingsLabels();
+        self::assertSame(
+            ['timeFormat', 'monthFormat', 'dateOrder', 'dateSeparator', 'showSeconds'],
+            array_keys($labels),
+            'all five trait properties must appear in the labels map — missing entries silently break translation in non-English contexts',
+        );
+        foreach ($labels as $value) {
+            self::assertIsString($value);
+            self::assertNotSame('', $value);
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // DateRangeSettingsTrait
+    // ---------------------------------------------------------------------
+
+    public function testDateRangeSettingsTraitDefaultsToNullForCascade(): void
+    {
+        $settings = new class extends Model {
+            use DateRangeSettingsTrait;
+        };
+
+        self::assertNull($settings->defaultDateRange, 'defaultDateRange default must be null');
+    }
+
+    public function testDateRangeSettingsRulesPinTheTenAllowedRanges(): void
+    {
+        $settings = new class extends Model {
+            use DateRangeSettingsTrait;
+        };
+
+        $rules = $settings->dateRangeSettingsRules();
+        $byAttribute = self::indexRulesByFirstAttribute($rules);
+
+        $expected = [
+            'today', 'yesterday', 'last7days', 'last30days', 'last90days',
+            'thisMonth', 'lastMonth', 'thisYear', 'lastYear', 'all',
+        ];
+        self::assertSame($expected, $byAttribute['defaultDateRange']['range']);
+        self::assertTrue($byAttribute['defaultDateRange']['skipOnEmpty'] ?? false);
+    }
+
+    public function testDateRangeSettingsLabelHasOneEntry(): void
+    {
+        $settings = new class extends Model {
+            use DateRangeSettingsTrait;
+        };
+
+        self::assertSame(['defaultDateRange'], array_keys($settings->dateRangeSettingsLabel()));
+    }
+
+    // ---------------------------------------------------------------------
+    // ExportFormatSettingsTrait
+    // ---------------------------------------------------------------------
+
+    public function testExportFormatSettingsTraitDefaultsToNullForCascade(): void
+    {
+        $settings = new class extends Model {
+            use ExportFormatSettingsTrait;
+        };
+
+        self::assertNull($settings->exportsCsv);
+        self::assertNull($settings->exportsJson);
+        self::assertNull($settings->exportsExcel);
+    }
+
+    public function testExportFormatSettingsRulesBundleAllThreeFlagsAsBooleans(): void
+    {
+        $settings = new class extends Model {
+            use ExportFormatSettingsTrait;
+        };
+
+        $rules = $settings->exportFormatSettingsRules();
+        self::assertCount(1, $rules, 'expected a single bundled boolean rule covering all three flags');
+
+        [$attributes, $validator] = $rules[0];
+        self::assertSame(['exportsCsv', 'exportsJson', 'exportsExcel'], $attributes);
+        self::assertSame('boolean', $validator);
+        self::assertTrue($rules[0]['skipOnEmpty'] ?? false);
+    }
+
+    public function testExportFormatSettingsLabelsReturnAllThreeFormats(): void
+    {
+        $settings = new class extends Model {
+            use ExportFormatSettingsTrait;
+        };
+
+        self::assertSame(
+            ['exportsCsv', 'exportsJson', 'exportsExcel'],
+            array_keys($settings->exportFormatSettingsLabels()),
+        );
+    }
+
+    // ---------------------------------------------------------------------
+    // ItemsPerPageSettingsTrait
+    // ---------------------------------------------------------------------
+
+    public function testItemsPerPageSettingsTraitDefaultsToOneHundred(): void
+    {
+        $settings = new class extends Model {
+            use ItemsPerPageSettingsTrait;
+        };
+
+        // 100 is the standardized default the May 2026 rollout settled on
+        // after auditing 14 plugins. Tests pin this so a regression to 50 (the
+        // pre-rollout value used by ~6 plugins) is caught.
+        self::assertSame(100, $settings->itemsPerPage);
+    }
+
+    public function testItemsPerPageSettingsRulesEnforceMinTenMaxFiveHundred(): void
+    {
+        $settings = new class extends Model {
+            use ItemsPerPageSettingsTrait;
+        };
+
+        $rules = $settings->itemsPerPageSettingsRules();
+
+        // The trait emits TWO rules per attribute (integer bounds + default
+        // value), so we can't use the first-attribute index helper here —
+        // pull out the integer rule explicitly.
+        $integerRules = array_filter($rules, static fn(array $rule): bool => ($rule[1] ?? null) === 'integer');
+        self::assertCount(1, $integerRules, 'expected exactly one integer rule for itemsPerPage');
+        $integerRule = array_values($integerRules)[0];
+
+        // The min:10 contract is the bug fix from search-manager's bundled
+        // `integer, min: 1` rule. Lower values are not meaningful for CP
+        // pagination — pin this so future widening doesn't slip through.
+        self::assertSame(['itemsPerPage'], $integerRule[0]);
+        self::assertSame(10, $integerRule['min']);
+        self::assertSame(500, $integerRule['max']);
+
+        // The default-value rule keeps the property at 100 when validation
+        // receives null (e.g. fresh DB rows on plugins that backfilled the
+        // column without a notNull default).
+        $defaultRules = array_filter($rules, static fn(array $rule): bool => ($rule[1] ?? null) === 'default');
+        self::assertCount(1, $defaultRules, 'expected exactly one default-value rule for itemsPerPage');
+        self::assertSame(100, array_values($defaultRules)[0]['value']);
+    }
+
+    // ---------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------
+
+    /**
+     * Yii rules come in array form `[[attributes], validator, ...options]`.
+     * This collapses them into a flat `attribute => [validator, ...options]`
+     * lookup keyed by the FIRST attribute in each rule's attribute list, so
+     * tests can pull validator names + ranges by name instead of array index.
+     *
+     * @param array<int, array<int|string, mixed>> $rules
+     * @return array<string, array<string, mixed>>
+     */
+    private static function indexRulesByFirstAttribute(array $rules): array
+    {
+        $byAttribute = [];
+        foreach ($rules as $rule) {
+            $firstAttribute = is_array($rule[0]) ? ($rule[0][0] ?? null) : $rule[0];
+            if (!is_string($firstAttribute)) {
+                continue;
+            }
+            $byAttribute[$firstAttribute] = [
+                'validator' => $rule[1] ?? null,
+            ] + array_filter($rule, static fn($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
+        }
+        return $byAttribute;
+    }
+}
