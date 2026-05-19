@@ -59,6 +59,9 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 | `lrToApiString` | (none) | ISO 8601 format |
 | `lrToFilenameString` | `includeTime=true` | `Y-m-d-His` format |
 
+> [!NOTE]
+> Example outputs above assume the default config (`showSeconds=false`). When `showSeconds=true` is set in `config/lindemannrock-base.php` or via a plugin's [`DateFormatSettingsTrait`](../feature-tour/date-format-helper.md#cascade-order-since5100), seconds appear in **all** lengths — `lrTime`, `lrDatetime('short')`, and `lrCompactDatetime` all honor the cascade. Pass an explicit `true`/`false` as the `showSeconds` arg to override the cascade for a single call site.
+
 ## Date/Time Functions
 
 ```twig

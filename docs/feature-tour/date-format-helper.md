@@ -10,9 +10,24 @@ Centralized date/time formatting for all LindemannRock plugins. Converts dates t
 All formatting respects two things:
 
 1. **Craft's timezone** — dates are automatically converted from UTC to the site's configured timezone before formatting
-2. **Config settings** — `config/lindemannrock-base.php` controls time format (12/24h), date order, month format, and separator
+2. **Config settings** — `config/lindemannrock-base.php` controls time format (12/24h), date order, month format, separator, and whether to show seconds
 
 See [Configuration](../get-started/configuration.md) for all available settings.
+
+### Cascade order @since(5.10.0)
+
+When `DateFormatHelper::getConfig()` resolves a setting, it walks four layers (high → low priority):
+
+```
+1. Plugin config file       config/{handle}.php                  ← env overrides
+2. Plugin DB settings       (via DateFormatSettingsTrait)        ← user-set in plugin CP
+3. Base config file         config/lindemannrock-base.php        ← global default
+4. Hardcoded fallback       (in the getter methods)              ← '24' / 'ymd' / etc.
+```
+
+The "current plugin" is auto-detected from `Craft::$app->controller->module` when its controller belongs to a plugin — so Twig filters like `|lrTime` automatically respect per-plugin overrides without callers needing to thread a plugin handle through every call site.
+
+To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/date-format-settings.twig`. Cross-plugin rollout status is tracked in [`_docs/rollouts/date-format-settings.md`](../../../_docs/rollouts/date-format-settings.md).
 
 ## Display Formatting
 
@@ -56,6 +71,8 @@ Formats the time portion only.
 DateFormatHelper::formatTime($date);                     // "3:45 PM" (12h) or "15:45" (24h)
 DateFormatHelper::formatTime($date, 'short', true);      // "3:45:32 PM" (with seconds)
 ```
+
+When `$showSeconds` is `null` (default), the value flows from the [cascade](#cascade-order-since5100). Seconds appear if base config or the active plugin has `showSeconds=true`, regardless of `$length` — the helper no longer special-cases `'short'` to drop seconds.
 
 ### formatCompactDatetime()
 
