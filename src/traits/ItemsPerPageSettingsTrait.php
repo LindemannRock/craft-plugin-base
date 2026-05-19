@@ -22,7 +22,7 @@ use Craft;
  * What's centralized is the shared default (100), the shared validation bounds
  * (min 10, max 500), the shared label translation, and the form-field markup.
  *
- * Companion CP partial: `lindemannrock-base/_partials/items-per-page-field.twig`
+ * Companion CP partial: `lindemannrock-base/_partials/field-items-per-page.twig`
  * renders the form field with shared label and a generic config-override
  * warning — plugins include it once and pass plugin-specific instructions.
  *
