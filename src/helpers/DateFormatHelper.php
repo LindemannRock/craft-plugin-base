@@ -543,12 +543,6 @@ class DateFormatHelper
         $is12Hour = self::getTimeFormat() === '12';
         $seconds = $showSeconds ?? self::getShowSeconds();
 
-        // For 'short' length, only show seconds if explicitly requested
-        // For 'medium'/'long', show seconds based on config/param
-        if ($length === 'short' && $showSeconds === null) {
-            $seconds = false;
-        }
-
         if ($is12Hour) {
             $format = $seconds ? 'g:i:s A' : 'g:i A';  // 3:45:32 PM or 3:45 PM
         } else {
