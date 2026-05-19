@@ -58,9 +58,6 @@ Pass hex colors directly:
 | `url` | `string` | Wrap badge in a link |
 | `title` | `string` | Tooltip text |
 
-> [!NOTE]
-> `status-badge` is a deprecated alias that redirects to `badge`.
-
 ---
 
 ## Info Box
