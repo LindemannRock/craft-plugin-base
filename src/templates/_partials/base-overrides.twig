@@ -1,0 +1,86 @@
+{#
+/**
+ * Base Plugin Overrides — umbrella partial
+ *
+ * Renders a single consistent "Base Plugin Overrides" CP section with:
+ *   - One heading (overridable via the `heading` param)
+ *   - One cascade info-box explaining the "Use global default" semantics
+ *   - The requested sub-partials in a fixed order
+ *
+ * Sub-partials currently supported (more added as DateRangeSettingsTrait /
+ * ExportFormatSettingsTrait ship — see _docs/rollouts/date-format-settings.md
+ * for the broader rollout plan):
+ *
+ *   dateFormat → _partials/date-format-settings.twig
+ *   dateRange  → (future) _partials/date-range-settings.twig
+ *   exports    → (future) _partials/export-format-settings.twig
+ *
+ * Required variables:
+ * - settings: Plugin Settings model
+ * - pluginHandle: Plugin handle used in config-override warning messages
+ * - sections: Hash of section keys → per-section config. The presence of a
+ *   key opts the plugin into rendering that sub-partial. Each section's
+ *   config object can carry sub-partial-specific options.
+ *
+ * Optional variables:
+ * - heading: Section heading text. Defaults to 'Base Plugin Overrides'|t.
+ *   Pass `false` to omit the heading entirely.
+ * - showInfoBox: Boolean. Defaults to true. Set false to suppress the
+ *   cascade info-box (e.g., for plugins surfacing the same section in a
+ *   wider context that already explains the cascade).
+ *
+ * Per-section options (passed inside the `sections` hash):
+ *   sections.dateFormat.fields → whitelist of fields to render. Defaults to
+ *     all 5. See _partials/date-format-settings.twig for the field list.
+ *
+ * Usage:
+ * {% include 'lindemannrock-base/_partials/base-overrides' with {
+ *     settings: settings,
+ *     pluginHandle: 'logging-library',
+ *     sections: {
+ *         dateFormat: { fields: ['timeFormat', 'showSeconds'] },
+ *     },
+ * } only %}
+ *
+ * With every section (when more land):
+ * {% include 'lindemannrock-base/_partials/base-overrides' with {
+ *     settings: settings,
+ *     pluginHandle: 'shortlink-manager',
+ *     sections: {
+ *         dateFormat: {},
+ *         dateRange: {},
+ *         exports: {},
+ *     },
+ * } only %}
+ */
+#}
+
+{% set pluginHandle = pluginHandle ?? 'app' %}
+{% set sections = sections ?? {} %}
+{% set heading = heading is defined ? heading : 'Base Plugin Overrides'|t('lindemannrock-base') %}
+{% set showInfoBox = showInfoBox ?? true %}
+
+{% if heading is not same as(false) %}
+<h2>{{ heading }}</h2>
+{% endif %}
+
+{% if showInfoBox %}
+{% include 'lindemannrock-base/_components/info-box' with {
+    message: 'Settings marked "Use global default" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.'|t('lindemannrock-base')|raw,
+    type: 'info',
+    margin: 'bottom',
+} only %}
+{% endif %}
+
+{% if sections.dateFormat is defined %}
+    {% include 'lindemannrock-base/_partials/date-format-settings' with {
+        settings: settings,
+        pluginHandle: pluginHandle,
+        fields: sections.dateFormat.fields ?? ['timeFormat', 'showSeconds', 'monthFormat', 'dateOrder', 'dateSeparator'],
+    } only %}
+{% endif %}
+
+{# Future sub-partials slot here in the order:
+   - sections.dateRange  → _partials/date-range-settings.twig
+   - sections.exports    → _partials/export-format-settings.twig
+#}

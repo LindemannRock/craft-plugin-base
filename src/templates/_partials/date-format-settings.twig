@@ -2,29 +2,50 @@
 /**
  * Date Format Settings
  *
- * Renders five form fields for per-plugin date/time formatting overrides.
- * Each value defaults to "Use global default" (empty string) which lets the
- * value cascade from base config / hardcoded defaults via DateFormatHelper.
+ * Renders up to five form fields for per-plugin date/time formatting overrides,
+ * grouped under "Time" and "Date" sub-headings. Each value defaults to
+ * "Use global default" (empty string) which lets the value cascade from base
+ * config / hardcoded defaults via DateFormatHelper.
  *
  * Include this partial in plugin settings pages whose Settings model uses
  * `lindemannrock\base\traits\DateFormatSettingsTrait`.
+ *
+ * Most plugins should include the umbrella `_partials/base-overrides` partial
+ * instead of this one directly — the umbrella adds the shared "Base Plugin
+ * Overrides" heading + cascade info-box once.
  *
  * Required variables:
  * - settings: Plugin Settings model using DateFormatSettingsTrait
  * - pluginHandle: Plugin handle used in config-override warning messages
  *
- * Usage:
+ * Optional variables:
+ * - fields: Whitelist of field names to render. Defaults to all 5
+ *   (`['timeFormat', 'showSeconds', 'monthFormat', 'dateOrder', 'dateSeparator']`).
+ *   Plugins that only consume a subset (e.g., logging-library only uses
+ *   `lrTime`) should narrow the list to avoid surfacing controls that
+ *   have no visible effect.
+ *
+ * Usage (standalone — without the umbrella):
  * {% include 'lindemannrock-base/_partials/date-format-settings' with {
  *     settings: settings,
- *     pluginHandle: 'logging-library'
+ *     pluginHandle: 'logging-library',
+ *     fields: ['timeFormat', 'showSeconds'],
  * } only %}
  */
 #}
 
 {% import "_includes/forms" as forms %}
 {% set pluginHandle = pluginHandle ?? 'app' %}
+{% set fields = fields ?? ['timeFormat', 'showSeconds', 'monthFormat', 'dateOrder', 'dateSeparator'] %}
 {% set inheritLabel = 'Use global default'|t('lindemannrock-base') %}
 
+{% set hasTimeFields = 'timeFormat' in fields or 'showSeconds' in fields %}
+{% set hasDateFields = 'monthFormat' in fields or 'dateOrder' in fields or 'dateSeparator' in fields %}
+
+{% if hasTimeFields %}
+<h3>{{ 'Time'|t('lindemannrock-base') }}</h3>
+
+{% if 'timeFormat' in fields %}
 {{ forms.selectField({
     label: 'Time Format'|t('lindemannrock-base'),
     instructions: 'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).'|t('lindemannrock-base'),
@@ -41,7 +62,32 @@
         'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'timeFormat', handle: pluginHandle})|raw : null,
     errors: settings.getErrors('timeFormat'),
 }) }}
+{% endif %}
 
+{% if 'showSeconds' in fields %}
+{{ forms.selectField({
+    label: 'Show Seconds'|t('lindemannrock-base'),
+    instructions: 'Whether to include seconds in time displays by default.'|t('lindemannrock-base'),
+    id: 'showSeconds',
+    name: 'settings[showSeconds]',
+    value: settings.showSeconds is null ? '' : (settings.showSeconds ? '1' : '0'),
+    options: [
+        {label: inheritLabel, value: ''},
+        {label: 'No (14:30)'|t('lindemannrock-base'), value: '0'},
+        {label: 'Yes (14:30:25)'|t('lindemannrock-base'), value: '1'},
+    ],
+    disabled: settings.isOverriddenByConfig('showSeconds'),
+    warning: settings.isOverriddenByConfig('showSeconds') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'showSeconds', handle: pluginHandle})|raw : null,
+    errors: settings.getErrors('showSeconds'),
+}) }}
+{% endif %}
+{% endif %}
+
+{% if hasDateFields %}
+<h3>{{ 'Date'|t('lindemannrock-base') }}</h3>
+
+{% if 'monthFormat' in fields %}
 {{ forms.selectField({
     label: 'Month Format'|t('lindemannrock-base'),
     instructions: 'How months appear in dates: numeric (01), short (Jan), or long (January).'|t('lindemannrock-base'),
@@ -59,7 +105,9 @@
         'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'monthFormat', handle: pluginHandle})|raw : null,
     errors: settings.getErrors('monthFormat'),
 }) }}
+{% endif %}
 
+{% if 'dateOrder' in fields %}
 {{ forms.selectField({
     label: 'Date Order'|t('lindemannrock-base'),
     instructions: 'Order of day, month, and year in date displays.'|t('lindemannrock-base'),
@@ -77,7 +125,9 @@
         'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'dateOrder', handle: pluginHandle})|raw : null,
     errors: settings.getErrors('dateOrder'),
 }) }}
+{% endif %}
 
+{% if 'dateSeparator' in fields %}
 {{ forms.selectField({
     label: 'Date Separator'|t('lindemannrock-base'),
     instructions: 'Character between numeric date parts. Only applies when month format is numeric.'|t('lindemannrock-base'),
@@ -95,20 +145,5 @@
         'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'dateSeparator', handle: pluginHandle})|raw : null,
     errors: settings.getErrors('dateSeparator'),
 }) }}
-
-{{ forms.selectField({
-    label: 'Show Seconds'|t('lindemannrock-base'),
-    instructions: 'Whether to include seconds in time displays by default.'|t('lindemannrock-base'),
-    id: 'showSeconds',
-    name: 'settings[showSeconds]',
-    value: settings.showSeconds is null ? '' : (settings.showSeconds ? '1' : '0'),
-    options: [
-        {label: inheritLabel, value: ''},
-        {label: 'No (14:30)'|t('lindemannrock-base'), value: '0'},
-        {label: 'Yes (14:30:25)'|t('lindemannrock-base'), value: '1'},
-    ],
-    disabled: settings.isOverriddenByConfig('showSeconds'),
-    warning: settings.isOverriddenByConfig('showSeconds') ?
-        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'showSeconds', handle: pluginHandle})|raw : null,
-    errors: settings.getErrors('showSeconds'),
-}) }}
+{% endif %}
+{% endif %}
