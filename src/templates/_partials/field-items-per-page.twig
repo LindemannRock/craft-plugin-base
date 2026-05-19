@@ -17,9 +17,22 @@
  * Required variables:
  * - settings: Plugin Settings model using ItemsPerPageSettingsTrait
  * - pluginHandle: Plugin handle used in config-override warning messages
- * - instructions: Plugin-specific instructions text (translated by the caller)
  *
- * Usage:
+ * Optional variables:
+ * - instructions: Override the default instructions text. Defaults to a
+ *   generic shared string in base translations
+ *   ("Number of items to display per page in lists."). Pass a plugin-specific
+ *   string when your plugin's listings have a domain-specific noun
+ *   (e.g., "log entries", dynamic `{pluginName}` substitution). Pass empty
+ *   string `''` to render no instructions at all.
+ *
+ * Usage (shared default):
+ * {% include 'lindemannrock-base/_partials/field-items-per-page' with {
+ *     settings: settings,
+ *     pluginHandle: 'redirect-manager',
+ * } only %}
+ *
+ * Usage (plugin-specific override):
  * {% include 'lindemannrock-base/_partials/field-items-per-page' with {
  *     settings: settings,
  *     pluginHandle: 'logging-library',
@@ -30,10 +43,11 @@
 
 {% import "_includes/forms" as forms %}
 {% set pluginHandle = pluginHandle ?? 'app' %}
+{% set instructions = instructions ?? 'Number of items to display per page in lists.'|t('lindemannrock-base') %}
 
 {{ forms.textField({
     label: 'Items Per Page'|t('lindemannrock-base'),
-    instructions: instructions ?? null,
+    instructions: instructions,
     id: 'itemsPerPage',
     name: 'settings[itemsPerPage]',
     type: 'number',
