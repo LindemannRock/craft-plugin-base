@@ -19,6 +19,7 @@
             "feature-tour/settings-persistence",
             "feature-tour/settings-config",
             "feature-tour/settings-display-name",
+            "feature-tour/base-settings-traits",
             "feature-tour/edition-support",
             "feature-tour/date-format-helper",
             "feature-tour/date-range-helper",
