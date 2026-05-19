@@ -77,6 +77,7 @@ class DateTimeExtension extends AbstractExtension
             new TwigFunction('lrIsToday', [DateFormatHelper::class, 'isToday']),
             new TwigFunction('lrIsPast', [DateFormatHelper::class, 'isPast']),
             new TwigFunction('lrIsFuture', [DateFormatHelper::class, 'isFuture']),
+            new TwigFunction('lrDateFormatConfig', [DateFormatHelper::class, 'getConfig']),
             new TwigFunction('lrDefaultDateRange', [DateRangeHelper::class, 'getDefaultDateRange']),
             new TwigFunction('lrDateRangeOptions', [DateRangeHelper::class, 'getOptions']),
         ];
