@@ -28,13 +28,17 @@
 {% import "_includes/forms" as forms %}
 {% set pluginHandle = pluginHandle ?? 'app' %}
 {% set inheritLabel = 'Use global default'|t('lindemannrock-base') %}
+{% set isOverridden = settings.isOverriddenByConfig('defaultDateRange') %}
+{# When overridden by config, display the cascade-resolved (effective) value
+   so the form reflects what's actually in force — not the stale DB value. #}
+{% set effectiveValue = isOverridden ? lrDefaultDateRange(pluginHandle) : settings.defaultDateRange %}
 
 {{ forms.selectField({
     label: 'Default Date Range'|t('lindemannrock-base'),
     instructions: 'Default time window applied to analytics, logs, and dashboard pages in this plugin.'|t('lindemannrock-base'),
     id: 'defaultDateRange',
     name: 'settings[defaultDateRange]',
-    value: settings.defaultDateRange,
+    value: effectiveValue,
     options: [
         {label: inheritLabel, value: ''},
         {label: 'Today'|t('lindemannrock-base'), value: 'today'},
@@ -48,8 +52,8 @@
         {label: 'Last year'|t('lindemannrock-base'), value: 'lastYear'},
         {label: 'All time'|t('lindemannrock-base'), value: 'all'},
     ],
-    disabled: settings.isOverriddenByConfig('defaultDateRange'),
-    warning: settings.isOverriddenByConfig('defaultDateRange') ?
+    disabled: isOverridden,
+    warning: isOverridden ?
         'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'defaultDateRange', handle: pluginHandle})|raw : null,
     errors: settings.getErrors('defaultDateRange'),
 }) }}
