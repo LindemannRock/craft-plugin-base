@@ -79,7 +79,7 @@ use Craft;
  * ```
  *
  * @author LindemannRock
- * @since 5.10.0
+ * @since 5.25.0
  */
 trait DateFormatSettingsTrait
 {
