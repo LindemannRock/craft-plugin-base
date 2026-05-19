@@ -118,7 +118,11 @@ return [
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS、1,000 リクエスト/日 無料。API キーは任意です（レート制限を増加させます）。',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS、50,000 リクエスト/月 無料。API キーは任意です（レート制限を増加させます）。',
 
-    // Date format settings (shared via _partials/date-format-settings.twig)
+    // Date format settings (shared via _partials/date-format-settings.twig + _partials/base-overrides.twig)
+    'Base Plugin Overrides' => 'ベースプラグインのオーバーライド',
+    'Settings marked "グローバルデフォルトを使用" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => '「グローバルデフォルトを使用」と表示された設定は <code>config/lindemannrock-base.php</code> から継承されます。そのファイル（または特定のキー）が存在しない場合は、コードに組み込まれたデフォルト値が適用されます。',
+    'Time' => '時刻',
+    'Date' => '日付',
     'Time Format' => '時刻フォーマット',
     'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'このプラグイン全体での時刻の表示方法を設定します（AM/PM 付き 12 時間制または 24 時間制）。',
     '24-hour (14:30)' => '24 時間制 (14:30)',

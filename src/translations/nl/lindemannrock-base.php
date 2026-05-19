@@ -118,7 +118,11 @@ return [
     'ipapi.co: HTTPS with 1,000 free requests/day. API key optional (increases rate limits).' => 'ipapi.co: HTTPS met 1.000 gratis verzoeken/dag. API-sleutel optioneel (verhoogt limieten).',
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS met 50.000 gratis verzoeken/maand. API-sleutel optioneel (verhoogt limieten).',
 
-    // Date format settings (shared via _partials/date-format-settings.twig)
+    // Date format settings (shared via _partials/date-format-settings.twig + _partials/base-overrides.twig)
+    'Base Plugin Overrides' => 'Basis-plugin-overschrijvingen',
+    'Settings marked "Globale standaardinstelling gebruiken" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply.' => 'Instellingen gemarkeerd als „Globale standaardinstelling gebruiken" worden overgenomen uit <code>config/lindemannrock-base.php</code>. Als dat bestand (of de specifieke sleutel) ontbreekt, gelden de vaste standaardwaarden.',
+    'Time' => 'Tijd',
+    'Date' => 'Datum',
     'Time Format' => 'Tijdnotatie',
     'How times display throughout this plugin (12-hour with AM/PM or 24-hour military).' => 'Bepaalt hoe tijden worden weergegeven in deze plugin (12-uurs met AM/PM of 24-uurs).',
     '24-hour (14:30)' => '24-uurs (14:30)',
