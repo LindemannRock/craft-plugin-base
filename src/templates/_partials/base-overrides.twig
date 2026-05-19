@@ -7,13 +7,12 @@
  *   - One cascade info-box explaining the "Use global default" semantics
  *   - The requested sub-partials in a fixed order
  *
- * Sub-partials currently supported (more added as DateRangeSettingsTrait /
- * ExportFormatSettingsTrait ship — see _docs/rollouts/date-format-settings.md
- * for the broader rollout plan):
+ * Sub-partials currently supported (see _docs/rollouts/base-settings.md
+ * for the cross-plugin rollout tracker):
  *
  *   dateFormat → _partials/date-format-settings.twig
- *   dateRange  → (future) _partials/date-range-settings.twig
- *   exports    → (future) _partials/export-format-settings.twig
+ *   dateRange  → _partials/date-range-settings.twig
+ *   exports    → _partials/export-format-settings.twig
  *
  * Required variables:
  * - settings: Plugin Settings model
@@ -80,7 +79,17 @@
     } only %}
 {% endif %}
 
-{# Future sub-partials slot here in the order:
-   - sections.dateRange  → _partials/date-range-settings.twig
-   - sections.exports    → _partials/export-format-settings.twig
-#}
+{% if sections.dateRange is defined %}
+    {% include 'lindemannrock-base/_partials/date-range-settings' with {
+        settings: settings,
+        pluginHandle: pluginHandle,
+    } only %}
+{% endif %}
+
+{% if sections.exports is defined %}
+    {% include 'lindemannrock-base/_partials/export-format-settings' with {
+        settings: settings,
+        pluginHandle: pluginHandle,
+        fields: sections.exports.fields ?? ['exportsCsv', 'exportsJson', 'exportsExcel'],
+    } only %}
+{% endif %}
