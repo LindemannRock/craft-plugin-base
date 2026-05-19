@@ -1,0 +1,68 @@
+{#
+/**
+ * Export Format Settings
+ *
+ * Renders three CP form fields for a plugin's per-format export toggles
+ * (`exportsCsv`, `exportsJson`, `exportsExcel`). Each field is a select with
+ * a "Use global default" option that lets the value cascade from base config
+ * via `ExportHelper::getConfig()`. Pattern mirrors `showSeconds` from
+ * `date-format-settings.twig`.
+ *
+ * Include this partial in plugin settings pages whose Settings model uses
+ * `lindemannrock\base\traits\ExportFormatSettingsTrait`.
+ *
+ * Most plugins should include the umbrella `_partials/base-overrides` partial
+ * with `sections.exports` instead of this one directly — the umbrella adds
+ * the shared "Base Plugin Overrides" heading + cascade info-box once.
+ *
+ * Required variables:
+ * - settings: Plugin Settings model using ExportFormatSettingsTrait
+ * - pluginHandle: Plugin handle used in config-override warning messages
+ *
+ * Optional variables:
+ * - fields: Whitelist of format names to render. Defaults to all three
+ *   (`['exportsCsv', 'exportsJson', 'exportsExcel']`). Plugins that only
+ *   support a subset of formats should narrow the list.
+ *
+ * Usage (standalone — without the umbrella):
+ * {% include 'lindemannrock-base/_partials/export-format-settings' with {
+ *     settings: settings,
+ *     pluginHandle: 'search-manager',
+ *     fields: ['exportsCsv', 'exportsJson', 'exportsExcel'],
+ * } only %}
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+{% set pluginHandle = pluginHandle ?? 'app' %}
+{% set fields = fields ?? ['exportsCsv', 'exportsJson', 'exportsExcel'] %}
+{% set inheritLabel = 'Use global default'|t('lindemannrock-base') %}
+{% set disabledLabel = 'Disabled'|t('lindemannrock-base') %}
+{% set enabledLabel = 'Enabled'|t('lindemannrock-base') %}
+
+{% set formats = [
+    {key: 'exportsCsv', label: 'CSV Export'|t('lindemannrock-base'), instructions: 'Whether the CSV export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
+    {key: 'exportsJson', label: 'JSON Export'|t('lindemannrock-base'), instructions: 'Whether the JSON export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
+    {key: 'exportsExcel', label: 'Excel Export'|t('lindemannrock-base'), instructions: 'Whether the Excel export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
+] %}
+
+{% for format in formats %}
+    {% if format.key in fields %}
+        {{ forms.selectField({
+            label: format.label,
+            instructions: format.instructions,
+            id: format.key,
+            name: 'settings[' ~ format.key ~ ']',
+            value: attribute(settings, format.key) is null ? '' : (attribute(settings, format.key) ? '1' : '0'),
+            options: [
+                {label: inheritLabel, value: ''},
+                {label: disabledLabel, value: '0'},
+                {label: enabledLabel, value: '1'},
+            ],
+            disabled: settings.isOverriddenByConfig(format.key),
+            warning: settings.isOverriddenByConfig(format.key) ?
+                'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: format.key, handle: pluginHandle})|raw : null,
+            errors: settings.getErrors(format.key),
+        }) }}
+    {% endif %}
+{% endfor %}
