@@ -183,4 +183,15 @@ return [
     'Copy' => 'نسخ',
     'Copied!' => 'تم النسخ!',
     'Failed to copy to clipboard' => 'فشل النسخ إلى الحافظة',
+
+    // IP hash salt error (shared via _partials/ip-salt-error.twig)
+    'Configuration Required' => 'الإعداد مطلوب',
+    'IP hash salt is missing.' => 'مفتاح تجزئة IP مفقود.',
+    'Analytics tracking requires a secure salt for privacy protection.' => 'يتطلب تتبع التحليلات مفتاح تجزئة آمناً لحماية الخصوصية.',
+    'Run one of these commands in your terminal:' => 'قم بتشغيل أحد هذه الأوامر في الطرفية:',
+    'Standard:' => 'قياسي:',
+    'DDEV:' => 'DDEV:',
+    'This will automatically add {envVar} to your .env file.' => 'سيؤدي ذلك إلى إضافة {envVar} تلقائياً إلى ملف .env الخاص بك.',
+    'Warning:' => 'تحذير:',
+    'Copy the same salt to staging and production environments.' => 'انسخ مفتاح التجزئة نفسه إلى بيئات التدريج والإنتاج.',
 ];

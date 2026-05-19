@@ -183,4 +183,15 @@ return [
     'Copy' => 'Copiar',
     'Copied!' => '¡Copiado!',
     'Failed to copy to clipboard' => 'Error al copiar al portapapeles',
+
+    // IP hash salt error (shared via _partials/ip-salt-error.twig)
+    'Configuration Required' => 'Configuración requerida',
+    'IP hash salt is missing.' => 'Falta el salt de hash IP.',
+    'Analytics tracking requires a secure salt for privacy protection.' => 'El seguimiento analítico requiere un salt seguro para la protección de la privacidad.',
+    'Run one of these commands in your terminal:' => 'Ejecute uno de estos comandos en su terminal:',
+    'Standard:' => 'Estándar:',
+    'DDEV:' => 'DDEV:',
+    'This will automatically add {envVar} to your .env file.' => 'Esto añadirá automáticamente {envVar} a su archivo .env.',
+    'Warning:' => 'Advertencia:',
+    'Copy the same salt to staging and production environments.' => 'Copie el mismo salt en los entornos de staging y producción.',
 ];

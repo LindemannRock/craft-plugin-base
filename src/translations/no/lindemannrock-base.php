@@ -183,4 +183,15 @@ return [
     'Copy' => 'Kopier',
     'Copied!' => 'Kopiert!',
     'Failed to copy to clipboard' => 'Kopiering til utklippstavlen mislyktes',
+
+    // IP hash salt error (shared via _partials/ip-salt-error.twig)
+    'Configuration Required' => 'Konfigurasjon påkrevd',
+    'IP hash salt is missing.' => 'IP-hashsalt mangler.',
+    'Analytics tracking requires a secure salt for privacy protection.' => 'Analysesporing krever et sikkert salt for personvernbeskyttelse.',
+    'Run one of these commands in your terminal:' => 'Kjør en av disse kommandoene i terminalen din:',
+    'Standard:' => 'Standard:',
+    'DDEV:' => 'DDEV:',
+    'This will automatically add {envVar} to your .env file.' => 'Dette legger automatisk til {envVar} i .env-filen din.',
+    'Warning:' => 'Advarsel:',
+    'Copy the same salt to staging and production environments.' => 'Kopier det samme saltet til staging- og produksjonsmiljøer.',
 ];
