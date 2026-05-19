@@ -1,12 +1,12 @@
 # Base Settings Traits @since(5.25.0)
 
-A set of six traits and their companion CP partials that centralize the duplicated Settings-model boilerplate found across every LindemannRock plugin — pluginName, logLevel, itemsPerPage, dateFormat, dateRange, and export-format toggles. Each trait pairs with a Twig partial that renders the corresponding form field with shared labels, validation, and override-warning behaviour. The translations live once in `lindemannrock-base` instead of being duplicated per plugin × 12 languages.
+A set of seven traits and their companion CP partials that centralize the duplicated Settings-model boilerplate found across every LindemannRock plugin — pluginName, logLevel, itemsPerPage, dateFormat, dateRange, export-format toggles, and geo provider/API key. Each trait pairs with a Twig partial that renders the corresponding form field with shared labels, validation, and override-warning behaviour. The translations live once in `lindemannrock-base` instead of being duplicated per plugin × 12 languages.
 
 ## Two patterns
 
 | Pattern | Cascade overrides | Shared standalone fields |
 |---------|-------------------|--------------------------|
-| **Traits** | `DateFormatSettingsTrait`, `DateRangeSettingsTrait`, `ExportFormatSettingsTrait` | `ItemsPerPageSettingsTrait`, `PluginNameSettingsTrait`, `LogLevelSettingsTrait` |
+| **Traits** | `DateFormatSettingsTrait`, `DateRangeSettingsTrait`, `ExportFormatSettingsTrait` | `ItemsPerPageSettingsTrait`, `PluginNameSettingsTrait`, `LogLevelSettingsTrait`, `GeoSettingsTrait` |
 | **Properties** | Nullable. `null` = "inherit from base config / hardcoded default". | Concrete typed values. Plugin owns its default. |
 | **Cascade engine** | `DateFormatHelper`, `DateRangeHelper`, `ExportHelper` — each resolves a 4-layer cascade (defaults → base config → plugin Settings → plugin config) | None. Each plugin owns its own value. |
 | **Form rendering** | Routes through the `cascade-base-overrides` umbrella partial, which adds the shared "Base Plugin Overrides" heading + cascade info-box + dispatches to per-section sub-partials. | Individual `field-*` partials, included directly by the plugin's settings template. |
@@ -304,6 +304,57 @@ class Settings extends Model
     pluginHandle: 'my-plugin',
 } only %}
 ```
+
+## `GeoSettingsTrait` — shared geo provider + API key fields @since(5.25.0)
+
+Centralizes the validation rules and labels for `$geoProvider` (one of `ip-api.com`, `ipapi.co`, `ipinfo.io`) and `$geoApiKey` (optional string) — the two properties the `_partials/geo-settings.twig` partial binds to. The trait **does not** declare the properties — every plugin keeps its own `public string $geoProvider = 'ip-api.com'` and `public ?string $geoApiKey = null`. Pairs with the existing `GeoLookupTrait` (which runs the lookups in service classes) but the two are independent — `GeoSettingsTrait` covers the CP settings surface, `GeoLookupTrait` covers the runtime lookup logic.
+
+```php
+use lindemannrock\base\traits\GeoSettingsTrait;
+
+class Settings extends Model
+{
+    use GeoSettingsTrait;
+
+    // Plugin keeps its own property declarations:
+    public string $geoProvider = 'ip-api.com';
+    public ?string $geoApiKey = null;
+
+    public function rules(): array
+    {
+        return array_merge([
+            // ... plugin-specific rules ...
+        ], $this->geoSettingsRules());
+    }
+
+    public function attributeLabels(): array
+    {
+        return array_merge([
+            // ... plugin-specific labels ...
+        ], $this->geoSettingsLabel());
+    }
+}
+```
+
+**Schema** — two columns in the plugin's Settings table:
+
+```php
+'geoProvider' => $this->string(20)->notNull()->defaultValue('ip-api.com'),
+'geoApiKey'   => $this->string(255)->null(),
+```
+
+**Partial** — standalone. Renders the provider select, the API key input, the HTTP/HTTPS warning for `ip-api.com`'s free tier, and dynamic provider info via inline JavaScript:
+
+```twig
+{% include 'lindemannrock-base/_partials/geo-settings' with {
+    settings: settings,
+    pluginHandle: 'my-plugin',
+} only %}
+```
+
+The provider list (`ip-api.com (HTTP free, HTTPS paid)`, `ipapi.co (HTTPS, 1k/day free)`, `ipinfo.io (HTTPS, 50k/month free)`) lives in base translations and is shared across plugins.
+
+See: [GeoHelper](geo-helper.md) for country names + phone helpers, [GeoLookupTrait](geo-lookup.md) for the service-class lookup pattern.
 
 ## SettingsController `''` → null coercion
 

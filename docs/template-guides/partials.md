@@ -183,6 +183,8 @@ Geo detection provider settings fields. Include this in plugin settings pages th
 
 Renders a provider select, API key input, HTTP warning for ip-api.com free tier, and dynamic provider info. Provider-specific UI updates happen via inline JavaScript.
 
+Pairs with [`GeoSettingsTrait`](../feature-tour/base-settings-traits.md#geosettingstrait--shared-geo-provider--api-key-fields) — adopt the trait in the plugin's Settings model to get the matching validation rules + attribute labels for the `geoProvider`/`geoApiKey` properties this partial binds to.
+
 ### Usage
 
 ```twig

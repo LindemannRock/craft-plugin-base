@@ -29,7 +29,7 @@ Reusable traits for Settings models and plugin classes:
 - **[SettingsPersistenceTrait](settings-persistence.md)** — Save/load settings to database tables instead of project config
 - **[SettingsConfigTrait](settings-config.md)** — Config file overrides with lock icon indicators
 - **[SettingsDisplayNameTrait](settings-display-name.md)** — Custom plugin display names
-- **[Base settings traits](base-settings-traits.md)** — 6 traits + matching CP partials that centralize the per-plugin Settings boilerplate for `pluginName`, `logLevel`, `itemsPerPage`, date format overrides, date range, and export-format toggles
+- **[Base settings traits](base-settings-traits.md)** — 7 traits + matching CP partials that centralize the per-plugin Settings boilerplate for `pluginName`, `logLevel`, `itemsPerPage`, date format overrides, date range, export-format toggles, and geo provider + API key
 - **[EditionTrait](edition-support.md)** — Plugin editions (Lite/Standard/Pro)
 - **[DeviceDetectionTrait](device-detection.md)** — User-agent parsing for device, browser, and OS detection
 - **[GeoLookupTrait](geo-lookup.md)** — IP geolocation in service classes
