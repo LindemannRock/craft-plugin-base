@@ -1,0 +1,48 @@
+{#
+/**
+ * Items Per Page Field
+ *
+ * Renders a number-input form field for a plugin's `itemsPerPage` setting with
+ * a shared "Items Per Page" label, the shared min/max bounds (10–500), and
+ * a generic config-override warning that activates when the value is locked
+ * by `config/{handle}.php`.
+ *
+ * Include this partial in plugin settings pages whose Settings model uses
+ * `lindemannrock\base\traits\ItemsPerPageSettingsTrait`.
+ *
+ * Unlike `_partials/base-overrides` (which is reserved for cascade overrides
+ * of base defaults), this partial is a stand-alone shared field — it does not
+ * imply any "Use global default" inheritance from `config/lindemannrock-base.php`.
+ *
+ * Required variables:
+ * - settings: Plugin Settings model using ItemsPerPageSettingsTrait
+ * - pluginHandle: Plugin handle used in config-override warning messages
+ * - instructions: Plugin-specific instructions text (translated by the caller)
+ *
+ * Usage:
+ * {% include 'lindemannrock-base/_partials/items-per-page-field' with {
+ *     settings: settings,
+ *     pluginHandle: 'logging-library',
+ *     instructions: 'Number of log entries to display per page in the log viewers'|t('logging-library'),
+ * } only %}
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+{% set pluginHandle = pluginHandle ?? 'app' %}
+
+{{ forms.textField({
+    label: 'Items Per Page'|t('lindemannrock-base'),
+    instructions: instructions ?? null,
+    id: 'itemsPerPage',
+    name: 'settings[itemsPerPage]',
+    type: 'number',
+    value: settings.itemsPerPage,
+    min: 10,
+    max: 500,
+    required: true,
+    errors: settings.getErrors('itemsPerPage'),
+    disabled: settings.isOverriddenByConfig('itemsPerPage'),
+    warning: settings.isOverriddenByConfig('itemsPerPage') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'itemsPerPage', handle: pluginHandle})|raw : null,
+}) }}
