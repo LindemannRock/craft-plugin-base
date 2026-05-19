@@ -1,0 +1,55 @@
+{#
+/**
+ * Date Range Settings
+ *
+ * Renders a single CP form field for a plugin's `defaultDateRange` setting
+ * with a "Use global default" option that lets the value cascade from base
+ * config / hardcoded default via `DateRangeHelper::getDefaultDateRange()`.
+ *
+ * Include this partial in plugin settings pages whose Settings model uses
+ * `lindemannrock\base\traits\DateRangeSettingsTrait`.
+ *
+ * Most plugins should include the umbrella `_partials/base-overrides` partial
+ * with `sections.dateRange` instead of this one directly — the umbrella adds
+ * the shared "Base Plugin Overrides" heading + cascade info-box once.
+ *
+ * Required variables:
+ * - settings: Plugin Settings model using DateRangeSettingsTrait
+ * - pluginHandle: Plugin handle used in config-override warning messages
+ *
+ * Usage (standalone — without the umbrella):
+ * {% include 'lindemannrock-base/_partials/date-range-settings' with {
+ *     settings: settings,
+ *     pluginHandle: 'search-manager',
+ * } only %}
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+{% set pluginHandle = pluginHandle ?? 'app' %}
+{% set inheritLabel = 'Use global default'|t('lindemannrock-base') %}
+
+{{ forms.selectField({
+    label: 'Default Date Range'|t('lindemannrock-base'),
+    instructions: 'Default time window applied to analytics, logs, and dashboard pages in this plugin.'|t('lindemannrock-base'),
+    id: 'defaultDateRange',
+    name: 'settings[defaultDateRange]',
+    value: settings.defaultDateRange,
+    options: [
+        {label: inheritLabel, value: ''},
+        {label: 'Today'|t('lindemannrock-base'), value: 'today'},
+        {label: 'Yesterday'|t('lindemannrock-base'), value: 'yesterday'},
+        {label: 'Last 7 days'|t('lindemannrock-base'), value: 'last7days'},
+        {label: 'Last 30 days'|t('lindemannrock-base'), value: 'last30days'},
+        {label: 'Last 90 days'|t('lindemannrock-base'), value: 'last90days'},
+        {label: 'This month'|t('lindemannrock-base'), value: 'thisMonth'},
+        {label: 'Last month'|t('lindemannrock-base'), value: 'lastMonth'},
+        {label: 'This year'|t('lindemannrock-base'), value: 'thisYear'},
+        {label: 'Last year'|t('lindemannrock-base'), value: 'lastYear'},
+        {label: 'All time'|t('lindemannrock-base'), value: 'all'},
+    ],
+    disabled: settings.isOverriddenByConfig('defaultDateRange'),
+    warning: settings.isOverriddenByConfig('defaultDateRange') ?
+        'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {setting: 'defaultDateRange', handle: pluginHandle})|raw : null,
+    errors: settings.getErrors('defaultDateRange'),
+}) }}
