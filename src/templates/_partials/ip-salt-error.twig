@@ -1,83 +1,166 @@
 {#
-  IP Hash Salt Error Partial
+  IP Hash Salt Error Partial @since 5.25.0
 
-  Displays an admin error banner when analytics is enabled but IP hash salt is missing.
+  Displays a warning info-box when a plugin's analytics is enabled but its
+  IP hash salt is missing (or still holds the literal `$ENVVAR_NAME` string,
+  meaning the env var was never set). Shows the appropriate console commands
+  for generating one (both Standard and DDEV variants) with copy-to-clipboard
+  buttons, plus the env var name that will be added to `.env`.
 
   Usage:
   {% include 'lindemannrock-base/_partials/ip-salt-error' with {
-      translationCategory: 'redirect-manager'
-  } %}
+      pluginHandle: 'redirect-manager',
+  } only %}
+
+  Parameters:
+  - pluginHandle (required, string) — plugin handle used to (a) resolve the
+    plugin instance for reading its `enableAnalytics` + `ipHashSalt`
+    settings, (b) build the console command path, and (c) derive the
+    default env var name.
+  - envVarName   (optional, string) — override the derived env var name.
+    Defaults to `{pluginHandle uppercased, hyphens → underscores}_IP_SALT`
+    (e.g., `redirect-manager` → `REDIRECT_MANAGER_IP_SALT`).
+
+  Behaviour:
+  - Renders nothing when analytics is disabled OR salt is set correctly.
+  - All emitted UI strings route through `|t('lindemannrock-base')` —
+    plugins consuming this partial do not need any matching keys in their
+    own translation files (see `_docs/guides/translations/base-vs-plugin.md`).
+  - Copy-to-clipboard JS is IIFE-scoped per render (unique `boxId`) so
+    multiple invocations on the same page don't collide.
+  - Clipboard write uses the modern `navigator.clipboard` API with a
+    `document.execCommand('copy')` fallback for older browsers / non-secure
+    contexts. Failed copy alerts the user.
 
   @link      https://lindemannrock.com
-  @copyright Copyright (c) 2025 LindemannRock
+  @copyright Copyright (c) 2026 LindemannRock
 #}
 
-{% set translationCategory = translationCategory ?? 'app' %}
-{% set plugin = craft.app.plugins.getPlugin(translationCategory) %}
-{% set pluginId = plugin and plugin.id is defined and plugin.id ? plugin.id : translationCategory %}
-{% set envVarName = envVarName ?? (translationCategory|replace({'-': '_'})|upper ~ '_IP_SALT') %}
+{# Backward-compat: accept legacy `translationCategory` param name. Drop after one release cycle. #}
+{% set pluginHandle = pluginHandle ?? translationCategory ?? 'app' %}
+{% set plugin = craft.app.plugins.getPlugin(pluginHandle) %}
+{% set pluginId = plugin and plugin.id is defined and plugin.id ? plugin.id : pluginHandle %}
+{% set envVarName = envVarName ?? (pluginHandle|replace({'-': '_'})|upper ~ '_IP_SALT') %}
 
 {% set analyticsEnabled = plugin and (plugin.settings.enableAnalytics ?? false) %}
 {% set actualSalt = plugin ? (plugin.settings.ipHashSalt ?? null) : null %}
 {% set saltIsMissing = not actualSalt or actualSalt == ('$' ~ envVarName) %}
 
 {% if analyticsEnabled and saltIsMissing %}
-    <div class="error-summary" tabindex="-1" style="margin-bottom: 24px;">
-        <div>
-            <span class="notification-icon" data-icon="alert" aria-label="{{ 'error'|t(translationCategory) }}" role="img"></span>
-            <h2>{{ 'Configuration Required'|t(translationCategory) }}</h2>
-        </div>
-        <ul class="errors">
-            <li>
-                <strong>{{ 'IP hash salt is missing.'|t(translationCategory) }}</strong> {{ 'Analytics tracking requires a secure salt for privacy protection.'|t(translationCategory) }}
-                <br><br>
-                <strong>{{ 'Run one of these commands in your terminal:'|t(translationCategory) }}</strong>
-                <br><br>
+    {% set boxId = 'lr-ip-salt-' ~ random(999999999) %}
 
-                <div>
-                    <div style="margin-bottom: 12px;">
-                        <strong style="font-size: 13px; color: #596673; display: block; margin-bottom: 4px;">{{ 'Standard:'|t(translationCategory) }}</strong>
-                        <div style="position: relative; display: flex; align-items: center; gap: 8px;">
-                            <code id="salt-cmd-normal" style="background: #f9fafb; padding: 10px 12px; border-radius: 4px; flex: 1; border: 1px solid #e5e7eb; font-size: 13px; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;">php craft {{ pluginId }}/security/generate-salt</code>
-                            <button type="button" onclick="copyToClipboard('salt-cmd-normal', this)" style="background: #0d78f2; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;">{{ 'COPY'|t(translationCategory) }}</button>
-                        </div>
-                    </div>
+    {% set messageHtml %}
+        <strong>{{ 'Configuration Required'|t('lindemannrock-base') }}</strong>
 
-                    <div>
-                        <strong style="font-size: 13px; color: #596673; display: block; margin-bottom: 4px;">{{ 'DDEV:'|t(translationCategory) }}</strong>
-                        <div style="position: relative; display: flex; align-items: center; gap: 8px;">
-                            <code id="salt-cmd-ddev" style="background: #f9fafb; padding: 10px 12px; border-radius: 4px; flex: 1; border: 1px solid #e5e7eb; font-size: 13px; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;">ddev craft {{ pluginId }}/security/generate-salt</code>
-                            <button type="button" onclick="copyToClipboard('salt-cmd-ddev', this)" style="background: #0d78f2; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;">{{ 'COPY'|t(translationCategory) }}</button>
-                        </div>
-                    </div>
+        <p style="margin: 0.5rem 0;">
+            <strong>{{ 'IP hash salt is missing.'|t('lindemannrock-base') }}</strong>
+            {{ 'Analytics tracking requires a secure salt for privacy protection.'|t('lindemannrock-base') }}
+        </p>
+
+        <p style="margin: 0.75rem 0 0.5rem;">
+            <strong>{{ 'Run one of these commands in your terminal:'|t('lindemannrock-base') }}</strong>
+        </p>
+
+        <div id="{{ boxId }}">
+            <div style="margin-bottom: 0.5rem;">
+                <p class="light" style="margin: 0 0 0.25rem;">{{ 'Standard:'|t('lindemannrock-base') }}</p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text"
+                           readonly
+                           class="text fullwidth lr-ip-salt-input"
+                           value="php craft {{ pluginId }}/security/generate-salt"
+                           style="font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; cursor: copy; flex: 1;">
+                    <button type="button"
+                            class="btn lr-ip-salt-copy-btn"
+                            data-original-label="{{ 'Copy'|t('lindemannrock-base')|e('html_attr') }}"
+                            data-copied-label="{{ 'Copied!'|t('lindemannrock-base')|e('html_attr') }}"
+                            style="white-space: nowrap;">{{ 'Copy'|t('lindemannrock-base') }}</button>
                 </div>
+            </div>
 
-                <br>
-                {{ 'This will automatically add'|t(translationCategory) }} <code>{{ envVarName }}</code> {{ 'to your'|t(translationCategory) }} <code>.env</code> {{ 'file.'|t(translationCategory) }}
-                <br>
-                <strong style="color: #d97706;">{{ 'Warning:'|t(translationCategory) }}</strong> {{ 'Copy the same salt to staging and production environments.'|t(translationCategory) }}
+            <div>
+                <p class="light" style="margin: 0 0 0.25rem;">{{ 'DDEV:'|t('lindemannrock-base') }}</p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text"
+                           readonly
+                           class="text fullwidth lr-ip-salt-input"
+                           value="ddev craft {{ pluginId }}/security/generate-salt"
+                           style="font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; cursor: copy; flex: 1;">
+                    <button type="button"
+                            class="btn lr-ip-salt-copy-btn"
+                            data-original-label="{{ 'Copy'|t('lindemannrock-base')|e('html_attr') }}"
+                            data-copied-label="{{ 'Copied!'|t('lindemannrock-base')|e('html_attr') }}"
+                            style="white-space: nowrap;">{{ 'Copy'|t('lindemannrock-base') }}</button>
+                </div>
+            </div>
+        </div>
 
-                <script>
-                function copyToClipboard(elementId, button) {
-                    const element = document.getElementById(elementId);
-                    const text = element.textContent;
+        <p style="margin: 0.75rem 0 0.25rem;">
+            {{ 'This will automatically add {envVar} to your .env file.'|t('lindemannrock-base', {envVar: '<code>' ~ envVarName ~ '</code>'})|raw }}
+        </p>
 
-                    navigator.clipboard.writeText(text).then(function() {
-                        const originalText = button.textContent;
-                        button.textContent = {{ 'COPIED!'|t(translationCategory)|json_encode|raw }};
-                        button.style.background = '#10b981';
+        <p style="margin: 0;">
+            <strong>{{ 'Warning:'|t('lindemannrock-base') }}</strong>
+            {{ 'Copy the same salt to staging and production environments.'|t('lindemannrock-base') }}
+        </p>
+    {% endset %}
 
-                        setTimeout(function() {
-                            button.textContent = originalText;
-                            button.style.background = '#0d78f2';
-                        }, 2000);
-                    }).catch(function(err) {
-                        console.error('Failed to copy:', err);
-                        alert({{ 'Failed to copy to clipboard'|t(translationCategory)|json_encode|raw }});
-                    });
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: messageHtml,
+        type: 'warning',
+        variant: 'colored',
+        margin: 'bottom',
+        allowHtml: true,
+    } only %}
+
+    <script>
+    (function() {
+        var box = document.getElementById({{ boxId|json_encode|raw }});
+        if (!box) return;
+
+        var inputs = box.querySelectorAll('.lr-ip-salt-input');
+        var buttons = box.querySelectorAll('.lr-ip-salt-copy-btn');
+
+        function showCopiedFeedback(button) {
+            var copiedLabel = button.dataset.copiedLabel;
+            var originalLabel = button.dataset.originalLabel;
+            button.textContent = copiedLabel;
+            button.classList.add('secondary');
+            setTimeout(function() {
+                button.textContent = originalLabel;
+                button.classList.remove('secondary');
+            }, 2000);
+        }
+
+        function fallbackCopy(input, button) {
+            input.select();
+            try {
+                document.execCommand('copy');
+                showCopiedFeedback(button);
+            } catch (_) {
+                alert({{ 'Failed to copy to clipboard'|t('lindemannrock-base')|json_encode|raw }});
+            }
+        }
+
+        inputs.forEach(function(input) {
+            input.addEventListener('click', function() {
+                this.select();
+            });
+        });
+
+        buttons.forEach(function(button, index) {
+            button.addEventListener('click', function() {
+                var input = inputs[index];
+                if (!input) return;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(input.value).then(function() {
+                        showCopiedFeedback(button);
+                    }).catch(function() { fallbackCopy(input, button); });
+                } else {
+                    fallbackCopy(input, button);
                 }
-                </script>
-            </li>
-        </ul>
-    </div>
+            });
+        });
+    })();
+    </script>
 {% endif %}
