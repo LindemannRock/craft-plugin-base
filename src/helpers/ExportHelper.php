@@ -75,14 +75,20 @@ class ExportHelper
     /**
      * Get export configuration
      *
-     * Resolves the per-format enable map by layering (low → high priority):
+     * Resolves the per-format enable map by layering (low → high priority).
+     * Matches the cascade order used by `DateFormatHelper::getConfig()` —
+     * plugin config file is the highest authority because it's env-controlled:
+     *
      *   1. DEFAULT_FORMATS (hardcoded fallback)
      *   2. Base config:    'exports' hash in config/lindemannrock-base.php
-     *   3. Plugin config:  'exports' hash in config/{handle}.php
-     *   4. Plugin Settings model: $settings->exportsCsv / exportsJson /
+     *   3. Plugin Settings model: $settings->exportsCsv / exportsJson /
      *      exportsExcel — when the plugin uses
      *      `lindemannrock\base\traits\ExportFormatSettingsTrait` and the
      *      property is non-null. Skipped silently when the trait isn't in use.
+     *   4. Plugin config:  'exports' hash in config/{handle}.php — when this
+     *      file sets a key, the CP form for that property shows the
+     *      "overridden by config" warning via `isOverriddenByConfig('exports.X')`
+     *      and the field is disabled.
      *
      * @param string|null $pluginHandle Optional plugin handle to check for override
      * @return array
@@ -99,13 +105,7 @@ class ExportHelper
         }
 
         if ($pluginHandle) {
-            // Layer 3: plugin config file
-            $pluginConfig = Craft::$app->config->getConfigFromFile($pluginHandle) ?: [];
-            if (isset($pluginConfig['exports']) && is_array($pluginConfig['exports'])) {
-                $result = array_merge($result, $pluginConfig['exports']);
-            }
-
-            // Layer 4: plugin Settings model flat props (highest priority)
+            // Layer 3: plugin Settings model flat props
             $plugin = Craft::$app->plugins->getPlugin($pluginHandle);
             if ($plugin !== null) {
                 $settings = $plugin->getSettings();
@@ -120,6 +120,12 @@ class ExportHelper
                         $result['excel'] = (bool) $settings->exportsExcel;
                     }
                 }
+            }
+
+            // Layer 4: plugin config file (highest priority)
+            $pluginConfig = Craft::$app->config->getConfigFromFile($pluginHandle) ?: [];
+            if (isset($pluginConfig['exports']) && is_array($pluginConfig['exports'])) {
+                $result = array_merge($result, $pluginConfig['exports']);
             }
         }
 
