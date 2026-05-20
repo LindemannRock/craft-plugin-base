@@ -56,7 +56,7 @@ return [
     'Search' => '検索',
     'Search...' => '検索...',
     'Clear' => '削除する',
-    'Clear search' => '検索をクリア',
+    'Clear search' => '検索を削除',
     'All' => 'すべて',
 
     // Table view + pagination

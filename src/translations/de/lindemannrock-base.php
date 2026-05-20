@@ -100,8 +100,8 @@ return [
     'No import history yet.' => 'Noch kein Import-Verlauf vorhanden.',
     'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Möchten Sie wirklich alle Import-Protokolle löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
     'Failed to clear history.' => 'Verlauf konnte nicht gelöscht werden.',
-    'Loading backup history...' => 'Sicherungsverlauf wird geladen...',
-    'No backups found.' => 'Keine Sicherungen gefunden.',
+    'Loading backup history...' => 'Backup-Verlauf wird geladen...',
+    'No backups found.' => 'Keine Backups gefunden.',
 
     // Geo provider settings (shared via _partials/cascade-geo-settings.twig)
     'Geo Provider' => 'Geo-Anbieter',
