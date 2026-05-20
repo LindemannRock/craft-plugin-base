@@ -19,7 +19,7 @@ A reusable layout for plugin utility/overview pages with system overview cards a
 } %}
 
 {% block overview %}
-    {% include 'lindemannrock-base/_components/cards/unified-card' with {
+    {% include 'lindemannrock-base/_components/unified-card' with {
         title: 'Total Items',
         color: '#059669',
         value: stats.total,
@@ -79,13 +79,13 @@ System overview cards. Rendered inside an `.lr-unified-cards` grid container.
 
 ```twig
 {% block overview %}
-    {% include 'lindemannrock-base/_components/cards/unified-card' with {
+    {% include 'lindemannrock-base/_components/unified-card' with {
         title: 'Total Items',
         color: '#059669',
         value: stats.total,
         description: 'items in database',
     } only %}
-    {% include 'lindemannrock-base/_components/cards/unified-card' with {
+    {% include 'lindemannrock-base/_components/unified-card' with {
         title: 'Cache Status',
         color: '#0ea5e9',
         value: 'Active',

@@ -158,12 +158,12 @@ Wrap stat boxes in `.lr-analytics-stats` for a responsive grid. Add `.compact` f
 
 Flexible card component for dashboards, utilities, and analytics. Supports primary values, secondary values, badges, sub-metric boxes, palette coloring, and clickable cards.
 
-**Path:** `lindemannrock-base/_components/cards/unified-card`
+**Path:** `lindemannrock-base/_components/unified-card`
 
 ### Basic Usage
 
 ```twig
-{% include 'lindemannrock-base/_components/cards/unified-card' with {
+{% include 'lindemannrock-base/_components/unified-card' with {
     title: 'Total Messages',
     color: '#059669',
     value: 1234,
@@ -174,7 +174,7 @@ Flexible card component for dashboards, utilities, and analytics. Supports prima
 ### With Secondary Value and Badge
 
 ```twig
-{% include 'lindemannrock-base/_components/cards/unified-card' with {
+{% include 'lindemannrock-base/_components/unified-card' with {
     title: 'Messages Sent',
     color: '#0ea5e9',
     value: 150,
@@ -182,7 +182,7 @@ Flexible card component for dashboards, utilities, and analytics. Supports prima
     description: 'of total capacity',
 } only %}
 
-{% include 'lindemannrock-base/_components/cards/unified-card' with {
+{% include 'lindemannrock-base/_components/unified-card' with {
     title: 'Success Rate',
     color: '#10b981',
     value: '89%',
@@ -194,7 +194,7 @@ Flexible card component for dashboards, utilities, and analytics. Supports prima
 ### With Sub-Metric Boxes
 
 ```twig
-{% include 'lindemannrock-base/_components/cards/unified-card' with {
+{% include 'lindemannrock-base/_components/unified-card' with {
     title: 'Analytics',
     color: '#8b5cf6',
     value: 1523,
@@ -209,7 +209,7 @@ Flexible card component for dashboards, utilities, and analytics. Supports prima
 ### Clickable Card
 
 ```twig
-{% include 'lindemannrock-base/_components/cards/unified-card' with {
+{% include 'lindemannrock-base/_components/unified-card' with {
     title: 'View Logs',
     color: '#0ea5e9',
     value: 150,
@@ -221,7 +221,7 @@ Flexible card component for dashboards, utilities, and analytics. Supports prima
 ### Palette-Colored Card
 
 ```twig
-{% include 'lindemannrock-base/_components/cards/unified-card' with {
+{% include 'lindemannrock-base/_components/unified-card' with {
     value: 1234,
     description: 'Total Messages',
     palette: 'green',
@@ -255,8 +255,8 @@ Wrap cards in `.lr-unified-cards` for a responsive grid:
 
 ```twig
 <div class="lr-unified-cards">
-    {% include 'lindemannrock-base/_components/cards/unified-card' with {...} only %}
-    {% include 'lindemannrock-base/_components/cards/unified-card' with {...} only %}
+    {% include 'lindemannrock-base/_components/unified-card' with {...} only %}
+    {% include 'lindemannrock-base/_components/unified-card' with {...} only %}
 </div>
 ```
 

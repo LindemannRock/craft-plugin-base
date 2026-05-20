@@ -247,12 +247,12 @@ The most-used layout. Extends `cp-table` and provides filters, search, sort, pag
 {% block tabs %}
     <div id="overview" class="lr-tab-content">
         <div class="lr-analytics-stats">
-            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+            {% include 'lindemannrock-base/_components/unified-card' with {
                 title: 'Total Views'|t('my-plugin'),
                 color: '#6366f1',
                 value: stats.totalViews|number,
             } only %}
-            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+            {% include 'lindemannrock-base/_components/unified-card' with {
                 title: 'Unique Visitors'|t('my-plugin'),
                 color: '#0ea5e9',
                 value: stats.uniqueVisitors|number,
@@ -287,7 +287,7 @@ The most-used layout. Extends `cp-table` and provides filters, search, sort, pag
 } %}
 
 {% block overview %}
-    {% include 'lindemannrock-base/_components/cards/unified-card' with {
+    {% include 'lindemannrock-base/_components/unified-card' with {
         title: 'Total Items'|t('my-plugin'),
         color: lrPaletteColor('emerald').color,
         value: stats.total,
