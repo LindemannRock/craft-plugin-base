@@ -50,9 +50,9 @@ class LabelHelper
         $available = $maxLength - mb_strlen($suffix) - 1; // 1 for the ellipsis
         if ($available < 10) {
             // Suffix too long to preserve meaningfully; drop it and truncate body.
-            return mb_substr($label, 0, $maxLength - 1) . '…';
+            return mb_substr($label, 0, $maxLength - 1) . '...';
         }
 
-        return rtrim(mb_substr($label, 0, $available)) . '…' . $suffix;
+        return rtrim(mb_substr($label, 0, $available)) . '...' . $suffix;
     }
 }
