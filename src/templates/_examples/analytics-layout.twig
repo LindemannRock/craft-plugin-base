@@ -124,25 +124,25 @@
     <div id="overview" class="lr-tab-content">
         {# Summary Stats #}
         <div class="lr-unified-cards">
-            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+            {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.totalViews,
                 description: 'Total Views'|t('app'),
                 align: 'center',
             } only %}
 
-            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+            {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.uniqueVisitors,
                 description: 'Unique Visitors'|t('app'),
                 align: 'center',
             } only %}
 
-            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+            {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.avgDuration ~ 's',
                 description: 'Avg. Duration'|t('app'),
                 align: 'center',
             } only %}
 
-            {% include 'lindemannrock-base/_components/cards/unified-card' with {
+            {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.bounceRate ~ '%',
                 description: 'Bounce Rate'|t('app'),
                 align: 'center',
