@@ -27,7 +27,7 @@ return [
     'Last month' => 'Letzten Monat',
     'This year' => 'Dieses Jahr',
     'Last year' => 'Letztes Jahr',
-    'All time' => 'Gesamte Zeit',
+    'All time' => 'Gesamter Zeitraum',
     'Custom Range' => 'Benutzerdefinierter Zeitraum',
 
     // Schedule options
