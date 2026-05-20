@@ -71,8 +71,8 @@ return [
     'Use defaults' => 'استخدام الإعدادات الافتراضية',
     'Close' => 'إغلاق',
     'New' => 'جديد',
-    'Action' => 'إجراء',
-    'Actions' => 'إجراءات',
+    'Action' => 'الإجراء',
+    'Actions' => 'الإجراءات',
     'Select all' => 'تحديد الكل',
     'Select' => 'تحديد',
     'Cannot modify config items' => 'لا يمكن تعديل عناصر الإعداد',
@@ -176,7 +176,7 @@ return [
     'Whether the CSV export option appears in this plugin\'s export menus.' => 'يحدد ما إذا كان خيار تصدير CSV يظهر في قوائم التصدير لهذا المكوِّن الإضافي.',
     'Whether the JSON export option appears in this plugin\'s export menus.' => 'يحدد ما إذا كان خيار تصدير JSON يظهر في قوائم التصدير لهذا المكوِّن الإضافي.',
     'Whether the Excel export option appears in this plugin\'s export menus.' => 'يحدد ما إذا كان خيار تصدير Excel يظهر في قوائم التصدير لهذا المكوِّن الإضافي.',
-    'Enabled' => 'مفعَّل',
+    'Enabled' => 'مفعّل',
 
     // Copy-to-clipboard controls — shared across any base component or partial
     // that exposes a copy action (secret-reveal, ip-salt-error, future ones).

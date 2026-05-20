@@ -61,7 +61,7 @@ return [
 
     // Table view + pagination
     'No items found.' => 'Geen items gevonden.',
-    'View' => 'Weergave',
+    'View' => 'Bekijken',
     'Sort by' => 'Sorteren op',
     'Sort attribute' => 'Sorteerattribuut',
     'Sort direction' => 'Sorteerrichting',
@@ -92,14 +92,14 @@ return [
     'Tab' => 'Tab',
     'Pipe (|)' => 'Pipe (|)',
     'Create Backup Before Import' => 'Back-up maken vóór import',
-    'Upload & Map Columns' => 'Uploaden & kolommen koppelen',
+    'Upload & Map Columns' => 'Uploaden en kolommen toewijzen',
     'CSV Import' => 'CSV-import',
     'Alternate Import' => 'Alternatieve import',
     'Import History' => 'Importgeschiedenis',
     'Clear history' => 'Geschiedenis wissen',
     'No import history yet.' => 'Nog geen importgeschiedenis.',
     'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Weet u zeker dat u alle importlogboeken wilt wissen? Deze actie kan niet ongedaan worden gemaakt.',
-    'Failed to clear history.' => 'Geschiedenis wissen mislukt.',
+    'Failed to clear history.' => 'Geschiedenis kon niet worden gewist.',
     'Loading backup history...' => 'Back-upgeschiedenis laden...',
     'No backups found.' => 'Geen back-ups gevonden.',
 

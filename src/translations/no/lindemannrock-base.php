@@ -99,7 +99,7 @@ return [
     'Clear history' => 'Tøm historikk',
     'No import history yet.' => 'Ingen importhistorikk ennå.',
     'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Er du sikker på at du vil tømme alle importlogger? Denne handlingen kan ikke angres.',
-    'Failed to clear history.' => 'Kunne ikke tømme historikk.',
+    'Failed to clear history.' => 'Kunne ikke fjerne historikken.',
     'Loading backup history...' => 'Laster inn sikkerhetskopieringshistorikk...',
     'No backups found.' => 'Ingen sikkerhetskopier funnet.',
 

@@ -61,7 +61,7 @@ return [
 
     // Table view + pagination
     'No items found.' => 'Inga objekt hittades.',
-    'View' => 'Vy',
+    'View' => 'Visa',
     'Sort by' => 'Sortera efter',
     'Sort attribute' => 'Sorteringsattribut',
     'Sort direction' => 'Sorteringsriktning',

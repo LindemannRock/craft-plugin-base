@@ -61,7 +61,7 @@ return [
 
     // Table view + pagination
     'No items found.' => 'No se encontraron elementos.',
-    'View' => 'Vista',
+    'View' => 'Ver',
     'Sort by' => 'Ordenar por',
     'Sort attribute' => 'Atributo de ordenación',
     'Sort direction' => 'Dirección de ordenación',
@@ -99,7 +99,7 @@ return [
     'Clear history' => 'Borrar historial',
     'No import history yet.' => 'Aún no hay historial de importaciones.',
     'Are you sure you want to clear all import logs? This action cannot be undone.' => '¿Está seguro de que desea borrar todos los registros de importación? Esta acción no se puede deshacer.',
-    'Failed to clear history.' => 'Error al borrar el historial.',
+    'Failed to clear history.' => 'No se pudo borrar el historial.',
     'Loading backup history...' => 'Cargando historial de copias de seguridad...',
     'No backups found.' => 'No se encontraron copias de seguridad.',
 

@@ -61,7 +61,7 @@ return [
 
     // Table view + pagination
     'No items found.' => 'Aucun élément trouvé.',
-    'View' => 'Vue',
+    'View' => 'Afficher',
     'Sort by' => 'Trier par',
     'Sort attribute' => 'Attribut de tri',
     'Sort direction' => 'Sens du tri',
@@ -98,8 +98,8 @@ return [
     'Import History' => 'Historique des imports',
     'Clear history' => 'Effacer l\'historique',
     'No import history yet.' => 'Aucun historique d\'import pour l\'instant.',
-    'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Êtes-vous sûr de vouloir supprimer tous les journaux d\'import ? Cette action est irréversible.',
-    'Failed to clear history.' => 'Échec de la suppression de l\'historique.',
+    'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Voulez-vous vraiment effacer tous les journaux d\'import ? Cette action est irréversible.',
+    'Failed to clear history.' => 'Échec de l\'effacement de l\'historique.',
     'Loading backup history...' => 'Chargement de l\'historique des sauvegardes...',
     'No backups found.' => 'Aucune sauvegarde trouvée.',
 

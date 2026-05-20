@@ -61,7 +61,7 @@ return [
 
     // Table view + pagination
     'No items found.' => 'Nessun elemento trovato.',
-    'View' => 'Vista',
+    'View' => 'Visualizza',
     'Sort by' => 'Ordina per',
     'Sort attribute' => 'Attributo di ordinamento',
     'Sort direction' => 'Direzione di ordinamento',

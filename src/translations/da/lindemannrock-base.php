@@ -61,7 +61,7 @@ return [
 
     // Table view + pagination
     'No items found.' => 'Ingen elementer fundet.',
-    'View' => 'Visning',
+    'View' => 'Vis',
     'Sort by' => 'Sortér efter',
     'Sort attribute' => 'Sorteringsattribut',
     'Sort direction' => 'Sorteringsretning',
@@ -99,7 +99,7 @@ return [
     'Clear history' => 'Ryd historik',
     'No import history yet.' => 'Ingen importhistorik endnu.',
     'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Er du sikker på, at du vil rydde alle importlogfiler? Denne handling kan ikke fortrydes.',
-    'Failed to clear history.' => 'Kunne ikke rydde historik.',
+    'Failed to clear history.' => 'Kunne ikke rydde historikken.',
     'Loading backup history...' => 'Indlæser sikkerhedskopieringshistorik...',
     'No backups found.' => 'Ingen sikkerhedskopier fundet.',
 
