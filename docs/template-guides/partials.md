@@ -177,7 +177,7 @@ Switch between CSV import and an alternate method (e.g., paste URLs):
 
 ---
 
-## geo-settings
+## cascade-geo-settings
 
 Geo detection provider settings fields. Include this in plugin settings pages that support IP geolocation.
 
@@ -188,7 +188,7 @@ Pairs with [`GeoSettingsTrait`](../feature-tour/base-settings-traits.md#geosetti
 ### Usage
 
 ```twig
-{% include 'lindemannrock-base/_partials/geo-settings' with {
+{% include 'lindemannrock-base/_partials/cascade-geo-settings' with {
     settings: settings,
     translationCategory: 'search-manager',
 } %}

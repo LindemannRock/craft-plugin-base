@@ -307,7 +307,7 @@ class Settings extends Model
 
 ## `GeoSettingsTrait` — shared geo provider + API key fields @since(5.25.0)
 
-Centralizes the validation rules and labels for `$geoProvider` (one of `ip-api.com`, `ipapi.co`, `ipinfo.io`) and `$geoApiKey` (optional string) — the two properties the `_partials/geo-settings.twig` partial binds to. The trait **does not** declare the properties — every plugin keeps its own `public string $geoProvider = 'ip-api.com'` and `public ?string $geoApiKey = null`. Pairs with the existing `GeoLookupTrait` (which runs the lookups in service classes) but the two are independent — `GeoSettingsTrait` covers the CP settings surface, `GeoLookupTrait` covers the runtime lookup logic.
+Centralizes the validation rules and labels for `$geoProvider` (one of `ip-api.com`, `ipapi.co`, `ipinfo.io`) and `$geoApiKey` (optional string) — the two properties the `_partials/cascade-geo-settings.twig` partial binds to. The trait **does not** declare the properties — every plugin keeps its own `public string $geoProvider = 'ip-api.com'` and `public ?string $geoApiKey = null`. Pairs with the existing `GeoLookupTrait` (which runs the lookups in service classes) but the two are independent — `GeoSettingsTrait` covers the CP settings surface, `GeoLookupTrait` covers the runtime lookup logic.
 
 ```php
 use lindemannrock\base\traits\GeoSettingsTrait;
@@ -346,7 +346,7 @@ class Settings extends Model
 **Partial** — standalone. Renders the provider select, the API key input, the HTTP/HTTPS warning for `ip-api.com`'s free tier, and dynamic provider info via inline JavaScript:
 
 ```twig
-{% include 'lindemannrock-base/_partials/geo-settings' with {
+{% include 'lindemannrock-base/_partials/cascade-geo-settings' with {
     settings: settings,
     pluginHandle: 'my-plugin',
 } only %}
