@@ -14,12 +14,12 @@ use Craft;
  * Geo Settings Trait
  *
  * Centralizes the validation rules and attribute labels for the `$geoProvider`
- * and `$geoApiKey` properties that plugins using `_partials/geo-settings.twig`
+ * and `$geoApiKey` properties that plugins using `_partials/cascade-geo-settings.twig`
  * carry. Each plugin keeps its own property declarations (defaults are
  * conventionally `'ip-api.com'` and `null`) while the shared validation +
  * labels live here.
  *
- * Pairs with `lindemannrock-base/_partials/geo-settings.twig`, which renders
+ * Pairs with `lindemannrock-base/_partials/cascade-geo-settings.twig`, which renders
  * the form fields with the shared labels and the generic config-override
  * warnings using base translations.
  *
