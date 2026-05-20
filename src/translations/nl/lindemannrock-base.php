@@ -103,7 +103,7 @@ return [
     'Loading backup history...' => 'Back-upgeschiedenis laden...',
     'No backups found.' => 'Geen back-ups gevonden.',
 
-    // Geo provider settings (shared via _partials/geo-settings.twig)
+    // Geo provider settings (shared via _partials/cascade-geo-settings.twig)
     'Geo Provider' => 'Geo-aanbieder',
     'Select the geo IP lookup provider. HTTPS providers recommended for privacy.' => 'Selecteer de geo-IP-opzoekprovider. HTTPS-providers aanbevolen voor privacy.',
     'ip-api.com (HTTP free, HTTPS paid)' => 'ip-api.com (HTTP gratis, HTTPS betaald)',
