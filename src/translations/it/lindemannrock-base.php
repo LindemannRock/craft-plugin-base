@@ -109,7 +109,7 @@ return [
     'ip-api.com (HTTP free, HTTPS paid)' => 'ip-api.com (HTTP gratuito, HTTPS a pagamento)',
     'ipapi.co (HTTPS, 1k/day free)' => 'ipapi.co (HTTPS, 1.000/giorno gratuiti)',
     'ipinfo.io (HTTPS, 50k/month free)' => 'ipinfo.io (HTTPS, 50.000/mese gratuiti)',
-    'API Key' => 'API Key',
+    'API Key' => 'Chiave API',
     'Optional. Required for paid tiers (enables HTTPS for ip-api.com Pro).' => 'Facoltativa. Obbligatoria per i piani a pagamento (abilita HTTPS per ip-api.com Pro).',
     'This is being overridden by the <code>geoProvider</code> setting in <code>config/{handle}.php</code>.' => 'Questa impostazione è sovrascritta dall\'opzione <code>geoProvider</code> in <code>config/{handle}.php</code>.',
     'This is being overridden by the <code>geoApiKey</code> setting in <code>config/{handle}.php</code>.' => 'Questa impostazione è sovrascritta dall\'opzione <code>geoApiKey</code> in <code>config/{handle}.php</code>.',
