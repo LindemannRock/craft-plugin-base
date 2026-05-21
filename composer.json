@@ -58,6 +58,13 @@
         "post-install-cmd": "@install-hooks",
         "post-update-cmd": "@install-hooks"
     },
+    "config": {
+        "allow-plugins": {
+            "craftcms/plugin-installer": true,
+            "yiisoft/yii2-composer": true,
+            "php-http/discovery": true
+        }
+    },
     "extra": {
         "name": "LindemannRock Plugin Base",
         "handle": "lindemannrock-base",
