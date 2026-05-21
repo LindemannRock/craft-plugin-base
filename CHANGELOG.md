@@ -1,13 +1,83 @@
 # Changelog
 
-## [5.24.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.23.0...v5.24.0) (2026-05-09)
+## [5.25.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.24.0...v5.25.0) - 2026-05-21
+
+
+### Added
+
+* add unified card component for flexible analytics displays ([d8026dc](https://github.com/LindemannRock/craft-plugin-base/commit/d8026dc2a8581fed8c37c5684f4248203135defa))
+* **color:** add log source color definitions for improved clarity ([ad8b37e](https://github.com/LindemannRock/craft-plugin-base/commit/ad8b37e2a2d4387a8d70080f17a387916f78e1aa))
+* **color:** update color definitions for orange, red, blue, green ([23832db](https://github.com/LindemannRock/craft-plugin-base/commit/23832dbbcad0fd3c0541368074213acd39fe4552))
+* **cp-table:** implement single delegated event listener for row actions ([ce1322b](https://github.com/LindemannRock/craft-plugin-base/commit/ce1322b6560556614d8b031065264c6f689edb6f))
+* **css:** add neutral row styles for table components ([ee11552](https://github.com/LindemannRock/craft-plugin-base/commit/ee11552c72d15ec3a17c081893c534881f6c6197))
+* **css:** add styles for disabled menu items in row-action menu ([ceff47e](https://github.com/LindemannRock/craft-plugin-base/commit/ceff47ed14a84ab72ba94004c457b7fc798a41f9))
+* **date-format:** add lrDateFormatConfig function for date format configuration ([f299508](https://github.com/LindemannRock/craft-plugin-base/commit/f299508b9c43fcd00d60d30ec130eb717a6063b6))
+* **date-format:** display effective values for overridden date format settings ([41af080](https://github.com/LindemannRock/craft-plugin-base/commit/41af08029069e8c4887159365262f15565848e99))
+* **date-format:** implement date format settings and helper methods ([d148776](https://github.com/LindemannRock/craft-plugin-base/commit/d1487768be56a31241e2f5c554502282dd694492))
+* **date-range:** add date range settings partial for plugin configuration ([e6eacd0](https://github.com/LindemannRock/craft-plugin-base/commit/e6eacd03e1cd77fe3c483ab7843e2d75828175af))
+* **date-range:** add DateRangeSettingsTrait for customizable date range ([ccbcab1](https://github.com/LindemannRock/craft-plugin-base/commit/ccbcab1a6fa6b99108827075d2830b3dadf866a3))
+* **date-range:** update default date range selection logic to reflect effective value ([bfedf51](https://github.com/LindemannRock/craft-plugin-base/commit/bfedf512674806d9419e1823c2cb7b9770bbc549))
+* **db-helper:** add castToText method for DB-agnostic type casting ([e441ad0](https://github.com/LindemannRock/craft-plugin-base/commit/e441ad062b82c49167ac4dd43daac55b6db3ce8d))
+* **db:** add support for Craft table-prefix syntax in jsonExtract ([4bd5949](https://github.com/LindemannRock/craft-plugin-base/commit/4bd594961ab6948d42fc6cd8e57a721ea546826f))
+* **db:** enhance jsonExtract to support Craft table-prefix syntax ([f2394c6](https://github.com/LindemannRock/craft-plugin-base/commit/f2394c67ad0c0a8c2c45aae223944464057b262a))
+* **export:** add configKey to export format settings for better configuration management ([d2bc827](https://github.com/LindemannRock/craft-plugin-base/commit/d2bc827310442ead93c7c7b66820149793b7915e))
+* **export:** add content-only methods for CSV and Excel exports ([044c319](https://github.com/LindemannRock/craft-plugin-base/commit/044c31925446f65a695f57bc200222ca4dba4f3f))
+* **export:** add export format settings partial for plugin configuration ([ddf6f70](https://github.com/LindemannRock/craft-plugin-base/commit/ddf6f70dafd3957f3ceaf78e2a2d2d16fed80294))
+* **export:** add ExportFormatSettingsTrait for customizable export options ([8665c1e](https://github.com/LindemannRock/craft-plugin-base/commit/8665c1e2681830ca27b28ad174ae1a1ac5f46265))
+* **export:** add shortKey to export format settings for better configuration ([4f37c31](https://github.com/LindemannRock/craft-plugin-base/commit/4f37c31659a6cb6a037f0320dee6d1085637bb18))
+* **export:** enhance export configuration resolution with layered approach ([ab34320](https://github.com/LindemannRock/craft-plugin-base/commit/ab34320d401d3dfbf0bb376894c51869febee517))
+* **export:** implement config cache for export settings retrieval ([1c66e23](https://github.com/LindemannRock/craft-plugin-base/commit/1c66e2328052a398567b5b1f4dd0b14e5fed31ae))
+* **geo-settings:** add geo detection provider settings partial with dynamic UI updates ([f7b1ee7](https://github.com/LindemannRock/craft-plugin-base/commit/f7b1ee761099cb1ed7ff08aac354970b741fab31))
+* **geo-settings:** add GeoSettingsTrait for centralized validation and labels ([598c951](https://github.com/LindemannRock/craft-plugin-base/commit/598c951b820f41f67f4002e1798516f506c46ab8))
+* **i18n:** add base plugin overrides translations for multiple languages ([ee9241c](https://github.com/LindemannRock/craft-plugin-base/commit/ee9241c2fd8c2cad9d91706144bedecc722895ae))
+* **i18n:** add date format settings translations for multiple languages ([b6fc81b](https://github.com/LindemannRock/craft-plugin-base/commit/b6fc81b5d820febf79289fa7a4ff641099f8ea86))
+* **i18n:** add IP hash salt error messages in multiple languages ([09b9975](https://github.com/LindemannRock/craft-plugin-base/commit/09b99756498a6b97792c9674f2a85534871c02a0))
+* **i18n:** add new date range and export format translations ([3152e63](https://github.com/LindemannRock/craft-plugin-base/commit/3152e6332733c6fb2a4eb09315b7b548ca77b837))
+* **i18n:** add schedule options translations for multiple languages ([85c796f](https://github.com/LindemannRock/craft-plugin-base/commit/85c796ff1e72f0c0471c9145b3093c730f9696c0))
+* **i18n:** add translation issue template for reporting translation problems ([e4e1a60](https://github.com/LindemannRock/craft-plugin-base/commit/e4e1a60392482105e35b28fec4530bd0b9d314c0))
+* **i18n:** add translations for 'Items Per Page' in multiple languages ([e452ba9](https://github.com/LindemannRock/craft-plugin-base/commit/e452ba9f9cb859d6288033fd72679390c24aac02))
+* **i18n:** update geo provider settings references in translations ([d9b67e1](https://github.com/LindemannRock/craft-plugin-base/commit/d9b67e1ede5ff3e310cda6dd8d5cd79742979740))
+* **i18n:** update translations for various languages with new plugin settings ([c59ae6e](https://github.com/LindemannRock/craft-plugin-base/commit/c59ae6e453d806b783f7faf04ddda31defea03db))
+* **i18n:** update translations to include global customization instructions ([deaa105](https://github.com/LindemannRock/craft-plugin-base/commit/deaa105b162c5e19f63e2513d8d826573a7f6ccd))
+* **import-history:** add import history partial with clear logs functionality ([1422680](https://github.com/LindemannRock/craft-plugin-base/commit/14226807f1683ae56470a0aae2504b9167773736))
+* **import-history:** add import history partial with clear logs functionality ([1d5d793](https://github.com/LindemannRock/craft-plugin-base/commit/1d5d793fa04085a3e373aa12ebd83c41b4448db1))
+* **ip-salt-error:** enhance warning info-box for missing IP hash salt ([c1badd5](https://github.com/LindemannRock/craft-plugin-base/commit/c1badd5042d235b7dc5bc9b79463b50f2c6346a6))
+* **items-per-page:** add Items Per Page field partial for plugin settings ([26c9b4c](https://github.com/LindemannRock/craft-plugin-base/commit/26c9b4c21ad12c4aa4da2fa715afd1c4af3c4227))
+* **items-per-page:** add ItemsPerPageSettingsTrait for consistent paging control ([f576032](https://github.com/LindemannRock/craft-plugin-base/commit/f576032ec63b508ca11059acaf6965a9eba6fef4))
+* **log-level:** add LogLevelSettingsTrait for standardized log level management ([64b5136](https://github.com/LindemannRock/craft-plugin-base/commit/64b51364c04d23a543e1f7472244526485158055))
+* **log-level:** add styles for log level rows with color set integration ([1f26bbd](https://github.com/LindemannRock/craft-plugin-base/commit/1f26bbd2c4cdb372cceff866e7a838e894f25216))
+* **log-level:** add styles for log level rows with dynamic tinting ([4239510](https://github.com/LindemannRock/craft-plugin-base/commit/42395104bf6023d5c260e909c20ffc9fd6fdacaf))
+* make isDangerousValue public for broader access ([6e694f6](https://github.com/LindemannRock/craft-plugin-base/commit/6e694f63632f23456833de2d498bb8a948d094b7))
+* **overrides:** add support for dateRange and exports sub-partials in base overrides ([8ebde81](https://github.com/LindemannRock/craft-plugin-base/commit/8ebde812e366892679b6be21dc70dba4c16e8475))
+* **overrides:** implement base plugin overrides partial for date formatting settings ([ea32ade](https://github.com/LindemannRock/craft-plugin-base/commit/ea32ade8fa665dc253f62c251e975259b1784083))
+* **row-actions:** add support for disabled menu items with tooltip text ([781cd99](https://github.com/LindemannRock/craft-plugin-base/commit/781cd99e3def3374fbb16f493643dc20f6837772))
+* **schedule:** add ScheduleHelper for recurring-job scheduling ([6890036](https://github.com/LindemannRock/craft-plugin-base/commit/68900366103a2551e06937406319442fc6c3e5f4))
+* **secret-reveal:** add one-time secret reveal component with copy functionality ([aae0237](https://github.com/LindemannRock/craft-plugin-base/commit/aae02372e139606a83e47e7cc0b02d1c60cdc59f))
+* **settings:** add various settings partials for plugin configuration ([7e610f0](https://github.com/LindemannRock/craft-plugin-base/commit/7e610f033ae2816dcae1fa0a320b4989ecd39882))
+* **testing:** add integration testing framework and bootstrap files ([781b433](https://github.com/LindemannRock/craft-plugin-base/commit/781b433db234fdc14d7bbefba3004bfa8eabb157))
+* **testing:** add StubConsoleRequest and StubWebRequest for testing ([09d2a0d](https://github.com/LindemannRock/craft-plugin-base/commit/09d2a0df142e38db41b47f4048c47637afa1c71a))
+* **tests:** add integration tests for various helper classes ([1bbf887](https://github.com/LindemannRock/craft-plugin-base/commit/1bbf887c729169e540ccaf0826b487d24865e154))
+* **traits:** add PluginNameSettingsTrait for centralized plugin name management ([b2edeae](https://github.com/LindemannRock/craft-plugin-base/commit/b2edeaee3c1a8609cffd30277ace30d3b3cb5025))
+
+
+### Fixed
+
+* **cp-table:** update new button permission check logic ([407ee5b](https://github.com/LindemannRock/craft-plugin-base/commit/407ee5bda7c05235621a42c75f4ef4d2f3e74214))
+* **i18n:** align 43 cross-plugin shared translations + IT "API Key" translation ([f365126](https://github.com/LindemannRock/craft-plugin-base/commit/f3651266c1c9a696d52d79a480e2b108a231ac3c))
+* **i18n:** correct German and Japanese translations for backup messages ([12aca74](https://github.com/LindemannRock/craft-plugin-base/commit/12aca748d735386684884bf9014c576cc6df5954))
+* **i18n:** correct German translation for "All time" string ([ed6b1c8](https://github.com/LindemannRock/craft-plugin-base/commit/ed6b1c8eac3efa3974cb9f60ebb7a4793afe3f8b))
+* **i18n:** correct Italian translation for API Key string ([166a1fb](https://github.com/LindemannRock/craft-plugin-base/commit/166a1fb7a02c5ec2a996a87fc452d9197116b923))
+* **traits:** update version annotation for DateFormatSettingsTrait ([bb59cd0](https://github.com/LindemannRock/craft-plugin-base/commit/bb59cd0fac423b8a3f61d1296f307caf09289a5d))
+* update info-box message to include global customization instructions ([9c2dc14](https://github.com/LindemannRock/craft-plugin-base/commit/9c2dc14517393ad82bc1549f27fbf3390e72bcd4))
+
+## [5.24.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.23.0...v5.24.0) - 2026-05-09
 
 
 ### Features
 
 * **boolean-helper:** add BooleanHelper for normalizing boolean-like values ([9a3578f](https://github.com/LindemannRock/craft-plugin-base/commit/9a3578f7b6a009b2e82908c420f4175d1e9a5e23))
 
-## [5.23.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.22.0...v5.23.0) (2026-05-06)
+## [5.23.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.22.0...v5.23.0) - 2026-05-06
 
 
 ### Features
@@ -24,7 +94,7 @@
 
 * **ExportHelper:** handle failure in reading generated ZIP file ([64c9e43](https://github.com/LindemannRock/craft-plugin-base/commit/64c9e43aea85fc2beb33bbbfa8b14d4db15243ad))
 
-## [5.22.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.21.0...v5.22.0) (2026-04-25)
+## [5.22.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.21.0...v5.22.0) - 2026-04-25
 
 
 ### Features
@@ -42,7 +112,7 @@
 * drop PAT requirement for release-please — use built-in GITHUB_TOKEN ([bafd0f6](https://github.com/LindemannRock/craft-plugin-base/commit/bafd0f6a9f3a387f58188e0c450b3c3fd9f3f00d))
 * **helper:** update version in applyConfigOverridesToSettings method ([c09cd6b](https://github.com/LindemannRock/craft-plugin-base/commit/c09cd6b77c151283f5680bb73bbbeff735cb93b9))
 
-## [5.21.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.1...v5.21.0) (2026-04-02)
+## [5.21.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.1...v5.21.0) - 2026-04-02
 
 
 ### Features
@@ -58,28 +128,28 @@
 * **ExportHelper:** update error message translation for export failure ([d5ca474](https://github.com/LindemannRock/craft-plugin-base/commit/d5ca4748d3aab6542dc7fcb184c063df2f395c58))
 * **install-experience:** translate static text in install experience ([5ffd896](https://github.com/LindemannRock/craft-plugin-base/commit/5ffd89655ea035409f207c932993c58abcc787c8))
 
-## [5.20.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.0...v5.20.1) (2026-03-26)
+## [5.20.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.20.0...v5.20.1) - 2026-03-26
 
 
 ### Bug Fixes
 
 * **badge:** add nowrap style to status label spans ([5b3e1d6](https://github.com/LindemannRock/craft-plugin-base/commit/5b3e1d60a6b0d41addb2a5a83fd3bba391bbc265))
 
-## [5.20.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.1...v5.20.0) (2026-03-17)
+## [5.20.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.1...v5.20.0) - 2026-03-17
 
 
 ### Features
 
 * **AnalyticsIpHelper:** add IP preprocessing and anonymization helper class ([e71a144](https://github.com/LindemannRock/craft-plugin-base/commit/e71a144014e143a0975e4dc240d945513f9a1d4b))
 
-## [5.19.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.0...v5.19.1) (2026-03-17)
+## [5.19.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.19.0...v5.19.1) - 2026-03-17
 
 
 ### Bug Fixes
 
 * **PluginHelper:** simplify global variable registration in Twig ([b988d8b](https://github.com/LindemannRock/craft-plugin-base/commit/b988d8bf3a2bc7aa34451cc69346b31e72d109aa))
 
-## [5.19.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.18.0...v5.19.0) (2026-03-17)
+## [5.19.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.18.0...v5.19.0) - 2026-03-17
 
 
 ### Features
@@ -94,7 +164,7 @@
 * **assets:** add package.json for asset management and build scripts ([dea148c](https://github.com/LindemannRock/craft-plugin-base/commit/dea148c4c14da9e78b882c0f6be3b57947a33830))
 * **package:** update dependencies and add build script ([91f847c](https://github.com/LindemannRock/craft-plugin-base/commit/91f847c50be5f9475f4b54cea1dc98d82860ff33))
 
-## [5.18.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.17.0...v5.18.0) (2026-03-04)
+## [5.18.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.17.0...v5.18.0) - 2026-03-04
 
 
 ### Features
@@ -116,7 +186,7 @@
 * **traits:** improve logging configuration in DeviceDetectionTrait ([c941435](https://github.com/LindemannRock/craft-plugin-base/commit/c941435e37137b903199d0831b446eb05f0d965f))
 * **validators:** enhance StoragePathValidator error handling ([ccf5f1d](https://github.com/LindemannRock/craft-plugin-base/commit/ccf5f1dbf3af74fa2cbeae147670c4d414476184))
 
-## [5.17.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.16.0...v5.17.0) (2026-02-22)
+## [5.17.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.16.0...v5.17.0) - 2026-02-22
 
 
 ### Features
@@ -139,7 +209,7 @@
 * **SettingsDisplayNameTrait:** update display name exceptions ([ad35df0](https://github.com/LindemannRock/craft-plugin-base/commit/ad35df0455d79e3269b6515f1120805e926298c3))
 * **SettingsPersistenceTrait:** handle JSON encoding errors in saveToDatabase ([03d2e5e](https://github.com/LindemannRock/craft-plugin-base/commit/03d2e5e7615a2feeba1fc2bc2848ae1415890bdd))
 
-## [5.16.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.15.0...v5.16.0) (2026-02-17)
+## [5.16.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.15.0...v5.16.0) - 2026-02-17
 
 
 ### Features
@@ -161,7 +231,7 @@
 
 * add .gitattributes with export-ignore for Packagist distribution ([a824c9f](https://github.com/LindemannRock/craft-plugin-base/commit/a824c9f76595acffa55dbfa254a170dd42cb34a7))
 
-## [5.15.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.14.0...v5.15.0) (2026-02-07)
+## [5.15.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.14.0...v5.15.0) - 2026-02-07
 
 
 ### Features
@@ -169,7 +239,7 @@
 * Add DateFormatHelper and DbHelper for date and database operations ([34eb74b](https://github.com/LindemannRock/craft-plugin-base/commit/34eb74b5c92610f1164b74a329b1072b435e1da9))
 * **DbHelper:** enhance jsonExtract and add groupConcat for DB-agnostic SQL ([25fbfb8](https://github.com/LindemannRock/craft-plugin-base/commit/25fbfb836cf4e71fbbc71ebae7e785e0c294958d))
 
-## [5.14.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.13.0...v5.14.0) (2026-02-05)
+## [5.14.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.13.0...v5.14.0) - 2026-02-05
 
 
 ### Features
@@ -206,7 +276,7 @@
 * **composer:** update matomo/device-detector dependency to ^6.4 ([7a56ba2](https://github.com/LindemannRock/craft-plugin-base/commit/7a56ba2f989345133f74408f64f280fb2a7c1b8c))
 * **PluginHelper:** update version annotation for getCacheKeySet method to 5.14.0 ([fcad3c8](https://github.com/LindemannRock/craft-plugin-base/commit/fcad3c84adbb75f29146662f843afeed71b04c99))
 
-## [5.13.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.12.0...v5.13.0) (2026-01-28)
+## [5.13.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.12.0...v5.13.0) - 2026-01-28
 
 
 ### Features
@@ -217,7 +287,7 @@
 * **phone-input:** add reusable phone input component with country code detection ([bb74180](https://github.com/LindemannRock/craft-plugin-base/commit/bb74180583c195fdb22dcf5a0513dafeb7bb6aa8))
 * **table:** enhance bulk actions and item selection logic ([575ed24](https://github.com/LindemannRock/craft-plugin-base/commit/575ed248717e22e8cbd2da24a81243a016e333a8))
 
-## [5.12.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.11.0...v5.12.0) (2026-01-28)
+## [5.12.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.11.0...v5.12.0) - 2026-01-28
 
 
 ### Features
@@ -229,21 +299,21 @@
 
 * add phpspreadsheet ^5.0 support for Craft 5.9 compatibility ([4e4c596](https://github.com/LindemannRock/craft-plugin-base/commit/4e4c59688fcbc236b2da569340cc053f39adf806))
 
-## [5.11.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.1...v5.11.0) (2026-01-27)
+## [5.11.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.1...v5.11.0) - 2026-01-27
 
 
 ### Features
 
 * add message status colors to ColorHelper ([13a8bfc](https://github.com/LindemannRock/craft-plugin-base/commit/13a8bfc9bfe63b33ad123600e8ea64214b919626))
 
-## [5.10.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.0...v5.10.1) (2026-01-26)
+## [5.10.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.10.0...v5.10.1) - 2026-01-26
 
 
 ### Bug Fixes
 
 * remove premature getTwig call in Twig extension registration ([36f07f4](https://github.com/LindemannRock/craft-plugin-base/commit/36f07f458a1fabfce95e60b05dc2f1d1c4256972))
 
-## [5.10.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.9.0...v5.10.0) (2026-01-26)
+## [5.10.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.9.0...v5.10.0) - 2026-01-26
 
 
 ### Features
@@ -261,21 +331,21 @@
 * plugin status colors with additional dot indicators for active, disabled, and not installed states ([9a41f7f](https://github.com/LindemannRock/craft-plugin-base/commit/9a41f7f31dada2aff2ffe1989d9cc0ce0ee06ca9))
 * **security:** address export and config vulnerabilities in base plugin ([1224bf0](https://github.com/LindemannRock/craft-plugin-base/commit/1224bf07e231a492491e2242883228c1db6be353))
 
-## [5.9.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.8.0...v5.9.0) (2026-01-24)
+## [5.9.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.8.0...v5.9.0) - 2026-01-24
 
 
 ### Features
 
 * add export format options and enhance sidebar content in templates ([bd9e5b8](https://github.com/LindemannRock/craft-plugin-base/commit/bd9e5b809e5b5fcb0c1e8f19ca6480f0f1932953))
 
-## [5.8.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.7.0...v5.8.0) (2026-01-24)
+## [5.8.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.7.0...v5.8.0) - 2026-01-24
 
 
 ### Features
 
 * add centralized helpers, reusable CP layouts, and export functionality ([1c1eb7d](https://github.com/LindemannRock/craft-plugin-base/commit/1c1eb7d50094038870c5902dfbabf3537fad1e07))
 
-## [5.7.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.6.0...v5.7.0) (2026-01-21)
+## [5.7.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.6.0...v5.7.0) - 2026-01-21
 
 
 ### Features
@@ -284,7 +354,7 @@
 * enhance info-box component with additional options and styling ([855e1fc](https://github.com/LindemannRock/craft-plugin-base/commit/855e1fcd24b8d6d09bf224dbe0f7142a7fcad842))
 * implement geo IP lookup and provider configuration classes ([9ffc6a6](https://github.com/LindemannRock/craft-plugin-base/commit/9ffc6a63c6f42b3d9a3ca62da11fde66a38ca080))
 
-## [5.6.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.5.0...v5.6.0) (2026-01-18)
+## [5.6.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.5.0...v5.6.0) - 2026-01-18
 
 
 ### Features
@@ -292,7 +362,7 @@
 * add stretch option to info-box component for full-width display ([25570cb](https://github.com/LindemannRock/craft-plugin-base/commit/25570cbaaa20a700c5ad057ff3df0f938b870073))
 * enhance info-box component with margin and background options ([bf1eb6a](https://github.com/LindemannRock/craft-plugin-base/commit/bf1eb6aa9897dcc5b6d8a62996a5d20f7c4ce7a6))
 
-## [5.5.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.4.0...v5.5.0) (2026-01-16)
+## [5.5.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.4.0...v5.5.0) - 2026-01-16
 
 
 ### Features
@@ -313,14 +383,14 @@
 
 * add cache path helpers for consistent plugin caching structure ([a81696c](https://github.com/LindemannRock/craft-plugin-base/commit/a81696ccf2de86bbddd49c93acc208719ea1da54))
 
-## [5.4.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.3.0...v5.4.0) (2026-01-12)
+## [5.4.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.3.0...v5.4.0) - 2026-01-12
 
 
 ### Features
 
 * enhance getDisplayName method to preserve acronyms during singularization ([f664813](https://github.com/LindemannRock/craft-plugin-base/commit/f66481306104ebb972e0701ccb1cef7b00cb4f7d))
 
-## [5.3.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.2.0...v5.3.0) (2026-01-10)
+## [5.3.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.2.0...v5.3.0) - 2026-01-10
 
 
 ### Features
@@ -332,21 +402,21 @@
 
 * update README to include GeoHelper usage and functionality ([949d764](https://github.com/LindemannRock/craft-plugin-base/commit/949d764c767c5f02007828e21ce9fcc93c92b803))
 
-## [5.2.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.1.0...v5.2.0) (2026-01-06)
+## [5.2.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.1.0...v5.2.0) - 2026-01-06
 
 
 ### Features
 
 * register global variable directly via Twig in PluginHelper ([35e31b2](https://github.com/LindemannRock/craft-plugin-base/commit/35e31b2fcdacb90b1537ee48e150d9d3d8acc76c))
 
-## [5.1.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.0.0...v5.1.0) (2026-01-05)
+## [5.1.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.0.0...v5.1.0) - 2026-01-05
 
 
 ### Features
 
 * add floatFields method for type conversion in SettingsPersistenceTrait ([180b8b2](https://github.com/LindemannRock/craft-plugin-base/commit/180b8b2694a1134d2e85c9cff98facada6e07d56))
 
-## 5.0.0 (2026-01-05)
+## 5.0.0 - 2026-01-05
 
 
 ### Features
