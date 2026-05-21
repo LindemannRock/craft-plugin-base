@@ -9,7 +9,6 @@
 namespace lindemannrock\base\geo;
 
 use Craft;
-use lindemannrock\logginglibrary\traits\LoggingTrait;
 
 /**
  * Geo Lookup
@@ -35,7 +34,7 @@ use lindemannrock\logginglibrary\traits\LoggingTrait;
  */
 class GeoLookup
 {
-    use LoggingTrait;
+    private const LOG_CATEGORY = 'lindemannrock-base';
 
     /**
      * @var array<string, mixed>
@@ -52,6 +51,7 @@ class GeoLookup
      *   - provider: Provider name (default: 'ip-api.com')
      *   - apiKey: API key for paid tiers (default: null)
      *   - timeout: Request timeout in seconds (default: 2)
+     *   - logCategory: Craft log category for geo lookup warnings (default: 'lindemannrock-base')
      */
     public function __construct(array $config = [])
     {
@@ -60,8 +60,6 @@ class GeoLookup
             'apiKey' => null,
             'timeout' => 2,
         ], $config);
-
-        $this->setLoggingHandle('base');
     }
 
     /**
@@ -85,9 +83,13 @@ class GeoLookup
 
             // Warn once per request if using HTTP
             if (str_starts_with($url, 'http://') && !self::$httpWarningLogged) {
-                $this->logWarning('Geo lookup using HTTP - IP addresses exposed in transit. Consider HTTPS provider.', [
-                    'provider' => $this->config['provider'],
-                ]);
+                Craft::warning(
+                    $this->formatLogMessage(
+                        'Geo lookup using HTTP - IP addresses exposed in transit. Consider HTTPS provider.',
+                        ['provider' => $this->config['provider']],
+                    ),
+                    $this->getLogCategory()
+                );
                 self::$httpWarningLogged = true;
             }
 
@@ -99,7 +101,7 @@ class GeoLookup
 
             return $this->normalizeResponse($response);
         } catch (\Throwable $e) {
-            $this->logWarning('Geo lookup failed', ['error' => $e->getMessage()]);
+            Craft::warning($this->formatLogMessage('Geo lookup failed', ['error' => $e->getMessage()]), $this->getLogCategory());
             return null;
         }
     }
@@ -156,9 +158,34 @@ class GeoLookup
             $data = json_decode($body, true);
             return is_array($data) ? $data : null;
         } catch (\Throwable $e) {
-            $this->logDebug('Geo fetch failed', ['url' => $this->sanitizeUrl($url), 'error' => $e->getMessage()]);
+            Craft::debug(
+                $this->formatLogMessage('Geo fetch failed', [
+                    'url' => $this->sanitizeUrl($url),
+                    'error' => $e->getMessage(),
+                ]),
+                $this->getLogCategory()
+            );
             return null;
         }
+    }
+
+    private function getLogCategory(): string
+    {
+        $category = $this->config['logCategory'] ?? null;
+
+        return is_string($category) && $category !== '' ? $category : self::LOG_CATEGORY;
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function formatLogMessage(string $message, array $params = []): string
+    {
+        if (empty($params)) {
+            return $message;
+        }
+
+        return $message . ' | ' . json_encode($params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**
