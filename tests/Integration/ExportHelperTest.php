@@ -10,9 +10,17 @@ declare(strict_types=1);
 
 namespace lindemannrock\base\tests\Integration;
 
+use Craft;
+use craft\web\Response as WebResponse;
+use DateTime;
+use DateTimeZone;
+use lindemannrock\base\helpers\DateFormatHelper;
 use lindemannrock\base\helpers\ExportHelper;
 use lindemannrock\base\testing\IntegrationTestCase;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use ReflectionClass;
+use ZipArchive;
 
 /**
  * Pins the contract for {@see ExportHelper::getConfig()} — the 4-layer cascade
@@ -36,9 +44,14 @@ use ReflectionClass;
  */
 final class ExportHelperTest extends IntegrationTestCase
 {
+    private object $originalResponse;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->originalResponse = Craft::$app->getResponse();
+        Craft::$app->set('response', new WebResponse());
+
         // Each test starts from an empty cache so on-disk config (if any)
         // re-resolves cleanly per case.
         ExportHelper::clearConfigCache();
@@ -47,6 +60,8 @@ final class ExportHelperTest extends IntegrationTestCase
     protected function tearDown(): void
     {
         ExportHelper::clearConfigCache();
+        Craft::$app->set('response', $this->originalResponse);
+
         parent::tearDown();
     }
 
@@ -144,6 +159,227 @@ final class ExportHelperTest extends IntegrationTestCase
         self::assertEqualsCanonicalizing(['csv', 'excel'], ExportHelper::getEnabledFormats());
     }
 
+    public function testCsvContentQuotesCommasQuotesAndNewlines(): void
+    {
+        $csv = ExportHelper::csvContent(
+            [
+                [
+                    'name' => 'Alice',
+                    'note' => "comma, quote \" and\nnewline",
+                    'score' => 42,
+                ],
+            ],
+            ['Name', 'Note', 'Score'],
+        );
+
+        self::assertSame(
+            "Name,Note,Score\nAlice,\"comma, quote \"\" and\nnewline\",42\n",
+            $csv,
+        );
+    }
+
+    public function testCsvContentSanitizesFormulaInjectionValues(): void
+    {
+        $csv = ExportHelper::csvContent(
+            [
+                ['value' => '=cmd|calc'],
+                ['value' => '+SUM(A1:A2)'],
+                ['value' => '-SUM(A1:A2)'],
+                ['value' => '@HYPERLINK("https://example.test")'],
+                ['value' => "\t=tab-prefixed"],
+                ['value' => "\r=carriage-return-prefixed"],
+                ['value' => "\n=newline-prefixed"],
+                ['value' => '+123'],
+                ['value' => '-123.45'],
+            ],
+            ['Value'],
+        );
+
+        self::assertSame(
+            [
+                ['Value'],
+                ["'=cmd|calc"],
+                ["'+SUM(A1:A2)"],
+                ["'-SUM(A1:A2)"],
+                ['\'@HYPERLINK("https://example.test")'],
+                ["'\t=tab-prefixed"],
+                ["'\r=carriage-return-prefixed"],
+                ["'\n=newline-prefixed"],
+                ['+123'],
+                ['-123.45'],
+            ],
+            self::parseCsv($csv),
+        );
+    }
+
+    public function testIsDangerousValueAllowsSignedNumericValuesOnly(): void
+    {
+        self::assertFalse(ExportHelper::isDangerousValue('+123'));
+        self::assertFalse(ExportHelper::isDangerousValue('-123'));
+        self::assertFalse(ExportHelper::isDangerousValue('+12.5'));
+        self::assertFalse(ExportHelper::isDangerousValue('-12,5'));
+
+        self::assertTrue(ExportHelper::isDangerousValue('+foo'));
+        self::assertTrue(ExportHelper::isDangerousValue('-foo'));
+        self::assertTrue(ExportHelper::isDangerousValue('  +foo'));
+        self::assertTrue(ExportHelper::isDangerousValue('  =SUM(A1:A2)'));
+    }
+
+    public function testDateColumnFormattingUsesDatabaseStringsForCsvExcelAndApiStringsForJson(): void
+    {
+        $rows = [
+            [
+                'label' => 'sent',
+                'dateCreated' => '2026-05-22 10:15:30',
+                'untouched' => null,
+            ],
+        ];
+
+        $localDate = DateFormatHelper::toCraftTimezone($rows[0]['dateCreated']);
+
+        self::assertInstanceOf(DateTime::class, $localDate);
+        self::assertSame(
+            [
+                [
+                    'label' => 'sent',
+                    'dateCreated' => DateFormatHelper::toDateTimeString($localDate),
+                    'untouched' => null,
+                ],
+            ],
+            ExportHelper::formatDateColumns($rows, ['dateCreated', 'untouched']),
+        );
+        self::assertSame(
+            [
+                [
+                    'label' => 'sent',
+                    'dateCreated' => DateFormatHelper::toApiString($localDate),
+                    'untouched' => null,
+                ],
+            ],
+            ExportHelper::formatDateColumnsForApi($rows, ['dateCreated', 'untouched']),
+        );
+    }
+
+    public function testToJsonFormatsDateColumnsAndSetsDownloadHeaders(): void
+    {
+        $response = ExportHelper::toJson(
+            [
+                [
+                    'name' => 'München',
+                    'dateCreated' => '2026-05-22 10:15:30',
+                ],
+            ],
+            "../unsafe\nname.json",
+            ['dateCreated'],
+        );
+
+        $decoded = json_decode((string)$response->content, true);
+        $localDate = DateFormatHelper::toCraftTimezone('2026-05-22 10:15:30');
+
+        self::assertIsArray($decoded);
+        self::assertInstanceOf(DateTime::class, $localDate);
+        self::assertSame('München', $decoded[0]['name']);
+        self::assertSame(DateFormatHelper::toApiString($localDate), $decoded[0]['dateCreated']);
+        self::assertSame('application/json; charset=utf-8', $response->headers->get('Content-Type'));
+        self::assertSame('attachment; filename="unsafename.json"', $response->headers->get('Content-Disposition'));
+    }
+
+    public function testToCsvSetsHeadersAndSanitizesFilename(): void
+    {
+        $response = ExportHelper::toCsv(
+            [['name' => 'Alice']],
+            ['Name'],
+            "../unsafe\rname.csv",
+        );
+
+        self::assertSame("Name\nAlice\n", $response->content);
+        self::assertSame('text/csv; charset=utf-8', $response->headers->get('Content-Type'));
+        self::assertSame('attachment; filename="unsafename.csv"', $response->headers->get('Content-Disposition'));
+    }
+
+    public function testExcelContentFormatsDatesAndWritesDangerousValuesAsStrings(): void
+    {
+        $rows = [
+            [
+                'label' => '=SUM(A1:A2)',
+                'dateCreated' => '2026-05-22 10:15:30',
+            ],
+        ];
+        $content = ExportHelper::excelContent(
+            $rows,
+            ['Label', 'Date Created'],
+            ['dateCreated'],
+            ['sheetTitle' => 'Dangerous / Dates'],
+        );
+        $tempFile = self::writeTempFile($content, 'xlsx');
+
+        try {
+            $spreadsheet = IOFactory::load($tempFile);
+            $sheet = $spreadsheet->getActiveSheet();
+            $localDate = DateFormatHelper::toCraftTimezone($rows[0]['dateCreated']);
+
+            self::assertInstanceOf(DateTime::class, $localDate);
+            self::assertSame('Dangerous - Dates', $sheet->getTitle());
+            self::assertSame('Label', $sheet->getCell('A1')->getValue());
+            self::assertSame('=SUM(A1:A2)', $sheet->getCell('A2')->getValue());
+            self::assertSame(DataType::TYPE_STRING, $sheet->getCell('A2')->getDataType());
+            self::assertSame(DateFormatHelper::toDateTimeString($localDate), $sheet->getCell('B2')->getValue());
+
+            $spreadsheet->disconnectWorksheets();
+        } finally {
+            @unlink($tempFile);
+        }
+    }
+
+    public function testToZipIncludesNamedAndKeyedFilesAndAddsZipExtension(): void
+    {
+        $response = ExportHelper::toZip(
+            [
+                ['name' => 'summary.csv', 'content' => "Name\nAlice\n"],
+                'raw/data.json' => '{"ok":true}',
+            ],
+            'exports',
+        );
+        $tempFile = self::writeTempFile((string)$response->content, 'zip');
+        $zip = new ZipArchive();
+
+        try {
+            self::assertSame('application/zip; charset=utf-8', $response->headers->get('Content-Type'));
+            self::assertSame('attachment; filename="exports.zip"', $response->headers->get('Content-Disposition'));
+            self::assertTrue($zip->open($tempFile));
+            self::assertSame("Name\nAlice\n", $zip->getFromName('summary.csv'));
+            self::assertSame('{"ok":true}', $zip->getFromName('raw/data.json'));
+        } finally {
+            $zip->close();
+            @unlink($tempFile);
+        }
+    }
+
+    public function testFilenameSupportsExactPrefixAndSettingsPatterns(): void
+    {
+        $before = time();
+        $settings = new class {
+            public function getLowerDisplayName(): string
+            {
+                return 'Search Manager';
+            }
+        };
+
+        self::assertSame('exact-name.csv', ExportHelper::filename('exact-name.csv'));
+
+        $simple = ExportHelper::filename('logs', 'csv');
+        $withParts = ExportHelper::filename($settings, ['analytics', null, 'last30days'], 'xlsx');
+        $after = time();
+
+        self::assertMatchesRegularExpression('/^logs-\d{4}-\d{2}-\d{2}-\d{6}\.csv$/', $simple);
+        self::assertMatchesRegularExpression(
+            '/^search-manager-analytics-last30days-\d{4}-\d{2}-\d{2}-\d{6}\.xlsx$/',
+            $withParts,
+        );
+        self::assertTimestampInRange($simple, 'logs-', '.csv', $before, $after);
+        self::assertTimestampInRange($withParts, 'search-manager-analytics-last30days-', '.xlsx', $before, $after);
+    }
+
     // ---------------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------------
@@ -172,5 +408,54 @@ final class ExportHelperTest extends IntegrationTestCase
     {
         $property = (new ReflectionClass(ExportHelper::class))->getProperty('configCache');
         $property->setValue(null, $value);
+    }
+
+    /**
+     * @return list<list<string|null>>
+     */
+    private static function parseCsv(string $csv): array
+    {
+        $stream = fopen('php://temp', 'r+');
+        self::assertIsResource($stream);
+        fwrite($stream, $csv);
+        rewind($stream);
+
+        $rows = [];
+        while (($row = fgetcsv($stream)) !== false) {
+            $rows[] = $row;
+        }
+        fclose($stream);
+
+        return $rows;
+    }
+
+    private static function writeTempFile(string $content, string $extension): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'export_helper_test_');
+        self::assertIsString($path);
+        $target = $path . '.' . $extension;
+        rename($path, $target);
+        file_put_contents($target, $content);
+
+        return $target;
+    }
+
+    private static function assertTimestampInRange(
+        string $filename,
+        string $prefix,
+        string $suffix,
+        int $before,
+        int $after,
+    ): void {
+        $timestamp = substr($filename, strlen($prefix), -strlen($suffix));
+        $date = DateTime::createFromFormat(
+            'Y-m-d-His',
+            $timestamp,
+            new DateTimeZone(Craft::$app->getTimeZone()),
+        );
+
+        self::assertInstanceOf(DateTime::class, $date);
+        self::assertGreaterThanOrEqual($before, $date->getTimestamp());
+        self::assertLessThanOrEqual($after, $date->getTimestamp());
     }
 }
