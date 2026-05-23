@@ -34,7 +34,7 @@ final class ColorHelperTest extends IntegrationTestCase
         $names = ColorHelper::getPaletteColorNames();
 
         // Palette is the documented 18-color set. If a future PR adds or
-        // removes a color this test fires so docs/CLAUDE.md can be updated
+        // removes a color this test fires so the docs can be updated
         // alongside the change.
         self::assertCount(18, $names);
         self::assertContains('emerald', $names);
