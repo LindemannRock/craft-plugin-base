@@ -12,6 +12,7 @@ namespace lindemannrock\base\tests\Integration;
 
 use DateTime;
 use DateTimeZone;
+use InvalidArgumentException;
 use lindemannrock\base\helpers\ScheduleHelper;
 use lindemannrock\base\testing\IntegrationTestCase;
 
@@ -70,13 +71,58 @@ final class ScheduleHelperTest extends IntegrationTestCase
         self::assertSame(0, ScheduleHelper::calculateDelaySeconds('disabled', $from));
         self::assertSame(0, ScheduleHelper::calculateDelaySeconds('arbitrary', $from));
 
-        // The valid set is the documented allowlist — 10 identifiers excluding
-        // 'disabled'. Pin the count so a future addition shows up in this test
-        // and can be evaluated as an intentional schedule, not a typo.
+        // The valid set is the documented allowlist. Pin the count so a future
+        // addition shows up in this test and can be evaluated as an intentional
+        // schedule, not a typo.
         $valid = ScheduleHelper::getValidValues();
+        self::assertContains('every15minutes', $valid);
+        self::assertContains('hourly', $valid);
         self::assertContains('daily2am', $valid);
         self::assertContains('disabled', $valid);
+        self::assertContains('every2weeks', $valid);
         self::assertContains('yearly', $valid);
-        self::assertCount(11, $valid);
+        self::assertCount(18, $valid);
+    }
+
+    public function testMinuteAndHourIntervalsUseTheNextFixedSlot(): void
+    {
+        $from = new DateTime('2026-05-16 10:15:00', new DateTimeZone('UTC'));
+
+        $nextQuarter = ScheduleHelper::calculateNext('every15minutes', $from);
+        self::assertNotNull($nextQuarter);
+        self::assertSame('2026-05-16 10:30:00', $nextQuarter->format('Y-m-d H:i:s'));
+
+        $afterQuarter = new DateTime('2026-05-16 10:16:00', new DateTimeZone('UTC'));
+        $nextHalf = ScheduleHelper::calculateNext('every30minutes', $afterQuarter);
+        self::assertNotNull($nextHalf);
+        self::assertSame('2026-05-16 10:30:00', $nextHalf->format('Y-m-d H:i:s'));
+
+        $nextTwoHours = ScheduleHelper::calculateNext('every2hours', $from);
+        self::assertNotNull($nextTwoHours);
+        self::assertSame('2026-05-16 12:00:00', $nextTwoHours->format('Y-m-d H:i:s'));
+    }
+
+    public function testCuratedOptionsPreserveRequestedOrderAndRejectUnknownValues(): void
+    {
+        $options = ScheduleHelper::getOptions(['daily', 'disabled', 'weekly']);
+
+        self::assertSame([
+            ['value' => 'daily', 'label' => 'Daily'],
+            ['value' => 'disabled', 'label' => 'Disabled'],
+            ['value' => 'weekly', 'label' => 'Weekly'],
+        ], $options);
+
+        self::assertSame(
+            ['hourly' => 'Hourly', 'monthly' => 'Monthly'],
+            ScheduleHelper::getOptions(['hourly', 'monthly'], 'assoc')
+        );
+
+        self::assertSame(
+            ['every15minutes', 'daily2am'],
+            ScheduleHelper::getValidValues(['every15minutes', 'daily2am'])
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        ScheduleHelper::getOptions(['daily', 'manual']);
     }
 }

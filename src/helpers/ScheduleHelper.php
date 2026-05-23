@@ -10,6 +10,7 @@ namespace lindemannrock\base\helpers;
 
 use Craft;
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * Schedule Helper
@@ -20,11 +21,18 @@ use DateTime;
  *
  * Schedule identifiers:
  * - 'disabled'       — no automatic schedule
+ * - 'every15minutes' — every 15 minutes
+ * - 'every30minutes' — every 30 minutes
+ * - 'hourly'         — every hour
+ * - 'every2hours'    — 00:00, 02:00, 04:00, ...
+ * - 'every3hours'    — 00:00, 03:00, 06:00, ...
+ * - 'every4hours'    — 00:00, 04:00, 08:00, ...
  * - 'every6hours'    — 00:00, 06:00, 12:00, 18:00
  * - 'every12hours'   — 00:00, 12:00
  * - 'daily'          — 00:00
  * - 'daily2am'       — 02:00
  * - 'weekly'         — configured Craft week-start day at 00:00
+ * - 'every2weeks'    — same weekday + time as the starting point, +2 weeks
  * - 'monthly'        — same day-of-month + time as the starting point
  * - 'every2months'   — same as monthly, +2
  * - 'quarterly'      — same as monthly, +3
@@ -36,28 +44,57 @@ use DateTime;
 class ScheduleHelper
 {
     /**
+     * Schedule labels keyed by canonical schedule identifier.
+     */
+    private const LABELS = [
+        'disabled' => 'Disabled',
+        'every15minutes' => 'Every 15 Minutes',
+        'every30minutes' => 'Every 30 Minutes',
+        'hourly' => 'Hourly',
+        'every2hours' => 'Every 2 Hours',
+        'every3hours' => 'Every 3 Hours',
+        'every4hours' => 'Every 4 Hours',
+        'every6hours' => 'Every 6 Hours',
+        'every12hours' => 'Every 12 Hours',
+        'daily' => 'Daily',
+        'daily2am' => 'Daily at 2:00 AM',
+        'weekly' => 'Weekly',
+        'every2weeks' => 'Every 2 Weeks',
+        'monthly' => 'Monthly',
+        'every2months' => 'Every 2 Months',
+        'quarterly' => 'Quarterly',
+        'every6months' => 'Every 6 Months',
+        'yearly' => 'Yearly',
+    ];
+
+    /**
      * Get standard schedule options for dropdowns.
      *
-     * Returns an array of options suitable for Twig templates.
+     * Returns an array of options suitable for Twig templates. Pass an
+     * explicit value list for curated plugin UIs; omit it to get every
+     * canonical option.
      *
+     * @param array<string>|string $valuesOrFormat Schedule values, or 'array'/'assoc' for backwards compatibility
      * @param string $format 'array' returns [{value, label}], 'assoc' returns {value: label}
      * @return array
      */
-    public static function getOptions(string $format = 'array'): array
+    public static function getOptions(array|string $valuesOrFormat = 'array', string $format = 'array'): array
     {
-        $options = [
-            'disabled' => Craft::t('lindemannrock-base', 'Disabled'),
-            'every6hours' => Craft::t('lindemannrock-base', 'Every 6 Hours'),
-            'every12hours' => Craft::t('lindemannrock-base', 'Every 12 Hours'),
-            'daily' => Craft::t('lindemannrock-base', 'Daily'),
-            'daily2am' => Craft::t('lindemannrock-base', 'Daily at 2:00 AM'),
-            'weekly' => Craft::t('lindemannrock-base', 'Weekly'),
-            'monthly' => Craft::t('lindemannrock-base', 'Monthly'),
-            'every2months' => Craft::t('lindemannrock-base', 'Every 2 Months'),
-            'quarterly' => Craft::t('lindemannrock-base', 'Quarterly'),
-            'every6months' => Craft::t('lindemannrock-base', 'Every 6 Months'),
-            'yearly' => Craft::t('lindemannrock-base', 'Yearly'),
-        ];
+        if (is_string($valuesOrFormat)) {
+            $format = $valuesOrFormat;
+            $values = array_keys(self::LABELS);
+        } else {
+            $values = $valuesOrFormat;
+        }
+
+        $options = [];
+        foreach ($values as $value) {
+            if (!array_key_exists($value, self::LABELS)) {
+                throw new InvalidArgumentException(sprintf('Unknown schedule value "%s".', $value));
+            }
+
+            $options[$value] = Craft::t('lindemannrock-base', self::LABELS[$value]);
+        }
 
         if ($format === 'assoc') {
             return $options;
@@ -71,15 +108,21 @@ class ScheduleHelper
     }
 
     /**
-     * Get the list of valid schedule identifiers (excluding 'disabled').
+     * Get the list of valid schedule identifiers.
      *
      * Useful for `in` validators on Settings models.
      *
+     * @param array<string>|null $values Optional curated values to validate
      * @return string[]
      */
-    public static function getValidValues(): array
+    public static function getValidValues(?array $values = null): array
     {
-        return array_keys(self::getOptions('assoc'));
+        if ($values === null) {
+            return array_keys(self::LABELS);
+        }
+
+        self::getOptions($values, 'assoc');
+        return $values;
     }
 
     /**
@@ -103,11 +146,18 @@ class ScheduleHelper
         $from = $from ?? DateFormatHelper::now();
 
         return match ($schedule) {
+            'every15minutes' => self::getNextMinuteInterval($from, 15),
+            'every30minutes' => self::getNextMinuteInterval($from, 30),
+            'hourly' => self::getNextMinuteInterval($from, 60),
+            'every2hours' => self::getNextFixedHour($from, [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]),
+            'every3hours' => self::getNextFixedHour($from, [0, 3, 6, 9, 12, 15, 18, 21]),
+            'every4hours' => self::getNextFixedHour($from, [0, 4, 8, 12, 16, 20]),
             'every6hours' => self::getNextFixedHour($from, [0, 6, 12, 18]),
             'every12hours' => self::getNextFixedHour($from, [0, 12]),
             'daily' => self::getNextFixedHour($from, [0]),
             'daily2am' => self::getNextFixedHour($from, [2]),
             'weekly' => self::getNextWeekday($from, self::getWeekStartIsoDay()),
+            'every2weeks' => (clone $from)->modify('+2 weeks'),
             'monthly' => self::addMonthsClamped($from, 1),
             'every2months' => self::addMonthsClamped($from, 2),
             'quarterly' => self::addMonthsClamped($from, 3),
@@ -115,6 +165,24 @@ class ScheduleHelper
             'yearly' => self::addMonthsClamped($from, 12),
             default => null,
         };
+    }
+
+    /**
+     * Get the next occurrence of a minute interval.
+     */
+    private static function getNextMinuteInterval(DateTime $from, int $minutes): DateTime
+    {
+        $next = (clone $from)->setTime(
+            (int) $from->format('G'),
+            (int) floor((int) $from->format('i') / $minutes) * $minutes,
+            0
+        );
+
+        while ($next <= $from) {
+            $next->modify("+{$minutes} minutes");
+        }
+
+        return $next;
     }
 
     /**
