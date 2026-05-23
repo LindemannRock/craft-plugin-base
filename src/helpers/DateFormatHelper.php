@@ -553,23 +553,6 @@ class DateFormatHelper
     }
 
     /**
-     * Format short date for charts/compact display
-     *
-     * @param DateTime|string|null $date
-     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
-     * @return string|null Example: "Jan 22"
-     */
-    public static function formatShortDate(DateTime|string|null $date, bool $isUtc = true): ?string
-    {
-        $date = self::toCraftTimezone($date, $isUtc);
-        if ($date === null) {
-            return null;
-        }
-
-        return $date->format('M j');  // Jan 22
-    }
-
-    /**
      * Format relative time (e.g., "2 hours ago")
      *
      * @param DateTime|string|null $date
