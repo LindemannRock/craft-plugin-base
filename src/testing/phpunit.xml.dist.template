@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copy this file to your plugin's root as `phpunit.xml.dist`. Adjust suite
-    directories if your plugin has non-standard layout. See
-    `plugins/_docs/guides/testing.md` for the full setup recipe.
+    directories if your plugin has non-standard layout.
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
