@@ -14,7 +14,7 @@ A set of seven traits and their companion CP partials that centralize the duplic
 
 ## Adopting the patterns
 
-The full per-plugin walkthrough lives in [`../../../_docs/guides/base-settings-rollout-prompt.md`](../../../_docs/guides/base-settings-rollout-prompt.md). The cross-plugin progress tracker is at [`../../../_docs/rollouts/base-settings.md`](../../../_docs/rollouts/base-settings.md). Two working reference plugins:
+The full per-plugin walkthrough lives in [`../../../_docs/rollouts/completed/base-settings/prompt.md`](../../../_docs/rollouts/completed/base-settings/prompt.md). The cross-plugin progress tracker is at [`../../../_docs/rollouts/completed/base-settings/tracker.md`](../../../_docs/rollouts/completed/base-settings/tracker.md). Two working reference plugins:
 
 - **`search-manager`** — full coverage of all 6 patterns end-to-end. Canonical example for any pattern.
 - **`logging-library`** — narrower (3 of 6). Demonstrates the `excludeFromSave()` subset-of-trait-fields trick and the pre-launch-with-migrations exception.
@@ -390,5 +390,5 @@ The only plugin-specific translation surface that survives is plugin-specific in
 - [SettingsConfigTrait](settings-config.md) — provides `isOverriddenByConfig()` + `validateLogLevel`; required by every cascade trait + the log-level trait
 - [SettingsPersistenceTrait](settings-persistence.md) — DB-backed Settings models; required by every plugin that adopts these traits
 - [SettingsDisplayNameTrait](settings-display-name.md) — pairs with `PluginNameSettingsTrait`
-- [Rollout prompt](../../../_docs/guides/base-settings-rollout-prompt.md) — per-plugin adoption walkthrough
-- [Rollout tracker](../../../_docs/rollouts/base-settings.md) — cross-plugin progress
+- [Rollout prompt](../../../_docs/rollouts/completed/base-settings/prompt.md) — per-plugin adoption walkthrough
+- [Rollout tracker](../../../_docs/rollouts/completed/base-settings/tracker.md) — cross-plugin progress

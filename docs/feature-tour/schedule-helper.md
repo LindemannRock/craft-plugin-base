@@ -118,7 +118,7 @@ if ($delay > 0) {
 
 ## Typical Job + Bootstrap Pattern
 
-The full pattern wires four pieces together: settings model, settings UI, the recurring job, and the plugin bootstrap. See the [Scheduler Migration Guide](../../../_docs/guides/scheduler-rollout-prompt.md) for the migration checklist. No shipped plugin is the canonical reference yet; the first migrated plugin should update the rollout tracker with observed verification notes.
+The full pattern wires four pieces together: settings model, settings UI, the recurring job, and the plugin bootstrap. See the [Scheduler Migration Guide](../../../_docs/rollouts/active/scheduler-pattern/prompt.md) for the migration checklist. No shipped plugin is the canonical reference yet; the first migrated plugin should update the rollout tracker with observed verification notes.
 
 ### Settings model
 
@@ -362,5 +362,5 @@ These cost real time during the first migration. The rollout guide covers them i
 
 - [DateFormatHelper](date-format-helper.md) — TZ-aware "now" + display formatting (used internally by `ScheduleHelper`)
 - [QueueTtrTrait](queue-ttr.md) — shared queue TTR for jobs
-- [Scheduler Migration Guide](../../../_docs/guides/scheduler-rollout-prompt.md) — per-plugin rollout prompt
-- [Scheduler Rollout Tracker](../../../_docs/rollouts/scheduler-pattern.md) — cross-plugin status
+- [Scheduler Migration Guide](../../../_docs/rollouts/active/scheduler-pattern/prompt.md) — per-plugin rollout prompt
+- [Scheduler Rollout Tracker](../../../_docs/rollouts/active/scheduler-pattern/tracker.md) — cross-plugin status

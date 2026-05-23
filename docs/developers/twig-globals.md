@@ -37,7 +37,6 @@ The base module registers five Twig extensions. All functions and filters are pr
 | `lrCompactDatetime` | Datetime without year | " |
 | `lrDate` | Date only | " |
 | `lrTime` | Time only | " |
-| `lrShortDate` | Short date for charts | " |
 | `lrRelative` | Relative time ("2 hours ago") | " |
 | `lrToDateTimeString` | `Y-m-d H:i:s` format | [Twig Filters](../template-guides/twig-filters-functions.md#machine-formatting) |
 | `lrToApiString` | ISO 8601 format | " |

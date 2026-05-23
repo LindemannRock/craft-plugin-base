@@ -25,9 +25,6 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 {{ entry.dateCreated|lrTime }}                         {# "3:45 PM" or "15:45" #}
 {{ entry.dateCreated|lrTime('short', true) }}          {# "3:45:32 PM" (seconds) #}
 
-{# Short date — for charts #}
-{{ entry.dateCreated|lrShortDate }}                    {# "Jan 24" #}
-
 {# Relative time #}
 {{ entry.dateCreated|lrRelative }}                     {# "2 hours ago" #}
 ```
@@ -53,7 +50,6 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 | `lrCompactDatetime` | `showSeconds=null`, `isUtc=true` | Datetime without year |
 | `lrDate` | `length='short'`, `includeYear=true`, `isUtc=true` | Date only |
 | `lrTime` | `length='short'`, `showSeconds=null`, `isUtc=true` | Time only |
-| `lrShortDate` | `isUtc=true` | Short date for charts |
 | `lrRelative` | `isUtc=true` | Relative time |
 | `lrToDateTimeString` | (none) | `Y-m-d H:i:s` format |
 | `lrToApiString` | (none) | ISO 8601 format |

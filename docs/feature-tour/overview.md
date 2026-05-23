@@ -39,7 +39,7 @@ Reusable traits for Settings models and plugin classes:
 
 Filters and functions available in all CP templates after bootstrap:
 
-- **Date/time filters** — `|lrDatetime`, `|lrCompactDatetime`, `|lrDate`, `|lrTime`, `|lrShortDate`, `|lrRelative`, `|lrToDateTimeString`, `|lrToApiString`, `|lrToFilenameString`
+- **Date/time filters** — `|lrDatetime`, `|lrCompactDatetime`, `|lrDate`, `|lrTime`, `|lrRelative`, `|lrToDateTimeString`, `|lrToApiString`, `|lrToFilenameString`
 - **Date/time functions** — `lrNow()`, `lrIsToday()`, `lrIsPast()`, `lrIsFuture()`, `lrDefaultDateRange()`, `lrDateRangeOptions()`
 - **Color functions** — `lrPaletteColor()`, `lrPaletteColorNames()`, `lrColorSet()`, `lrSetColor()`, `lrHasColorSet()`, `lrAvailableColorSets()`, `lrNeutralColor()`, `lrDefaultColor()`, `lrFilterColor()`
 - **Export functions** — `lrExportEnabled()`, `lrExportFormats()`, `lrExportFormatOptions()`
@@ -55,7 +55,7 @@ Shared scaffolding for PHPUnit integration tests against a live Craft install:
 
 - **[Testing](testing.md)** — `IntegrationTestCase` abstract base (component swap/restore, generic DB helpers, marker cleanup, queue drain, `cleanupExternalState()` hook), `bootstrap()` function (Craft console init with optional explicit project root), and `phpunit.xml.dist.template` for copy-once suite setup
 
-See the cross-plugin maintainer guide in [`plugins/_docs/guides/testing.md`](../../../_docs/guides/testing.md) for the workflow recipe.
+See the cross-plugin maintainer guide in [`plugins/_docs/workflows/testing.md`](../../../_docs/workflows/testing.md) for the workflow recipe.
 
 ### CP Layouts & Components
 

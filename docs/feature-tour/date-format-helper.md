@@ -27,7 +27,7 @@ When `DateFormatHelper::getConfig()` resolves a setting, it walks four layers (h
 
 The "current plugin" is auto-detected from `Craft::$app->controller->module` when its controller belongs to a plugin — so Twig filters like `|lrTime` automatically respect per-plugin overrides without callers needing to thread a plugin handle through every call site.
 
-To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/cascade-date-format-settings.twig`. Cross-plugin rollout status is tracked in [`_docs/rollouts/base-settings.md`](../../../_docs/rollouts/base-settings.md).
+To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/cascade-date-format-settings.twig`. Cross-plugin rollout status is tracked in [`_docs/rollouts/completed/base-settings/tracker.md`](../../../_docs/rollouts/completed/base-settings/tracker.md).
 
 ## Display Formatting
 
@@ -80,14 +80,6 @@ Short datetime without year — useful for dashboards and recent activity lists.
 
 ```php
 DateFormatHelper::formatCompactDatetime($date);  // "24 Jan 3:45 PM"
-```
-
-### formatShortDate()
-
-Short date for charts and compact display. Always uses "M j" format.
-
-```php
-DateFormatHelper::formatShortDate($date);  // "Jan 24"
 ```
 
 ### formatRelative()
