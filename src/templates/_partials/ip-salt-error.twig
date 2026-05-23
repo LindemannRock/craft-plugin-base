@@ -25,7 +25,7 @@
   - Renders nothing when analytics is disabled OR salt is set correctly.
   - All emitted UI strings route through `|t('lindemannrock-base')` —
     plugins consuming this partial do not need any matching keys in their
-    own translation files (see `_docs/guides/translations/base-vs-plugin.md`).
+    own translation files.
   - Copy-to-clipboard JS is IIFE-scoped per render (unique `boxId`) so
     multiple invocations on the same page don't collide.
   - Clipboard write uses the modern `navigator.clipboard` API with a
