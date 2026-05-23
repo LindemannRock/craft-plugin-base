@@ -29,7 +29,6 @@ use Twig\TwigFunction;
  * {{ date|lrDate('long') }}          {# 22 January 2026 #}
  * {{ date|lrTime }}                  {# 15:45 #}
  * {{ date|lrTime('short', true) }}   {# 15:45:32 (with seconds) #}
- * {{ date|lrShortDate }}             {# Jan 22 #}
  * {{ date|lrRelative }}              {# 2 hours ago #}
  * ```
  *
@@ -57,7 +56,6 @@ class DateTimeExtension extends AbstractExtension
             new TwigFilter('lrCompactDatetime', [$this, 'formatCompactDatetime']),
             new TwigFilter('lrDate', [$this, 'formatDate']),
             new TwigFilter('lrTime', [$this, 'formatTime']),
-            new TwigFilter('lrShortDate', [$this, 'formatShortDate']),
             new TwigFilter('lrRelative', [$this, 'formatRelative']),
 
             // Machine formatting
@@ -154,18 +152,6 @@ class DateTimeExtension extends AbstractExtension
         bool $isUtc = true,
     ): ?string {
         return DateFormatHelper::formatTime($date, $length, $showSeconds, $isUtc);
-    }
-
-    /**
-     * Format short date for charts
-     *
-     * @param mixed $date
-     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
-     * @return string|null
-     */
-    public function formatShortDate(mixed $date, bool $isUtc = true): ?string
-    {
-        return DateFormatHelper::formatShortDate($date, $isUtc);
     }
 
     /**
