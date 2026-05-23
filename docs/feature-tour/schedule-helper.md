@@ -1,19 +1,28 @@
 # ScheduleHelper @since(5.25.0)
 
-Cron-style scheduling for recurring queue jobs. Maps a schedule identifier (`'daily2am'`, `'weekly'`, etc.) to its next-run `DateTime` using fixed time slots, so successive runs don't drift. Returns delay-in-seconds for `Craft::$app->getQueue()->delay(...)`. Supplies the labeled dropdown options for settings UIs and the value allowlist for validation rules.
+Preset scheduling for recurring queue jobs. Maps a schedule identifier (`'daily2am'`, `'weekly'`, etc.) to its next-run `DateTime` using fixed time slots, so successive runs don't drift. Returns delay-in-seconds for `Craft::$app->getQueue()->delay(...)`. Supplies labeled dropdown options for settings UIs and value allowlists for validation rules.
 
 Use this for any plugin that needs a user-configurable recurring job (analytics cleanup, scheduled exports, usage rechecks, scheduled backups, etc.).
+
+This helper is not a cron-expression evaluator. Plugins that need multiple named schedules, per-section schedule rows, arbitrary weekdays/month days, or custom cron expressions should keep a plugin-specific scheduler or use a future cron-specific base helper. `cache-manager` is the current example of that separate model.
 
 ## Schedule identifiers
 
 | Value | Next-run rule |
 |-------|---------------|
 | `disabled` | No automatic schedule |
+| `every15minutes` | Every 15 minutes |
+| `every30minutes` | Every 30 minutes |
+| `hourly` | Every hour |
+| `every2hours` | 00:00, 02:00, 04:00, ... |
+| `every3hours` | 00:00, 03:00, 06:00, ... |
+| `every4hours` | 00:00, 04:00, 08:00, ... |
 | `every6hours` | 00:00, 06:00, 12:00, 18:00 |
 | `every12hours` | 00:00, 12:00 |
 | `daily` | 00:00 |
 | `daily2am` | 02:00 |
 | `weekly` | Configured Craft week-start day at 00:00 |
+| `every2weeks` | Same weekday + time as the starting point, +2 weeks |
 | `monthly` | Same day-of-month + time as the starting point, +1 month |
 | `every2months` | Same as monthly, +2 |
 | `quarterly` | Same as monthly, +3 |
@@ -22,23 +31,33 @@ Use this for any plugin that needs a user-configurable recurring job (analytics 
 
 All times are in **Craft's app timezone** (`Craft::$app->getTimeZone()`), not PHP's `date.timezone`. The helper uses [`DateFormatHelper::now()`](date-format-helper.md) internally for "now".
 
+`disabled` is the only base value for "do not schedule automatically". Do not add `manual` as a base schedule value. If a plugin currently stores `manual`, migrate or normalize it to `disabled` when adopting this helper; keep "manual/on-demand still works" in UI help text, not in the stored schedule value.
+
 ## Dropdown Options
 
 Returns labeled options for select fields. Labels are translated via the base plugin's translation category (no duplication needed in your plugin's translation files).
 
+Calling `getOptions()` without a value list returns every canonical option. User-facing plugin UIs should usually pass a curated list so they do not accidentally expose unsupported or poor-fit schedules.
+
 ```php
 use lindemannrock\base\helpers\ScheduleHelper;
 
-// Array of {value, label} objects (for Craft select fields)
+// Every canonical option as {value, label} objects (for Craft select fields)
 $options = ScheduleHelper::getOptions();
-// [['value' => 'disabled', 'label' => 'Disabled'], ['value' => 'every6hours', 'label' => 'Every 6 Hours'], ...]
+// [['value' => 'disabled', 'label' => 'Disabled'], ['value' => 'every15minutes', 'label' => 'Every 15 Minutes'], ...]
 
-// Associative array (value => label)
+// Every canonical option as an associative array (value => label)
 $options = ScheduleHelper::getOptions('assoc');
-// ['disabled' => 'Disabled', 'every6hours' => 'Every 6 Hours', ...]
+// ['disabled' => 'Disabled', 'every15minutes' => 'Every 15 Minutes', ...]
+
+// Curated UI options, preserving the requested order
+$options = ScheduleHelper::getOptions(['hourly', 'daily', 'weekly', 'monthly']);
+
+// Curated associative options
+$options = ScheduleHelper::getOptions(['disabled', 'daily2am', 'weekly'], 'assoc');
 ```
 
-Pass `$options` from the controller into the template — don't call helpers from Twig and don't hardcode the labels.
+Pass `$options` from the controller into the template — don't call helpers from Twig and don't hardcode the labels. Unknown curated values throw `InvalidArgumentException` so typos fail loudly.
 
 ## Validation Allowlist
 
@@ -54,8 +73,10 @@ public function rules(): array
 }
 
 ScheduleHelper::getValidValues();
-// ['disabled', 'every6hours', 'every12hours', 'daily', 'daily2am',
-//  'weekly', 'monthly', 'every2months', 'quarterly', 'every6months', 'yearly']
+// ['disabled', 'every15minutes', 'every30minutes', 'hourly', ...]
+
+ScheduleHelper::getValidValues(['disabled', 'daily', 'weekly']);
+// ['disabled', 'daily', 'weekly']
 ```
 
 ## Calculating the Next Run
@@ -71,6 +92,9 @@ $next = ScheduleHelper::calculateNext('weekly');
 
 $next = ScheduleHelper::calculateNext('disabled');
 // null
+
+$next = ScheduleHelper::calculateNext('every15minutes', new DateTime('2026-05-15 10:15:00'));
+// DateTime "2026-05-15 10:30" (exact slots advance to the next slot)
 
 // Pass an explicit "now" for testing or batch calculations
 $next = ScheduleHelper::calculateNext('monthly', new DateTime('2026-01-31 12:00'));
@@ -94,11 +118,13 @@ if ($delay > 0) {
 
 ## Typical Job + Bootstrap Pattern
 
-The full pattern wires four pieces together: settings model, settings UI, the recurring job, and the plugin bootstrap. See the [Scheduler Migration Guide](../../../_docs/guides/scheduler-rollout-prompt.md) for the migration checklist; the canonical reference implementation is `translation-manager`'s `RecheckUsageJob`.
+The full pattern wires four pieces together: settings model, settings UI, the recurring job, and the plugin bootstrap. See the [Scheduler Migration Guide](../../../_docs/guides/scheduler-rollout-prompt.md) for the migration checklist. No shipped plugin is the canonical reference yet; the first migrated plugin should update the rollout tracker with observed verification notes.
 
 ### Settings model
 
 ```php
+public const MY_JOB_SCHEDULES = ['disabled', 'daily2am', 'weekly', 'monthly'];
+
 public bool $enableMyScheduledJob = true;
 public string $myJobSchedule = 'daily2am';
 
@@ -111,7 +137,7 @@ public function rules(): array
 {
     return [
         [['enableMyScheduledJob'], 'boolean'],
-        [['myJobSchedule'], 'in', 'range' => ScheduleHelper::getValidValues()],
+        [['myJobSchedule'], 'in', 'range' => ScheduleHelper::getValidValues(self::MY_JOB_SCHEDULES)],
         // ...
     ];
 }
@@ -123,7 +149,7 @@ public function rules(): array
 // SettingsController
 return $this->renderTemplate('my-plugin/settings/scheduling', [
     'settings' => $settings,
-    'scheduleOptions' => ScheduleHelper::getOptions(),
+    'scheduleOptions' => ScheduleHelper::getOptions(Settings::MY_JOB_SCHEDULES),
 ]);
 ```
 
@@ -260,8 +286,19 @@ private function scheduleMyJob(): void
         return;
     }
 
-    Craft::$app->getQueue()->delay(5 * 60)->push(new MyScheduledJob([
+    $next = ScheduleHelper::calculateNext($settings->myJobSchedule);
+    if ($next === null) {
+        return;
+    }
+
+    $delay = $next->getTimestamp() - time();
+    if ($delay <= 0) {
+        return;
+    }
+
+    Craft::$app->getQueue()->delay($delay)->push(new MyScheduledJob([
         'reschedule' => true,
+        'nextRunTime' => DateFormatHelper::formatCompactDatetime($next, false, false),
     ]));
 }
 ```
@@ -313,7 +350,7 @@ These cost real time during the first migration. The rollout guide covers them i
 
 | Pitfall | Symptom | Fix |
 |---------|---------|-----|
-| Using `new DateTime()` instead of `DateFormatHelper::now()` | Cron math drifts when PHP TZ ≠ Craft TZ | Use `DateFormatHelper::now()` (already done inside the helper — only matters if you compute "now" yourself) |
+| Using `new DateTime()` instead of `DateFormatHelper::now()` | Schedule math drifts when PHP TZ ≠ Craft TZ | Use `DateFormatHelper::now()` (already done inside the helper — only matters if you compute "now" yourself) |
 | Using `date('M j, g:ia', time() + $delay)` for the display string | Display in wrong TZ; baked into serialized payload, so old jobs keep stale string until re-push | `DateFormatHelper::formatCompactDatetime($next, false, false)` |
 | Cache-flag dedup in bootstrap | Manual "Release All Jobs" deletes the row but cache still says "scheduled" — job stays gone for hours | Plain `{{%queue}}` LIKE-check, no cache flag |
 | Self-reschedule LIKE-checks the queue | False-matches the still-reserved row of the currently-executing job, kills the reschedule silently | Just push from inside `execute()`'s reschedule path; no dedup needed |
