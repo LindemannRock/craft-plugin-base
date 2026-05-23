@@ -32,11 +32,18 @@ return [
 
     // Schedule options
     'Disabled' => '無効',
+    'Every 15 Minutes' => '15 分ごと',
+    'Every 30 Minutes' => '30 分ごと',
+    'Hourly' => '1 時間ごと',
+    'Every 2 Hours' => '2 時間ごと',
+    'Every 3 Hours' => '3 時間ごと',
+    'Every 4 Hours' => '4 時間ごと',
     'Every 6 Hours' => '6 時間ごと',
     'Every 12 Hours' => '12 時間ごと',
     'Daily' => '毎日',
     'Daily at 2:00 AM' => '毎日 02:00',
     'Weekly' => '毎週',
+    'Every 2 Weeks' => '2 週間ごと',
     'Monthly' => '毎月',
     'Every 2 Months' => '2 か月ごと',
     'Quarterly' => '四半期ごと',

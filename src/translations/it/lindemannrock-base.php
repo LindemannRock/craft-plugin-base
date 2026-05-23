@@ -32,11 +32,18 @@ return [
 
     // Schedule options
     'Disabled' => 'Disabilitato',
+    'Every 15 Minutes' => 'Ogni 15 minuti',
+    'Every 30 Minutes' => 'Ogni 30 minuti',
+    'Hourly' => 'Ogni ora',
+    'Every 2 Hours' => 'Ogni 2 ore',
+    'Every 3 Hours' => 'Ogni 3 ore',
+    'Every 4 Hours' => 'Ogni 4 ore',
     'Every 6 Hours' => 'Ogni 6 ore',
     'Every 12 Hours' => 'Ogni 12 ore',
     'Daily' => 'Giornaliero',
     'Daily at 2:00 AM' => 'Ogni giorno alle 02:00',
     'Weekly' => 'Settimanale',
+    'Every 2 Weeks' => 'Ogni 2 settimane',
     'Monthly' => 'Mensile',
     'Every 2 Months' => 'Ogni 2 mesi',
     'Quarterly' => 'Trimestrale',

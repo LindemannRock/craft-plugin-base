@@ -32,11 +32,18 @@ return [
 
     // Schedule options
     'Disabled' => 'Disabled',
+    'Every 15 Minutes' => 'Every 15 Minutes',
+    'Every 30 Minutes' => 'Every 30 Minutes',
+    'Hourly' => 'Hourly',
+    'Every 2 Hours' => 'Every 2 Hours',
+    'Every 3 Hours' => 'Every 3 Hours',
+    'Every 4 Hours' => 'Every 4 Hours',
     'Every 6 Hours' => 'Every 6 Hours',
     'Every 12 Hours' => 'Every 12 Hours',
     'Daily' => 'Daily',
     'Daily at 2:00 AM' => 'Daily at 2:00 AM',
     'Weekly' => 'Weekly',
+    'Every 2 Weeks' => 'Every 2 Weeks',
     'Monthly' => 'Monthly',
     'Every 2 Months' => 'Every 2 Months',
     'Quarterly' => 'Quarterly',

@@ -32,11 +32,18 @@ return [
 
     // Schedule options
     'Disabled' => 'معطّل',
+    'Every 15 Minutes' => 'كل 15 دقيقة',
+    'Every 30 Minutes' => 'كل 30 دقيقة',
+    'Hourly' => 'كل ساعة',
+    'Every 2 Hours' => 'كل ساعتين',
+    'Every 3 Hours' => 'كل 3 ساعات',
+    'Every 4 Hours' => 'كل 4 ساعات',
     'Every 6 Hours' => 'كل 6 ساعات',
     'Every 12 Hours' => 'كل 12 ساعة',
     'Daily' => 'يومياً',
     'Daily at 2:00 AM' => 'يومياً في 02:00',
     'Weekly' => 'أسبوعياً',
+    'Every 2 Weeks' => 'كل أسبوعين',
     'Monthly' => 'شهرياً',
     'Every 2 Months' => 'كل شهرين',
     'Quarterly' => 'ربع سنوي',

@@ -32,11 +32,18 @@ return [
 
     // Schedule options
     'Disabled' => 'Deaktiveret',
+    'Every 15 Minutes' => 'Hvert 15. minut',
+    'Every 30 Minutes' => 'Hvert 30. minut',
+    'Hourly' => 'Hver time',
+    'Every 2 Hours' => 'Hver 2. time',
+    'Every 3 Hours' => 'Hver 3. time',
+    'Every 4 Hours' => 'Hver 4. time',
     'Every 6 Hours' => 'Hver 6. time',
     'Every 12 Hours' => 'Hver 12. time',
     'Daily' => 'Dagligt',
     'Daily at 2:00 AM' => 'Dagligt kl. 02:00',
     'Weekly' => 'Ugentligt',
+    'Every 2 Weeks' => 'Hver 2. uge',
     'Monthly' => 'Månedligt',
     'Every 2 Months' => 'Hver 2. måned',
     'Quarterly' => 'Kvartalsvis',

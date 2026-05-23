@@ -32,11 +32,18 @@ return [
 
     // Schedule options
     'Disabled' => 'Uitgeschakeld',
+    'Every 15 Minutes' => 'Elke 15 minuten',
+    'Every 30 Minutes' => 'Elke 30 minuten',
+    'Hourly' => 'Elk uur',
+    'Every 2 Hours' => 'Elke 2 uur',
+    'Every 3 Hours' => 'Elke 3 uur',
+    'Every 4 Hours' => 'Elke 4 uur',
     'Every 6 Hours' => 'Elke 6 uur',
     'Every 12 Hours' => 'Elke 12 uur',
     'Daily' => 'Dagelijks',
     'Daily at 2:00 AM' => 'Dagelijks om 02:00',
     'Weekly' => 'Wekelijks',
+    'Every 2 Weeks' => 'Elke 2 weken',
     'Monthly' => 'Maandelijks',
     'Every 2 Months' => 'Elke 2 maanden',
     'Quarterly' => 'Per kwartaal',
