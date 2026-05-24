@@ -39,6 +39,16 @@ final class DateFormatHelperTest extends IntegrationTestCase
         parent::tearDown();
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function setDateFormatConfig(array $config): void
+    {
+        $cache = new ReflectionClass(DateFormatHelper::class);
+        $configProperty = $cache->getProperty('configCache');
+        $configProperty->setValue(null, ['__base__' => $config]);
+    }
+
     public function testLocalDateExpressionParameterizesTimezoneOffsetAgainstSqlInjection(): void
     {
         $expr = DateFormatHelper::localDateExpression('dateCreated');
@@ -69,19 +79,64 @@ final class DateFormatHelperTest extends IntegrationTestCase
         }
     }
 
-    public function testFormatDateUnsupportedLengthSilentlyFallsBackToShort(): void
+    public function testFormatDateStylesSeparateCascadeFromFixedPresets(): void
     {
-        $date = new DateTime('2026-05-16 15:45:00', new DateTimeZone('UTC'));
+        $this->setDateFormatConfig([
+            'timeFormat' => '12',
+            'dateOrder' => 'dmy',
+            'monthFormat' => 'long',
+            'dateSeparator' => '/',
+            'showSeconds' => true,
+        ]);
 
-        $short = DateFormatHelper::formatDate($date, 'short');
+        $date = new DateTime('2026-05-30 00:30:00', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame('30 May 2026', DateFormatHelper::formatDate($date));
+        self::assertSame('30 May 2026', DateFormatHelper::formatDate($date, 'cascade'));
+        self::assertSame('30/05/2026', DateFormatHelper::formatDate($date, 'short'));
+        self::assertSame('30 May 2026', DateFormatHelper::formatDate($date, 'medium'));
+        self::assertSame('30 May 2026', DateFormatHelper::formatDate($date, 'long'));
+        self::assertSame('30 May 2026 at 12:30:00 AM', DateFormatHelper::formatDatetime($date, 'long'));
+    }
+
+    public function testShowSecondsStaysOrthogonalToDisplayStyle(): void
+    {
+        $this->setDateFormatConfig([
+            'timeFormat' => '24',
+            'dateOrder' => 'ymd',
+            'monthFormat' => 'numeric',
+            'dateSeparator' => '-',
+            'showSeconds' => true,
+        ]);
+
+        $date = new DateTime('2026-05-30 15:45:32', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame('15:45:32', DateFormatHelper::formatTime($date, 'cascade'));
+        self::assertSame('15:45:32', DateFormatHelper::formatTime($date, 'short'));
+        self::assertSame('15:45:32', DateFormatHelper::formatTime($date, 'medium'));
+        self::assertSame('15:45:32', DateFormatHelper::formatTime($date, 'long'));
+        self::assertSame('15:45', DateFormatHelper::formatTime($date, 'long', false));
+    }
+
+    public function testFormatDateUnsupportedStyleSilentlyFallsBackToCascade(): void
+    {
+        $this->setDateFormatConfig([
+            'timeFormat' => '24',
+            'dateOrder' => 'dmy',
+            'monthFormat' => 'long',
+            'dateSeparator' => '/',
+            'showSeconds' => false,
+        ]);
+
+        $date = new DateTime('2026-05-16 15:45:00', new DateTimeZone(Craft::$app->getTimeZone()));
+        $cascade = DateFormatHelper::formatDate($date, 'cascade');
         $full = DateFormatHelper::formatDate($date, 'full');
 
-        // The display length set is exactly 'short' / 'medium' / 'long'.
-        // Anything else falls into the `default` arm of the inner `match`, so
-        // 'full' silently produces 'short' output. Pin that behaviour so a
-        // future maintainer thinking about adding 'full' notices the contract.
-        self::assertNotNull($short);
-        self::assertSame($short, $full, "passing an unsupported length must silently fall back to 'short'");
+        // The display style set is exactly 'cascade' / 'short' / 'medium' / 'long'.
+        // Unsupported values remain non-fatal in Twig-heavy display contexts and
+        // fall back to cascade-driven output.
+        self::assertNotNull($cascade);
+        self::assertSame($cascade, $full, "passing an unsupported style must silently fall back to 'cascade'");
     }
 
     public function testToFilenameStringFormatIsYearMonthDayHis(): void
@@ -113,9 +168,7 @@ final class DateFormatHelperTest extends IntegrationTestCase
         // absent. Force-empty the static cache via reflection to simulate the
         // no-config-file path. The cache key is '__base__' when no plugin is
         // active (auto-detected from the controller, which is null in tests).
-        $cache = new ReflectionClass(DateFormatHelper::class);
-        $configProperty = $cache->getProperty('configCache');
-        $configProperty->setValue(null, ['__base__' => []]);
+        $this->setDateFormatConfig([]);
 
         self::assertSame('24', DateFormatHelper::getTimeFormat(), 'timeFormat default must be 24');
         self::assertSame('ymd', DateFormatHelper::getDateOrder(), 'dateOrder default must be ymd');
