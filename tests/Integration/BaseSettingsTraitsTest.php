@@ -112,7 +112,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
         self::assertNull($settings->defaultDateRange, 'defaultDateRange default must be null');
     }
 
-    public function testDateRangeSettingsRulesPinTheTenAllowedRanges(): void
+    public function testDateRangeSettingsRulesPinTheAllowedRanges(): void
     {
         $settings = new class extends Model {
             use DateRangeSettingsTrait;
@@ -122,8 +122,10 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
         $byAttribute = self::indexRulesByFirstAttribute($rules);
 
         $expected = [
-            'today', 'yesterday', 'last7days', 'last30days', 'last90days',
-            'thisMonth', 'lastMonth', 'thisYear', 'lastYear', 'all',
+            'today', 'yesterday', 'thisWeek', 'lastWeek', 'last7days',
+            'last14days', 'last30days', 'last90days', 'thisMonth',
+            'lastMonth', 'thisQuarter', 'lastQuarter', 'thisYear',
+            'lastYear', 'last12months', 'all',
         ];
         self::assertSame($expected, $byAttribute['defaultDateRange']['range']);
         self::assertTrue($byAttribute['defaultDateRange']['skipOnEmpty'] ?? false);
