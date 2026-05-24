@@ -156,7 +156,7 @@ class ScheduleHelper
             'every12hours' => self::getNextFixedHour($from, [0, 12]),
             'daily' => self::getNextFixedHour($from, [0]),
             'daily2am' => self::getNextFixedHour($from, [2]),
-            'weekly' => self::getNextWeekday($from, self::getWeekStartIsoDay()),
+            'weekly' => self::getNextWeekday($from, DateRangeHelper::getWeekStartIsoDay()),
             'every2weeks' => (clone $from)->modify('+2 weeks'),
             'monthly' => self::addMonthsClamped($from, 1),
             'every2months' => self::addMonthsClamped($from, 2),
@@ -276,19 +276,5 @@ class ScheduleHelper
         }
 
         return $next;
-    }
-
-    /**
-     * Get the configured Craft week start day as an ISO weekday.
-     *
-     * Craft stores week start as 0=Sunday, 1=Monday, ..., 6=Saturday.
-     * PHP's ISO weekday format uses 1=Monday, ..., 7=Sunday.
-     */
-    private static function getWeekStartIsoDay(): int
-    {
-        $craftWeekday = (int) Craft::$app->getConfig()->getGeneral()->defaultWeekStartDay;
-        $craftWeekday = max(0, min(6, $craftWeekday));
-
-        return $craftWeekday === 0 ? 7 : $craftWeekday;
     }
 }
