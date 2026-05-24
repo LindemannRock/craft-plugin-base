@@ -89,13 +89,19 @@ class DateRangeHelper
         $options = [
             'today' => Craft::t('lindemannrock-base', 'Today'),
             'yesterday' => Craft::t('lindemannrock-base', 'Yesterday'),
+            'thisWeek' => Craft::t('lindemannrock-base', 'This week'),
+            'lastWeek' => Craft::t('lindemannrock-base', 'Last week'),
             'last7days' => Craft::t('lindemannrock-base', 'Last 7 days'),
+            'last14days' => Craft::t('lindemannrock-base', 'Last 14 days'),
             'last30days' => Craft::t('lindemannrock-base', 'Last 30 days'),
             'last90days' => Craft::t('lindemannrock-base', 'Last 90 days'),
             'thisMonth' => Craft::t('lindemannrock-base', 'This month'),
             'lastMonth' => Craft::t('lindemannrock-base', 'Last month'),
+            'thisQuarter' => Craft::t('lindemannrock-base', 'This quarter'),
+            'lastQuarter' => Craft::t('lindemannrock-base', 'Last quarter'),
             'thisYear' => Craft::t('lindemannrock-base', 'This year'),
             'lastYear' => Craft::t('lindemannrock-base', 'Last year'),
+            'last12months' => Craft::t('lindemannrock-base', 'Last 12 months'),
             'all' => Craft::t('lindemannrock-base', 'All time'),
         ];
 
@@ -135,6 +141,23 @@ class DateRangeHelper
     }
 
     /**
+     * Get the configured Craft week start day as an ISO weekday.
+     *
+     * Craft stores week start as 0=Sunday, 1=Monday, ..., 6=Saturday.
+     * PHP's ISO weekday format uses 1=Monday, ..., 7=Sunday.
+     *
+     * @return int Day of week (1=Monday, 7=Sunday)
+     * @since 5.26.0
+     */
+    public static function getWeekStartIsoDay(): int
+    {
+        $craftWeekday = (int) Craft::$app->getConfig()->getGeneral()->defaultWeekStartDay;
+        $craftWeekday = max(0, min(6, $craftWeekday));
+
+        return $craftWeekday === 0 ? 7 : $craftWeekday;
+    }
+
+    /**
      * Return UTC date bounds for a date range.
      *
      * @return array{start: \DateTime|null, end: \DateTime|null}
@@ -170,9 +193,22 @@ class DateRangeHelper
                 $end = new \DateTime('now', $tz);
                 $end->setTime(0, 0, 0);
                 break;
+            case 'thisWeek':
+                $start = self::getStartOfCurrentWeek($tz);
+                break;
+            case 'lastWeek':
+                $end = self::getStartOfCurrentWeek($tz);
+
+                $start = clone $end;
+                $start->modify('-7 days');
+                break;
             case 'last7days':
                 $start = new \DateTime('now', $tz);
                 $start->modify('-7 days');
+                break;
+            case 'last14days':
+                $start = new \DateTime('now', $tz);
+                $start->modify('-14 days');
                 break;
             case 'last30days':
                 $start = new \DateTime('now', $tz);
@@ -193,6 +229,15 @@ class DateRangeHelper
                 $end = new \DateTime('now', $tz);
                 $end->modify('first day of this month')->setTime(0, 0, 0);
                 break;
+            case 'thisQuarter':
+                $start = self::getStartOfCurrentQuarter($tz);
+                break;
+            case 'lastQuarter':
+                $end = self::getStartOfCurrentQuarter($tz);
+
+                $start = clone $end;
+                $start->modify('-3 months');
+                break;
             case 'thisYear':
                 $start = new \DateTime('now', $tz);
                 $start->modify('first day of January this year')->setTime(0, 0, 0);
@@ -203,6 +248,10 @@ class DateRangeHelper
 
                 $end = new \DateTime('now', $tz);
                 $end->modify('first day of January this year')->setTime(0, 0, 0);
+                break;
+            case 'last12months':
+                $start = new \DateTime('now', $tz);
+                $start->modify('-12 months');
                 break;
             case 'all':
             case 'alltime':
@@ -260,6 +309,18 @@ class DateRangeHelper
         // For dynamic ranges, calculate actual days using Craft's timezone
         $tz = new \DateTimeZone(\Craft::$app->getTimeZone());
 
+        if ($normalized === 'thisWeek') {
+            $weekStart = self::getWeekStartIsoDay();
+            $today = new \DateTime('now', $tz);
+            $currentWeekday = (int) $today->format('N');
+
+            return (($currentWeekday - $weekStart + 7) % 7) + 1;
+        }
+
+        if ($normalized === 'lastWeek') {
+            return 7;
+        }
+
         if ($normalized === 'thisMonth') {
             $now = new \DateTime('now', $tz);
             return (int) $now->format('j'); // Day of month (1-31)
@@ -276,20 +337,65 @@ class DateRangeHelper
             return (int) $now->diff($startOfYear)->days + 1;
         }
 
+        if ($normalized === 'thisQuarter') {
+            $now = new \DateTime('now', $tz);
+            $startOfQuarter = self::getStartOfCurrentQuarter($tz);
+
+            return (int) $now->diff($startOfQuarter)->days + 1;
+        }
+
+        if ($normalized === 'lastQuarter') {
+            $end = self::getStartOfCurrentQuarter($tz);
+            $start = clone $end;
+            $start->modify('-3 months');
+
+            return (int) $end->diff($start)->days;
+        }
+
         if ($normalized === 'lastYear') {
             $now = new \DateTime('now', $tz);
             $lastYear = (int) $now->format('Y') - 1;
             return ((($lastYear % 4 === 0) && ($lastYear % 100 !== 0)) || ($lastYear % 400 === 0)) ? 366 : 365;
         }
 
+        if ($normalized === 'last12months') {
+            $now = new \DateTime('now', $tz);
+            $start = (clone $now)->modify('-12 months');
+
+            return (int) $now->diff($start)->days;
+        }
+
         return match ($normalized) {
             'today' => 1,
             'yesterday' => 1,
             'last7days' => 7,
+            'last14days' => 14,
             'last30days' => 30,
             'last90days' => 90,
             default => 30,
         };
+    }
+
+    private static function getStartOfCurrentWeek(\DateTimeZone $tz): \DateTime
+    {
+        $start = new \DateTime('now', $tz);
+        $currentWeekday = (int) $start->format('N');
+        $daysSinceWeekStart = ($currentWeekday - self::getWeekStartIsoDay() + 7) % 7;
+
+        if ($daysSinceWeekStart > 0) {
+            $start->modify("-{$daysSinceWeekStart} days");
+        }
+
+        return $start->setTime(0, 0, 0);
+    }
+
+    private static function getStartOfCurrentQuarter(\DateTimeZone $tz): \DateTime
+    {
+        $start = new \DateTime('now', $tz);
+        $month = (int) $start->format('n');
+        $quarterStartMonth = ((int) floor(($month - 1) / 3) * 3) + 1;
+
+        return $start->setDate((int) $start->format('Y'), $quarterStartMonth, 1)->setTime(0, 0, 0);
     }
 
     private static function normalizeCustomDate(\DateTime|string|null $date, \DateTimeZone $tz): ?\DateTime
