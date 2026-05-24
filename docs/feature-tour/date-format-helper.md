@@ -38,17 +38,25 @@ Formats a date and time for display. Accepts `DateTime` objects, date strings, o
 ```php
 use lindemannrock\base\helpers\DateFormatHelper;
 
-// With config: timeFormat='12', dateOrder='dmy', monthFormat='short'
-DateFormatHelper::formatDatetime($date);                    // "24 Jan 2026 3:45 PM"
+// With config: timeFormat='12', dateOrder='dmy', monthFormat='long'
+DateFormatHelper::formatDatetime($date);                    // "24 January 2026 3:45 PM"
+DateFormatHelper::formatDatetime($date, 'short');           // "24/01/2026 3:45 PM"
 DateFormatHelper::formatDatetime($date, 'medium');          // "24 Jan 2026 3:45 PM"
 DateFormatHelper::formatDatetime($date, 'long');            // "24 January 2026 at 3:45 PM"
-DateFormatHelper::formatDatetime($date, 'short', true);     // "24 Jan 2026 3:45:32 PM" (with seconds)
+DateFormatHelper::formatDatetime($date, 'cascade', true);   // "24 January 2026 3:45:32 PM" (with seconds)
 ```
+
+| Style | Contract |
+|-------|----------|
+| `cascade` | Default. Respects the active plugin/base cascade: `monthFormat`, `dateOrder`, `dateSeparator`, `timeFormat`, and `showSeconds`. |
+| `short` | Fixed compact numeric date. Respects `dateOrder`, `dateSeparator`, `timeFormat`, and `showSeconds`, but forces numeric month display. |
+| `medium` | Fixed abbreviated month date. Respects `dateOrder`, `timeFormat`, and `showSeconds`, but forces short month names. |
+| `long` | Fixed full month date with ` at ` between date and time. Respects `dateOrder`, `timeFormat`, and `showSeconds`, but forces full month names. |
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `$date` | `DateTime\|string\|null` | required | The date to format |
-| `$length` | `string` | `'short'` | `'short'`, `'medium'`, or `'long'` |
+| `$style` | `string` | `'cascade'` | `'cascade'`, `'short'`, `'medium'`, or `'long'` |
 | `$showSeconds` | `bool\|null` | `null` | Override config's `showSeconds` |
 | `$includeYear` | `bool` | `true` | Include year in output |
 | `$isUtc` | `bool` | `true` | Whether string input is UTC |
@@ -58,9 +66,10 @@ DateFormatHelper::formatDatetime($date, 'short', true);     // "24 Jan 2026 3:45
 Formats the date portion only.
 
 ```php
-DateFormatHelper::formatDate($date);             // "24 Jan 2026"
-DateFormatHelper::formatDate($date, 'long');      // "24 January 2026"
-DateFormatHelper::formatDate($date, 'short', false);  // "24 Jan" (no year)
+DateFormatHelper::formatDate($date);                  // "24 January 2026" when cascade monthFormat='long'
+DateFormatHelper::formatDate($date, 'short');          // "24/01/2026"
+DateFormatHelper::formatDate($date, 'medium', false);  // "24 Jan" (no year)
+DateFormatHelper::formatDate($date, 'long');           // "24 January 2026"
 ```
 
 ### formatTime()
@@ -69,10 +78,10 @@ Formats the time portion only.
 
 ```php
 DateFormatHelper::formatTime($date);                     // "3:45 PM" (12h) or "15:45" (24h)
-DateFormatHelper::formatTime($date, 'short', true);      // "3:45:32 PM" (with seconds)
+DateFormatHelper::formatTime($date, 'cascade', true);    // "3:45:32 PM" (with seconds)
 ```
 
-When `$showSeconds` is `null` (default), the value flows from the [cascade](#cascade-order-since5100). Seconds appear if base config or the active plugin has `showSeconds=true`, regardless of `$length` — the helper no longer special-cases `'short'` to drop seconds.
+When `$showSeconds` is `null` (default), the value flows from the [cascade](#cascade-order-since5100). Seconds appear if base config or the active plugin has `showSeconds=true`, regardless of `$style`. Pass explicit `true` or `false` to override seconds for one call site.
 
 ### formatCompactDatetime()
 
@@ -200,7 +209,7 @@ All display methods are available as Twig filters and functions. See [Twig Filte
 ```twig
 {{ entry.dateCreated|lrDatetime }}
 {{ entry.dateCreated|lrDate('long') }}
-{{ entry.dateCreated|lrTime('short', true) }}
+{{ entry.dateCreated|lrTime('cascade', true) }}
 {{ entry.dateCreated|lrRelative }}
 {% if lrIsToday(entry.dateCreated) %}Today{% endif %}
 ```

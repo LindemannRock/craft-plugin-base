@@ -93,7 +93,7 @@ DateFormatHelper::formatDatetime($localDate, isUtc: false);
 In Twig:
 
 ```twig
-{{ localDate|lrDatetime('short', null, true, false) }}
+{{ localDate|lrDatetime('cascade', null, true, false) }}
 ```
 
 ---

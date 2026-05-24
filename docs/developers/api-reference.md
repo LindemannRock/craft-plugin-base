@@ -41,11 +41,13 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `formatDatetime($dt, $length, $showSeconds, $year, $isUtc)` | `string` | Full datetime |
+| `formatDatetime($dt, $style, $showSeconds, $year, $isUtc)` | `string` | Full datetime |
 | `formatCompactDatetime($dt, $showSeconds, $isUtc)` | `string` | Datetime without year |
-| `formatDate($dt, $length, $year, $isUtc)` | `string` | Date only |
-| `formatTime($dt, $length, $showSeconds, $isUtc)` | `string` | Time only |
+| `formatDate($dt, $style, $year, $isUtc)` | `string` | Date only |
+| `formatTime($dt, $style, $showSeconds, $isUtc)` | `string` | Time only |
 | `formatRelative($dt, $isUtc)` | `string` | Relative time |
+
+Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cascade` respects the active date-format settings; the other styles force numeric, abbreviated month, or full month date display respectively.
 
 **Machine formatting:**
 

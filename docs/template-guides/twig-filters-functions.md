@@ -7,23 +7,25 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 ### Display Formatting
 
 ```twig
-{# Full datetime — output depends on config (timeFormat, dateOrder, monthFormat) #}
-{{ entry.dateCreated|lrDatetime }}                    {# "24 Jan 2026 3:45 PM" #}
+{# Full datetime — default output depends on config (timeFormat, dateOrder, monthFormat) #}
+{{ entry.dateCreated|lrDatetime }}                    {# "24 January 2026 3:45 PM" if monthFormat='long' #}
+{{ entry.dateCreated|lrDatetime('short') }}           {# "24/01/2026 3:45 PM" #}
 {{ entry.dateCreated|lrDatetime('medium') }}           {# "24 Jan 2026 3:45 PM" #}
 {{ entry.dateCreated|lrDatetime('long') }}             {# "24 January 2026 at 3:45 PM" #}
-{{ entry.dateCreated|lrDatetime('short', true) }}      {# "24 Jan 2026 3:45:32 PM" (seconds) #}
+{{ entry.dateCreated|lrDatetime('cascade', true) }}    {# "24 January 2026 3:45:32 PM" (seconds) #}
 
 {# Compact datetime (no year) — for dashboards #}
 {{ entry.dateCreated|lrCompactDatetime }}              {# "24 Jan 3:45 PM" #}
 
 {# Date only #}
-{{ entry.dateCreated|lrDate }}                         {# "24 Jan 2026" #}
+{{ entry.dateCreated|lrDate }}                         {# cascade-driven #}
+{{ entry.dateCreated|lrDate('short') }}                {# "24/01/2026" #}
 {{ entry.dateCreated|lrDate('long') }}                 {# "24 January 2026" #}
-{{ entry.dateCreated|lrDate('short', false) }}         {# "24 Jan" (no year) #}
+{{ entry.dateCreated|lrDate('medium', false) }}        {# "24 Jan" (no year) #}
 
 {# Time only #}
 {{ entry.dateCreated|lrTime }}                         {# "3:45 PM" or "15:45" #}
-{{ entry.dateCreated|lrTime('short', true) }}          {# "3:45:32 PM" (seconds) #}
+{{ entry.dateCreated|lrTime('cascade', true) }}        {# "3:45:32 PM" (seconds) #}
 
 {# Relative time #}
 {{ entry.dateCreated|lrRelative }}                     {# "2 hours ago" #}
@@ -46,17 +48,17 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 
 | Filter | Parameters | Description |
 |--------|------------|-------------|
-| `lrDatetime` | `length='short'`, `showSeconds=null`, `includeYear=true`, `isUtc=true` | Full datetime |
+| `lrDatetime` | `style='cascade'`, `showSeconds=null`, `includeYear=true`, `isUtc=true` | Full datetime |
 | `lrCompactDatetime` | `showSeconds=null`, `isUtc=true` | Datetime without year |
-| `lrDate` | `length='short'`, `includeYear=true`, `isUtc=true` | Date only |
-| `lrTime` | `length='short'`, `showSeconds=null`, `isUtc=true` | Time only |
+| `lrDate` | `style='cascade'`, `includeYear=true`, `isUtc=true` | Date only |
+| `lrTime` | `style='cascade'`, `showSeconds=null`, `isUtc=true` | Time only |
 | `lrRelative` | `isUtc=true` | Relative time |
 | `lrToDateTimeString` | (none) | `Y-m-d H:i:s` format |
 | `lrToApiString` | (none) | ISO 8601 format |
 | `lrToFilenameString` | `includeTime=true` | `Y-m-d-His` format |
 
 > [!NOTE]
-> Example outputs above assume the default config (`showSeconds=false`). When `showSeconds=true` is set in `config/lindemannrock-base.php` or via a plugin's [`DateFormatSettingsTrait`](../feature-tour/date-format-helper.md#cascade-order-since5100), seconds appear in **all** lengths — `lrTime`, `lrDatetime('short')`, and `lrCompactDatetime` all honor the cascade. Pass an explicit `true`/`false` as the `showSeconds` arg to override the cascade for a single call site.
+> `cascade` is the default style and respects the active plugin/base date-format settings. `short`, `medium`, and `long` are fixed display styles. When `showSeconds=true` is set in `config/lindemannrock-base.php` or via a plugin's [`DateFormatSettingsTrait`](../feature-tour/date-format-helper.md#cascade-order-since5100), seconds appear in all styles. Pass an explicit `true`/`false` as the `showSeconds` arg to override the cascade for a single call site.
 
 ## Date/Time Functions
 
