@@ -28,7 +28,7 @@ use Twig\TwigFunction;
  * {{ date|lrDate }}                  {# 22/01/2026 #}
  * {{ date|lrDate('long') }}          {# 22 January 2026 #}
  * {{ date|lrTime }}                  {# 15:45 #}
- * {{ date|lrTime('short', true) }}   {# 15:45:32 (with seconds) #}
+ * {{ date|lrTime('cascade', true) }} {# 15:45:32 (with seconds) #}
  * {{ date|lrRelative }}              {# 2 hours ago #}
  * ```
  *
@@ -89,7 +89,7 @@ class DateTimeExtension extends AbstractExtension
      * Format datetime for display
      *
      * @param mixed $date
-     * @param string $length 'short', 'medium', 'long'
+     * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool|null $showSeconds
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
@@ -97,12 +97,12 @@ class DateTimeExtension extends AbstractExtension
      */
     public function formatDatetime(
         mixed $date,
-        string $length = 'short',
+        string $style = 'cascade',
         ?bool $showSeconds = null,
         bool $includeYear = true,
         bool $isUtc = true,
     ): ?string {
-        return DateFormatHelper::formatDatetime($date, $length, $showSeconds, $includeYear, $isUtc);
+        return DateFormatHelper::formatDatetime($date, $style, $showSeconds, $includeYear, $isUtc);
     }
 
     /**
@@ -122,36 +122,36 @@ class DateTimeExtension extends AbstractExtension
      * Format date for display
      *
      * @param mixed $date
-     * @param string $length 'short', 'medium', 'long'
+     * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      */
     public function formatDate(
         mixed $date,
-        string $length = 'short',
+        string $style = 'cascade',
         bool $includeYear = true,
         bool $isUtc = true,
     ): ?string {
-        return DateFormatHelper::formatDate($date, $length, $includeYear, $isUtc);
+        return DateFormatHelper::formatDate($date, $style, $includeYear, $isUtc);
     }
 
     /**
      * Format time for display
      *
      * @param mixed $date
-     * @param string $length 'short', 'medium', 'long'
+     * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool|null $showSeconds
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      */
     public function formatTime(
         mixed $date,
-        string $length = 'short',
+        string $style = 'cascade',
         ?bool $showSeconds = null,
         bool $isUtc = true,
     ): ?string {
-        return DateFormatHelper::formatTime($date, $length, $showSeconds, $isUtc);
+        return DateFormatHelper::formatTime($date, $style, $showSeconds, $isUtc);
     }
 
     /**
