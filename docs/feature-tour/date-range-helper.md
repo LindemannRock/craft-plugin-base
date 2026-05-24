@@ -8,17 +8,25 @@ Standard date range parsing for analytics, logs, and any date-filtered CP pages.
 |-------|-------------|
 | `today` | Start of today (in site timezone) to now |
 | `yesterday` | Start of yesterday to start of today |
+| `thisWeek` | Configured Craft week start to now |
+| `lastWeek` | Previous full configured Craft week |
 | `last7days` | 7 days ago to now |
+| `last14days` | 14 days ago to now |
 | `last30days` | 30 days ago to now |
 | `last90days` | 90 days ago to now |
 | `thisMonth` | First day of current month to now |
 | `lastMonth` | First day of last month to first day of current month |
+| `thisQuarter` | First day of current calendar quarter to now |
+| `lastQuarter` | Previous full calendar quarter |
 | `thisYear` | January 1st of current year to now |
 | `lastYear` | January 1st of last year to January 1st of current year |
+| `last12months` | 12 months ago to now |
 | `all` | No date filter (returns all records) |
 | `custom` | Uses caller-provided start/end dates |
 
 `custom` is opt-in for dropdowns and query helpers. Plugins decide whether to expose custom date fields in their own UI.
+
+Week-based ranges use Craft's `defaultWeekStartDay` general config setting. The helper converts Craft's weekday numbering (`0` = Sunday) to PHP ISO weekdays (`7` = Sunday) via `DateRangeHelper::getWeekStartIsoDay()`.
 
 ## Getting the Default Range @since(5.3.0)
 
@@ -68,6 +76,9 @@ $bounds = DateRangeHelper::getBounds('last7days');
 $bounds = DateRangeHelper::getBounds('lastMonth');
 // Returns: ['start' => DateTime (first of last month), 'end' => DateTime (first of this month)]
 
+$bounds = DateRangeHelper::getBounds('lastWeek');
+// Returns the previous full week using Craft's configured week start day
+
 $bounds = DateRangeHelper::getBounds('all');
 // Returns: ['start' => null, 'end' => null]
 
@@ -103,6 +114,7 @@ Useful for calculating averages (e.g., "average clicks per day").
 
 ```php
 $days = DateRangeHelper::getDaysCount('last30days');  // 30
+$days = DateRangeHelper::getDaysCount('lastWeek');    // 7
 $days = DateRangeHelper::getDaysCount('thisMonth');   // Day of month (1–31)
 $days = DateRangeHelper::getDaysCount('lastYear');    // 365 or 366
 ```

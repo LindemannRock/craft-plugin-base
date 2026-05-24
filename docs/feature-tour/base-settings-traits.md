@@ -83,7 +83,7 @@ See: [DateFormatHelper](date-format-helper.md) for the cascade engine + Twig fil
 
 ## `DateRangeSettingsTrait` — default analytics date range
 
-Adds a single nullable `?string $defaultDateRange` whose value cascades through `DateRangeHelper::getDefaultDateRange()` (one of 10 standard ranges: `today`, `yesterday`, `last7days`, `last30days`, `last90days`, `thisMonth`, `lastMonth`, `thisYear`, `lastYear`, `all`).
+Adds a single nullable `?string $defaultDateRange` whose value cascades through `DateRangeHelper::getDefaultDateRange()` (one of the standard ranges: `today`, `yesterday`, `thisWeek`, `lastWeek`, `last7days`, `last14days`, `last30days`, `last90days`, `thisMonth`, `lastMonth`, `thisQuarter`, `lastQuarter`, `thisYear`, `lastYear`, `last12months`, `all`).
 
 ```php
 use lindemannrock\base\traits\DateRangeSettingsTrait;

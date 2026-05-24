@@ -74,7 +74,7 @@ The default date range used for analytics dashboards, log viewers, and any date-
 |--------|------|---------|-------------|
 | `defaultDateRange` | `string` | `'last30days'` | Default date range for date-filtered pages |
 
-**Available values:** `'today'`, `'yesterday'`, `'last7days'`, `'last30days'`, `'last90days'`, `'thisMonth'`, `'lastMonth'`, `'thisYear'`, `'lastYear'`, `'all'`
+**Available values:** `'today'`, `'yesterday'`, `'thisWeek'`, `'lastWeek'`, `'last7days'`, `'last14days'`, `'last30days'`, `'last90days'`, `'thisMonth'`, `'lastMonth'`, `'thisQuarter'`, `'lastQuarter'`, `'thisYear'`, `'lastYear'`, `'last12months'`, `'all'`
 
 ## Full Config Example
 

@@ -103,6 +103,7 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `getBounds(string $range, ?DateTimeZone $tz, DateTime|string|null $customStart, DateTime|string|null $customEnd)` | `array` | `['start' => ?DateTime, 'end' => ?DateTime]` in UTC |
 | `applyToQuery(Query $query, string $dateRange, string $column, ?DateTimeZone $tz, DateTime|string|null $customStart, DateTime|string|null $customEnd)` | `void` | Add date range WHERE to query |
 | `getDaysCount(string $range)` | `int` | Number of days in range |
+| `getWeekStartIsoDay()` | `int` | Craft week start converted to ISO weekday |
 
 ### ExportHelper
 

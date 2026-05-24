@@ -21,7 +21,7 @@ This helper is not a cron-expression evaluator. Plugins that need multiple named
 | `every12hours` | 00:00, 12:00 |
 | `daily` | 00:00 |
 | `daily2am` | 02:00 |
-| `weekly` | Configured Craft week-start day at 00:00 |
+| `weekly` | Configured Craft week-start day at 00:00, using `DateRangeHelper::getWeekStartIsoDay()` |
 | `every2weeks` | Same weekday + time as the starting point, +2 weeks |
 | `monthly` | Same day-of-month + time as the starting point, +1 month |
 | `every2months` | Same as monthly, +2 |
