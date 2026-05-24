@@ -41,6 +41,7 @@ use yii\db\Expression;
  * DateFormatHelper::formatDate($date);                  // "22/01/2026"
  * DateFormatHelper::formatTime($date);                  // "15:45"
  * DateFormatHelper::formatTime($date, showSeconds: true); // "15:45:32"
+ * DateFormatHelper::formatDate($date, 'short');           // "22/01/2026" (fixed numeric)
  *
  * // For database/export/API/filenames
  * DateFormatHelper::toDateTimeString($date); // "2026-01-22 15:45:32"
@@ -360,7 +361,7 @@ class DateFormatHelper
      * Format datetime for display
      *
      * @param DateTime|string|null $date
-     * @param string $length 'short', 'medium', 'long'
+     * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
@@ -368,7 +369,7 @@ class DateFormatHelper
      */
     public static function formatDatetime(
         DateTime|string|null $date,
-        string $length = 'short',
+        string $style = 'cascade',
         ?bool $showSeconds = null,
         bool $includeYear = true,
         bool $isUtc = true,
@@ -378,10 +379,10 @@ class DateFormatHelper
             return null;
         }
 
-        $datePart = self::formatDate($date, $length, $includeYear);
-        $timePart = self::formatTime($date, $length, $showSeconds);
+        $datePart = self::formatDate($date, $style, $includeYear);
+        $timePart = self::formatTime($date, $style, $showSeconds);
 
-        if ($length === 'long') {
+        if ($style === 'long') {
             return $datePart . ' at ' . $timePart;
         }
 
@@ -401,21 +402,21 @@ class DateFormatHelper
         ?bool $showSeconds = null,
         bool $isUtc = true,
     ): ?string {
-        return self::formatDatetime($date, 'short', $showSeconds, false, $isUtc);
+        return self::formatDatetime($date, 'cascade', $showSeconds, false, $isUtc);
     }
 
     /**
      * Format date only for display
      *
      * @param DateTime|string|null $date
-     * @param string $length 'short', 'medium', 'long'
+     * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      */
     public static function formatDate(
         DateTime|string|null $date,
-        string $length = 'short',
+        string $style = 'cascade',
         bool $includeYear = true,
         bool $isUtc = true,
     ): ?string {
@@ -426,8 +427,14 @@ class DateFormatHelper
 
         $order = self::getDateOrder();
         $sep = self::getDateSeparator();
+        $monthFormat = match ($style) {
+            'short' => 'numeric',
+            'medium' => 'short',
+            'long' => 'long',
+            default => self::getMonthFormat(),
+        };
 
-        if ($length === 'long') {
+        if ($monthFormat === 'long') {
             if ($includeYear) {
                 $format = match ($order) {
                     'dmy' => 'j F Y',      // 22 January 2026
@@ -443,7 +450,7 @@ class DateFormatHelper
                     default => 'j F',
                 };
             }
-        } elseif ($length === 'medium') {
+        } elseif ($monthFormat === 'short') {
             if ($includeYear) {
                 $format = match ($order) {
                     'dmy' => 'j M Y',      // 22 Jan 2026
@@ -460,60 +467,21 @@ class DateFormatHelper
                 };
             }
         } else {
-            // short - respects monthFormat config
-            $monthFormat = self::getMonthFormat();
-
-            if ($monthFormat === 'long') {
-                // Full month name
-                if ($includeYear) {
-                    $format = match ($order) {
-                        'dmy' => 'j F Y',      // 22 January 2026
-                        'mdy' => 'F j, Y',     // January 22, 2026
-                        'ymd' => 'Y F j',      // 2026 January 22
-                        default => 'j F Y',
-                    };
-                } else {
-                    $format = match ($order) {
-                        'dmy' => 'j F',        // 22 January
-                        'mdy' => 'F j',        // January 22
-                        'ymd' => 'F j',        // January 22
-                        default => 'j F',
-                    };
-                }
-            } elseif ($monthFormat === 'short') {
-                // Short month name
-                if ($includeYear) {
-                    $format = match ($order) {
-                        'dmy' => 'j M Y',      // 22 Jan 2026
-                        'mdy' => 'M j, Y',     // Jan 22, 2026
-                        'ymd' => 'Y M j',      // 2026 Jan 22
-                        default => 'j M Y',
-                    };
-                } else {
-                    $format = match ($order) {
-                        'dmy' => 'j M',        // 22 Jan
-                        'mdy' => 'M j',        // Jan 22
-                        'ymd' => 'M j',        // Jan 22
-                        default => 'j M',
-                    };
-                }
+            // numeric
+            if ($includeYear) {
+                $format = match ($order) {
+                    'dmy' => "d{$sep}m{$sep}Y",  // 22/01/2026
+                    'mdy' => "m{$sep}d{$sep}Y",  // 01/22/2026
+                    'ymd' => "Y{$sep}m{$sep}d",  // 2026/01/22
+                    default => "d{$sep}m{$sep}Y",
+                };
             } else {
-                // numeric (default)
-                if ($includeYear) {
-                    $format = match ($order) {
-                        'dmy' => "d{$sep}m{$sep}Y",  // 22/01/2026
-                        'mdy' => "m{$sep}d{$sep}Y",  // 01/22/2026
-                        'ymd' => "Y{$sep}m{$sep}d",  // 2026/01/22
-                        default => "d{$sep}m{$sep}Y",
-                    };
-                } else {
-                    $format = match ($order) {
-                        'dmy' => "d{$sep}m",         // 22/01
-                        'mdy' => "m{$sep}d",         // 01/22
-                        'ymd' => "m{$sep}d",         // 01/22
-                        default => "d{$sep}m",
-                    };
-                }
+                $format = match ($order) {
+                    'dmy' => "d{$sep}m",         // 22/01
+                    'mdy' => "m{$sep}d",         // 01/22
+                    'ymd' => "m{$sep}d",         // 01/22
+                    default => "d{$sep}m",
+                };
             }
         }
 
@@ -524,14 +492,14 @@ class DateFormatHelper
      * Format time only for display
      *
      * @param DateTime|string|null $date
-     * @param string $length 'short', 'medium', 'long' (medium/long include seconds if showSeconds)
+     * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @return string|null
      */
     public static function formatTime(
         DateTime|string|null $date,
-        string $length = 'short',
+        string $style = 'cascade',
         ?bool $showSeconds = null,
         bool $isUtc = true,
     ): ?string {
