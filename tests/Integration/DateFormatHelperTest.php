@@ -46,7 +46,9 @@ final class DateFormatHelperTest extends IntegrationTestCase
     {
         $cache = new ReflectionClass(DateFormatHelper::class);
         $configProperty = $cache->getProperty('configCache');
-        $configProperty->setValue(null, [$cacheKey => $config]);
+        $existing = $configProperty->getValue();
+        $existing[$cacheKey] = $config;
+        $configProperty->setValue(null, $existing);
     }
 
     public function testLocalDateExpressionParameterizesTimezoneOffsetAgainstSqlInjection(): void
@@ -117,6 +119,71 @@ final class DateFormatHelperTest extends IntegrationTestCase
             'January 7, 2026 2:30:25 PM',
             DateFormatHelper::formatDatetime($date, pluginHandle: 'test-plugin'),
         );
+    }
+
+    public function testCompactDatetimeCanFormatFromResolvedSettingsObject(): void
+    {
+        $settings = (object) [
+            'timeFormat' => '24',
+            'dateOrder' => 'ymd',
+            'monthFormat' => 'long',
+            'dateSeparator' => '-',
+            'showSeconds' => false,
+        ];
+
+        $date = new DateTime('2026-05-25 18:57:00', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame(
+            'May 25 18:57',
+            DateFormatHelper::formatCompactDatetimeFromSettings($date, $settings, false, false),
+        );
+    }
+
+    public function testCompactDatetimeFromSettingsCanShowNumericDatesAndSeconds(): void
+    {
+        $settings = (object) [
+            'timeFormat' => '12',
+            'dateOrder' => 'dmy',
+            'monthFormat' => 'numeric',
+            'dateSeparator' => '-',
+            'showSeconds' => true,
+        ];
+
+        $date = new DateTime('2026-05-25 18:57:14', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame(
+            '25-05 6:57:14 PM',
+            DateFormatHelper::formatCompactDatetimeFromSettings($date, $settings, null, false),
+        );
+    }
+
+    public function testCanClearOnePluginConfigCacheEntry(): void
+    {
+        $cache = new ReflectionClass(DateFormatHelper::class);
+        $configProperty = $cache->getProperty('configCache');
+
+        $this->setDateFormatConfig([
+            'timeFormat' => '12',
+            'dateOrder' => 'mdy',
+            'monthFormat' => 'short',
+            'dateSeparator' => '/',
+            'showSeconds' => false,
+        ], 'plugin-a');
+
+        $this->setDateFormatConfig([
+            'timeFormat' => '24',
+            'dateOrder' => 'dmy',
+            'monthFormat' => 'long',
+            'dateSeparator' => '-',
+            'showSeconds' => true,
+        ], 'plugin-b');
+
+        DateFormatHelper::clearConfigCache('plugin-a');
+
+        $config = $configProperty->getValue();
+        self::assertArrayNotHasKey('plugin-a', $config);
+        self::assertArrayHasKey('plugin-b', $config);
+        self::assertSame('24', $config['plugin-b']['timeFormat']);
     }
 
     public function testShowSecondsStaysOrthogonalToDisplayStyle(): void
