@@ -41,6 +41,7 @@ use yii\db\Expression;
  * DateFormatHelper::formatDate($date);                  // "22/01/2026"
  * DateFormatHelper::formatTime($date);                  // "15:45"
  * DateFormatHelper::formatTime($date, showSeconds: true); // "15:45:32"
+ * DateFormatHelper::formatDate($date, pluginHandle: 'my-plugin'); // Explicit cascade context
  * DateFormatHelper::formatDate($date, 'short');           // "22/01/2026" (fixed numeric)
  *
  * // For database/export/API/filenames
@@ -169,9 +170,9 @@ class DateFormatHelper
      *
      * @return string '12' or '24'
      */
-    public static function getTimeFormat(): string
+    public static function getTimeFormat(?string $pluginHandle = null): string
     {
-        return self::getConfig()['timeFormat'] ?? '24';
+        return self::getConfig($pluginHandle)['timeFormat'] ?? '24';
     }
 
     /**
@@ -179,9 +180,9 @@ class DateFormatHelper
      *
      * @return string 'dmy', 'mdy', or 'ymd'
      */
-    public static function getDateOrder(): string
+    public static function getDateOrder(?string $pluginHandle = null): string
     {
-        return self::getConfig()['dateOrder'] ?? 'ymd';
+        return self::getConfig($pluginHandle)['dateOrder'] ?? 'ymd';
     }
 
     /**
@@ -189,9 +190,9 @@ class DateFormatHelper
      *
      * @return string '/', '-', or '.'
      */
-    public static function getDateSeparator(): string
+    public static function getDateSeparator(?string $pluginHandle = null): string
     {
-        return self::getConfig()['dateSeparator'] ?? '/';
+        return self::getConfig($pluginHandle)['dateSeparator'] ?? '/';
     }
 
     /**
@@ -199,9 +200,9 @@ class DateFormatHelper
      *
      * @return bool
      */
-    public static function getShowSeconds(): bool
+    public static function getShowSeconds(?string $pluginHandle = null): bool
     {
-        return self::getConfig()['showSeconds'] ?? false;
+        return self::getConfig($pluginHandle)['showSeconds'] ?? false;
     }
 
     /**
@@ -209,9 +210,9 @@ class DateFormatHelper
      *
      * @return string 'numeric', 'short', or 'long'
      */
-    public static function getMonthFormat(): string
+    public static function getMonthFormat(?string $pluginHandle = null): string
     {
-        return self::getConfig()['monthFormat'] ?? 'numeric';
+        return self::getConfig($pluginHandle)['monthFormat'] ?? 'numeric';
     }
 
     /**
@@ -365,6 +366,7 @@ class DateFormatHelper
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null
      */
     public static function formatDatetime(
@@ -373,14 +375,15 @@ class DateFormatHelper
         ?bool $showSeconds = null,
         bool $includeYear = true,
         bool $isUtc = true,
+        ?string $pluginHandle = null,
     ): ?string {
         $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
 
-        $datePart = self::formatDate($date, $style, $includeYear);
-        $timePart = self::formatTime($date, $style, $showSeconds);
+        $datePart = self::formatDate($date, $style, $includeYear, pluginHandle: $pluginHandle);
+        $timePart = self::formatTime($date, $style, $showSeconds, pluginHandle: $pluginHandle);
 
         if ($style === 'long') {
             return $datePart . ' at ' . $timePart;
@@ -395,14 +398,16 @@ class DateFormatHelper
      * @param DateTime|string|null $date
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null Example: "Jan 23, 15:45" or "23 Jan 15:45"
      */
     public static function formatCompactDatetime(
         DateTime|string|null $date,
         ?bool $showSeconds = null,
         bool $isUtc = true,
+        ?string $pluginHandle = null,
     ): ?string {
-        return self::formatDatetime($date, 'cascade', $showSeconds, false, $isUtc);
+        return self::formatDatetime($date, 'cascade', $showSeconds, false, $isUtc, $pluginHandle);
     }
 
     /**
@@ -412,6 +417,7 @@ class DateFormatHelper
      * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null
      */
     public static function formatDate(
@@ -419,19 +425,20 @@ class DateFormatHelper
         string $style = 'cascade',
         bool $includeYear = true,
         bool $isUtc = true,
+        ?string $pluginHandle = null,
     ): ?string {
         $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
 
-        $order = self::getDateOrder();
-        $sep = self::getDateSeparator();
+        $order = self::getDateOrder($pluginHandle);
+        $sep = self::getDateSeparator($pluginHandle);
         $monthFormat = match ($style) {
             'short' => 'numeric',
             'medium' => 'short',
             'long' => 'long',
-            default => self::getMonthFormat(),
+            default => self::getMonthFormat($pluginHandle),
         };
 
         if ($monthFormat === 'long') {
@@ -495,6 +502,7 @@ class DateFormatHelper
      * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool|null $showSeconds Override config default (null = use config)
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null
      */
     public static function formatTime(
@@ -502,14 +510,15 @@ class DateFormatHelper
         string $style = 'cascade',
         ?bool $showSeconds = null,
         bool $isUtc = true,
+        ?string $pluginHandle = null,
     ): ?string {
         $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
 
-        $is12Hour = self::getTimeFormat() === '12';
-        $seconds = $showSeconds ?? self::getShowSeconds();
+        $is12Hour = self::getTimeFormat($pluginHandle) === '12';
+        $seconds = $showSeconds ?? self::getShowSeconds($pluginHandle);
 
         if ($is12Hour) {
             $format = $seconds ? 'g:i:s A' : 'g:i A';  // 3:45:32 PM or 3:45 PM
