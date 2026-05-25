@@ -143,6 +143,26 @@ class DateFormatHelper
     }
 
     /**
+     * Clear cached date/time configuration.
+     *
+     * Use this after plugin settings change, or before queue-job descriptions
+     * are serialized in contexts where another bootstrap path may have already
+     * resolved stale date settings during the same request.
+     *
+     * @param string|null $pluginHandle Plugin handle to clear, or null for all cached config.
+     * @since 5.26.0
+     */
+    public static function clearConfigCache(?string $pluginHandle = null): void
+    {
+        if ($pluginHandle === null) {
+            self::$configCache = [];
+            return;
+        }
+
+        unset(self::$configCache[$pluginHandle]);
+    }
+
+    /**
      * Detect the current plugin handle from the active controller's module.
      *
      * Returns null when no controller is active (console boot, etc.) or when
@@ -213,14 +233,6 @@ class DateFormatHelper
     public static function getMonthFormat(?string $pluginHandle = null): string
     {
         return self::getConfig($pluginHandle)['monthFormat'] ?? 'numeric';
-    }
-
-    /**
-     * Clear cached config (useful for testing)
-     */
-    public static function clearConfigCache(): void
-    {
-        self::$configCache = [];
     }
 
     // =========================================================================
@@ -408,6 +420,88 @@ class DateFormatHelper
         ?string $pluginHandle = null,
     ): ?string {
         return self::formatDatetime($date, 'cascade', $showSeconds, false, $isUtc, $pluginHandle);
+    }
+
+    /**
+     * Format compact datetime from an already-resolved plugin settings object.
+     *
+     * Use this for serialized contexts such as queue descriptions, where the
+     * plugin settings object is already available and the output should not
+     * depend on request-order config cache state.
+     *
+     * @param DateTime|string|null $date
+     * @param object $settings Settings object with date/time format properties
+     * @param bool|null $showSeconds Override settings default (null = use settings)
+     * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @return string|null Example: "Jan 23 15:45" or "23 Jan 15:45"
+     * @since 5.26.0
+     */
+    public static function formatCompactDatetimeFromSettings(
+        DateTime|string|null $date,
+        object $settings,
+        ?bool $showSeconds = null,
+        bool $isUtc = true,
+    ): ?string {
+        $date = self::toCraftTimezone($date, $isUtc);
+        if ($date === null) {
+            return null;
+        }
+
+        $monthFormat = (string) self::settingValue($settings, 'monthFormat', 'numeric');
+        $dateOrder = (string) self::settingValue($settings, 'dateOrder', 'ymd');
+        $dateSeparator = (string) self::settingValue($settings, 'dateSeparator', '/');
+        $timeFormat = (string) self::settingValue($settings, 'timeFormat', '24');
+        $showSeconds ??= (bool) self::settingValue($settings, 'showSeconds', false);
+
+        $datePart = match ($monthFormat) {
+            'numeric' => $date->format(match ($dateOrder) {
+                'dmy' => "d{$dateSeparator}m",
+                'mdy', 'ymd' => "m{$dateSeparator}d",
+                default => "d{$dateSeparator}m",
+            }),
+            'short' => $date->format(match ($dateOrder) {
+                'dmy' => 'j M',
+                'mdy', 'ymd' => 'M j',
+                default => 'j M',
+            }),
+            'long' => $date->format(match ($dateOrder) {
+                'dmy' => 'j F',
+                'mdy', 'ymd' => 'F j',
+                default => 'j F',
+            }),
+            default => $date->format(match ($dateOrder) {
+                'dmy' => "d{$dateSeparator}m",
+                'mdy', 'ymd' => "m{$dateSeparator}d",
+                default => "d{$dateSeparator}m",
+            }
+            ),
+        };
+
+        $timePart = $date->format(match ($timeFormat) {
+            '12' => $showSeconds ? 'g:i:s A' : 'g:i A',
+            default => $showSeconds ? 'H:i:s' : 'H:i',
+        });
+
+        return "{$datePart} {$timePart}";
+    }
+
+    /**
+     * Read a non-empty value from a settings object.
+     *
+     * @return mixed
+     */
+    private static function settingValue(object $settings, string $key, mixed $default): mixed
+    {
+        if (!property_exists($settings, $key)) {
+            return $default;
+        }
+
+        $value = $settings->{$key} ?? null;
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        return $value;
     }
 
     /**
