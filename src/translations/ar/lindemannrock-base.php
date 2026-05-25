@@ -94,6 +94,7 @@ return [
     'no' => 'لا',
     'of' => 'من',
     'Auto-refresh' => 'تحديث تلقائي',
+    'Refreshing' => 'جار التحديث',
 
     // Import + backups
     'Import from CSV' => 'استيراد من CSV',
@@ -181,6 +182,11 @@ return [
     // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'نطاق التاريخ الافتراضي',
     'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'الإطار الزمني الافتراضي المُطبَّق على صفحات التحليلات والسجلات ولوحة التحكم في هذا المكوِّن الإضافي.',
+
+    // Analytics layout (shared via _layouts/cp-analytics.twig + _partials/analytics-panel.twig)
+    'Analytics' => 'التحليلات',
+    'All Sites' => 'كل المواقع',
+    'Loading' => 'جار التحميل',
 
     // Export format settings (shared via _partials/cascade-export-format-settings.twig)
     'CSV Export' => 'تصدير CSV',

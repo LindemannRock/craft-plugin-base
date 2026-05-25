@@ -94,6 +94,7 @@ return [
     'no' => 'nej',
     'of' => 'av',
     'Auto-refresh' => 'Automatisk uppdatering',
+    'Refreshing' => 'Uppdaterar',
 
     // Import + backups
     'Import from CSV' => 'Importera från CSV',
@@ -181,6 +182,11 @@ return [
     // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'Standarddatumintervall',
     'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'Standardtidsfönster som tillämpas på analys-, logg- och instrumentpanelssidor i detta plugin.',
+
+    // Analytics layout (shared via _layouts/cp-analytics.twig + _partials/analytics-panel.twig)
+    'Analytics' => 'Analys',
+    'All Sites' => 'Alla webbplatser',
+    'Loading' => 'Läser in',
 
     // Export format settings (shared via _partials/cascade-export-format-settings.twig)
     'CSV Export' => 'CSV-export',

@@ -94,6 +94,7 @@ return [
     'no' => 'いいえ',
     'of' => '/',
     'Auto-refresh' => '自動更新',
+    'Refreshing' => '更新中',
 
     // Import + backups
     'Import from CSV' => 'CSV からインポートする',
@@ -181,6 +182,11 @@ return [
     // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'デフォルトの日付範囲',
     'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'このプラグインのアナリティクス、ログ、およびダッシュボードページに適用されるデフォルトの期間です。',
+
+    // Analytics layout (shared via _layouts/cp-analytics.twig + _partials/analytics-panel.twig)
+    'Analytics' => 'アナリティクス',
+    'All Sites' => 'すべてのサイト',
+    'Loading' => 'ロードしています',
 
     // Export format settings (shared via _partials/cascade-export-format-settings.twig)
     'CSV Export' => 'CSV エクスポート',
