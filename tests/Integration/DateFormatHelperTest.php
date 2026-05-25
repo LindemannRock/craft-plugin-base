@@ -121,6 +121,9 @@ final class DateFormatHelperTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * @since 5.26.0
+     */
     public function testCompactDatetimeCanFormatFromResolvedSettingsObject(): void
     {
         $settings = (object) [
@@ -139,6 +142,9 @@ final class DateFormatHelperTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * @since 5.26.0
+     */
     public function testCompactDatetimeFromSettingsCanShowNumericDatesAndSeconds(): void
     {
         $settings = (object) [
@@ -157,6 +163,9 @@ final class DateFormatHelperTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * @since 5.26.0
+     */
     public function testCanClearOnePluginConfigCacheEntry(): void
     {
         $cache = new ReflectionClass(DateFormatHelper::class);
