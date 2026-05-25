@@ -305,6 +305,7 @@ The template is **purely presentational** — it builds `tableConfig` and render
         itemLabel: {singular: 'thing'|t('my-plugin'), plural: 'things'|t('my-plugin')},
     },
     checkboxes: canEdit or canDelete,
+    rowActions: canEdit or canDelete,
 } %}
 
 {% block tableRow %}
@@ -318,6 +319,18 @@ The template is **purely presentational** — it builds `tableConfig` and render
     </td>
 {% endblock %}
 ```
+
+### Read-only pages: set `rowActions: false` explicitly
+
+For pages with no row actions (read-only viewers / analytics dashboards / stats lists), set `rowActions: false` explicitly. The layout defaults to `true` and will render an empty `<th>Actions</th>` header plus an empty `<td>` per row when the key is omitted — looks like a bug to operators, but it's the configured default.
+
+```twig
+{# ✓ Read-only page. No row actions, no checkboxes. #}
+checkboxes: false,
+rowActions: false,
+```
+
+Same rule for `checkboxes: false` — the default is benign (no checkbox column when omitted), but stating it explicitly documents intent for the next reader.
 
 ### Anti-patterns to avoid
 
@@ -333,6 +346,10 @@ The template is **purely presentational** — it builds `tableConfig` and render
 {# ✗ Don't compute totalCount from a Twig-filtered array — silently wrong
      against a SQL-paginated source. #}
 {% set totalCount = things|filter(t => t.enabled)|length %}
+
+{# ✗ Don't omit `rowActions:` on a read-only page. The layout defaults to
+     `true` and renders an empty Actions column. Set `rowActions: false`. #}
+{# (no `rowActions:` key on a page that defines no rowActions block) #}
 ```
 
 ## Row-Action JS Anatomy
@@ -584,6 +601,19 @@ For each existing CP index page that doesn't follow this pattern:
 9. **Add JSON branches to action endpoints called via `Craft.sendActionRequest`** if they currently only redirect. Use `$request->getAcceptsJson()` to branch. AJAX-only endpoints can `requireAcceptsJson()` at the top.
 10. **Run `composer phpstan` + `composer fix-cs`** in the affected plugin. Both must be 0 errors.
 11. **Verify in the browser.** Click every row action and every bulk action; confirm filter/sort/paginate / search input still works; confirm pagination still shows the filtered total count.
+
+### Migration shapes — full vs. safety-rails-only
+
+Not every page needs every checklist item. In practice migrations fall into two shapes:
+
+| Shape | When it applies | Checklist items |
+|---|---|---|
+| **Full migration** | Twig owns orchestration today (`getParam`, `\|filter`, `\|sort`, `\|slice` in the template); controller does nothing or minimal. JS uses broad/narrow `querySelectorAll('[data-action]')` selectors. | Apply the full checklist (1–11). |
+| **Safety-rails-only pass** | Controller already orchestrates (param parsing, filter, sort, paginate). Template is already presentational. Missing only the canonical safety rails: allowlists, search clamp, `dir` snap, `max(1, …)` guards, permission booleans pre-computed. | Apply items **2** (allowlists / clamps / snaps), **4** (`totalCount` after filter), **6** (permission booleans), **10** (PHPStan / ECS), **11** (verify). Skip 3, 5, 7, 8, 9 if no behaviour change is implied. |
+
+**How to tell which shape you have:** read the existing controller's `actionIndex` first. If it already parses params, filters, sorts, paginates, and computes `totalCount` correctly, you're in safety-rails territory. If filter/sort/paginate happens in Twig, it's a full migration. A page can also be hybrid (controller orchestrates but template still has a `craft.app.request.getParam('search', '')` fallback line — strip those even in a safety-rails pass).
+
+Don't skip items 2 / 6 just because "the migration looks done." A controller that orchestrates correctly but doesn't validate `sort` against an allowlist still has a footgun (unknown sort values landing in `ORDER BY` — usually safe via the underlying layer's own validation, but the canonical pattern is defence in depth).
 
 ## Helper Extraction Decision
 
