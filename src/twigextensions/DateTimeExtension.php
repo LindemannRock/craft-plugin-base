@@ -23,12 +23,13 @@ use Twig\TwigFunction;
  *
  * Filters:
  * ```twig
- * {{ date|lrDatetime }}              {# 22/01/2026 15:45 #}
- * {{ date|lrDatetime('long') }}      {# 22 January 2026 at 15:45 #}
- * {{ date|lrDate }}                  {# 22/01/2026 #}
- * {{ date|lrDate('long') }}          {# 22 January 2026 #}
- * {{ date|lrTime }}                  {# 15:45 #}
- * {{ date|lrTime('cascade', true) }} {# 15:45:32 (with seconds) #}
+ * {{ date|lrDatetime }}                                  {# 22/01/2026 15:45 #}
+ * {{ date|lrDatetime('long') }}                          {# 22 January 2026 at 15:45 #}
+ * {{ date|lrDate }}                                      {# 22/01/2026 #}
+ * {{ date|lrDate('long') }}                              {# 22 January 2026 #}
+ * {{ date|lrTime }}                                      {# 15:45 #}
+ * {{ date|lrTime('cascade', true) }}                     {# 15:45:32 (with seconds) #}
+ * {{ date|lrDate('cascade', true, true, 'my-plugin') }}  {# Explicit cascade context #}
  * {{ date|lrRelative }}              {# 2 hours ago #}
  * ```
  *
@@ -93,6 +94,7 @@ class DateTimeExtension extends AbstractExtension
      * @param bool|null $showSeconds
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null
      */
     public function formatDatetime(
@@ -101,8 +103,9 @@ class DateTimeExtension extends AbstractExtension
         ?bool $showSeconds = null,
         bool $includeYear = true,
         bool $isUtc = true,
+        ?string $pluginHandle = null,
     ): ?string {
-        return DateFormatHelper::formatDatetime($date, $style, $showSeconds, $includeYear, $isUtc);
+        return DateFormatHelper::formatDatetime($date, $style, $showSeconds, $includeYear, $isUtc, $pluginHandle);
     }
 
     /**
@@ -111,11 +114,16 @@ class DateTimeExtension extends AbstractExtension
      * @param mixed $date
      * @param bool|null $showSeconds
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null
      */
-    public function formatCompactDatetime(mixed $date, ?bool $showSeconds = null, bool $isUtc = true): ?string
-    {
-        return DateFormatHelper::formatCompactDatetime($date, $showSeconds, $isUtc);
+    public function formatCompactDatetime(
+        mixed $date,
+        ?bool $showSeconds = null,
+        bool $isUtc = true,
+        ?string $pluginHandle = null,
+    ): ?string {
+        return DateFormatHelper::formatCompactDatetime($date, $showSeconds, $isUtc, $pluginHandle);
     }
 
     /**
@@ -125,6 +133,7 @@ class DateTimeExtension extends AbstractExtension
      * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool $includeYear Whether to include year in output
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null
      */
     public function formatDate(
@@ -132,8 +141,9 @@ class DateTimeExtension extends AbstractExtension
         string $style = 'cascade',
         bool $includeYear = true,
         bool $isUtc = true,
+        ?string $pluginHandle = null,
     ): ?string {
-        return DateFormatHelper::formatDate($date, $style, $includeYear, $isUtc);
+        return DateFormatHelper::formatDate($date, $style, $includeYear, $isUtc, $pluginHandle);
     }
 
     /**
@@ -143,6 +153,7 @@ class DateTimeExtension extends AbstractExtension
      * @param string $style 'cascade', 'short', 'medium', 'long'
      * @param bool|null $showSeconds
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
+     * @param string|null $pluginHandle Explicit plugin handle for cascade settings when auto-detection is unavailable
      * @return string|null
      */
     public function formatTime(
@@ -150,8 +161,9 @@ class DateTimeExtension extends AbstractExtension
         string $style = 'cascade',
         ?bool $showSeconds = null,
         bool $isUtc = true,
+        ?string $pluginHandle = null,
     ): ?string {
-        return DateFormatHelper::formatTime($date, $style, $showSeconds, $isUtc);
+        return DateFormatHelper::formatTime($date, $style, $showSeconds, $isUtc, $pluginHandle);
     }
 
     /**
