@@ -46,6 +46,8 @@
     {key: 'exportsExcel', shortKey: 'excel', configKey: 'exports.excel', label: 'Excel Export'|t('lindemannrock-base'), instructions: 'Whether the Excel export option appears in this plugin\'s export menus.'|t('lindemannrock-base')},
 ] %}
 
+<h3>{{ 'Export'|t('lindemannrock-base') }}</h3>
+
 {% for format in formats %}
     {% if format.key in fields %}
         {% set isOverridden = settings.isOverriddenByConfig(format.configKey) %}
