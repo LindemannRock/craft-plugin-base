@@ -43,6 +43,7 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 |--------|---------|-------------|
 | `formatDatetime($dt, $style, $showSeconds, $year, $isUtc)` | `string` | Full datetime |
 | `formatCompactDatetime($dt, $showSeconds, $isUtc)` | `string` | Datetime without year |
+| `formatCompactDatetimeFromSettings($dt, $settings, $showSeconds, $isUtc)` | `string` | Datetime without year from a resolved settings object |
 | `formatDate($dt, $style, $year, $isUtc)` | `string` | Date only |
 | `formatTime($dt, $style, $showSeconds, $isUtc)` | `string` | Time only |
 | `formatRelative($dt, $isUtc)` | `string` | Relative time |

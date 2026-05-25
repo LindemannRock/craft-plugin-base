@@ -102,6 +102,19 @@ DateFormatHelper::formatCompactDatetime($date);  // "24 Jan 3:45 PM"
 DateFormatHelper::formatCompactDatetime($date, pluginHandle: 'my-plugin');
 ```
 
+### formatCompactDatetimeFromSettings() @since(5.26.0)
+
+Short datetime without year from an already-resolved plugin settings object. Use this for serialized strings such as queue descriptions, where the plugin settings object is available and the output should not depend on request-order config cache state.
+
+```php
+DateFormatHelper::formatCompactDatetimeFromSettings(
+    $nextRun,
+    MyPlugin::$plugin->getSettings(),
+    false,
+    false,
+); // "May 25 18:57"
+```
+
 ### formatRelative()
 
 Relative time using Craft's formatter.
