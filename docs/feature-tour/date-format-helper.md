@@ -27,6 +27,13 @@ When `DateFormatHelper::getConfig()` resolves a setting, it walks four layers (h
 
 The "current plugin" is auto-detected from `Craft::$app->controller->module` when its controller belongs to a plugin — so Twig filters like `|lrTime` automatically respect per-plugin overrides without callers needing to thread a plugin handle through every call site.
 
+When plugin code is rendered by a Craft-owned controller, pass the plugin handle explicitly. Common examples are element-index attributes, element cards, slideouts, widgets, and other CP surfaces where Craft owns the request but the plugin owns the display code:
+
+```php
+DateFormatHelper::formatDate($date, pluginHandle: 'my-plugin');
+DateFormatHelper::formatDatetime($date, pluginHandle: 'my-plugin');
+```
+
 To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/cascade-date-format-settings.twig`. Cross-plugin rollout status is tracked in [`_docs/rollouts/completed/base-settings/tracker.md`](../../../_docs/rollouts/completed/base-settings/tracker.md).
 
 ## Display Formatting
@@ -60,6 +67,7 @@ DateFormatHelper::formatDatetime($date, 'cascade', true);   // "24 January 2026 
 | `$showSeconds` | `bool\|null` | `null` | Override config's `showSeconds` |
 | `$includeYear` | `bool` | `true` | Include year in output |
 | `$isUtc` | `bool` | `true` | Whether string input is UTC |
+| `$pluginHandle` | `string\|null` | `null` | Explicit plugin handle for cascade settings when auto-detection is unavailable |
 
 ### formatDate()
 
@@ -70,6 +78,7 @@ DateFormatHelper::formatDate($date);                  // "24 January 2026" when 
 DateFormatHelper::formatDate($date, 'short');          // "24/01/2026"
 DateFormatHelper::formatDate($date, 'medium', false);  // "24 Jan" (no year)
 DateFormatHelper::formatDate($date, 'long');           // "24 January 2026"
+DateFormatHelper::formatDate($date, pluginHandle: 'my-plugin');
 ```
 
 ### formatTime()
@@ -79,6 +88,7 @@ Formats the time portion only.
 ```php
 DateFormatHelper::formatTime($date);                     // "3:45 PM" (12h) or "15:45" (24h)
 DateFormatHelper::formatTime($date, 'cascade', true);    // "3:45:32 PM" (with seconds)
+DateFormatHelper::formatTime($date, pluginHandle: 'my-plugin');
 ```
 
 When `$showSeconds` is `null` (default), the value flows from the [cascade](#cascade-order-since5100). Seconds appear if base config or the active plugin has `showSeconds=true`, regardless of `$style`. Pass explicit `true` or `false` to override seconds for one call site.
@@ -89,6 +99,7 @@ Short datetime without year — useful for dashboards and recent activity lists.
 
 ```php
 DateFormatHelper::formatCompactDatetime($date);  // "24 Jan 3:45 PM"
+DateFormatHelper::formatCompactDatetime($date, pluginHandle: 'my-plugin');
 ```
 
 ### formatRelative()
