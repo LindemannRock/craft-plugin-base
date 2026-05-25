@@ -42,11 +42,11 @@ final class DateFormatHelperTest extends IntegrationTestCase
     /**
      * @param array<string, mixed> $config
      */
-    private function setDateFormatConfig(array $config): void
+    private function setDateFormatConfig(array $config, string $cacheKey = '__base__'): void
     {
         $cache = new ReflectionClass(DateFormatHelper::class);
         $configProperty = $cache->getProperty('configCache');
-        $configProperty->setValue(null, ['__base__' => $config]);
+        $configProperty->setValue(null, [$cacheKey => $config]);
     }
 
     public function testLocalDateExpressionParameterizesTimezoneOffsetAgainstSqlInjection(): void
@@ -97,6 +97,26 @@ final class DateFormatHelperTest extends IntegrationTestCase
         self::assertSame('30 May 2026', DateFormatHelper::formatDate($date, 'medium'));
         self::assertSame('30 May 2026', DateFormatHelper::formatDate($date, 'long'));
         self::assertSame('30 May 2026 at 12:30:00 AM', DateFormatHelper::formatDatetime($date, 'long'));
+    }
+
+    public function testExplicitPluginHandleSelectsPluginCascadeConfig(): void
+    {
+        $this->setDateFormatConfig([
+            'timeFormat' => '12',
+            'dateOrder' => 'mdy',
+            'monthFormat' => 'long',
+            'dateSeparator' => '/',
+            'showSeconds' => true,
+        ], 'test-plugin');
+
+        $date = new DateTime('2026-01-07 14:30:25', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame('January 7, 2026', DateFormatHelper::formatDate($date, pluginHandle: 'test-plugin'));
+        self::assertSame('2:30:25 PM', DateFormatHelper::formatTime($date, pluginHandle: 'test-plugin'));
+        self::assertSame(
+            'January 7, 2026 2:30:25 PM',
+            DateFormatHelper::formatDatetime($date, pluginHandle: 'test-plugin'),
+        );
     }
 
     public function testShowSecondsStaysOrthogonalToDisplayStyle(): void
