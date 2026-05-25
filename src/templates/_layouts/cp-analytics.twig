@@ -71,7 +71,7 @@
 
 {# Page info #}
 {% set pageConfig = config.page ?? {} %}
-{% set title = pageConfig.title ?? 'Analytics'|t('app') %}
+{% set title = pageConfig.title ?? 'Analytics'|t('lindemannrock-base') %}
 {% set selectedSubnavItem = pageConfig.subnav ?? 'analytics' %}
 {% set crumbs = pageConfig.crumbs ?? [] %}
 
@@ -169,7 +169,7 @@
                         <button type="button" class="btn menubtn">
                             <span id="{{ filter.param }}Label">
                                 {% set currentOption = filter.options|filter(o => o.value == filter.current)|first %}
-                                {{ currentOption.label ?? filter.allLabel ?? 'All'|t('app') }}
+                                {{ currentOption.label ?? filter.allLabel ?? 'All'|t('lindemannrock-base') }}
                             </span>
                         </button>
                         <div class="menu">
@@ -197,12 +197,12 @@
                 <div class="btngroup">
                     <button type="button" class="btn menubtn">
                         <span id="siteLabel">
-                            {{ currentSiteId ? sites|filter(s => s.id == currentSiteId)|first.name : 'All Sites'|t('app') }}
+                            {{ currentSiteId ? sites|filter(s => s.id == currentSiteId)|first.name : 'All Sites'|t('lindemannrock-base') }}
                         </span>
                     </button>
                     <div class="menu">
                         <ul>
-                            <li><a href="#" data-site="" class="lr-site-option {{ not currentSiteId ? 'sel' : '' }}">{{ "All Sites"|t('app') }}</a></li>
+                            <li><a href="#" data-site="" class="lr-site-option {{ not currentSiteId ? 'sel' : '' }}">{{ "All Sites"|t('lindemannrock-base') }}</a></li>
                             {% for site in sites %}
                                 <li><a href="#" data-site="{{ site.id }}" class="lr-site-option {{ currentSiteId == site.id ? 'sel' : '' }}">{{ site.name }}</a></li>
                             {% endfor %}
@@ -253,7 +253,7 @@
         <div class="lr-analytics-loader" aria-hidden="true">
             <div class="lr-analytics-loader-inner">
                 <div class="lr-analytics-spinner"></div>
-                <span>{{ "Loading"|t('app') }}</span>
+                <span>{{ "Loading"|t('lindemannrock-base') }}</span>
             </div>
         </div>
     {# Tab Content - Plugin defines the content #}

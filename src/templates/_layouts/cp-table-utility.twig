@@ -663,7 +663,7 @@
                 if (!noticeEl || !textEl) return;
                 if (isRefreshing) {
                     noticeEl.classList.add('is-refreshing');
-                    textEl.textContent = '{{ "Refreshing"|t("app") }}';
+                    textEl.textContent = '{{ "Refreshing"|t("lindemannrock-base") }}';
                 } else {
                     noticeEl.classList.remove('is-refreshing');
                     textEl.textContent = formatTime(countdown);
