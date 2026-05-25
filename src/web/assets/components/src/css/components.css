@@ -919,6 +919,10 @@ a.lr-unified-card-link:active {
     text-align: center;
 }
 
+.tablepane table#lr-data-table.data th.orderable:first-child:not(.checkbox-cell, .vuetable-th-slot-checkbox) button {
+    padding-inline-start: var(--pane-padding, var(--pane-x-padding-default));
+}
+
 .page-info {
     margin: 0 12px;
     color: #596673;
