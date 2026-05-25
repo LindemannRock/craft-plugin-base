@@ -70,7 +70,7 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `getDateSeparator()` | `string` | `'/'`, `'-'`, or `'.'` |
 | `getShowSeconds()` | `bool` | Default showSeconds preference |
 | `getMonthFormat()` | `string` | `'numeric'`, `'short'`, or `'long'` |
-| `clearConfigCache()` | `void` | Clear cached config (useful for testing) |
+| `clearConfigCache($pluginHandle = null)` | `void` | Clear cached config for one plugin, or all cached config when omitted |
 
 **Utilities:**
 

@@ -165,7 +165,8 @@ DateFormatHelper::getDateOrder();      // 'dmy', 'mdy', or 'ymd'
 DateFormatHelper::getDateSeparator();  // '/', '-', or '.'
 DateFormatHelper::getShowSeconds();    // bool
 DateFormatHelper::getMonthFormat();    // 'numeric', 'short', or 'long'
-DateFormatHelper::clearConfigCache();  // Clear cached config (useful in tests)
+DateFormatHelper::clearConfigCache();             // Clear all cached config
+DateFormatHelper::clearConfigCache('my-plugin');  // Clear one plugin's cached config
 ```
 
 ## SQL Expressions @since(5.15.0)
