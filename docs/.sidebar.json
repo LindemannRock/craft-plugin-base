@@ -25,6 +25,7 @@
             "feature-tour/date-range-helper",
             "feature-tour/schedule-helper",
             "feature-tour/color-helper",
+            "feature-tour/config-file-helper",
             "feature-tour/export-helper",
             "feature-tour/geo-helper",
             "feature-tour/geo-lookup",
