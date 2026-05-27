@@ -166,6 +166,27 @@ final class DateFormatHelperTest extends IntegrationTestCase
     /**
      * @since 5.26.0
      */
+    public function testCompactDatetimeFromSettingsCanIncludeYear(): void
+    {
+        $settings = (object) [
+            'timeFormat' => '24',
+            'dateOrder' => 'ymd',
+            'monthFormat' => 'long',
+            'dateSeparator' => '-',
+            'showSeconds' => false,
+        ];
+
+        $date = new DateTime('2027-05-27 11:14:00', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame(
+            '2027 May 27 11:14',
+            DateFormatHelper::formatCompactDatetimeFromSettings($date, $settings, false, false, true),
+        );
+    }
+
+    /**
+     * @since 5.26.0
+     */
     public function testCanClearOnePluginConfigCacheEntry(): void
     {
         $cache = new ReflectionClass(DateFormatHelper::class);
