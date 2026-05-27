@@ -14,10 +14,9 @@ A set of seven traits and their companion CP partials that centralize the duplic
 
 ## Adopting the patterns
 
-The full per-plugin walkthrough lives in [`../../../_docs/rollouts/completed/base-settings/prompt.md`](../../../_docs/rollouts/completed/base-settings/prompt.md). The cross-plugin progress tracker is at [`../../../_docs/rollouts/completed/base-settings/tracker.md`](../../../_docs/rollouts/completed/base-settings/tracker.md). Two working reference plugins:
+Adopt the traits one settings surface at a time. Add the trait to the plugin settings model, add or migrate the matching database columns, include the base partial in the CP settings template, and keep plugin-specific instructions in the plugin's own translation category.
 
-- **`search-manager`** — full coverage of all 6 patterns end-to-end. Canonical example for any pattern.
-- **`logging-library`** — narrower (3 of 6). Demonstrates the `excludeFromSave()` subset-of-trait-fields trick and the pre-launch-with-migrations exception.
+Plugins can surface only the fields they need. When a plugin includes a subset of trait-managed fields, exclude any unsurfaced properties from persistence so missing columns are not written during settings saves.
 
 ## `DateFormatSettingsTrait` — date/time format overrides
 
@@ -390,5 +389,3 @@ The only plugin-specific translation surface that survives is plugin-specific in
 - [SettingsConfigTrait](settings-config.md) — provides `isOverriddenByConfig()` + `validateLogLevel`; required by every cascade trait + the log-level trait
 - [SettingsPersistenceTrait](settings-persistence.md) — DB-backed Settings models; required by every plugin that adopts these traits
 - [SettingsDisplayNameTrait](settings-display-name.md) — pairs with `PluginNameSettingsTrait`
-- [Rollout prompt](../../../_docs/rollouts/completed/base-settings/prompt.md) — per-plugin adoption walkthrough
-- [Rollout tracker](../../../_docs/rollouts/completed/base-settings/tracker.md) — cross-plugin progress

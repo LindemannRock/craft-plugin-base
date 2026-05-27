@@ -34,7 +34,7 @@ DateFormatHelper::formatDate($date, pluginHandle: 'my-plugin');
 DateFormatHelper::formatDatetime($date, pluginHandle: 'my-plugin');
 ```
 
-To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/cascade-date-format-settings.twig`. Cross-plugin rollout status is tracked in [`_docs/rollouts/completed/base-settings/tracker.md`](../../../_docs/rollouts/completed/base-settings/tracker.md).
+To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/cascade-date-format-settings.twig`.
 
 ## Display Formatting
 

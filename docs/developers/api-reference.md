@@ -368,7 +368,7 @@ Same three accessors as `StubConsoleRequest`, but extends Yii's web request. **P
 
 `lindemannrock\base\testing\bootstrap(?string $projectRoot = null): void` — initialise Craft as a console application from a test bootstrap file. Auto-detects the project root when `$projectRoot` is null.
 
-For the cross-plugin workflow recipe, see [`plugins/_docs/workflows/testing.md`](../../../_docs/workflows/testing.md).
+See [Testing](../feature-tour/testing.md) for setup details and examples.
 
 ---
 

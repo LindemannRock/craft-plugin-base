@@ -501,7 +501,7 @@ This is **pattern-conformant**, not a divergence — the JS still goes through t
 
 **Promote to a server-side bulk endpoint when:** selection ceilings rise, the per-row endpoint has heavy side effects (cache invalidation, logging, etc.) that would benefit from batching, or response-time across the fan-out becomes user-visible.
 
-References in the repo: `search-manager/templates/widgets/styles/index.twig` (bulk-delete fan-out over `delete-style`) and `redirect-manager/templates/dashboard/index.twig` (bulk-delete fan-out over `/analytics/delete`). Both flagged in their plugin's `.internal/todo.md` as candidates for promotion if usage justifies it.
+This pattern is appropriate when the selected row count is bounded and each request is independently safe. If the selection size or side effects grow, add a dedicated server-side bulk action instead.
 
 ## Paired Controller-Side JSON Branch
 

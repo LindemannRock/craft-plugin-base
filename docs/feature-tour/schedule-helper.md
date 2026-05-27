@@ -118,7 +118,7 @@ if ($delay > 0) {
 
 ## Typical Job + Bootstrap Pattern
 
-The full pattern wires four pieces together: settings model, settings UI, the recurring job, and the plugin bootstrap. See the [Scheduler Migration Guide](../../../_docs/rollouts/active/scheduler-pattern/prompt.md) for the migration checklist. No shipped plugin is the canonical reference yet; the first migrated plugin should update the rollout tracker with observed verification notes.
+The full pattern wires four pieces together: settings model, settings UI, the recurring job, and the plugin bootstrap. Use this structure when a plugin needs one recurring schedule setting that can be disabled, changed from the CP, and rescheduled safely after each run.
 
 ### Settings model
 
@@ -346,7 +346,7 @@ public function handleMyScheduleChange(Settings $settings): void
 
 ## Common Pitfalls
 
-These cost real time during the first migration. The rollout guide covers them in detail.
+These are the common failure modes to avoid when wiring a recurring queue job to a settings-controlled schedule.
 
 | Pitfall | Symptom | Fix |
 |---------|---------|-----|
@@ -362,5 +362,3 @@ These cost real time during the first migration. The rollout guide covers them i
 
 - [DateFormatHelper](date-format-helper.md) — TZ-aware "now" + display formatting (used internally by `ScheduleHelper`)
 - [QueueTtrTrait](queue-ttr.md) — shared queue TTR for jobs
-- [Scheduler Migration Guide](../../../_docs/rollouts/active/scheduler-pattern/prompt.md) — per-plugin rollout prompt
-- [Scheduler Rollout Tracker](../../../_docs/rollouts/active/scheduler-pattern/tracker.md) — cross-plugin status

@@ -3,7 +3,7 @@
 Shared scaffolding for PHPUnit integration tests against a live Craft install. Provides an abstract base test case, a Craft-console bootstrap function, and a `phpunit.xml.dist` template plugins copy once.
 
 > [!TIP]
-> For the cross-plugin workflow recipe — adding tests to a new plugin, setup steps, marker-cleanup conventions, when to write a test — see the dedicated maintainer guide in [`plugins/_docs/workflows/testing.md`](../../../_docs/workflows/testing.md). This page is the **API reference** for the base layer itself.
+> This page is the API reference for the base testing layer. Copy the template, add a plugin bootstrap, and extend `IntegrationTestCase` for live Craft integration tests.
 
 ## What's in the namespace
 
@@ -297,5 +297,5 @@ Adjust only if your plugin has non-standard layout.
 
 ## Related
 
-- [`plugins/_docs/workflows/testing.md`](../../../_docs/workflows/testing.md) — Cross-plugin workflow guide: how to add tests to a new plugin, patterns, conventions, when to write a test.
-- search-manager `tests/` — Reference suite (77 tests / 271 assertions). Read its `tests/TestCase.php` to see how a plugin layers its own helpers on top of `IntegrationTestCase`.
+- [Bootstrapping](../developers/bootstrapping.md) — how to initialize the base module
+- `phpunit.xml.dist.template` — copy-once suite setup for plugin integration tests
