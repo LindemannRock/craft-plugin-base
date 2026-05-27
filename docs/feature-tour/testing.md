@@ -17,7 +17,7 @@ Shared scaffolding for PHPUnit integration tests against a live Craft install. P
 | `bootstrap()` | function | Initialises Craft as a console application from a test bootstrap file. |
 | `phpunit.xml.dist.template` | template file | Copy-once `phpunit.xml.dist` shipping strict mode and a sensible default suite layout. |
 
-The reference search-manager suite (77 tests / 271 assertions) extends `IntegrationTestCase` directly. shortlink-manager uses `StubWebRequest` (its `trackClick()` type-hints `yii\web\Request`); smartlink-manager uses `StubConsoleRequest` (its `trackClick()` reads off `Craft::$app->request`).
+Choose `StubWebRequest` when code accepts a web request argument, and choose `StubConsoleRequest` when code reads from `Craft::$app->request` inside the console-bootstrapped test harness.
 
 ## `IntegrationTestCase`
 

@@ -375,7 +375,7 @@ foreach ($postedSettings as $key => $value) {
 }
 ```
 
-It's reflection-driven so it covers every nullable property generically — not just the trait-managed ones. Search-manager's `SettingsController::actionSave()` is the working reference.
+It's reflection-driven so it covers every nullable property generically — not just the trait-managed ones.
 
 ## Translations
 
