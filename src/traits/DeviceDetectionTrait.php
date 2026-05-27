@@ -28,6 +28,7 @@ use lindemannrock\base\device\DeviceDetection;
  *             'cacheEnabled' => $settings->cacheDeviceDetection,
  *             'cacheStorageMethod' => $settings->cacheStorageMethod,
  *             'cacheDuration' => $settings->deviceDetectionCacheDuration,
+ *             'pluginHandle' => MyPlugin::$plugin->id,
  *             'cachePath' => PluginHelper::getCachePath(MyPlugin::$plugin, 'device'),
  *             'cacheKeyPrefix' => 'myplugin:device:',
  *             'cacheKeySet' => 'myplugin-device-keys',
