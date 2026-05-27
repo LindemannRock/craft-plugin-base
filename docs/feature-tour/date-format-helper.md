@@ -113,6 +113,14 @@ DateFormatHelper::formatCompactDatetimeFromSettings(
     false,
     false,
 ); // "May 25 18:57"
+
+DateFormatHelper::formatCompactDatetimeFromSettings(
+    $nextRun,
+    MyPlugin::$plugin->getSettings(),
+    false,
+    false,
+    true,
+); // "2027 May 25 18:57" when the queue label needs the year
 ```
 
 ### formatRelative()
