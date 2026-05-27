@@ -139,7 +139,7 @@ return [
     'ipinfo.io: HTTPS with 50,000 free requests/month. API key optional (increases rate limits).' => 'ipinfo.io: HTTPS med 50 000 gratis forespørsler/måned. API-nøkkel valgfri (øker hastighetsgrenser).',
 
     // Date format settings (shared via _partials/cascade-date-format-settings.twig + _partials/cascade-base-overrides.twig)
-    'Base Plugin Overrides' => 'Overstyringer av basisplugin',
+    'Base Settings Overrides' => 'Overstyringer av basisinnstillinger',
     'Settings marked "Use global default" inherit from <code>config/lindemannrock-base.php</code>. If that file (or the specific key) is absent, hardcoded defaults apply. To customize globally, copy <code>vendor/lindemannrock/craft-plugin-base/src/config.php</code> to your project\'s <code>config/</code> directory.' => 'Innstillinger merket som „Bruk global standardinnstilling" arver fra <code>config/lindemannrock-base.php</code>. Hvis den filen (eller den spesifikke nøkkelen) mangler, gjelder de innebygde standardverdiene. For global tilpasning, kopier <code>vendor/lindemannrock/craft-plugin-base/src/config.php</code> til prosjektets <code>config/</code>-mappe.',
     'Time' => 'Tid',
     'Date' => 'Dato',
