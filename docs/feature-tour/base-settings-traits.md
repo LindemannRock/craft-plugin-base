@@ -9,7 +9,7 @@ A set of seven traits and their companion CP partials that centralize the duplic
 | **Traits** | `DateFormatSettingsTrait`, `DateRangeSettingsTrait`, `ExportFormatSettingsTrait` | `ItemsPerPageSettingsTrait`, `PluginNameSettingsTrait`, `LogLevelSettingsTrait`, `GeoSettingsTrait` |
 | **Properties** | Nullable. `null` = "inherit from base config / hardcoded default". | Concrete typed values. Plugin owns its default. |
 | **Cascade engine** | `DateFormatHelper`, `DateRangeHelper`, `ExportHelper` — each resolves a 4-layer cascade (defaults → base config → plugin Settings → plugin config) | None. Each plugin owns its own value. |
-| **Form rendering** | Routes through the `cascade-base-overrides` umbrella partial, which adds the shared "Base Plugin Overrides" heading + cascade info-box + dispatches to per-section sub-partials. | Individual `field-*` partials, included directly by the plugin's settings template. |
+| **Form rendering** | Routes through the `cascade-base-overrides` umbrella partial, which adds the shared "Base Settings Overrides" heading + cascade info-box + dispatches to per-section sub-partials. | Individual `field-*` partials, included directly by the plugin's settings template. |
 | **CP UX** | Each select has a `"Use global default"` (empty) option. The field is disabled with an override-warning when plugin config sets the same key. | Standard inputs (textField, number input, selectField). Override-warning behaves the same way. |
 
 ## Adopting the patterns
