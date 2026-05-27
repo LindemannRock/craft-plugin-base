@@ -4,40 +4,49 @@
  # Parameters:
  # - sectionId: container id (default: import-history)
  # - title: section title
+ # - description: optional section description (default: Recent CSV imports and their results.)
  # - importHistory: rows with formattedDate, user, filename, formattedSize, imported, failed
  # - canClearHistory: whether clear button is shown
  # - clearButtonId: clear button id (default: clear-logs-btn)
  # - clearLabel: clear button label
  # - emptyMessage: empty state text
- # - translationCategory: plugin translation category
  #}
 
 {% set sectionId = sectionId ?? 'import-history' %}
 {% set title = title ?? 'Import History'|t('lindemannrock-base') %}
+{% set description = description ?? 'Recent CSV imports and their results.'|t('lindemannrock-base') %}
 {% set importHistory = importHistory ?? [] %}
 {% set canClearHistory = canClearHistory ?? false %}
 {% set clearButtonId = clearButtonId ?? 'clear-logs-btn' %}
 {% set clearLabel = clearLabel ?? 'Clear history'|t('lindemannrock-base') %}
 {% set emptyMessage = emptyMessage ?? 'No import history yet.'|t('lindemannrock-base') %}
-{% set translationCategory = translationCategory ?? 'app' %}
 
 <div id="{{ sectionId }}" class="hidden">
-    <h2>{{ title }}</h2>
-    {% if importHistory|length and canClearHistory %}
-        <div style="margin: 0 0 1rem auto;">
-            <button type="button" class="btn" id="{{ clearButtonId }}">{{ clearLabel }}</button>
+    {% block heading %}
+        <div class="flex" style="align-items: center; margin-bottom: 1rem;">
+            <h2 style="margin: 0;">{{ title }}</h2>
+            {% if importHistory|length and canClearHistory %}
+                <div style="margin-left: auto;">
+                    <button type="button" class="btn" id="{{ clearButtonId }}">{{ clearLabel }}</button>
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
+        {% if description %}
+            <p>{{ description }}</p>
+        {% endif %}
+    {% endblock %}
+
     {% if importHistory|length %}
         <table class="data fullwidth">
             <thead>
                 <tr>
-                    <th>{{ 'Date'|t(translationCategory) }}</th>
-                    <th>{{ 'Created By'|t(translationCategory) }}</th>
-                    <th>{{ 'Filename'|t(translationCategory) }}</th>
-                    <th>{{ 'Size'|t(translationCategory) }}</th>
-                    <th>{{ 'Imported'|t(translationCategory) }}</th>
-                    <th>{{ 'Failed'|t(translationCategory) }}</th>
+                    <th>{{ 'Date'|t('lindemannrock-base') }}</th>
+                    <th>{{ 'Created By'|t('lindemannrock-base') }}</th>
+                    <th>{{ 'Filename'|t('lindemannrock-base') }}</th>
+                    <th>{{ 'Size'|t('lindemannrock-base') }}</th>
+                    <th>{{ 'Imported'|t('lindemannrock-base') }}</th>
+                    <th>{{ 'Failed'|t('lindemannrock-base') }}</th>
+                    {% block extraColumnsHead %}{% endblock %}
                 </tr>
             </thead>
             <tbody>
@@ -47,8 +56,9 @@
                         <td>{{ item.user }}</td>
                         <td>{{ item.filename ?? '-' }}</td>
                         <td><code style="font-size: 11px;">{{ item.formattedSize }}</code></td>
-                        <td><strong>{{ item.imported|number_format }}</strong></td>
+                        <td>{% block importedCell %}<strong>{{ item.imported|number_format }}</strong>{% endblock %}</td>
                         <td>{{ item.failed|number_format }}</td>
+                        {% block extraColumnsCell %}{% endblock %}
                     </tr>
                 {% endfor %}
             </tbody>
