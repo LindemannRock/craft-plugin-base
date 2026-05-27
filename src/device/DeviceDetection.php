@@ -10,6 +10,7 @@ namespace lindemannrock\base\device;
 
 use Craft;
 use DeviceDetector\DeviceDetector;
+use lindemannrock\base\helpers\PluginHelper;
 
 /**
  * Device Detection
@@ -47,7 +48,6 @@ class DeviceDetection
     ];
     private array $config;
     private ?DeviceDetector $detector = null;
-    private static bool $redisFallbackLogged = false;
 
     public function __construct(array $config = [])
     {
@@ -366,18 +366,10 @@ class DeviceDetection
         $cacheStorage = $config['cacheStorageMethod'] ?? 'file';
 
         if ($cacheStorage === 'redis') {
-            $cache = Craft::$app->cache;
-            if ($cache instanceof \yii\redis\Cache) {
+            $cache = PluginHelper::getRedisCacheOrLog($this->getPluginContext($config));
+            if ($cache !== null) {
                 $cached = $cache->get($cacheKey);
                 return $cached !== false ? $cached : null;
-            }
-
-            if (!self::$redisFallbackLogged) {
-                $this->logWarning(
-                    'Redis cache selected but Craft cache is not Redis; falling back to file cache',
-                    $config
-                );
-                self::$redisFallbackLogged = true;
             }
         }
 
@@ -417,8 +409,8 @@ class DeviceDetection
         $duration = (int)($config['cacheDuration'] ?? 0);
 
         if ($cacheStorage === 'redis') {
-            $cache = Craft::$app->cache;
-            if ($cache instanceof \yii\redis\Cache) {
+            $cache = PluginHelper::getRedisCacheOrLog($this->getPluginContext($config));
+            if ($cache !== null) {
                 $cache->set($cacheKey, $data, $duration);
 
                 $cacheKeySet = $config['cacheKeySet'] ?? null;
@@ -455,6 +447,19 @@ class DeviceDetection
     }
 
     /**
+     * @param array<string, mixed> $config
+     */
+    private function getPluginContext(array $config): string
+    {
+        $pluginHandle = $config['pluginHandle'] ?? null;
+        if (is_string($pluginHandle) && $pluginHandle !== '') {
+            return $pluginHandle;
+        }
+
+        return 'lindemannrock-base';
+    }
+
+    /**
      * Map device info array to a model instance.
      *
      * @param array<string, mixed> $data
@@ -485,17 +490,6 @@ class DeviceDetection
         }
 
         return $model;
-    }
-
-    private function logWarning(string $message, array $config, array $context = []): void
-    {
-        $logger = $config['logWarning'] ?? null;
-        if (is_callable($logger)) {
-            $logger($message, $context);
-            return;
-        }
-
-        Craft::warning($message, __METHOD__);
     }
 
     private function logError(string $message, array $config, array $context = []): void
