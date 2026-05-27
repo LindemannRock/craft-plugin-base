@@ -23,6 +23,7 @@ class AnalyticsService extends Component
             'cacheEnabled' => $settings->cacheDeviceDetection,
             'cacheStorageMethod' => $settings->cacheStorageMethod,
             'cacheDuration' => $settings->deviceDetectionCacheDuration,
+            'pluginHandle' => MyPlugin::$plugin->id,
             'cachePath' => PluginHelper::getCachePath(MyPlugin::$plugin, 'device'),
             'cacheKeyPrefix' => PluginHelper::getCacheKeyPrefix('my-plugin', 'device'),
             'cacheKeySet' => PluginHelper::getCacheKeySet('my-plugin', 'device'),
@@ -40,6 +41,7 @@ class AnalyticsService extends Component
 | `cacheEnabled` | `bool` | `false` | Enable detection result caching |
 | `cacheStorageMethod` | `string` | `'file'` | Cache storage: `'file'` or `'redis'` |
 | `cacheDuration` | `int` | `3600` | Cache TTL in seconds |
+| `pluginHandle` | `string` | `'lindemannrock-base'` | Plugin context used for Redis cache-component warning logs |
 | `cachePath` | `string` | `''` | File cache directory path |
 | `cacheKeyPrefix` | `string` | `''` | Cache key prefix |
 | `cacheKeySet` | `string` | `''` | Redis key set name |
