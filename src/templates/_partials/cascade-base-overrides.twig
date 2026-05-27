@@ -1,8 +1,8 @@
 {#
 /**
- * Base Plugin Overrides — umbrella partial
+ * Base Settings Overrides — umbrella partial
  *
- * Renders a single consistent "Base Plugin Overrides" CP section with:
+ * Renders a single consistent "Base Settings Overrides" CP section with:
  *   - One heading (overridable via the `heading` param)
  *   - One cascade info-box explaining the "Use global default" semantics
  *   - The requested sub-partials in a fixed order
@@ -21,7 +21,7 @@
  *   config object can carry sub-partial-specific options.
  *
  * Optional variables:
- * - heading: Section heading text. Defaults to 'Base Plugin Overrides'|t.
+ * - heading: Section heading text. Defaults to 'Base Settings Overrides'|t.
  *   Pass `false` to omit the heading entirely.
  * - showInfoBox: Boolean. Defaults to true. Set false to suppress the
  *   cascade info-box (e.g., for plugins surfacing the same section in a
@@ -55,7 +55,7 @@
 
 {% set pluginHandle = pluginHandle ?? 'app' %}
 {% set sections = sections ?? {} %}
-{% set heading = heading is defined ? heading : 'Base Plugin Overrides'|t('lindemannrock-base') %}
+{% set heading = heading is defined ? heading : 'Base Settings Overrides'|t('lindemannrock-base') %}
 {% set showInfoBox = showInfoBox ?? true %}
 
 {% if heading is not same as(false) %}
