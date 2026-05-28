@@ -92,6 +92,16 @@ final class StoragePathValidatorTest extends IntegrationTestCase
         self::assertStringContainsString('web-accessible', implode(' ', $model->getErrors('path')));
     }
 
+    public function testWebrootCanBeAllowedWhenWebrootPreventionIsDisabled(): void
+    {
+        $model = $this->validate('@webroot/assets/icons', [
+            'allowedAliases' => ['@root', '@storage', '@webroot'],
+            'preventWebroot' => false,
+        ]);
+
+        self::assertFalse($model->hasErrors('path'));
+    }
+
     public function testEnvVarsCanBeDisabledPerValidator(): void
     {
         $this->setEnvValue('@storage/example');
