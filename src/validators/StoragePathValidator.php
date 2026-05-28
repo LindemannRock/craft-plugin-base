@@ -146,7 +146,7 @@ class StoragePathValidator extends Validator
             return false;
         }
 
-        if (preg_match('/^@web(root)?(?:\/|$)/i', $value) === 1) {
+        if ($this->preventWebroot && preg_match('/^@web(root)?(?:\/|$)/i', $value) === 1) {
             $model->addError(
                 $attribute,
                 Craft::t($this->translationCategory, 'Path cannot use @web or @webroot because those are web-accessible.')
