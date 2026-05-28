@@ -179,6 +179,27 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 |--------|---------|-------------|
 | `htmlSafeJson(mixed $value)` | `string` | JSON-encode a value using HTML-safe flags for inline script/template output |
 
+### StoragePathHelper
+
+`lindemannrock\base\helpers\StoragePathHelper`
+[Full docs](../feature-tour/storage-path-validator.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `resolve(string $path)` | `string` | Resolve environment variables and Craft aliases in a storage path value |
+
+### StoragePathValidator
+
+`lindemannrock\base\validators\StoragePathValidator`
+[Full docs](../feature-tour/storage-path-validator.md)
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `allowedAliases` | `array` | Alias prefixes allowed for literal aliases and env-resolved absolute paths |
+| `preventWebroot` | `bool` | Reject paths that resolve inside `@webroot` |
+| `requireAlias` | `bool` | Require a literal alias, env var, or absolute path that resolves inside an allowed alias root |
+| `allowEnvVars` | `bool` | Allow `$VARIABLE` values and validate their resolved path |
+
 ### BooleanHelper
 
 `lindemannrock\base\helpers\BooleanHelper`

@@ -21,6 +21,7 @@ Utility classes for common operations:
 - **[CsvImportHelper](csv-import-helper.md)** — CSV file upload parsing with automatic delimiter detection
 - **[CpNavHelper](cp-nav-helper.md)** — CP navigation building for plugin sub-pages
 - **[LabelHelper](label-helper.md)** — Strip numbering and truncate long field labels for compact UI contexts
+- **[StoragePathHelper + StoragePathValidator](storage-path-validator.md)** — Resolve and validate plugin storage paths, aliases, env vars, and webroot guards
 
 ### PHP Traits
 
