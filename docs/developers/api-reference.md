@@ -187,6 +187,7 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `resolve(string $path)` | `string` | Resolve environment variables and Craft aliases in a storage path value |
+| `validatePath(string $path, array $options = [])` | `array` | Validate a raw storage path value without requiring a Yii model attribute |
 
 ### StoragePathValidator
 

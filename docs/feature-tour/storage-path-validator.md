@@ -1,6 +1,6 @@
 # Storage Path Validator
 
-`StoragePathValidator` validates local filesystem paths used by plugin settings, such as backup and export directories. Runtime/display code should use `StoragePathHelper::resolve()` for the same env-var + alias resolution contract.
+`StoragePathValidator` validates local filesystem paths used by plugin settings, such as backup and export directories. It is a Yii model adapter around `StoragePathHelper::validatePath()`, which is the shared raw-value validation API for dynamic or nested settings. Runtime/display code should use `StoragePathHelper::resolve()` for the same env-var + alias resolution contract.
 
 Use it for settings fields where administrators can choose a storage root:
 
@@ -21,6 +21,17 @@ use lindemannrock\base\validators\StoragePathValidator;
 use lindemannrock\base\helpers\StoragePathHelper;
 
 $resolvedPath = StoragePathHelper::resolve($settings->backupPath);
+```
+
+For nested settings that cannot attach a Yii validator directly, call the helper and add the returned errors to the appropriate field:
+
+```php
+$errors = StoragePathHelper::validatePath($settings['storagePath'] ?? '', [
+    'translationCategory' => 'my-plugin',
+    'allowedAliases' => ['@storage', '@root'],
+    'requireAlias' => true,
+    'preventWebroot' => true,
+]);
 ```
 
 ## What It Blocks
