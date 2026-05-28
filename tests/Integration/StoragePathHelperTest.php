@@ -57,6 +57,59 @@ final class StoragePathHelperTest extends IntegrationTestCase
         );
     }
 
+    public function testValidatePathAcceptsAllowedAlias(): void
+    {
+        self::assertSame([], $this->validate('@storage/example'));
+    }
+
+    public function testValidatePathAcceptsEnvVarResolvingInsideAllowedAliasRoot(): void
+    {
+        $this->setEnvValue(Craft::getAlias('@storage/example'));
+
+        self::assertSame([], $this->validate('$' . self::ENV_NAME));
+    }
+
+    public function testValidatePathRejectsEnvVarResolvingOutsideAllowedAliasRoot(): void
+    {
+        $this->setEnvValue('/tmp/lr-storage-path-helper');
+
+        $errors = $this->validate('$' . self::ENV_NAME);
+
+        self::assertNotEmpty($errors);
+        self::assertStringContainsString('@storage', implode(' ', $errors));
+    }
+
+    public function testValidatePathRejectsWebrootWhenPreventWebrootIsEnabled(): void
+    {
+        $this->setEnvValue(Craft::getAlias('@webroot'));
+
+        $errors = $this->validate('$' . self::ENV_NAME);
+
+        self::assertNotEmpty($errors);
+        self::assertStringContainsString('web-accessible', implode(' ', $errors));
+    }
+
+    public function testValidatePathCanAllowWebrootWhenPreventionIsDisabled(): void
+    {
+        self::assertSame([], $this->validate('@webroot/assets/icons', [
+            'allowedAliases' => ['@root', '@storage', '@webroot'],
+            'preventWebroot' => false,
+        ]));
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     * @return array<int, string>
+     */
+    private function validate(string $path, array $options = []): array
+    {
+        return StoragePathHelper::validatePath($path, array_merge([
+            'allowedAliases' => ['@storage', '@root'],
+            'requireAlias' => true,
+            'preventWebroot' => true,
+        ], $options));
+    }
+
     private function setEnvValue(string $value): void
     {
         putenv(self::ENV_NAME . '=' . $value);
