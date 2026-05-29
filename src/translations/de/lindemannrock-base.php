@@ -187,10 +187,10 @@ return [
 
     // Date range settings (shared via _partials/cascade-date-range-settings.twig)
     'Default Date Range' => 'Standard-Datumsbereich',
-    'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'Standard-Zeitfenster für Analytik-, Protokoll- und Dashboard-Seiten dieses Plugins.',
+    'Default time window applied to analytics, logs, and dashboard pages in this plugin.' => 'Standard-Zeitfenster für Analytics-, Protokoll- und Dashboard-Seiten dieses Plugins.',
 
     // Analytics layout (shared via _layouts/cp-analytics.twig + _partials/analytics-panel.twig)
-    'Analytics' => 'Analytik',
+    'Analytics' => 'Analytics',
     'All Sites' => 'Alle Websites',
     'Loading' => 'Wird geladen',
 
@@ -212,7 +212,7 @@ return [
     // IP hash salt error (shared via _partials/ip-salt-error.twig)
     'Configuration Required' => 'Konfiguration erforderlich',
     'IP hash salt is missing.' => 'IP-Hash-Salt fehlt.',
-    'Analytics tracking requires a secure salt for privacy protection.' => 'Das Analytik-Tracking erfordert einen sicheren Salt zum Schutz der Privatsphäre.',
+    'Analytics tracking requires a secure salt for privacy protection.' => 'Das Analytics-Tracking erfordert einen sicheren Salt zum Schutz der Privatsphäre.',
     'Run one of these commands in your terminal:' => 'Führen Sie einen dieser Befehle in Ihrem Terminal aus:',
     'Standard:' => 'Standard:',
     'DDEV:' => 'DDEV:',
