@@ -122,41 +122,76 @@ class ExportHelper
             return self::$configCache[$cacheKey];
         }
 
-        // Layer 1: hardcoded defaults
-        $result = self::DEFAULT_FORMATS;
+        $baseConfigValues = [];
+        $settingsValues = [];
+        $pluginConfigValues = [];
 
-        // Layer 2: base config
         $baseConfig = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
         if (isset($baseConfig['exports']) && is_array($baseConfig['exports'])) {
-            $result = array_merge($result, $baseConfig['exports']);
+            $baseConfigValues = $baseConfig['exports'];
         }
 
         if ($pluginHandle) {
-            // Layer 3: plugin Settings model flat props
             $plugin = Craft::$app->plugins->getPlugin($pluginHandle);
             if ($plugin !== null) {
                 $settings = $plugin->getSettings();
                 if ($settings !== null) {
                     if (property_exists($settings, 'exportsCsv') && $settings->exportsCsv !== null) {
-                        $result['csv'] = (bool) $settings->exportsCsv;
+                        $settingsValues['csv'] = (bool) $settings->exportsCsv;
                     }
                     if (property_exists($settings, 'exportsJson') && $settings->exportsJson !== null) {
-                        $result['json'] = (bool) $settings->exportsJson;
+                        $settingsValues['json'] = (bool) $settings->exportsJson;
                     }
                     if (property_exists($settings, 'exportsExcel') && $settings->exportsExcel !== null) {
-                        $result['excel'] = (bool) $settings->exportsExcel;
+                        $settingsValues['excel'] = (bool) $settings->exportsExcel;
                     }
                 }
             }
 
-            // Layer 4: plugin config file (highest priority)
             $pluginConfig = Craft::$app->config->getConfigFromFile($pluginHandle) ?: [];
             if (isset($pluginConfig['exports']) && is_array($pluginConfig['exports'])) {
-                $result = array_merge($result, $pluginConfig['exports']);
+                $pluginConfigValues = $pluginConfig['exports'];
             }
         }
 
+        $result = self::mergeFormatConfig(self::DEFAULT_FORMATS, $baseConfigValues, $settingsValues, $pluginConfigValues);
+
         self::$configCache[$cacheKey] = $result;
+        return $result;
+    }
+
+    /**
+     * Merge export format configuration layers.
+     *
+     * Priority, low → high:
+     * 1. hardcoded defaults
+     * 2. base config
+     * 3. plugin Settings model values
+     * 4. plugin config
+     *
+     * @param array<string, mixed> $defaults
+     * @param array<string, mixed> $baseConfig
+     * @param array<string, mixed> $settingsValues
+     * @param array<string, mixed> $pluginConfig
+     * @return array<string, bool>
+     * @since 5.26.0
+     */
+    public static function mergeFormatConfig(
+        array $defaults,
+        array $baseConfig = [],
+        array $settingsValues = [],
+        array $pluginConfig = [],
+    ): array {
+        $result = self::DEFAULT_FORMATS;
+
+        foreach ([$defaults, $baseConfig, $settingsValues, $pluginConfig] as $layer) {
+            foreach (self::DEFAULT_FORMATS as $format => $default) {
+                if (array_key_exists($format, $layer) && $layer[$format] !== null) {
+                    $result[$format] = (bool) $layer[$format];
+                }
+            }
+        }
+
         return $result;
     }
 
@@ -169,6 +204,38 @@ class ExportHelper
     ];
 
     /**
+     * Normalize export format aliases to the canonical format key.
+     *
+     * @param string $format Export format from request/config
+     * @return string Canonical format key (`csv`, `json`, or `excel` when supported)
+     * @since 5.26.0
+     */
+    public static function normalizeFormat(string $format): string
+    {
+        $format = strtolower(trim($format));
+
+        return self::FORMAT_ALIASES[$format] ?? $format;
+    }
+
+    /**
+     * Get the filename extension for an export format.
+     *
+     * @param string $format Export format from request/config
+     * @return string Filename extension
+     * @throws BadRequestHttpException If the format is unsupported
+     * @since 5.26.0
+     */
+    public static function extensionForFormat(string $format): string
+    {
+        return match (self::normalizeFormat($format)) {
+            'csv' => 'csv',
+            'json' => 'json',
+            'excel' => 'xlsx',
+            default => throw new BadRequestHttpException("Unknown export format: {$format}"),
+        };
+    }
+
+    /**
      * Check if an export format is enabled
      *
      * Accepts both config keys ('excel', 'csv', 'json') and common aliases ('xlsx', 'xls').
@@ -179,11 +246,25 @@ class ExportHelper
      */
     public static function isFormatEnabled(string $format, ?string $pluginHandle = null): bool
     {
-        // Normalize format to config key
-        $configKey = self::FORMAT_ALIASES[$format] ?? $format;
+        $configKey = self::normalizeFormat($format);
         $config = self::getConfig($pluginHandle);
 
         return $config[$configKey] ?? self::DEFAULT_FORMATS[$configKey] ?? false;
+    }
+
+    /**
+     * Assert that a format is enabled for an optional plugin context.
+     *
+     * @param string $format Export format from request/config
+     * @param string|null $pluginHandle Optional plugin handle to check for override
+     * @throws BadRequestHttpException If the format is disabled
+     * @since 5.26.0
+     */
+    public static function assertFormatEnabled(string $format, ?string $pluginHandle = null): void
+    {
+        if (!self::isFormatEnabled($format, $pluginHandle)) {
+            throw new BadRequestHttpException("Export format '{$format}' is not enabled.");
+        }
     }
 
     /**
@@ -301,6 +382,26 @@ class ExportHelper
         array $dateColumns = [],
         bool $pretty = true,
     ): Response {
+        $json = self::jsonContent($data, $dateColumns, $pretty);
+
+        return self::createResponse($json, $filename, 'application/json');
+    }
+
+    /**
+     * Build JSON content.
+     *
+     * @param array $data Data to export
+     * @param array $dateColumns Column keys to format as ISO 8601
+     * @param bool $pretty Pretty print JSON
+     * @return string JSON bytes
+     * @throws BadRequestHttpException If JSON encoding fails
+     * @since 5.26.0
+     */
+    public static function jsonContent(
+        array $data,
+        array $dateColumns = [],
+        bool $pretty = true,
+    ): string {
         // Format date columns if specified (use API format for JSON)
         if (!empty($dateColumns)) {
             $data = self::formatDateColumnsForApi($data, $dateColumns);
@@ -313,7 +414,7 @@ class ExportHelper
             throw new BadRequestHttpException('Failed to encode data as JSON: ' . json_last_error_msg());
         }
 
-        return self::createResponse($json, $filename, 'application/json');
+        return $json;
     }
 
     /**
@@ -494,6 +595,140 @@ class ExportHelper
     }
 
     /**
+     * Normalize section definitions for multi-sheet Excel export.
+     *
+     * @param array $sections Section definitions
+     * @return array Excel sheet definitions
+     */
+    private static function normalizeSectionsForExcel(array $sections): array
+    {
+        $sheets = [];
+
+        foreach ($sections as $index => $section) {
+            if (!is_array($section)) {
+                continue;
+            }
+
+            $title = (string)($section['title'] ?? $section['key'] ?? ('Section ' . ($index + 1)));
+            $options = $section['options'] ?? [];
+            if (!is_array($options)) {
+                $options = [];
+            }
+
+            $sheets[] = [
+                'title' => $title,
+                'headers' => self::normalizeStringList($section['headers'] ?? []),
+                'rows' => self::normalizeRows($section['rows'] ?? []),
+                'dateColumns' => self::normalizeStringList($section['dateColumns'] ?? []),
+                'options' => $options,
+            ];
+        }
+
+        return $sheets;
+    }
+
+    /**
+     * Build CSV files for section ZIP export.
+     *
+     * @param array $sections Section definitions
+     * @return array<string, string>
+     */
+    private static function buildSectionCsvFiles(array $sections): array
+    {
+        $files = [];
+
+        foreach ($sections as $index => $section) {
+            if (!is_array($section)) {
+                continue;
+            }
+
+            $title = (string)($section['title'] ?? $section['key'] ?? ('section-' . ($index + 1)));
+            $filename = (string)($section['filename'] ?? self::sectionFilename($title, $index));
+            if (!str_ends_with($filename, '.csv')) {
+                $filename .= '.csv';
+            }
+
+            $files[$filename] = self::csvContent(
+                self::normalizeRows($section['rows'] ?? []),
+                self::normalizeStringList($section['headers'] ?? []),
+                self::normalizeStringList($section['dateColumns'] ?? []),
+            );
+        }
+
+        return $files;
+    }
+
+    /**
+     * Build default JSON payload for section exports.
+     *
+     * @param array $sections Section definitions
+     * @return array<string, array{title: string, headers: array<int, string>, rows: array}>
+     */
+    private static function buildSectionJsonPayload(array $sections): array
+    {
+        $payload = [];
+
+        foreach ($sections as $index => $section) {
+            if (!is_array($section)) {
+                continue;
+            }
+
+            $title = (string)($section['title'] ?? $section['key'] ?? ('Section ' . ($index + 1)));
+            $key = (string)($section['key'] ?? self::sectionKey($title, $index));
+
+            $payload[$key] = [
+                'title' => $title,
+                'headers' => self::normalizeStringList($section['headers'] ?? []),
+                'rows' => self::normalizeRows($section['rows'] ?? []),
+            ];
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @param mixed $value
+     * @return array<int, string>
+     */
+    private static function normalizeStringList(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_map(static fn(mixed $item): string => (string)$item, $value));
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     */
+    private static function normalizeRows(mixed $value): array
+    {
+        return is_array($value) ? $value : [];
+    }
+
+    private static function sectionFilename(string $title, int $index): string
+    {
+        $filename = preg_replace('/[^a-z0-9_-]+/i', '-', strtolower($title));
+        $filename = trim((string)$filename, '-_');
+
+        return ($filename !== '' ? $filename : 'section-' . ($index + 1)) . '.csv';
+    }
+
+    private static function sectionKey(string $title, int $index): string
+    {
+        $key = preg_replace('/[^a-z0-9]+/i', ' ', $title);
+        $key = str_replace(' ', '', ucwords(strtolower(trim((string)$key))));
+
+        if ($key === '') {
+            return 'section' . ($index + 1);
+        }
+
+        return lcfirst($key);
+    }
+
+    /**
      * Export multiple files as a ZIP archive
      *
      * Each file can be provided as:
@@ -511,9 +746,40 @@ class ExportHelper
             $filename .= '.zip';
         }
 
+        $content = self::zipContent($files);
+
+        return self::createResponse($content, $filename, 'application/zip');
+    }
+
+    /**
+     * Build ZIP archive content from named files.
+     *
+     * Each file can be provided as:
+     * - ['name' => 'file.csv', 'content' => '...']
+     * - 'file.csv' => '...'
+     *
+     * @param array $files Files to include in the ZIP
+     * @return string ZIP file bytes
+     * @throws BadRequestHttpException If ZIP creation fails
+     * @since 5.26.0
+     */
+    public static function zipContent(array $files): string
+    {
+        if (!class_exists(\ZipArchive::class)) {
+            throw new BadRequestHttpException('The PHP Zip extension is required to create ZIP exports.');
+        }
+
         $tempFile = tempnam(sys_get_temp_dir(), 'zip_export_');
+        if ($tempFile === false) {
+            throw new BadRequestHttpException('Failed to create temporary ZIP file.');
+        }
+
         $zip = new \ZipArchive();
-        $zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $opened = $zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        if ($opened !== true) {
+            @unlink($tempFile);
+            throw new BadRequestHttpException('Failed to open temporary ZIP file.');
+        }
 
         foreach ($files as $key => $file) {
             $name = null;
@@ -541,7 +807,72 @@ class ExportHelper
             throw new \yii\web\BadRequestHttpException('Failed to read generated ZIP file.');
         }
 
-        return self::createResponse($content, $filename, 'application/zip');
+        return $content;
+    }
+
+    /**
+     * Dispatch a single-table export response.
+     *
+     * @param array $rows Data rows
+     * @param array $headers Column headers
+     * @param string $format Export format
+     * @param string $filename Output filename
+     * @param array $dateColumns Date column keys
+     * @param array $excelOptions Excel sheet options
+     * @param array|null $jsonData Optional JSON-specific payload
+     * @return Response
+     * @throws BadRequestHttpException If the format is unsupported
+     * @since 5.26.0
+     */
+    public static function dispatchTable(
+        array $rows,
+        array $headers,
+        string $format,
+        string $filename,
+        array $dateColumns = [],
+        array $excelOptions = [],
+        ?array $jsonData = null,
+    ): Response {
+        return match (self::normalizeFormat($format)) {
+            'csv' => self::toCsv($rows, $headers, $filename, $dateColumns),
+            'json' => self::toJson($jsonData ?? $rows, $filename, $dateColumns),
+            'excel' => self::toExcel($rows, $headers, $filename, $dateColumns, $excelOptions),
+            default => throw new BadRequestHttpException("Unknown export format: {$format}"),
+        };
+    }
+
+    /**
+     * Dispatch a multi-section export response.
+     *
+     * Section shape:
+     * - title: sheet/section title
+     * - headers: column headers
+     * - rows: data rows
+     * - dateColumns: optional date column keys
+     * - options: optional Excel options
+     * - filename: optional CSV filename inside ZIP
+     * - key: optional JSON section key
+     *
+     * @param array $sections Section definitions
+     * @param string $format Export format
+     * @param string $filename Output filename
+     * @param array|null $jsonPayload Optional JSON-specific payload
+     * @return Response
+     * @throws BadRequestHttpException If the format is unsupported
+     * @since 5.26.0
+     */
+    public static function dispatchSections(
+        array $sections,
+        string $format,
+        string $filename,
+        ?array $jsonPayload = null,
+    ): Response {
+        return match (self::normalizeFormat($format)) {
+            'excel' => self::toExcelMulti(self::normalizeSectionsForExcel($sections), $filename),
+            'csv' => self::toZip(self::buildSectionCsvFiles($sections), $filename),
+            'json' => self::toJson($jsonPayload ?? self::buildSectionJsonPayload($sections), $filename),
+            default => throw new BadRequestHttpException("Unknown export format: {$format}"),
+        };
     }
 
     /**
