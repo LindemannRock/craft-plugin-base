@@ -150,6 +150,45 @@ final class ExportHelperTest extends IntegrationTestCase
         self::assertFalse(ExportHelper::isFormatEnabled('xlsx'));
     }
 
+    public function testNormalizeFormatAndExtensionForFormatHandleExcelAliases(): void
+    {
+        self::assertSame('excel', ExportHelper::normalizeFormat(' XLSX '));
+        self::assertSame('excel', ExportHelper::normalizeFormat('xls'));
+        self::assertSame('csv', ExportHelper::normalizeFormat('CSV'));
+        self::assertSame('xlsx', ExportHelper::extensionForFormat('excel'));
+        self::assertSame('xlsx', ExportHelper::extensionForFormat('xlsx'));
+        self::assertSame('json', ExportHelper::extensionForFormat('json'));
+    }
+
+    public function testAssertFormatEnabledThrowsForDisabledFormat(): void
+    {
+        self::writeConfigCache(['__base__' => ['csv' => true, 'json' => false, 'excel' => true]]);
+
+        ExportHelper::assertFormatEnabled('csv');
+
+        $this->expectException(\yii\web\BadRequestHttpException::class);
+        ExportHelper::assertFormatEnabled('json');
+    }
+
+    public function testMergeFormatConfigPinsCascadePriority(): void
+    {
+        $config = ExportHelper::mergeFormatConfig(
+            ['csv' => true, 'json' => false, 'excel' => true],
+            ['json' => true, 'excel' => false],
+            ['json' => false, 'excel' => null],
+            ['csv' => false],
+        );
+
+        self::assertSame(
+            [
+                'csv' => false,
+                'json' => false,
+                'excel' => false,
+            ],
+            $config,
+        );
+    }
+
     public function testGetEnabledFormatsReturnsOnlyTrueKeys(): void
     {
         self::writeConfigCache(['__base__' => ['csv' => true, 'json' => false, 'excel' => true]]);
@@ -284,6 +323,27 @@ final class ExportHelperTest extends IntegrationTestCase
         self::assertSame('attachment; filename="unsafename.json"', $response->headers->get('Content-Disposition'));
     }
 
+    public function testJsonContentSupportsCompactOutputAndDateFormatting(): void
+    {
+        $json = ExportHelper::jsonContent(
+            [
+                [
+                    'name' => 'Alice',
+                    'dateCreated' => '2026-05-22 10:15:30',
+                ],
+            ],
+            ['dateCreated'],
+            false,
+        );
+        $decoded = json_decode($json, true);
+        $localDate = DateFormatHelper::toCraftTimezone('2026-05-22 10:15:30');
+
+        self::assertIsArray($decoded);
+        self::assertInstanceOf(DateTime::class, $localDate);
+        self::assertSame(DateFormatHelper::toApiString($localDate), $decoded[0]['dateCreated']);
+        self::assertStringNotContainsString("\n", $json);
+    }
+
     public function testToCsvSetsHeadersAndSanitizesFilename(): void
     {
         $response = ExportHelper::toCsv(
@@ -351,6 +411,106 @@ final class ExportHelperTest extends IntegrationTestCase
             self::assertSame('{"ok":true}', $zip->getFromName('raw/data.json'));
         } finally {
             $zip->close();
+            @unlink($tempFile);
+        }
+    }
+
+    public function testZipContentReturnsArchiveBytes(): void
+    {
+        $content = ExportHelper::zipContent([
+            'summary.csv' => "Name\nAlice\n",
+        ]);
+        $tempFile = self::writeTempFile($content, 'zip');
+        $zip = new ZipArchive();
+
+        try {
+            self::assertTrue($zip->open($tempFile));
+            self::assertSame("Name\nAlice\n", $zip->getFromName('summary.csv'));
+        } finally {
+            $zip->close();
+            @unlink($tempFile);
+        }
+    }
+
+    public function testDispatchTableRoutesCsvJsonAndExcelAliases(): void
+    {
+        $rows = [
+            [
+                'name' => '=SUM(A1:A2)',
+                'dateCreated' => '2026-05-22 10:15:30',
+            ],
+        ];
+        $headers = ['Name', 'Date Created'];
+
+        $csv = ExportHelper::dispatchTable($rows, $headers, 'csv', 'users.csv', ['dateCreated']);
+        self::assertSame('text/csv; charset=utf-8', $csv->headers->get('Content-Type'));
+        self::assertStringContainsString("'=SUM(A1:A2)", (string)$csv->content);
+
+        Craft::$app->set('response', new WebResponse());
+        $json = ExportHelper::dispatchTable(
+            $rows,
+            $headers,
+            'json',
+            'users.json',
+            [],
+            [],
+            ['meta' => ['count' => 1]],
+        );
+        self::assertSame(['meta' => ['count' => 1]], json_decode((string)$json->content, true));
+
+        Craft::$app->set('response', new WebResponse());
+        $excel = ExportHelper::dispatchTable($rows, $headers, 'xlsx', 'users.xlsx', ['dateCreated']);
+
+        self::assertSame(
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=utf-8',
+            $excel->headers->get('Content-Type'),
+        );
+    }
+
+    public function testDispatchSectionsRoutesExcelJsonAndCsvZip(): void
+    {
+        $sections = [
+            [
+                'key' => 'summary',
+                'title' => 'Summary',
+                'filename' => 'summary.csv',
+                'headers' => ['Name', 'Created'],
+                'rows' => [
+                    ['name' => 'Alice', 'dateCreated' => '2026-05-22 10:15:30'],
+                ],
+                'dateColumns' => ['dateCreated'],
+            ],
+            [
+                'key' => 'rawRows',
+                'title' => 'Raw Rows',
+                'headers' => ['Name'],
+                'rows' => [
+                    ['name' => 'Bob'],
+                ],
+            ],
+        ];
+
+        $excel = ExportHelper::dispatchSections($sections, 'excel', 'sections.xlsx');
+        self::assertSame(
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=utf-8',
+            $excel->headers->get('Content-Type'),
+        );
+
+        Craft::$app->set('response', new WebResponse());
+        $json = ExportHelper::dispatchSections($sections, 'json', 'sections.json');
+        self::assertSame(['summary', 'rawRows'], array_keys(json_decode((string)$json->content, true)));
+
+        Craft::$app->set('response', new WebResponse());
+        $zip = ExportHelper::dispatchSections($sections, 'csv', 'sections.zip');
+        $tempFile = self::writeTempFile((string)$zip->content, 'zip');
+        $archive = new ZipArchive();
+
+        try {
+            self::assertTrue($archive->open($tempFile));
+            self::assertNotFalse($archive->getFromName('summary.csv'));
+            self::assertNotFalse($archive->getFromName('raw-rows.csv'));
+        } finally {
+            $archive->close();
             @unlink($tempFile);
         }
     }
