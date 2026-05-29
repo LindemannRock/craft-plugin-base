@@ -16,6 +16,8 @@ ExportHelper::isFormatEnabled('json');   // false (default)
 
 // Accepts aliases
 ExportHelper::isFormatEnabled('xlsx');   // Same as 'excel'
+ExportHelper::normalizeFormat('xlsx');   // 'excel'
+ExportHelper::extensionForFormat('excel'); // 'xlsx'
 
 // List all enabled formats
 ExportHelper::getEnabledFormats();       // ['csv', 'excel']
@@ -130,13 +132,16 @@ return ExportHelper::toZip([
 ], 'export-bundle.zip');
 ```
 
-## Content-Only Methods @since(5.25.0)
+## Content-Only Methods
 
-Use `csvContent()` and `excelContent()` when you need the raw file bytes instead of an HTTP `Response`. Typical use cases: queued background exports that write to disk, bundling into a ZIP, attaching to an email, storing in an asset volume.
+Use `csvContent()` / `excelContent()` (@since 5.25.0) and `jsonContent()` / `zipContent()` (@since 5.26.0) when you need raw file bytes instead of an HTTP `Response`. Typical use cases: queued background exports that write to disk, bundling into a ZIP, attaching to an email, storing in an asset volume.
 
 ```php
 // Raw CSV bytes
 $csv = ExportHelper::csvContent($rows, $headers, ['dateCreated']);
+
+// Raw JSON bytes
+$json = ExportHelper::jsonContent($rows, ['dateCreated']);
 
 // Custom delimiter / enclosure (e.g. semicolon-separated for European locales)
 $csv = ExportHelper::csvContent($rows, $headers, ['dateCreated'], ';', '"');
@@ -153,9 +158,15 @@ file_put_contents('/path/to/export.xlsx', $xlsx);
 
 // Or attach to an email
 $message->attachContent($xlsx, ['fileName' => 'users.xlsx', 'contentType' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+
+// Raw ZIP bytes
+$zip = ExportHelper::zipContent([
+    'users.csv' => $csv,
+    'users.xlsx' => $xlsx,
+]);
 ```
 
-`csvContent()` and `excelContent()` apply the same formula-injection sanitization, header styling, and date formatting as the `Response`-returning methods — `toCsv()` and `toExcel()` are thin wrappers around them.
+`csvContent()` and `excelContent()` apply the same formula-injection sanitization, header styling, and date formatting as the `Response`-returning methods — `toCsv()` and `toExcel()` are thin wrappers around them. `toJson()` and `toZip()` likewise delegate to the content-only helpers.
 
 ## Empty Data Handling
 
@@ -227,13 +238,53 @@ public function actionExport(): Response
 
     $headers = ['Date', 'Event', 'Status'];
     $settings = MyPlugin::$plugin->getSettings();
-    $filename = ExportHelper::filename($settings, ['logs', $dateRange], $format);
+    $extension = ExportHelper::extensionForFormat($format);
+    $filename = ExportHelper::filename($settings, ['logs', $dateRange], $extension);
 
-    return match ($format) {
-        'xlsx' => ExportHelper::toExcel($rows, $headers, $filename, ['dateCreated']),
-        'json' => ExportHelper::toJson($rows, $filename, ['dateCreated']),
-        default => ExportHelper::toCsv($rows, $headers, $filename, ['dateCreated']),
-    };
+    return ExportHelper::dispatchTable(
+        rows: $rows,
+        headers: $headers,
+        format: $format,
+        filename: $filename,
+        dateColumns: ['dateCreated'],
+        excelOptions: ['sheetTitle' => 'Logs'],
+    );
+}
+```
+
+## Multi-Section Controller Pattern @since(5.26.0)
+
+Use `dispatchSections()` when one export contains multiple logical tables. It returns a multi-sheet workbook for Excel, a ZIP of CSV files for CSV, and a structured JSON payload for JSON.
+
+```php
+public function actionExportAnalytics(): Response
+{
+    $format = Craft::$app->getRequest()->getRequiredBodyParam('format');
+    ExportHelper::assertFormatEnabled($format, 'my-plugin');
+
+    $sections = [
+        [
+            'key' => 'summary',
+            'title' => 'Summary',
+            'filename' => 'summary.csv',
+            'headers' => ['Metric', 'Value'],
+            'rows' => $summaryRows,
+        ],
+        [
+            'key' => 'rawRows',
+            'title' => 'Raw Rows',
+            'filename' => 'raw-rows.csv',
+            'headers' => ['Date', 'Event'],
+            'rows' => $rawRows,
+            'dateColumns' => ['dateCreated'],
+        ],
+    ];
+
+    $settings = MyPlugin::$plugin->getSettings();
+    $extension = $format === 'csv' ? 'zip' : ExportHelper::extensionForFormat($format);
+    $filename = ExportHelper::filename($settings, ['analytics'], $extension);
+
+    return ExportHelper::dispatchSections($sections, $format, $filename);
 }
 ```
 
