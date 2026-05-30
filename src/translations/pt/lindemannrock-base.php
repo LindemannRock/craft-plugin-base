@@ -15,7 +15,7 @@ return [
     'Open plugin' => 'Abrir plugin',
     'Open settings' => 'Abrir configurações',
     'Close dialog' => 'Fechar diálogo',
-    'Everything is wired up. You can start configuring the plugin right away.' => 'Tudo está pronto. Você pode começar a configurar o plugin imediatamente.',
+    'Everything is wired up. You can start configuring the plugin right away.' => 'Tudo está pronto. Pode começar a configurar o plugin imediatamente.',
 
     // Date ranges
     'Today' => 'Hoje',
@@ -105,7 +105,7 @@ return [
     'Semicolon (;)' => 'Ponto e vírgula (;)',
     'Tab' => 'Tabulação',
     'Pipe (|)' => 'Pipe (|)',
-    'Create Backup Before Import' => 'Criar backup antes da importação',
+    'Create Backup Before Import' => 'Criar cópia de segurança antes da importação',
     'Upload & Map Columns' => 'Carregar e mapear colunas',
     'CSV Import' => 'Importação CSV',
     'Alternate Import' => 'Importação alternativa',
@@ -118,10 +118,10 @@ return [
     'Failed' => 'Falhou',
     'Clear history' => 'Limpar histórico',
     'No import history yet.' => 'Ainda não há histórico de importações.',
-    'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Limpar todos os logs de importação? Esta ação não pode ser anulada.',
+    'Are you sure you want to clear all import logs? This action cannot be undone.' => 'Limpar todos os registos de importação? Esta ação não pode ser anulada.',
     'Failed to clear history.' => 'Falha ao limpar o histórico.',
-    'Loading backup history...' => 'Carregando histórico de backups...',
-    'No backups found.' => 'Nenhum backup encontrado.',
+    'Loading backup history...' => 'A carregar histórico de cópias de segurança...',
+    'No backups found.' => 'Nenhuma cópia de segurança encontrada.',
 
     // Geo provider settings (shared via _partials/cascade-geo-settings.twig)
     'Geo Provider' => 'Fornecedor de Geolocalização',
