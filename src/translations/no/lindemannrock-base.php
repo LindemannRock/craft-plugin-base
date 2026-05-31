@@ -203,8 +203,7 @@ return [
     'Whether the Excel export option appears in this plugin\'s export menus.' => 'Bestemmer om Excel-eksportalternativet vises i eksportmenyene for dette pluginet.',
     'Enabled' => 'Aktivert',
 
-    // Copy-to-clipboard controls — shared across any base component or partial
-    // that exposes a copy action (secret-reveal, ip-salt-error, future ones).
+    // Copy-to-clipboard controls (shared via _components/secret-reveal.twig + _partials/ip-salt-error.twig)
     'Copy' => 'Kopier',
     'Copied!' => 'Kopiert!',
     'Failed to copy to clipboard' => 'Kopiering til utklippstavlen mislyktes',
