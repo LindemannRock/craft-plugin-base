@@ -33,10 +33,10 @@
 
 {# Mock categories for custom filter example #}
 {% set categories = [
-    { value: 'all', label: 'All Categories'|t('app') },
-    { value: 'news', label: 'News'|t('app') },
-    { value: 'products', label: 'Products'|t('app') },
-    { value: 'events', label: 'Events'|t('app') },
+    { value: 'all', label: 'All Categories'|t('lindemannrock-base') },
+    { value: 'news', label: 'News'|t('lindemannrock-base') },
+    { value: 'products', label: 'Products'|t('lindemannrock-base') },
+    { value: 'events', label: 'Events'|t('lindemannrock-base') },
 ] %}
 
 {# Mock summary stats #}
@@ -73,17 +73,17 @@
         name: 'My Plugin',
     },
     page: {
-        title: 'Analytics'|t('app'),
+        title: 'Analytics'|t('lindemannrock-base'),
         subnav: 'analytics',
         crumbs: [
             { label: 'My Plugin', url: url('my-plugin') },
-            { label: 'Analytics'|t('app'), url: url('my-plugin/analytics') },
+            { label: 'Analytics'|t('lindemannrock-base'), url: url('my-plugin/analytics') },
         ],
     },
     tabs: {
-        overview: { label: 'Overview'|t('app') },
-        pages: { label: 'Pages'|t('app') },
-        traffic: { label: 'Traffic Sources'|t('app') },
+        overview: { label: 'Overview'|t('lindemannrock-base') },
+        pages: { label: 'Pages'|t('lindemannrock-base') },
+        traffic: { label: 'Traffic Sources'|t('lindemannrock-base') },
     },
     filters: {
         dateRange: {
@@ -99,7 +99,7 @@
             {
                 param: 'category',
                 current: categoryId,
-                allLabel: 'All Categories'|t('app'),
+                allLabel: 'All Categories'|t('lindemannrock-base'),
                 options: categories,
             },
         ],
@@ -126,25 +126,25 @@
         <div class="lr-unified-cards">
             {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.totalViews,
-                description: 'Total Views'|t('app'),
+                description: 'Total Views'|t('lindemannrock-base'),
                 align: 'center',
             } only %}
 
             {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.uniqueVisitors,
-                description: 'Unique Visitors'|t('app'),
+                description: 'Unique Visitors'|t('lindemannrock-base'),
                 align: 'center',
             } only %}
 
             {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.avgDuration ~ 's',
-                description: 'Avg. Duration'|t('app'),
+                description: 'Avg. Duration'|t('lindemannrock-base'),
                 align: 'center',
             } only %}
 
             {% include 'lindemannrock-base/_components/unified-card' with {
                 value: summaryStats.bounceRate ~ '%',
-                description: 'Bounce Rate'|t('app'),
+                description: 'Bounce Rate'|t('lindemannrock-base'),
                 align: 'center',
             } only %}
         </div>
@@ -152,7 +152,7 @@
         {# Main Chart #}
         <div class="lr-analytics-charts">
             <div class="lr-chart-container full-width">
-                <h3>{{ 'Daily Traffic'|t('app') }}</h3>
+                <h3>{{ 'Daily Traffic'|t('lindemannrock-base') }}</h3>
                 <div style="height: 250px;">
                     <canvas id="daily-chart"></canvas>
                 </div>
@@ -162,11 +162,11 @@
         {# Two Column Charts #}
         <div class="lr-analytics-charts two-columns">
             <div class="lr-chart-container">
-                <h3>{{ 'Device Types'|t('app') }}</h3>
+                <h3>{{ 'Device Types'|t('lindemannrock-base') }}</h3>
                 <canvas id="device-chart"></canvas>
             </div>
             <div class="lr-chart-container">
-                <h3>{{ 'Browser Distribution'|t('app') }}</h3>
+                <h3>{{ 'Browser Distribution'|t('lindemannrock-base') }}</h3>
                 <canvas id="browser-chart"></canvas>
             </div>
         </div>
@@ -174,16 +174,16 @@
 
     {# Pages Tab #}
     <div id="pages" class="lr-tab-content hidden">
-        <h2 class="lr-section-heading">{{ 'Top Pages'|t('app') }}</h2>
+        <h2 class="lr-section-heading">{{ 'Top Pages'|t('lindemannrock-base') }}</h2>
 
         <div class="lr-chart-container">
             <div class="lr-table-scroll">
                 <table class="data fullwidth">
                     <thead>
                         <tr>
-                            <th>{{ 'Page'|t('app') }}</th>
-                            <th style="text-align: right;">{{ 'Views'|t('app') }}</th>
-                            <th style="text-align: right;">{{ 'Avg. Time'|t('app') }}</th>
+                            <th>{{ 'Page'|t('lindemannrock-base') }}</th>
+                            <th style="text-align: right;">{{ 'Views'|t('lindemannrock-base') }}</th>
+                            <th style="text-align: right;">{{ 'Avg. Time'|t('lindemannrock-base') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -202,15 +202,15 @@
 
     {# Traffic Sources Tab #}
     <div id="traffic" class="lr-tab-content hidden">
-        <h2 class="lr-section-heading">{{ 'Traffic Sources'|t('app') }}</h2>
+        <h2 class="lr-section-heading">{{ 'Traffic Sources'|t('lindemannrock-base') }}</h2>
 
         <div class="lr-analytics-charts two-columns">
             <div class="lr-chart-container">
-                <h3>{{ 'Source Distribution'|t('app') }}</h3>
+                <h3>{{ 'Source Distribution'|t('lindemannrock-base') }}</h3>
                 <canvas id="source-chart"></canvas>
             </div>
             <div class="lr-chart-container">
-                <h3>{{ 'Referrers'|t('app') }}</h3>
+                <h3>{{ 'Referrers'|t('lindemannrock-base') }}</h3>
                 <canvas id="referrer-chart"></canvas>
             </div>
         </div>
@@ -242,7 +242,7 @@
             labels: dailyData.labels,
             datasets: [
                 {
-                    label: '{{ "Views"|t('app')|e('js') }}',
+                    label: '{{ "Views"|t('lindemannrock-base')|e('js') }}',
                     data: dailyData.views,
                     borderColor: chartColors[0],
                     backgroundColor: chartColors[0] + '20',
@@ -250,7 +250,7 @@
                     fill: true
                 },
                 {
-                    label: '{{ "Visitors"|t('app')|e('js') }}',
+                    label: '{{ "Visitors"|t('lindemannrock-base')|e('js') }}',
                     data: dailyData.visitors,
                     borderColor: chartColors[1],
                     backgroundColor: chartColors[1] + '20',
@@ -293,7 +293,7 @@
         window.lrCreateChart('referrer-chart', 'bar', {
             labels: ['google.com', 'facebook.com', 'twitter.com', 'linkedin.com'],
             datasets: [{
-                label: '{{ "Visits"|t('app')|e('js') }}',
+                label: '{{ "Visits"|t('lindemannrock-base')|e('js') }}',
                 data: [1240, 580, 320, 180],
                 backgroundColor: chartColors[0]
             }]

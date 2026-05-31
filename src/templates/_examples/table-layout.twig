@@ -79,11 +79,11 @@
         name: 'My Plugin',
     },
     page: {
-        title: 'Items'|t('app'),
+        title: 'Items'|t('lindemannrock-base'),
         subnav: 'items',
         crumbs: [
             { label: 'My Plugin', url: url('my-plugin') },
-            { label: 'Items'|t('app'), url: url('my-plugin/items') }
+            { label: 'Items'|t('lindemannrock-base'), url: url('my-plugin/items') }
         ],
     },
     filters: [
@@ -91,41 +91,41 @@
             type: 'status',
             param: 'status',
             current: statusFilter,
-            label: 'All Status'|t('app'),
+            label: 'All Status'|t('lindemannrock-base'),
             colorSet: 'status',
             options: [
-                {value: 'all', label: 'All'|t('app'), status: 'all'},
-                {value: 'enabled', label: 'Enabled'|t('app'), colorKey: 'enabled'},
-                {value: 'disabled', label: 'Disabled'|t('app'), colorKey: 'disabled'},
-                {value: 'pending', label: 'Pending'|t('app'), colorKey: 'pending'},
+                {value: 'all', label: 'All'|t('lindemannrock-base'), status: 'all'},
+                {value: 'enabled', label: 'Enabled'|t('lindemannrock-base'), colorKey: 'enabled'},
+                {value: 'disabled', label: 'Disabled'|t('lindemannrock-base'), colorKey: 'disabled'},
+                {value: 'pending', label: 'Pending'|t('lindemannrock-base'), colorKey: 'pending'},
             ],
         },
         {
             type: 'dropdown',
             param: 'source',
             current: sourceFilter,
-            label: 'All Sources'|t('app'),
+            label: 'All Sources'|t('lindemannrock-base'),
             options: [
-                {value: 'all', label: 'All Sources'|t('app')},
-                {value: 'config', label: 'Config'|t('app')},
-                {value: 'database', label: 'Database'|t('app')},
+                {value: 'all', label: 'All Sources'|t('lindemannrock-base')},
+                {value: 'config', label: 'Config'|t('lindemannrock-base')},
+                {value: 'database', label: 'Database'|t('lindemannrock-base')},
             ],
         },
         {
             type: 'dropdown',
             param: 'type',
             current: typeFilter,
-            label: 'All Types'|t('app'),
+            label: 'All Types'|t('lindemannrock-base'),
             options: [
-                {value: 'all', label: 'All Types'|t('app')},
-                {value: 'production', label: 'Production'|t('app')},
-                {value: 'staging', label: 'Staging'|t('app')},
-                {value: 'development', label: 'Development'|t('app')},
+                {value: 'all', label: 'All Types'|t('lindemannrock-base')},
+                {value: 'production', label: 'Production'|t('lindemannrock-base')},
+                {value: 'staging', label: 'Staging'|t('lindemannrock-base')},
+                {value: 'development', label: 'Development'|t('lindemannrock-base')},
             ],
         },
     ],
     search: {
-        placeholder: 'Search items...'|t('app'),
+        placeholder: 'Search items...'|t('lindemannrock-base'),
         value: search,
     },
     sort: {
@@ -134,28 +134,28 @@
     },
     table: {
         columns: [
-            {key: 'name', label: 'Name'|t('app'), sortable: true},
-            {key: 'handle', label: 'Handle'|t('app')},
-            {key: 'status', label: 'Status'|t('app'), sortable: true},
-            {key: 'type', label: 'Type'|t('app')},
-            {key: 'source', label: 'Source'|t('app')},
-            {key: 'dateCreated', label: 'Created'|t('app'), sortable: true},
+            {key: 'name', label: 'Name'|t('lindemannrock-base'), sortable: true},
+            {key: 'handle', label: 'Handle'|t('lindemannrock-base')},
+            {key: 'status', label: 'Status'|t('lindemannrock-base'), sortable: true},
+            {key: 'type', label: 'Type'|t('lindemannrock-base')},
+            {key: 'source', label: 'Source'|t('lindemannrock-base')},
+            {key: 'dateCreated', label: 'Created'|t('lindemannrock-base'), sortable: true},
         ],
         items: filteredItems,
-        emptyMessage: 'No items found.'|t('app'),
+        emptyMessage: 'No items found.'|t('lindemannrock-base'),
         expandable: true,
     },
     pagination: {
         page: page,
         limit: limit,
         totalCount: totalCount,
-        itemLabel: {singular: 'item'|t('app'), plural: 'items'|t('app')},
+        itemLabel: {singular: 'item'|t('lindemannrock-base'), plural: 'items'|t('lindemannrock-base')},
     },
     checkboxes: true,
     rowActions: true,
     newButton: {
         url: url('my-plugin/items/new'),
-        label: 'New Item'|t('app'),
+        label: 'New Item'|t('lindemannrock-base'),
     },
 } %}
 
@@ -179,13 +179,13 @@
 
 {% block bulkActions %}
     <button type="button" class="btn" id="lr-bulk-enable-btn">
-        {{ 'Enable'|t('app') }}
+        {{ 'Enable'|t('lindemannrock-base') }}
     </button>
     <button type="button" class="btn" id="lr-bulk-disable-btn">
-        {{ 'Disable'|t('app') }}
+        {{ 'Disable'|t('lindemannrock-base') }}
     </button>
     <button type="button" class="btn secondary" id="lr-bulk-delete-btn">
-        {{ 'Delete'|t('app') }} (<span id="lr-selected-count">0</span>)
+        {{ 'Delete'|t('lindemannrock-base') }} (<span id="lr-selected-count">0</span>)
     </button>
 {% endblock %}
 
@@ -200,18 +200,18 @@
         actions: {
             type: 'menu',
             icon: 'settings',
-            title: 'Actions'|t('app'),
+            title: 'Actions'|t('lindemannrock-base'),
             items: [
                 {
-                    label: 'Edit'|t('app'),
+                    label: 'Edit'|t('lindemannrock-base'),
                     url: url('my-plugin/items/' ~ item.id),
                 },
                 {
-                    label: 'Duplicate'|t('app'),
+                    label: 'Duplicate'|t('lindemannrock-base'),
                     jsAction: 'duplicate',
                 },
                 {
-                    label: 'Delete'|t('app'),
+                    label: 'Delete'|t('lindemannrock-base'),
                     class: 'error',
                     jsAction: 'delete',
                 },
@@ -275,7 +275,7 @@
 {% block expandableRow %}
     <div style="padding: 8px 0;">
         <div style="font-size: 12px; color: #606d7b; font-weight: 600; margin-bottom: 8px;">
-            {{ 'Description'|t('app') }}
+            {{ 'Description'|t('lindemannrock-base') }}
         </div>
         <div style="color: #374151;">
             {{ item.description }}
@@ -291,15 +291,15 @@
 {% block sidebarContent %}
     <div class="meta" style="padding: 12px;">
         <div class="data">
-            <div class="heading">{{ "Total Items"|t('app') }}</div>
+            <div class="heading">{{ "Total Items"|t('lindemannrock-base') }}</div>
             <div class="value">{{ totalCount }}</div>
         </div>
         <div class="data">
-            <div class="heading">{{ "Enabled"|t('app') }}</div>
+            <div class="heading">{{ "Enabled"|t('lindemannrock-base') }}</div>
             <div class="value">{{ mockItems|filter(i => i.status == 'enabled')|length }}</div>
         </div>
         <div class="data">
-            <div class="heading">{{ "Disabled"|t('app') }}</div>
+            <div class="heading">{{ "Disabled"|t('lindemannrock-base') }}</div>
             <div class="value">{{ mockItems|filter(i => i.status == 'disabled')|length }}</div>
         </div>
     </div>
