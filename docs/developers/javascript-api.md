@@ -2,6 +2,53 @@
 
 The base module ships JavaScript assets that expose global functions and events for plugin developers. The main shared assets load automatically when a plugin uses the [CP Table Layout](../template-guides/cp-table-layout.md) or [CP Analytics Layout](../template-guides/cp-analytics-layout.md).
 
+## Identifier API
+
+Available when the base components asset is registered:
+
+```twig
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+```
+
+Use this API for live Control Panel previews of slug-like handles. PHP save handlers must still normalize authoritatively with `SlugHandleHelper`.
+
+### Globals
+
+| Global | Type | Description |
+|--------|------|-------------|
+| `window.lrIdentifiers` | `object` | Identifier normalization and input binding helpers |
+
+### `lrIdentifiers.normalizeSlug(value, fallback)`
+
+Normalize a value using the same lowercase kebab-style rules as `SlugHandleHelper::normalizeSlug()`.
+
+```javascript
+window.lrIdentifiers.normalizeSlug('TEst this thing');
+// -> 'test-this-thing'
+```
+
+### `lrIdentifiers.bindSlugHandle(sourceInput, targetInput, options)`
+
+Bind a name/title input to a slug-like handle input.
+
+```javascript
+window.lrIdentifiers.bindSlugHandle('#name', '#handle', {
+    isNew: true,
+});
+```
+
+Options:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `isNew` | `boolean` | `true` | Existing records do not auto-update by default |
+| `updateExisting` | `boolean` | `false` | Allow auto-updating existing records until manual edit |
+| `fallback` | `string\|function` | `''` | Fallback passed to `normalizeSlug()` |
+| `manuallyEdited` | `boolean` | depends on `isNew` | Initial manual-edit state |
+| `updateOnBind` | `boolean` | `false` | Generate immediately when binding |
+
+The binding stops auto-updating after the target input is edited manually.
+
 ## Table Selection API
 
 Available on pages using the CP Table Layout with checkboxes enabled.

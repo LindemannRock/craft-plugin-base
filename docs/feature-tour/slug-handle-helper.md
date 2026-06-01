@@ -24,6 +24,18 @@ $slug = SlugHandleHelper::normalizeSlug($postedSlug ?: $title);
 
 Use for URL-style slugs/codes. The helper keeps lowercase letters, numbers, underscores, and hyphens; other runs become `-`.
 
+For Control Panel live previews, register the base components asset and use the JavaScript mirror:
+
+```twig
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+```
+
+```javascript
+window.lrIdentifiers.bindSlugHandle('#name', '#slug', { isNew: true });
+```
+
+The JavaScript helper is only a preview convenience. PHP save handlers should still call `SlugHandleHelper::normalizeSlug()` before validation or persistence.
+
 ## Normalize Path Slugs
 
 ```php

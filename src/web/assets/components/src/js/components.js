@@ -1,4 +1,91 @@
 (() => {
+    if (window.lrIdentifiers) return;
+
+    const normalizeSlug = (value, fallback = '') => {
+        let slug = String(value ?? '')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9_-]+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^[-_]+|[-_]+$/g, '');
+
+        if (slug !== '') {
+            return slug;
+        }
+
+        if (fallback === '') {
+            return '';
+        }
+
+        slug = normalizeSlug(fallback, '');
+
+        return slug !== '' ? slug : 'item';
+    };
+
+    const resolveElement = (element) => {
+        if (typeof element === 'string') {
+            return document.querySelector(element);
+        }
+
+        return element;
+    };
+
+    const bindSlugHandle = (sourceInput, targetInput, options = {}) => {
+        const source = resolveElement(sourceInput);
+        const target = resolveElement(targetInput);
+
+        if (!source || !target || target.dataset.lrSlugHandleBound) {
+            return null;
+        }
+
+        const isNew = options.isNew !== false;
+        const updateExisting = options.updateExisting === true;
+        const fallback = options.fallback ?? '';
+        let manuallyEdited = options.manuallyEdited ?? (!isNew && !updateExisting);
+
+        const resolveFallback = () => {
+            if (typeof fallback === 'function') {
+                return fallback();
+            }
+
+            return fallback;
+        };
+
+        const update = () => {
+            if (manuallyEdited) {
+                return;
+            }
+
+            target.value = normalizeSlug(source.value, resolveFallback());
+        };
+
+        source.addEventListener('input', update);
+        target.addEventListener('input', () => {
+            manuallyEdited = true;
+        });
+
+        target.dataset.lrSlugHandleBound = 'true';
+
+        if (options.updateOnBind === true) {
+            update();
+        }
+
+        return {
+            update,
+            isManuallyEdited: () => manuallyEdited,
+            setManuallyEdited: (value) => {
+                manuallyEdited = Boolean(value);
+            },
+        };
+    };
+
+    window.lrIdentifiers = {
+        normalizeSlug,
+        bindSlugHandle,
+    };
+})();
+
+(() => {
     if (window.lrConfigTooltipInit) return;
     window.lrConfigTooltipInit = true;
 
