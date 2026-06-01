@@ -24,7 +24,7 @@ class LabelHelper
      * present so entries remain distinguishable after truncation.
      *
      * @param string $label The full label to shorten.
-     * @param int $maxLength Target max length of the shortened label (excluding ellipsis). Default 60.
+     * @param int $maxLength Target max length of the shortened label body, excluding the ellipsis; the body is kept one char under this. Default 60.
      * @return string
      */
     public static function shorten(string $label, int $maxLength = 60): string
@@ -47,7 +47,7 @@ class LabelHelper
             $label = trim(mb_substr($label, 0, -mb_strlen($matches[0])));
         }
 
-        $available = $maxLength - mb_strlen($suffix) - 1; // 1 for the ellipsis
+        $available = $maxLength - mb_strlen($suffix) - 1; // keep the body one char under the target length
         if ($available < 10) {
             // Suffix too long to preserve meaningfully; drop it and truncate body.
             return mb_substr($label, 0, $maxLength - 1) . '...';
