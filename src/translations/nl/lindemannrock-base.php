@@ -61,6 +61,7 @@ return [
     'No sheets to export.' => 'Geen bladen om te exporteren.',
     'Failed to read generated CSV.' => 'Gegenereerd CSV-bestand kon niet worden gelezen.',
     'Failed to read generated Excel file.' => 'Gegenereerd Excel-bestand kon niet worden gelezen.',
+    'Failed to create temporary Excel file.' => 'Tijdelijk Excel-bestand kon niet worden aangemaakt.',
     'Failed to read generated ZIP file.' => 'Gegenereerd ZIP-bestand kon niet worden gelezen.',
     'Failed to encode data as JSON: {error}' => 'Gegevens konden niet als JSON worden gecodeerd: {error}',
     'The PHP Zip extension is required to create ZIP exports.' => 'De PHP Zip-extensie is vereist om ZIP-exports te maken.',

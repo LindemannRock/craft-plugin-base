@@ -473,6 +473,11 @@ class ExportHelper
         self::writeSheet($sheet, $rows, $headers, $options);
 
         $tempFile = tempnam(sys_get_temp_dir(), 'excel_export_');
+        if ($tempFile === false) {
+            $spreadsheet->disconnectWorksheets();
+            throw new \yii\web\BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to create temporary Excel file.'));
+        }
+
         $writer = new Xlsx($spreadsheet);
         $writer->save($tempFile);
 
@@ -536,6 +541,11 @@ class ExportHelper
         }
 
         $tempFile = tempnam(sys_get_temp_dir(), 'excel_export_');
+        if ($tempFile === false) {
+            $spreadsheet->disconnectWorksheets();
+            throw new \yii\web\BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to create temporary Excel file.'));
+        }
+
         $writer = new Xlsx($spreadsheet);
         $writer->save($tempFile);
 

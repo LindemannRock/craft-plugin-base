@@ -61,6 +61,7 @@ return [
     'No sheets to export.' => 'Inga blad att exportera.',
     'Failed to read generated CSV.' => 'Det gick inte att läsa den genererade CSV-filen.',
     'Failed to read generated Excel file.' => 'Det gick inte att läsa den genererade Excel-filen.',
+    'Failed to create temporary Excel file.' => 'Det gick inte att skapa den tillfälliga Excel-filen.',
     'Failed to read generated ZIP file.' => 'Det gick inte att läsa den genererade ZIP-filen.',
     'Failed to encode data as JSON: {error}' => 'Det gick inte att koda data som JSON: {error}',
     'The PHP Zip extension is required to create ZIP exports.' => 'PHP-tillägget Zip krävs för att skapa ZIP-exporter.',
