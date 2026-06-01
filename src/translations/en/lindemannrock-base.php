@@ -58,6 +58,14 @@ return [
 
     // Export + editions
     'Nothing to export.' => 'Nothing to export.',
+    'No sheets to export.' => 'No sheets to export.',
+    'Failed to read generated CSV.' => 'Failed to read generated CSV.',
+    'Failed to read generated Excel file.' => 'Failed to read generated Excel file.',
+    'Failed to read generated ZIP file.' => 'Failed to read generated ZIP file.',
+    'Failed to encode data as JSON: {error}' => 'Failed to encode data as JSON: {error}',
+    'The PHP Zip extension is required to create ZIP exports.' => 'The PHP Zip extension is required to create ZIP exports.',
+    'Failed to create temporary ZIP file.' => 'Failed to create temporary ZIP file.',
+    'Failed to open temporary ZIP file.' => 'Failed to open temporary ZIP file.',
     '{feature} requires the {edition} edition.' => '{feature} requires the {edition} edition.',
     'This feature requires the {edition} edition.' => 'This feature requires the {edition} edition.',
     'Export' => 'Export',

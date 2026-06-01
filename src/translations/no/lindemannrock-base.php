@@ -58,6 +58,14 @@ return [
 
     // Export + editions
     'Nothing to export.' => 'Ingenting å eksportere.',
+    'No sheets to export.' => 'Ingen ark å eksportere.',
+    'Failed to read generated CSV.' => 'Kunne ikke lese den genererte CSV-filen.',
+    'Failed to read generated Excel file.' => 'Kunne ikke lese den genererte Excel-filen.',
+    'Failed to read generated ZIP file.' => 'Kunne ikke lese den genererte ZIP-filen.',
+    'Failed to encode data as JSON: {error}' => 'Kunne ikke kode data som JSON: {error}',
+    'The PHP Zip extension is required to create ZIP exports.' => 'PHP Zip-utvidelsen kreves for å opprette ZIP-eksporter.',
+    'Failed to create temporary ZIP file.' => 'Kunne ikke opprette den midlertidige ZIP-filen.',
+    'Failed to open temporary ZIP file.' => 'Kunne ikke åpne den midlertidige ZIP-filen.',
     '{feature} requires the {edition} edition.' => '{feature} krever {edition}-utgaven.',
     'This feature requires the {edition} edition.' => 'Denne funksjonen krever {edition}-utgaven.',
     'Export' => 'Export',
