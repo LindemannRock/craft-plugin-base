@@ -179,6 +179,29 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 |--------|---------|-------------|
 | `htmlSafeJson(mixed $value)` | `string` | JSON-encode a value using HTML-safe flags for inline script/template output |
 
+### SlugHandleHelper
+
+`lindemannrock\base\helpers\SlugHandleHelper`
+[Full docs](../feature-tour/slug-handle-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `normalizeHandle(?string $value, string $fallback = 'item')` | `string` | Normalize a value to a Craft-style handle |
+| `normalizeSlug(?string $value, string $fallback = 'item')` | `string` | Normalize a value to a lowercase URL-style slug |
+| `normalizePathSlug(?string $value, string $fallback = 'item')` | `string` | Normalize a slash-preserving path slug |
+| `exists(string $table, string $column, string $candidate, array $options = [])` | `bool` | Check whether a slug/handle candidate exists, with optional scope and excluded ID |
+| `makeUnique(string $table, string $column, string $base, array $options = [])` | `string` | Return `base`, `base-1`, `base-2`, etc. using DB-backed uniqueness checks |
+
+### SafeSegmentHelper
+
+`lindemannrock\base\helpers\SafeSegmentHelper`
+[Full docs](../feature-tour/safe-segment-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `filenamePart(?string $value, string $fallback = 'file', array $options = [])` | `string` | Normalize a safe filename/cache/ZIP segment |
+| `tokenKey(?string $value, string $fallback = 'token', int $maxLength = 64)` | `string` | Normalize a local token/config key |
+
 ### StoragePathHelper
 
 `lindemannrock\base\helpers\StoragePathHelper`

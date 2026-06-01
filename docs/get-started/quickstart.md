@@ -390,6 +390,8 @@ $(function() {
 | Dial code | `GeoHelper` | `GeoHelper::getDialCode('DE')` → `"49"` |
 | Check plugin | `PluginHelper` | `PluginHelper::isPluginEnabled('other-plugin')` |
 | CSV import | `CsvImportHelper` | `CsvImportHelper::parseUpload($file)` |
+| Slug/handle uniqueness | `SlugHandleHelper` | `SlugHandleHelper::makeUnique('{{%my_items}}', 'handle', $handle)` |
+| Safe filename segment | `SafeSegmentHelper` | `SafeSegmentHelper::filenamePart($label)` |
 
 ## Next Steps
 
