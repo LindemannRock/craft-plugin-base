@@ -411,7 +411,7 @@ class ExportHelper
         $json = json_encode($data, $flags | JSON_INVALID_UTF8_SUBSTITUTE);
 
         if ($json === false) {
-            throw new BadRequestHttpException('Failed to encode data as JSON: ' . json_last_error_msg());
+            throw new BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to encode data as JSON: {error}', ['error' => json_last_error_msg()]));
         }
 
         return $json;
@@ -483,7 +483,7 @@ class ExportHelper
         unset($spreadsheet);
 
         if ($content === false) {
-            throw new \yii\web\BadRequestHttpException('Failed to read generated Excel file.');
+            throw new \yii\web\BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to read generated Excel file.'));
         }
 
         return $content;
@@ -507,7 +507,7 @@ class ExportHelper
     public static function toExcelMulti(array $sheets, string $filename): Response
     {
         if (empty($sheets)) {
-            throw new BadRequestHttpException('No sheets to export.');
+            throw new BadRequestHttpException(Craft::t('lindemannrock-base', 'No sheets to export.'));
         }
 
         $spreadsheet = new Spreadsheet();
@@ -544,7 +544,7 @@ class ExportHelper
 
         if ($content === false) {
             $spreadsheet->disconnectWorksheets();
-            throw new \yii\web\BadRequestHttpException('Failed to read generated Excel file.');
+            throw new \yii\web\BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to read generated Excel file.'));
         }
 
         $spreadsheet->disconnectWorksheets();
@@ -566,6 +566,7 @@ class ExportHelper
      * @param string $delimiter CSV field delimiter @since 5.25.0
      * @param string $enclosure CSV field enclosure character @since 5.25.0
      * @return string CSV string
+     * @throws BadRequestHttpException If reading the generated CSV fails
      * @since 5.13.1
      */
     public static function csvContent(
@@ -590,6 +591,10 @@ class ExportHelper
         rewind($output);
         $csv = stream_get_contents($output);
         fclose($output);
+
+        if ($csv === false) {
+            throw new BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to read generated CSV.'));
+        }
 
         return $csv;
     }
@@ -766,19 +771,19 @@ class ExportHelper
     public static function zipContent(array $files): string
     {
         if (!class_exists(\ZipArchive::class)) {
-            throw new BadRequestHttpException('The PHP Zip extension is required to create ZIP exports.');
+            throw new BadRequestHttpException(Craft::t('lindemannrock-base', 'The PHP Zip extension is required to create ZIP exports.'));
         }
 
         $tempFile = tempnam(sys_get_temp_dir(), 'zip_export_');
         if ($tempFile === false) {
-            throw new BadRequestHttpException('Failed to create temporary ZIP file.');
+            throw new BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to create temporary ZIP file.'));
         }
 
         $zip = new \ZipArchive();
         $opened = $zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         if ($opened !== true) {
             @unlink($tempFile);
-            throw new BadRequestHttpException('Failed to open temporary ZIP file.');
+            throw new BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to open temporary ZIP file.'));
         }
 
         foreach ($files as $key => $file) {
@@ -804,7 +809,7 @@ class ExportHelper
         unlink($tempFile);
 
         if ($content === false) {
-            throw new \yii\web\BadRequestHttpException('Failed to read generated ZIP file.');
+            throw new \yii\web\BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to read generated ZIP file.'));
         }
 
         return $content;

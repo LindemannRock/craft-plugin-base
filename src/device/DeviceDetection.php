@@ -208,7 +208,7 @@ class DeviceDetection
         $detectedLang = null;
 
         $langParam = $request->getQueryParam('lang') ?? $request->getQueryParam('locale');
-        if ($langParam) {
+        if (is_string($langParam) && $langParam !== '') {
             $detectedLang = substr($langParam, 0, 2);
         }
 
