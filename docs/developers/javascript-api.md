@@ -295,7 +295,7 @@ The JavaScript loads through Craft's asset bundle system — you don't need to i
 | Asset Bundle | Loaded By | Provides |
 |--------------|-----------|----------|
 | `AnalyticsAsset` | CP Analytics Layout, Analytics Panel partial | Chart.js + `lrChartColors`, `lrLoadChartData`, `lrCreateChart`, `lrDestroyCharts`, `lrGetChart`, `lrAnalyticsInit` |
-| `ComponentsAsset` | CP Table Layout, CP Analytics Layout, Analytics Panel partial | Config tooltip behavior |
+| `ComponentsAsset` | CP Table Layout, CP Analytics Layout, Analytics Panel partial, explicit template registration | Config tooltip behavior + `lrIdentifiers` |
 | `InstallExperienceAsset` | Shared post-install CP modal | `window.LrInstallExperience` + preset-driven confetti animation |
 
 The table globals (`lrTableSelection`, `lrViewSettings`, `lrBuildUrl`, `lrTableConfig`) are embedded directly in the CP Table Layout template, not in a separate asset bundle.
