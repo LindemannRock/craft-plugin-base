@@ -46,6 +46,9 @@ class SafeSegmentHelper
             ? (preg_replace('/[^A-Za-z0-9._-]+/', '-', $segment) ?? '')
             : (preg_replace('/[^A-Za-z0-9_-]+/', '-', $segment) ?? '');
         $segment = preg_replace('/-+/', '-', $segment) ?? '';
+        if ($allowDots) {
+            $segment = preg_replace('/-+\./', '.', $segment) ?? '';
+        }
         $segment = trim($segment, '-_.');
 
         if ($lowercase) {

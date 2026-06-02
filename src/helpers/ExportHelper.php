@@ -796,6 +796,7 @@ class ExportHelper
             throw new BadRequestHttpException(Craft::t('lindemannrock-base', 'Failed to open temporary ZIP file.'));
         }
 
+        $usedNames = [];
         foreach ($files as $key => $file) {
             $name = null;
             $content = '';
@@ -809,6 +810,8 @@ class ExportHelper
             }
 
             if ($name) {
+                $name = self::uniqueZipEntryName(self::sanitizeZipEntryName((string)$name), $usedNames);
+                $usedNames[$name] = true;
                 $zip->addFromString($name, $content);
             }
         }
@@ -823,6 +826,63 @@ class ExportHelper
         }
 
         return $content;
+    }
+
+    /**
+     * Normalize a ZIP member name while preserving safe nested paths.
+     */
+    private static function sanitizeZipEntryName(string $name): string
+    {
+        $name = str_replace('\\', '/', $name);
+        $parts = array_filter(
+            explode('/', $name),
+            static fn(string $part): bool => $part !== '' && $part !== '.' && $part !== '..'
+        );
+
+        $safeParts = [];
+        foreach ($parts as $index => $part) {
+            $safePart = SafeSegmentHelper::filenamePart($part, 'file-' . ($index + 1), [
+                'allowDots' => true,
+            ]);
+
+            if ($safePart !== '') {
+                $safeParts[] = $safePart;
+            }
+        }
+
+        return !empty($safeParts) ? implode('/', $safeParts) : 'export-file.txt';
+    }
+
+    /**
+     * Keep every ZIP member addressable after sanitized names collide.
+     *
+     * @param array<string, true> $usedNames
+     */
+    private static function uniqueZipEntryName(string $name, array $usedNames): string
+    {
+        if (!isset($usedNames[$name])) {
+            return $name;
+        }
+
+        $directory = '';
+        $basename = $name;
+        $slashPos = strrpos($name, '/');
+        if ($slashPos !== false) {
+            $directory = substr($name, 0, $slashPos + 1);
+            $basename = substr($name, $slashPos + 1);
+        }
+
+        $dotPos = strrpos($basename, '.');
+        $stem = $dotPos !== false ? substr($basename, 0, $dotPos) : $basename;
+        $extension = $dotPos !== false ? substr($basename, $dotPos) : '';
+        $suffix = 2;
+
+        do {
+            $candidate = $directory . $stem . '-' . $suffix . $extension;
+            $suffix++;
+        } while (isset($usedNames[$candidate]));
+
+        return $candidate;
     }
 
     /**
@@ -1054,23 +1114,31 @@ class ExportHelper
 
         // Pattern 2: Simple prefix + extension
         if (is_string($pluginOrPrefix) && is_string($partsOrExtension) && $extension === null) {
-            return $pluginOrPrefix . '-' . DateFormatHelper::toFilenameString() . '.' . $partsOrExtension;
+            $prefix = SafeSegmentHelper::filenamePart($pluginOrPrefix, 'export');
+            $extension = SafeSegmentHelper::filenamePart($partsOrExtension, 'csv');
+
+            return $prefix . '-' . DateFormatHelper::toFilenameString() . '.' . $extension;
         }
 
         // Pattern 1: Settings/string + parts array + extension
         if (is_array($partsOrExtension) && $extension !== null) {
             // Get plugin name from settings or use string directly
             if (is_object($pluginOrPrefix) && method_exists($pluginOrPrefix, 'getLowerDisplayName')) {
-                $pluginName = strtolower(str_replace(' ', '-', $pluginOrPrefix->getLowerDisplayName()));
+                $pluginName = $pluginOrPrefix->getLowerDisplayName();
             } elseif (is_string($pluginOrPrefix)) {
                 $pluginName = $pluginOrPrefix;
             } else {
                 $pluginName = 'export';
             }
 
-            // Filter out empty/null parts and join
-            $allParts = array_filter([$pluginName, ...$partsOrExtension], fn($p) => $p !== null && $p !== '');
+            // Filter out empty/null parts, normalize each segment, and join.
+            $allParts = array_map(
+                static fn($part): string => SafeSegmentHelper::filenamePart((string)$part, ''),
+                array_filter([$pluginName, ...$partsOrExtension], fn($p) => $p !== null && $p !== '')
+            );
+            $allParts = array_filter($allParts, static fn(string $part): bool => $part !== '');
             $baseName = implode('-', $allParts);
+            $extension = SafeSegmentHelper::filenamePart($extension, 'csv');
 
             return $baseName . '-' . DateFormatHelper::toFilenameString() . '.' . $extension;
         }
