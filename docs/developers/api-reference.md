@@ -117,7 +117,7 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `isFormatEnabled(string $format, ?string $handle)` | `bool` | Check if format is enabled |
 | `getEnabledFormats(?string $handle)` | `array` | List enabled format keys |
 | `getFormatOptions()` | `array` | Options for select fields |
-| `filename($settings, $parts, ?string $ext)` | `string` | Generate export filename |
+| `filename($settings, $parts, ?string $ext)` | `string` | Generate sanitized export filename |
 | `assertNotEmpty(array $data, ?string $message = null)` | `void` | Throw if data is empty |
 | `toCsv(array $rows, array $headers, string $file, array $dateCols)` | `Response` | CSV download response |
 | `csvContent(array $rows, array $headers, array $dateCols, string $delimiter = ',', string $enclosure = '"')` | `string` | Build CSV string without sending response (delimiter/enclosure @since(5.25.0)) |
@@ -126,7 +126,7 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `excelContent(array $rows, array $headers, array $dateCols, array $opts)` | `string` | Build XLSX bytes without sending response @since(5.25.0) |
 | `isDangerousValue(mixed $value)` | `bool` | Check if a cell value would trigger formula injection (for callers building their own spreadsheet writer) @since(5.25.0) |
 | `toExcelMulti(array $sheets, string $file)` | `Response` | Multi-sheet Excel workbook |
-| `toZip(array $files, string $file)` | `Response` | ZIP archive download |
+| `toZip(array $files, string $file)` | `Response` | ZIP archive download with sanitized member names |
 | `formatDateColumns(array $rows, array $dateCols)` | `array` | Format dates for CSV/Excel (Craft TZ, `Y-m-d H:i:s`) |
 | `formatDateColumnsForApi(array $rows, array $dateCols)` | `array` | Format dates for JSON export (ISO 8601) |
 

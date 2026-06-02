@@ -57,6 +57,8 @@ ExportHelper::filename('exact-name.csv');
 // → "exact-name.csv"
 ```
 
+Generated timestamp filenames normalize the plugin/prefix and each filename part to safe lowercase filename segments. Exact names remain unchanged for callers that already provide a complete filename.
+
 ## Exporting Data
 
 All export methods return a `craft\web\Response` — return them directly from a controller action.
@@ -166,7 +168,7 @@ $zip = ExportHelper::zipContent([
 ]);
 ```
 
-`csvContent()` and `excelContent()` apply the same formula-injection sanitization, header styling, and date formatting as the `Response`-returning methods — `toCsv()` and `toExcel()` are thin wrappers around them. `toJson()` and `toZip()` likewise delegate to the content-only helpers.
+`csvContent()` and `excelContent()` apply the same formula-injection sanitization, header styling, and date formatting as the `Response`-returning methods — `toCsv()` and `toExcel()` are thin wrappers around them. `zipContent()` normalizes ZIP member names while preserving safe subfolders. `toJson()` and `toZip()` likewise delegate to the content-only helpers.
 
 ## Empty Data Handling
 
