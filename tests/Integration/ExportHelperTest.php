@@ -432,6 +432,27 @@ final class ExportHelperTest extends IntegrationTestCase
         }
     }
 
+    public function testZipContentSanitizesEntryNamesAndPreservesSafeSubfolders(): void
+    {
+        $content = ExportHelper::zipContent([
+            '../Raw Data/Unsafe "Name".csv' => "Name\nAlice\n",
+            ['name' => '..\\Raw Data\\Unsafe Name.csv', 'content' => "Name\nBob\n"],
+            '../../../' => "Name\nCarol\n",
+        ]);
+        $tempFile = self::writeTempFile($content, 'zip');
+        $zip = new ZipArchive();
+
+        try {
+            self::assertTrue($zip->open($tempFile));
+            self::assertSame("Name\nAlice\n", $zip->getFromName('raw-data/unsafe-name.csv'));
+            self::assertSame("Name\nBob\n", $zip->getFromName('raw-data/unsafe-name-2.csv'));
+            self::assertSame("Name\nCarol\n", $zip->getFromName('export-file.txt'));
+        } finally {
+            $zip->close();
+            @unlink($tempFile);
+        }
+    }
+
     public function testDispatchTableRoutesCsvJsonAndExcelAliases(): void
     {
         $rows = [
@@ -527,17 +548,17 @@ final class ExportHelperTest extends IntegrationTestCase
 
         self::assertSame('exact-name.csv', ExportHelper::filename('exact-name.csv'));
 
-        $simple = ExportHelper::filename('logs', 'csv');
-        $withParts = ExportHelper::filename($settings, ['analytics', null, 'last30days'], 'xlsx');
+        $simple = ExportHelper::filename('Logs & Reports', 'CSV');
+        $withParts = ExportHelper::filename($settings, ['Analytics', null, 'Last 30 days', '../Unsafe "Part"'], 'XLSX');
         $after = time();
 
-        self::assertMatchesRegularExpression('/^logs-\d{4}-\d{2}-\d{2}-\d{6}\.csv$/', $simple);
+        self::assertMatchesRegularExpression('/^logs-reports-\d{4}-\d{2}-\d{2}-\d{6}\.csv$/', $simple);
         self::assertMatchesRegularExpression(
-            '/^search-manager-analytics-last30days-\d{4}-\d{2}-\d{2}-\d{6}\.xlsx$/',
+            '/^search-manager-analytics-last-30-days-unsafe-part-\d{4}-\d{2}-\d{2}-\d{6}\.xlsx$/',
             $withParts,
         );
-        self::assertTimestampInRange($simple, 'logs-', '.csv', $before, $after);
-        self::assertTimestampInRange($withParts, 'search-manager-analytics-last30days-', '.xlsx', $before, $after);
+        self::assertTimestampInRange($simple, 'logs-reports-', '.csv', $before, $after);
+        self::assertTimestampInRange($withParts, 'search-manager-analytics-last-30-days-unsafe-part-', '.xlsx', $before, $after);
     }
 
     // ---------------------------------------------------------------------
