@@ -1335,6 +1335,8 @@ a.lr-unified-card-link:active {
 	right: 11px;
 	top: 50%;
 	transform: translateY(-50%);
+	/* Chromium does not propagate :hover from the SVG up to the <a>; let hits fall through to the pill */
+	pointer-events: none;
 }
 
 .lr-brand-text {
@@ -1349,6 +1351,7 @@ a.lr-unified-card-link:active {
 	text-transform: uppercase;
 	text-decoration: none;
 	padding-right: 40px;
+	pointer-events: none;
 }
 
 .lr-brand-credit:hover .lr-brand-text {
