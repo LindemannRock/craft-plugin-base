@@ -86,13 +86,14 @@ In Twig:
 | `priority` | low, normal, high, critical | Priority levels |
 | `httpStatus` | success, redirect, client_error, server_error | HTTP response types |
 | `logLevel` | debug, info, warning, error | Log severity |
+| `logSource` | web, queue, console, php-errors, plugin | Log origin |
 | `pluginStatus` | active, disabled, notInstalled | Plugin state |
 | `exportStatus` | pending, processing, completed, failed | Export/job status |
 | `triggerType` | manual, scheduled, api | Trigger types |
-| `exportFormat` | xlsx, csv, json | Export format types |
+| `exportFormat` | xlsx, csv, json, zip | Export format types |
 | `messageStatus` | pending, sent, delivered, failed | Message delivery |
 | `healthStatus` | ok, low, high | Health checks |
-| `backupReason` | import, restore, manual, scheduled, maintenance, clear, other | Backup reasons |
+| `backupReason` | import, restore, manual, scheduled, clean, clear, maintenance, other | Backup reasons |
 
 > **Note:** Some color sets include a `dot` key (e.g., `status`, `pluginStatus`, `messageStatus`, `healthStatus`). The `dot` key maps to Craft's built-in status dot CSS classes (`enabled`, `disabled`, `pending`, `off`, `on`). Palette colors returned by `getPaletteColor()` do not include `dot`.
 
