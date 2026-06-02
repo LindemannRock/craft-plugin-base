@@ -322,12 +322,13 @@ class ColorHelper
             ],
 
             // =================================================================
-            // EXPORT FORMAT - xlsx = green, csv = cyan, json = amber
+            // EXPORT FORMAT - xlsx = lime, csv = cyan, json = purple, zip = amber
             // =================================================================
             'exportFormat' => [
-                'xlsx' => self::PALETTE['green'],
+                'xlsx' => self::PALETTE['lime'],
                 'csv' => self::PALETTE['cyan'],
-                'json' => self::PALETTE['amber'],
+                'json' => self::PALETTE['purple'],
+                'zip' => self::PALETTE['amber'],
             ],
 
             // =================================================================
