@@ -36,6 +36,7 @@
             "feature-tour/csv-import-helper",
             "feature-tour/cp-nav-helper",
             "feature-tour/label-helper",
+            "feature-tour/asset-volume-helper",
             "feature-tour/testing"
         ]
     },

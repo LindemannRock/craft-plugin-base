@@ -202,6 +202,15 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `filenamePart(?string $value, string $fallback = 'file', array $options = [])` | `string` | Normalize a safe filename/cache/ZIP segment |
 | `tokenKey(?string $value, string $fallback = 'token', int $maxLength = 64)` | `string` | Normalize a local token/config key |
 
+### AssetVolumeHelper
+
+`lindemannrock\base\helpers\AssetVolumeHelper`
+[Full docs](../feature-tour/asset-volume-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `validateAssetId(mixed $assetId, ?string $allowedVolumeUid = null)` | `int|null` | Validate a submitted asset ID against an optional volume restriction and the current user's `viewAssets:` permission; returns the ID or `null` |
+
 ### StoragePathHelper
 
 `lindemannrock\base\helpers\StoragePathHelper`
