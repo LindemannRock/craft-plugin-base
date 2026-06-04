@@ -211,6 +211,16 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 |--------|---------|-------------|
 | `validateAssetId(mixed $assetId, ?string $allowedVolumeUid = null)` | `int|null` | Validate a submitted asset ID against an optional volume restriction and the current user's `viewAssets:` permission; returns the ID or `null` |
 
+### UrlSafetyHelper
+
+`lindemannrock\base\helpers\UrlSafetyHelper`
+[Full docs](../feature-tour/url-safety-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `sanitizeRedirectUrl(string $url, string $fallback = '/')` | `string` | Return the URL if it's a safe redirect target (relative path or `http(s)`), otherwise the fallback |
+| `isSafeRedirectUrl(string $url)` | `bool` | Whether the URL is a safe redirect target |
+
 ### StoragePathHelper
 
 `lindemannrock\base\helpers\StoragePathHelper`
