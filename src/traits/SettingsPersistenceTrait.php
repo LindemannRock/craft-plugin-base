@@ -223,6 +223,11 @@ trait SettingsPersistenceTrait
         $tableName = '{{%' . static::tableName() . '}}';
         $attributes = $this->getAttributes();
 
+        if ($attributesToValidate !== null) {
+            $scopedAttributes = array_fill_keys($attributesToValidate, true);
+            $attributes = array_intersect_key($attributes, $scopedAttributes);
+        }
+
         // Remove excluded fields (e.g., env-only fields)
         foreach (static::excludeFromSave() as $field) {
             unset($attributes[$field]);
