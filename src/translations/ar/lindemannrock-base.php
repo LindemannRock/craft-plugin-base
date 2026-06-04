@@ -227,4 +227,9 @@ return [
     'This will automatically add {envVar} to your .env file.' => 'سيؤدي ذلك إلى إضافة {envVar} تلقائياً إلى ملف .env الخاص بك.',
     'Warning:' => 'تحذير:',
     'Copy the same salt to staging and production environments.' => 'انسخ مفتاح التجزئة نفسه إلى بيئات التدريج والإنتاج.',
+
+    // Storage volume validation
+    'Selected volume not found.' => 'لم يتم العثور على وحدة التخزين المحددة.',
+    'Selected volume must use a local filesystem.' => 'يجب أن تستخدم وحدة التخزين المحددة نظام ملفات محلياً.',
+    'Local backup volumes cannot resolve inside @webroot.' => 'لا يمكن لوحدات النسخ الاحتياطي المحلية أن تُحل داخل @webroot.',
 ];

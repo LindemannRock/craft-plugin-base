@@ -227,4 +227,9 @@ return [
     'This will automatically add {envVar} to your .env file.' => 'Cela ajoutera automatiquement {envVar} à votre fichier .env.',
     'Warning:' => 'Avertissement :',
     'Copy the same salt to staging and production environments.' => 'Copiez le même salt dans les environnements de staging et de production.',
+
+    // Storage volume validation
+    'Selected volume not found.' => 'Le volume sélectionné est introuvable.',
+    'Selected volume must use a local filesystem.' => 'Le volume sélectionné doit utiliser un système de fichiers local.',
+    'Local backup volumes cannot resolve inside @webroot.' => 'Les volumes de sauvegarde locaux ne peuvent pas être résolus dans @webroot.',
 ];
