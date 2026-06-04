@@ -36,7 +36,10 @@
             "feature-tour/csv-import-helper",
             "feature-tour/cp-nav-helper",
             "feature-tour/label-helper",
+            "feature-tour/slug-handle-helper",
+            "feature-tour/safe-segment-helper",
             "feature-tour/asset-volume-helper",
+            "feature-tour/storage-path-validator",
             "feature-tour/testing"
         ]
     },
@@ -46,6 +49,7 @@
         "open": true,
         "children": [
             "template-guides/cp-table-layout",
+            "template-guides/cp-table-index-pattern",
             "template-guides/cp-analytics-layout",
             "template-guides/cp-utilities-layout",
             "template-guides/cp-table-utility-layout"

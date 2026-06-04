@@ -18,10 +18,15 @@ Utility classes for common operations:
 - **Shared install experience** — One-time CP install modal with version metadata, branding, and preset-driven confetti
 - **[BooleanHelper](boolean-helper.md)** — Normalize boolean-like config, env, POST, and HTML attribute values
 - **[DbHelper](db-helper.md)** — DB-agnostic JSON extraction and GROUP_CONCAT
+- **[ConfigFileHelper](config-file-helper.md)** — Read handle-keyed sections from plugin config files and merge config-defined records with database-defined records
 - **[CsvImportHelper](csv-import-helper.md)** — CSV file upload parsing with automatic delimiter detection
 - **[CpNavHelper](cp-nav-helper.md)** — CP navigation building for plugin sub-pages
 - **[LabelHelper](label-helper.md)** — Strip numbering and truncate long field labels for compact UI contexts
+- **[SlugHandleHelper](slug-handle-helper.md)** — Normalize persisted slugs/handles and resolve database collisions with a shared suffix convention
+- **[SafeSegmentHelper](safe-segment-helper.md)** — Normalize safe non-DB string fragments for filenames, cache/storage keys, and local config tokens
+- **[AssetVolumeHelper](asset-volume-helper.md)** — Server-side validation that a submitted asset ID belongs to an allowed volume and the user holds the matching view permission
 - **[StoragePathHelper + StoragePathValidator](storage-path-validator.md)** — Resolve and validate plugin storage paths, aliases, env vars, and webroot guards
+- **[StorageVolumeHelper + StorageVolumeValidator](storage-path-validator.md#storage-volume-validator)** — Validate asset volumes used as plugin storage and block local volumes inside `@webroot`
 
 ### PHP Traits
 

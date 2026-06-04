@@ -233,6 +233,27 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `requireAlias` | `bool` | Require a literal alias, env var, or absolute path that resolves inside an allowed alias root |
 | `allowEnvVars` | `bool` | Allow `$VARIABLE` values and validate their resolved path |
 
+### StorageVolumeHelper
+
+`lindemannrock\base\helpers\StorageVolumeHelper`
+[Full docs](../feature-tour/storage-path-validator.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `validateVolume(?string $volumeUid, array $options = [])` | `array` | Validate an optional asset volume UID for plugin-managed storage |
+| `displayPath(?string $volumeUid, string $subpath)` | `string|null` | Return a CP-friendly `Volume: Name / path` label |
+| `localRootPath(?string $volumeUid)` | `string|null` | Return the resolved root path for local filesystems, or `null` for remote/non-local volumes |
+
+### StorageVolumeValidator
+
+`lindemannrock\base\validators\StorageVolumeValidator`
+[Full docs](../feature-tour/storage-path-validator.md)
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `preventLocalWebroot` | `bool` | Reject local volumes that resolve inside `@webroot` |
+| `requireLocal` | `bool` | Require the selected volume to use a local filesystem |
+
 ### BooleanHelper
 
 `lindemannrock\base\helpers\BooleanHelper`

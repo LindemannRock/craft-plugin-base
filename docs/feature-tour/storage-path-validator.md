@@ -76,3 +76,45 @@ Set `allowEnvVars => false` for settings that must be literal aliases only.
 | `requireAlias` | `bool` | `false` | Require a literal alias, env var, or absolute path that resolves inside an allowed alias root |
 | `allowEnvVars` | `bool` | `true` | Allow `$VARIABLE` values and validate their resolved path |
 | `translationCategory` | `string` | `'app'` | Translation category for validation errors |
+
+## Storage Volume Validator
+
+`StorageVolumeValidator` validates optional Craft asset volume UIDs used as plugin-managed storage. Use it when a settings page lets an administrator choose between a local path and a Craft volume.
+
+```php
+use lindemannrock\base\validators\StorageVolumeValidator;
+
+[
+    ['backupVolumeUid'],
+    StorageVolumeValidator::class,
+    'preventLocalWebroot' => true,
+    'requireLocal' => false,
+],
+```
+
+For raw settings arrays or non-model code, call `StorageVolumeHelper::validateVolume()` directly.
+
+```php
+use lindemannrock\base\helpers\StorageVolumeHelper;
+
+$errors = StorageVolumeHelper::validateVolume($settings['backupVolumeUid'] ?? null, [
+    'preventLocalWebroot' => true,
+    'requireLocal' => false,
+]);
+```
+
+## Volume Display And Local Paths
+
+Use `StorageVolumeHelper::displayPath($uid, 'my-plugin/backups')` for CP display. It returns a label such as `Volume: Uploads / my-plugin/backups`, which avoids exposing partial or unresolved filesystem paths.
+
+Use `StorageVolumeHelper::localRootPath($uid)` only when the plugin really needs a local filesystem root. It returns `null` for remote volumes such as S3.
+
+## Volume Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `preventLocalWebroot` | `bool` | `true` | Reject local filesystems whose root resolves inside `@webroot` |
+| `requireLocal` | `bool` | `false` | Reject remote/non-local filesystems |
+| `translationCategory` | `string` | `'lindemannrock-base'` | Translation category for validation errors |
+
+Remote volumes are not rejected by default. Their public/private access depends on the filesystem provider, bucket policy, CDN settings, and credentials, so plugins should document that administrators must restrict access in the provider.
