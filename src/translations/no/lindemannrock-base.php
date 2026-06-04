@@ -17,6 +17,12 @@ return [
     'Close dialog' => 'Lukk dialogboks',
     'Everything is wired up. You can start configuring the plugin right away.' => 'Alt er klart. Du kan begynne å konfigurere pluginet med en gang.',
 
+    // Validation messages
+    'Value must be a whole number.' => 'Verdien må være et helt tall.',
+    'Value must be a number.' => 'Verdien må være et tall.',
+    'Value must be either true or false.' => 'Verdien må være enten true eller false.',
+    'Value must be an array.' => 'Verdien må være en array.',
+
     // Date ranges
     'Today' => 'I dag',
     'Yesterday' => 'I går',

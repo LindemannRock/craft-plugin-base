@@ -17,6 +17,12 @@ return [
     'Close dialog' => 'Dialoogvenster sluiten',
     'Everything is wired up. You can start configuring the plugin right away.' => 'Alles is ingesteld. U kunt de plugin direct configureren.',
 
+    // Validation messages
+    'Value must be a whole number.' => 'De waarde moet een geheel getal zijn.',
+    'Value must be a number.' => 'De waarde moet een getal zijn.',
+    'Value must be either true or false.' => 'De waarde moet waar of onwaar zijn.',
+    'Value must be an array.' => 'De waarde moet een array zijn.',
+
     // Date ranges
     'Today' => 'Vandaag',
     'Yesterday' => 'Gisteren',

@@ -17,6 +17,12 @@ return [
     'Close dialog' => 'Stäng dialogruta',
     'Everything is wired up. You can start configuring the plugin right away.' => 'Allt är klart. Du kan börja konfigurera pluginet direkt.',
 
+    // Validation messages
+    'Value must be a whole number.' => 'Värdet måste vara ett heltal.',
+    'Value must be a number.' => 'Värdet måste vara ett tal.',
+    'Value must be either true or false.' => 'Värdet måste vara antingen true eller false.',
+    'Value must be an array.' => 'Värdet måste vara en array.',
+
     // Date ranges
     'Today' => 'Idag',
     'Yesterday' => 'Igår',

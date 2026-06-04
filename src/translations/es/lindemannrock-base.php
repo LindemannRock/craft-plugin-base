@@ -17,6 +17,12 @@ return [
     'Close dialog' => 'Cerrar diálogo',
     'Everything is wired up. You can start configuring the plugin right away.' => 'Todo está listo. Puede comenzar a configurar el plugin de inmediato.',
 
+    // Validation messages
+    'Value must be a whole number.' => 'El valor debe ser un número entero.',
+    'Value must be a number.' => 'El valor debe ser un número.',
+    'Value must be either true or false.' => 'El valor debe ser verdadero o falso.',
+    'Value must be an array.' => 'El valor debe ser un array.',
+
     // Date ranges
     'Today' => 'Hoy',
     'Yesterday' => 'Ayer',

@@ -17,6 +17,12 @@ return [
     'Close dialog' => 'إغلاق النافذة',
     'Everything is wired up. You can start configuring the plugin right away.' => 'كل شيء جاهز. يمكنك البدء بتهيئة الإضافة فورًا.',
 
+    // Validation messages
+    'Value must be a whole number.' => 'يجب أن تكون القيمة عدداً صحيحاً.',
+    'Value must be a number.' => 'يجب أن تكون القيمة رقمًا.',
+    'Value must be either true or false.' => 'يجب أن تكون القيمة إما true أو false.',
+    'Value must be an array.' => 'يجب أن تكون القيمة مصفوفة.',
+
     // Date ranges
     'Today' => 'اليوم',
     'Yesterday' => 'أمس',

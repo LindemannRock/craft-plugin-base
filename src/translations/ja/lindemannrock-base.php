@@ -17,6 +17,12 @@ return [
     'Close dialog' => 'ダイアログを閉じる',
     'Everything is wired up. You can start configuring the plugin right away.' => 'すべての準備が整いました。すぐにプラグインの設定を開始できます。',
 
+    // Validation messages
+    'Value must be a whole number.' => '値は整数でなければなりません。',
+    'Value must be a number.' => '値は数値である必要があります。',
+    'Value must be either true or false.' => '値は true または false である必要があります。',
+    'Value must be an array.' => '値は配列である必要があります。',
+
     // Date ranges
     'Today' => '今日',
     'Yesterday' => '昨日',
