@@ -127,6 +127,7 @@ class ConsoleHelpHelper
         $options = $entry['options'] ?? [];
         if (is_array($options) && $options !== []) {
             $lines[] = 'Options';
+            $optionWidth = self::optionNameWidth($options);
             foreach ($options as $option) {
                 if (!is_array($option)) {
                     continue;
@@ -137,7 +138,7 @@ class ConsoleHelpHelper
                     continue;
                 }
                 $required = !empty($option['required']) ? 'Required. ' : '';
-                $lines[] = '  ' . str_pad($name, 14) . self::wrap($required . $description, 64, 16);
+                $lines[] = '  ' . str_pad($name, $optionWidth) . self::wrap($required . $description, 64, $optionWidth + 2);
             }
             $lines[] = '';
         }
@@ -220,6 +221,24 @@ class ConsoleHelpHelper
         }
 
         return null;
+    }
+
+    /**
+     * @param array<int, mixed> $options
+     */
+    private static function optionNameWidth(array $options): int
+    {
+        $width = 14;
+
+        foreach ($options as $option) {
+            if (!is_array($option)) {
+                continue;
+            }
+
+            $width = max($width, strlen((string)($option['name'] ?? '')) + 2);
+        }
+
+        return $width;
     }
 
     /**
