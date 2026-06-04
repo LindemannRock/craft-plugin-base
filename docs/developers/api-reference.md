@@ -179,6 +179,15 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 |--------|---------|-------------|
 | `htmlSafeJson(mixed $value)` | `string` | JSON-encode a value using HTML-safe flags for inline script/template output |
 
+### SettingsPostHelper
+
+`lindemannrock\base\helpers\SettingsPostHelper`
+[Full docs](../feature-tour/settings-post-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `apply(Model $model, array $postedValues, array $allowedAttributes, ?callable $isOverridden = null, array $adapters = [])` | `SettingsPostResult` | Apply section-scoped, config-aware, typed settings POST values to a settings model |
+
 ### SlugHandleHelper
 
 `lindemannrock\base\helpers\SlugHandleHelper`

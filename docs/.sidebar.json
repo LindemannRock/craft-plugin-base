@@ -17,6 +17,7 @@
             "feature-tour/overview",
             "feature-tour/plugin-helper",
             "feature-tour/settings-persistence",
+            "feature-tour/settings-post-helper",
             "feature-tour/settings-config",
             "feature-tour/settings-display-name",
             "feature-tour/base-settings-traits",
