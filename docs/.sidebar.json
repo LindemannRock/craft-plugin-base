@@ -35,6 +35,7 @@
             "feature-tour/db-helper",
             "feature-tour/csv-import-helper",
             "feature-tour/cp-nav-helper",
+            "feature-tour/console-help",
             "feature-tour/label-helper",
             "feature-tour/slug-handle-helper",
             "feature-tour/safe-segment-helper",

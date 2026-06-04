@@ -275,6 +275,17 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `isBooleanLike(mixed $value)` | `bool` | Check whether a value is a recognized boolean-like value |
 | `toStyleValue(mixed $value, bool $default = false)` | `string` | Normalize a boolean-like value to `'1'` or `'0'` for style config |
 
+### ConsoleHelpHelper
+
+`lindemannrock\base\helpers\ConsoleHelpHelper`
+[Full docs](../feature-tour/console-help.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `renderOverview(array $manifest)` | `string` | Render the top-level plugin command catalog |
+| `renderCommand(array $manifest, string $command)` | `string` | Render focused command help, or an unknown-command suggestion |
+| `hasCommand(array $manifest, ?string $command)` | `bool` | Whether the manifest contains the requested command; `null` is the overview |
+
 ### DbHelper
 
 `lindemannrock\base\helpers\DbHelper`
@@ -315,6 +326,20 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 |--------|---------|-------------|
 | `buildSubnav(User $user, ?Model $settings, array $sections)` | `array` | Build subnav array from section definitions |
 | `firstAccessibleRoute(User $user, ?Model $settings, array $sections)` | `?string` | First route the user can access |
+
+## Console Controllers
+
+### AbstractHelpController
+
+`lindemannrock\base\console\controllers\AbstractHelpController`
+[Full docs](../feature-tour/console-help.md)
+
+Extend this controller in a plugin's console namespace to expose `plugin-handle/help` and `plugin-handle/help group/action`.
+
+| Method | Description |
+|--------|-------------|
+| `actionIndex(?string $command = null)` | Render overview or focused command help |
+| `helpManifest(): array` | **(abstract)** Return the command manifest consumed by `ConsoleHelpHelper` |
 
 ---
 
