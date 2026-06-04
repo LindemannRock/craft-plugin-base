@@ -43,7 +43,7 @@ abstract class AbstractHelpController extends Controller
 
         $this->stdout($output);
 
-        return ConsoleHelpHelper::hasCommand($manifest, $command) ? ExitCode::OK : ExitCode::USAGE;
+        return ExitCode::OK;
     }
 
     /**
