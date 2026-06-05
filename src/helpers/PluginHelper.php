@@ -475,7 +475,7 @@ class PluginHelper
      */
     public static function getCacheBasePath(PluginInterface $plugin): string
     {
-        return Craft::$app->getPath()->getRuntimePath() . '/' . $plugin->id . '/cache/';
+        return Craft::$app->getRuntimePath() . '/' . $plugin->id . '/cache/';
     }
 
     /**
