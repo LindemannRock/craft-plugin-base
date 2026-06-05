@@ -32,7 +32,7 @@ final class SettingsPostHelperTest extends IntegrationTestCase
                 'nullableIntegerValue' => '',
                 'floatValue' => '1.25',
                 'booleanValue' => 'on',
-                'nullableBooleanValue' => '0',
+                'nullableBooleanValue' => '',
                 'stringValue' => 123,
                 'nullableStringValue' => '',
                 'arrayValue' => ['a' => 'b'],
@@ -53,7 +53,7 @@ final class SettingsPostHelperTest extends IntegrationTestCase
         self::assertNull($settings->nullableIntegerValue);
         self::assertSame(1.25, $settings->floatValue);
         self::assertTrue($settings->booleanValue);
-        self::assertFalse($settings->nullableBooleanValue);
+        self::assertNull($settings->nullableBooleanValue);
         self::assertSame('123', $settings->stringValue);
         self::assertNull($settings->nullableStringValue);
         self::assertSame(['a' => 'b'], $settings->arrayValue);
@@ -68,6 +68,26 @@ final class SettingsPostHelperTest extends IntegrationTestCase
             'nullableStringValue',
             'arrayValue',
         ], $result->assignedAttributes);
+    }
+
+    public function testApplyTreatsPostedEmptyStringAsFalseForNonNullableBooleans(): void
+    {
+        $settings = new SettingsPostHelperTestModel();
+        $settings->booleanValue = true;
+
+        $result = SettingsPostHelper::apply(
+            model: $settings,
+            postedValues: [
+                'booleanValue' => '',
+            ],
+            allowedAttributes: [
+                'booleanValue',
+            ],
+        );
+
+        self::assertFalse($settings->booleanValue);
+        self::assertFalse($result->hasErrors);
+        self::assertSame(['booleanValue'], $result->assignedAttributes);
     }
 
     public function testApplyIgnoresUnknownOffSectionConfigOverriddenAndUnsupportedProperties(): void
@@ -106,7 +126,7 @@ final class SettingsPostHelperTest extends IntegrationTestCase
             postedValues: [
                 'integerValue' => 'abc',
                 'floatValue' => 'abc',
-                'booleanValue' => '',
+                'booleanValue' => 'maybe',
                 'arrayValue' => 'not-array',
             ],
             allowedAttributes: ['integerValue', 'floatValue', 'booleanValue', 'arrayValue'],

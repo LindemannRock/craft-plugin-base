@@ -53,7 +53,9 @@ When the settings model uses `SettingsPersistenceTrait`, passing `$result->attri
 
 Empty strings become `null` only when the destination property allows null.
 
-For non-nullable numeric and boolean properties, an empty string is invalid and the helper adds a model error.
+For non-nullable numeric properties, an empty string is invalid and the helper adds a model error.
+
+For non-nullable boolean properties, an empty string becomes `false` because Craft's lightswitch field posts `''` when switched off.
 
 For non-nullable string properties, an empty string remains an empty string.
 
@@ -64,7 +66,7 @@ Boolean properties accept common Craft/HTML form values:
 | Input | Result |
 |-------|--------|
 | `true`, `1`, `'1'`, `'true'`, `'on'`, `'yes'` | `true` |
-| `false`, `0`, `'0'`, `'false'`, `'off'`, `'no'` | `false` |
+| `false`, `0`, `''`, `'0'`, `'false'`, `'off'`, `'no'` | `false` |
 
 Missing checkbox fields are not inferred as `false`. Controllers and templates should keep posting hidden fallbacks where the UI needs that behavior.
 

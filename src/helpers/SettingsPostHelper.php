@@ -187,6 +187,9 @@ class SettingsPostHelper
 
         if (is_string($value)) {
             $normalized = strtolower(trim($value));
+            if ($normalized === '') {
+                return ['valid' => true, 'value' => false];
+            }
             if (in_array($normalized, ['1', 'true', 'on', 'yes'], true)) {
                 return ['valid' => true, 'value' => true];
             }
