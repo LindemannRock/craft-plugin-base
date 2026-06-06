@@ -30,6 +30,7 @@ final class ConsoleHelpHelperTest extends IntegrationTestCase
         self::assertStringContainsString('Command groups', $output);
         self::assertStringContainsString('maintenance', $output);
         self::assertStringContainsString('Run focused help', $output);
+        self::assertStringContainsString('php craft example-manager/help <group/action>', $output);
         self::assertStringContainsString('ddev craft example-manager/help <group/action>', $output);
     }
 
@@ -40,6 +41,7 @@ final class ConsoleHelpHelperTest extends IntegrationTestCase
         self::assertStringContainsString('example-manager/maintenance/clean-by-type --type=<all|site|forms>', $output);
         self::assertStringContainsString('--type', $output);
         self::assertStringContainsString('Required. all, site, or forms.', $output);
+        self::assertStringContainsString('php craft example-manager/maintenance/clean-by-type --type=forms --provider=formie', $output);
         self::assertStringContainsString('ddev craft example-manager/maintenance/clean-by-type --type=forms --provider=formie', $output);
         self::assertStringContainsString('Native Craft help', $output);
     }
@@ -50,7 +52,20 @@ final class ConsoleHelpHelperTest extends IntegrationTestCase
 
         self::assertStringContainsString("No help entry for 'translations/clean-by-type'.", $output);
         self::assertStringContainsString('Did you mean?', $output);
+        self::assertStringContainsString('php craft example-manager/help maintenance/clean-by-type', $output);
         self::assertStringContainsString('ddev craft example-manager/help maintenance/clean-by-type', $output);
+    }
+
+    public function testRenderOverviewKeepsSingularCommandPrefixFallback(): void
+    {
+        $manifest = self::manifest();
+        unset($manifest['commandPrefixes']);
+        $manifest['commandPrefix'] = 'craft';
+
+        $output = ConsoleHelpHelper::renderOverview($manifest);
+
+        self::assertStringContainsString('craft example-manager/help <group/action>', $output);
+        self::assertStringNotContainsString('php craft example-manager/help <group/action>', $output);
     }
 
     public function testHasCommandAcceptsNullAndKnownCommands(): void
@@ -68,7 +83,10 @@ final class ConsoleHelpHelperTest extends IntegrationTestCase
         return [
             'title' => 'Example Manager',
             'pluginHandle' => 'example-manager',
-            'commandPrefix' => 'ddev craft',
+            'commandPrefixes' => [
+                'php craft',
+                'ddev craft',
+            ],
             'summary' => 'Short operator help for example commands.',
             'common' => [
                 'maintenance/clean-by-type',

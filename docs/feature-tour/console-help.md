@@ -25,7 +25,10 @@ final class HelpController extends AbstractHelpController
         return [
             'title' => 'My Plugin',
             'pluginHandle' => 'my-plugin',
-            'commandPrefix' => 'php craft',
+            'commandPrefixes' => [
+                'php craft',
+                'ddev craft',
+            ],
             'summary' => 'Manage plugin maintenance tasks from the command line.',
             'common' => [
                 'maintenance/clean-unused',
@@ -68,7 +71,8 @@ Top-level fields:
 |-------|------|-------------|
 | `title` | `string` | Display name used in the help header |
 | `pluginHandle` | `string` | Craft plugin handle, used to build command paths |
-| `commandPrefix` | `string` | Prefix used in examples, usually `php craft` or `ddev craft` |
+| `commandPrefixes` | `string[]` | Prefixes used in examples, usually `php craft` and `ddev craft` |
+| `commandPrefix` | `string` | Legacy single-prefix fallback when `commandPrefixes` is omitted |
 | `summary` | `string` | Short operator-facing explanation |
 | `common` | `string[]` | Command paths to highlight first |
 | `groups` | `array[]` | Group sections such as `translations`, `maintenance`, or `backup` |

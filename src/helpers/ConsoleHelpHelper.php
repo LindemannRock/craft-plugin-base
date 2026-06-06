@@ -28,7 +28,7 @@ class ConsoleHelpHelper
         $lines = [];
         $title = (string)($manifest['title'] ?? self::titleFromHandle((string)($manifest['pluginHandle'] ?? 'Plugin')));
         $handle = (string)($manifest['pluginHandle'] ?? '');
-        $prefix = (string)($manifest['commandPrefix'] ?? 'php craft');
+        $prefixes = self::commandPrefixes($manifest);
 
         $lines[] = $title . ' CLI';
         $lines[] = str_repeat('=', strlen($title . ' CLI'));
@@ -90,8 +90,10 @@ class ConsoleHelpHelper
         }
 
         $lines[] = 'Run focused help';
-        $lines[] = "  {$prefix} {$handle}/help <group/action>";
-        $lines[] = "  {$prefix} help {$handle}/<group>/<action>";
+        foreach ($prefixes as $prefix) {
+            $lines[] = "  {$prefix} {$handle}/help <group/action>";
+            $lines[] = "  {$prefix} help {$handle}/<group>/<action>";
+        }
 
         return rtrim(implode("\n", $lines)) . "\n";
     }
@@ -104,7 +106,7 @@ class ConsoleHelpHelper
     public static function renderCommand(array $manifest, string $command): string
     {
         $handle = (string)($manifest['pluginHandle'] ?? '');
-        $prefix = (string)($manifest['commandPrefix'] ?? 'php craft');
+        $prefixes = self::commandPrefixes($manifest);
         $normalized = self::normalizeCommand($command, $handle);
         $entry = self::findCommand($manifest, $normalized);
 
@@ -148,7 +150,9 @@ class ConsoleHelpHelper
             $lines[] = 'Examples';
             foreach ($examples as $example) {
                 if (is_string($example)) {
-                    $lines[] = "  {$prefix} {$example}";
+                    foreach ($prefixes as $prefix) {
+                        $lines[] = "  {$prefix} {$example}";
+                    }
                 }
             }
             $lines[] = '';
@@ -167,8 +171,10 @@ class ConsoleHelpHelper
 
         $lines[] = 'Native Craft help';
         $nativePath = self::commandPath($entry, $handle);
-        $lines[] = "  {$prefix} help {$nativePath}";
-        $lines[] = "  {$prefix} {$nativePath} --help";
+        foreach ($prefixes as $prefix) {
+            $lines[] = "  {$prefix} help {$nativePath}";
+            $lines[] = "  {$prefix} {$nativePath} --help";
+        }
 
         return rtrim(implode("\n", $lines)) . "\n";
     }
@@ -247,7 +253,7 @@ class ConsoleHelpHelper
     private static function renderUnknownCommand(array $manifest, string $command): string
     {
         $handle = (string)($manifest['pluginHandle'] ?? '');
-        $prefix = (string)($manifest['commandPrefix'] ?? 'php craft');
+        $prefixes = self::commandPrefixes($manifest);
         $suggestion = self::suggestCommand($manifest, $command);
 
         $lines = [
@@ -257,13 +263,17 @@ class ConsoleHelpHelper
 
         if ($suggestion !== null) {
             $lines[] = 'Did you mean?';
-            $lines[] = "  {$prefix} {$handle}/help {$suggestion}";
-            $lines[] = "  {$prefix} {$handle}/{$suggestion}";
+            foreach ($prefixes as $prefix) {
+                $lines[] = "  {$prefix} {$handle}/help {$suggestion}";
+                $lines[] = "  {$prefix} {$handle}/{$suggestion}";
+            }
             $lines[] = '';
         }
 
         $lines[] = 'Show all commands';
-        $lines[] = "  {$prefix} {$handle}/help";
+        foreach ($prefixes as $prefix) {
+            $lines[] = "  {$prefix} {$handle}/help";
+        }
 
         return implode("\n", $lines) . "\n";
     }
@@ -381,6 +391,35 @@ class ConsoleHelpHelper
     private static function titleFromHandle(string $handle): string
     {
         return ucwords(str_replace('-', ' ', $handle));
+    }
+
+    /**
+     * @param array<string, mixed> $manifest
+     * @return string[]
+     */
+    private static function commandPrefixes(array $manifest): array
+    {
+        $prefixes = $manifest['commandPrefixes'] ?? null;
+        if (is_array($prefixes)) {
+            $normalized = [];
+            foreach ($prefixes as $prefix) {
+                if (!is_string($prefix)) {
+                    continue;
+                }
+                $prefix = trim($prefix);
+                if ($prefix !== '' && !in_array($prefix, $normalized, true)) {
+                    $normalized[] = $prefix;
+                }
+            }
+
+            if ($normalized !== []) {
+                return $normalized;
+            }
+        }
+
+        $prefix = trim((string)($manifest['commandPrefix'] ?? 'php craft'));
+
+        return [$prefix !== '' ? $prefix : 'php craft'];
     }
 
     private static function wrap(string $text, int $width = 78, int $indent = 0): string
