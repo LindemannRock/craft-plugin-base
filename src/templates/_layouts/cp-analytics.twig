@@ -281,7 +281,7 @@
         var config = {
             prefix: '{{ chartPrefix }}',
             dataEndpoint: '{{ chartDataEndpoint ? actionUrl(chartDataEndpoint) : '' }}',
-            dateRange: '{{ dateRange }}',
+            dateRange: {{ dateRange|json_encode|raw }},
             siteId: '{{ currentSiteId }}',
             customFilters: {{ customFilterParams|json_encode|raw }},
             csrfToken: '{{ craft.app.request.csrfToken }}',
