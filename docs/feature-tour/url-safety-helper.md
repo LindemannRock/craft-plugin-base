@@ -20,6 +20,7 @@ A safe value (relative path starting with `/`, or an `http(s)` URL) is returned 
 UrlSafetyHelper::sanitizeRedirectUrl('/dashboard');            // '/dashboard'
 UrlSafetyHelper::sanitizeRedirectUrl('https://example.com');   // 'https://example.com'
 UrlSafetyHelper::sanitizeRedirectUrl('javascript:alert(1)');   // '/'
+UrlSafetyHelper::sanitizeRedirectUrl('//evil.com');            // '/' (protocol-relative)
 UrlSafetyHelper::sanitizeRedirectUrl('data:text/html,x', '/404'); // '/404'
 ```
 
@@ -39,7 +40,7 @@ return $this->redirect(UrlSafetyHelper::sanitizeRedirectUrl($url));
 
 ## Scope
 
-- `sanitizeRedirectUrl()` treats **any** `/`-prefixed value as a relative path (matching the long-standing controller behavior). If your context must also reject scheme-relative `//host` URLs, check for that explicitly before calling.
+- `sanitizeRedirectUrl()` accepts a single-leading-slash relative path (`/path`) but rejects scheme-relative `//host` URLs — the browser resolves `//host` to an external origin, so it collapses to the fallback like any other off-site target without an explicit `http(s)://` scheme.
 - This is a redirect-target guard only. It does not validate or normalize a URL for storage, display, or as a destination link — use the appropriate validator for those.
 
 ## Not For

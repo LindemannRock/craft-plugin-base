@@ -100,6 +100,7 @@ The helper can add these base-owned translated model errors:
 
 - `Value must be a whole number.`
 - `Value must be a number.`
+- `Value must be a string.`
 - `Value must be either true or false.`
 - `Value must be an array.`
 
