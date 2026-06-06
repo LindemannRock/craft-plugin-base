@@ -186,7 +186,7 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `apply(Model $model, array $postedValues, array $allowedAttributes, ?callable $isOverridden = null, array $adapters = [])` | `SettingsPostResult` | Apply section-scoped, config-aware, typed settings POST values to a settings model |
+| `apply(Model $model, array $postedValues, array $allowedAttributes, ?callable $shouldSkipAttribute = null, array $adapters = [])` | `SettingsPostResult` | Apply section-scoped typed settings POST values to a settings model, optionally skipping config-overridden attributes on explicit POST-save paths |
 
 ### SlugHandleHelper
 

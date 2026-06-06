@@ -14,9 +14,27 @@ Use this helper in settings controllers between reading `settings[...]` from the
 - `string` / `?string`
 - `array`
 
-Unknown fields, off-section fields, config-overridden fields, untyped properties, and unsupported typed properties are ignored before assignment. Unsupported fields require an adapter.
+Unknown fields, off-section fields, untyped properties, and unsupported typed properties are ignored before assignment. Additional attributes are ignored only when a `shouldSkipAttribute` callback is provided. Unsupported fields require an adapter.
 
-## Example
+## Skipping Attributes
+
+Pass `shouldSkipAttribute` only when `apply()` is running on an explicit Control Panel POST-save path, such as a custom settings controller or a DB-backed settings model that saves through `SettingsPersistenceTrait`.
+
+Use the callback for config-controlled attributes on POST-save paths:
+
+```php
+shouldSkipAttribute: fn(string $attribute): bool => $settings->isOverriddenByConfig($attribute),
+```
+
+Do not pass `shouldSkipAttribute` when `apply()` is called from a native plugin settings model's `setAttributes()` override. Native Craft plugin settings use `setAttributes()` for both loading merged project-config/config-file values and saving CP POST values. Skipping config-overridden attributes there prevents config-file values from loading.
+
+Rule of thumb:
+
+- Custom settings controller POST save: pass `shouldSkipAttribute`.
+- DB-backed `SettingsPersistenceTrait` save path: pass `shouldSkipAttribute`.
+- Native `settingsHtml()` model `setAttributes()` override: do not pass `shouldSkipAttribute`.
+
+## Custom Settings Controller Example
 
 ```php
 use lindemannrock\base\helpers\SettingsPostHelper;
@@ -29,7 +47,7 @@ $result = SettingsPostHelper::apply(
     model: $settings,
     postedValues: $settingsData,
     allowedAttributes: $sectionAttributes,
-    isOverridden: fn(string $attribute): bool => $settings->isOverriddenByConfig($attribute),
+    shouldSkipAttribute: fn(string $attribute): bool => $settings->isOverriddenByConfig($attribute),
     adapters: [
         'enabledIntegrations' => static fn(mixed $value): array => is_string($value)
             ? (json_decode($value, true) ?: [])

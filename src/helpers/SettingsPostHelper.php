@@ -22,14 +22,14 @@ class SettingsPostHelper
     /**
      * @param array<string, mixed> $postedValues
      * @param array<int, string> $allowedAttributes
-     * @param callable(string): bool|null $isOverridden
+     * @param callable(string): bool|null $shouldSkipAttribute Return true to skip an allowed attribute before assignment and validation.
      * @param array<string, callable(mixed, string, Model): mixed> $adapters
      */
     public static function apply(
         Model $model,
         array $postedValues,
         array $allowedAttributes,
-        ?callable $isOverridden = null,
+        ?callable $shouldSkipAttribute = null,
         array $adapters = [],
     ): SettingsPostResult {
         $allowedLookup = array_fill_keys($allowedAttributes, true);
@@ -39,7 +39,7 @@ class SettingsPostHelper
         $hadErrors = false;
 
         foreach ($allowedAttributes as $attribute) {
-            if ($isOverridden !== null && $isOverridden($attribute)) {
+            if ($shouldSkipAttribute !== null && $shouldSkipAttribute($attribute)) {
                 continue;
             }
 
@@ -54,7 +54,7 @@ class SettingsPostHelper
 
             if (
                 !isset($allowedLookup[$attribute]) ||
-                ($isOverridden !== null && $isOverridden($attribute)) ||
+                ($shouldSkipAttribute !== null && $shouldSkipAttribute($attribute)) ||
                 !property_exists($model, $attribute)
             ) {
                 $ignoredAttributes[] = $attribute;

@@ -105,7 +105,7 @@ final class SettingsPostHelperTest extends IntegrationTestCase
                 'objectValue' => new \DateTimeImmutable(),
             ],
             allowedAttributes: ['integerValue', 'configLockedValue', 'untypedValue', 'objectValue'],
-            isOverridden: static fn(string $attribute): bool => $attribute === 'configLockedValue',
+            shouldSkipAttribute: static fn(string $attribute): bool => $attribute === 'configLockedValue',
         );
 
         self::assertSame(42, $settings->integerValue);
