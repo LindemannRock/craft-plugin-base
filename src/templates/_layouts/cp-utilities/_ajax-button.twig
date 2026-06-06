@@ -81,7 +81,7 @@ $('#{{ id }}').on('click', function() {
     $btn.addClass('loading').prop('disabled', true);
 
     $.ajax({
-        url: '{{ action|raw }}',
+        url: {{ action|json_encode|raw }},
         type: 'POST',
         dataType: 'json',
         data: {
