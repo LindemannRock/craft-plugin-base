@@ -11,7 +11,9 @@ declare(strict_types=1);
 namespace lindemannrock\base\testing;
 
 use Craft;
+use craft\base\ElementInterface;
 use craft\db\Query;
+use craft\helpers\FileHelper;
 use craft\queue\BaseJob;
 use PHPUnit\Framework\TestCase as PhpUnitTestCase;
 
@@ -34,6 +36,12 @@ use PHPUnit\Framework\TestCase as PhpUnitTestCase;
  *  - {@see countRows()}, {@see fetchRow()} — generic Query wrappers
  *  - {@see purgeRowsByMarker()} — delete rows whose marker column starts with
  *    a given prefix; the canonical cleanup pattern
+ *  - {@see nextTestMarker()} — deterministic per-test marker generation for
+ *    seed rows, temp paths, and element handles
+ *  - {@see saveTestElement()}, {@see trackElementForCleanup()} — save Craft
+ *    elements and hard-delete them automatically during teardown
+ *  - {@see createTrackedTempDirectory()}, {@see trackTempPath()} — track temp
+ *    files/directories for automatic teardown cleanup
  *  - {@see drainQueueJob()} — run a queueable job in a loop until a condition
  *    holds, capped to surface hangs
  *  - {@see cleanupExternalState()} — override hook for non-DB cleanup (Redis
@@ -51,13 +59,35 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
      */
     private array $swappedComponents = [];
 
+    /**
+     * Counter backing {@see nextTestMarker()}.
+     */
+    private int $testMarkerCounter = 0;
+
+    /**
+     * Element IDs scheduled for hard-delete cleanup.
+     *
+     * @var list<int>
+     */
+    private array $trackedElementIds = [];
+
+    /**
+     * Filesystem paths scheduled for cleanup.
+     *
+     * @var list<string>
+     */
+    private array $trackedTempPaths = [];
+
     protected function tearDown(): void
     {
         // External-state cleanup runs first, while stubbed components are
         // still installed — a stub that recorded calls during the test may
         // need to be consulted by cleanup logic.
         $this->cleanupExternalState();
+        $this->cleanupTrackedElements();
+        $this->cleanupTrackedTempPaths();
         $this->restoreSwappedComponents();
+        $this->testMarkerCounter = 0;
         parent::tearDown();
     }
 
@@ -178,6 +208,96 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
     }
 
     /**
+     * Return a unique marker string for the current test instance.
+     *
+     * Use this for seed handles, titles, slugs, temporary path prefixes, or
+     * any other value that needs to be unique while still easy to find during
+     * cleanup. The returned value is ASCII-only when the prefix and kind are
+     * ASCII-only.
+     *
+     * @since 5.26.0
+     */
+    protected function nextTestMarker(string $prefix, string $kind = ''): string
+    {
+        $this->testMarkerCounter++;
+        $suffix = $kind !== '' ? $kind . '_' : '';
+
+        return $prefix . $suffix . $this->testMarkerCounter . '_' . bin2hex(random_bytes(4));
+    }
+
+    /**
+     * Save a Craft element through the element service and schedule it for
+     * hard-delete cleanup during teardown.
+     *
+     * The element is tracked only after a successful save with a real ID.
+     * Domain-specific seeders should still populate the element's required
+     * properties before calling this helper.
+     *
+     * @throws \RuntimeException when the element cannot be saved.
+     * @since 5.26.0
+     */
+    protected function saveTestElement(
+        ElementInterface $element,
+        bool $runValidation = false,
+        bool $propagate = true,
+        bool $updateSearchIndex = true,
+    ): ElementInterface {
+        $saved = Craft::$app->getElements()->saveElement($element, $runValidation, $propagate, $updateSearchIndex);
+        if (!$saved) {
+            throw new \RuntimeException('Test element failed to save: ' . json_encode($element->getErrors()));
+        }
+
+        if ($element->id !== null) {
+            $this->trackElementForCleanup((int) $element->id);
+        }
+
+        return $element;
+    }
+
+    /**
+     * Schedule an existing Craft element ID for hard-delete cleanup during
+     * teardown.
+     *
+     * @since 5.26.0
+     */
+    protected function trackElementForCleanup(int $elementId): void
+    {
+        if (!in_array($elementId, $this->trackedElementIds, true)) {
+            $this->trackedElementIds[] = $elementId;
+        }
+    }
+
+    /**
+     * Create a unique temporary directory and schedule it for teardown cleanup.
+     *
+     * @throws \yii\base\Exception if the directory cannot be created.
+     * @since 5.26.0
+     */
+    protected function createTrackedTempDirectory(string $prefix): string
+    {
+        $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $this->nextTestMarker($prefix, 'tmp');
+        FileHelper::createDirectory($root);
+        $this->trackTempPath($root);
+
+        return $root;
+    }
+
+    /**
+     * Schedule a file or directory path for teardown cleanup.
+     *
+     * Directories are removed recursively with {@see FileHelper::removeDirectory()}.
+     * Files and symlinks are removed with `unlink()`.
+     *
+     * @since 5.26.0
+     */
+    protected function trackTempPath(string $path): void
+    {
+        if (!in_array($path, $this->trackedTempPaths, true)) {
+            $this->trackedTempPaths[] = $path;
+        }
+    }
+
+    /**
      * Run a queueable job in a loop until $isDone returns true. Generalises
      * the BatchSyncJob "drain until empty" pattern — works for any job whose
      * single execution makes incremental progress against a queue / buffer.
@@ -199,5 +319,37 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
                 );
             }
         }
+    }
+
+    /**
+     * Hard-delete every element registered through {@see saveTestElement()} or
+     * {@see trackElementForCleanup()}.
+     */
+    private function cleanupTrackedElements(): void
+    {
+        foreach (array_reverse($this->trackedElementIds) as $elementId) {
+            $element = Craft::$app->getElements()->getElementById($elementId, null, null, ['status' => null]);
+            if ($element !== null) {
+                Craft::$app->getElements()->deleteElement($element, true);
+            }
+        }
+        $this->trackedElementIds = [];
+    }
+
+    /**
+     * Remove every filesystem path registered through {@see trackTempPath()}.
+     */
+    private function cleanupTrackedTempPaths(): void
+    {
+        foreach (array_reverse($this->trackedTempPaths) as $path) {
+            if (is_dir($path) && !is_link($path)) {
+                FileHelper::removeDirectory($path);
+                continue;
+            }
+            if (is_file($path) || is_link($path)) {
+                @unlink($path);
+            }
+        }
+        $this->trackedTempPaths = [];
     }
 }

@@ -60,7 +60,7 @@ See [Twig Filters & Functions](../template-guides/twig-filters-functions.md) for
 
 Shared scaffolding for PHPUnit integration tests against a live Craft install:
 
-- **[Testing](testing.md)** — `IntegrationTestCase` abstract base (component swap/restore, generic DB helpers, marker cleanup, queue drain, `cleanupExternalState()` hook), `bootstrap()` function (Craft console init with optional explicit project root), and `phpunit.xml.dist.template` for copy-once suite setup
+- **[Testing](testing.md)** — `IntegrationTestCase` abstract base (component swap/restore, generic DB helpers, marker cleanup, fixture lifecycle helpers for elements/temp paths, queue drain, `cleanupExternalState()` hook), `bootstrap()` function (Craft console init with optional explicit project root), and `phpunit.xml.dist.template` for copy-once suite setup
 
 ### CP Layouts & Components
 

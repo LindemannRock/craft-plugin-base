@@ -11,7 +11,7 @@ Shared scaffolding for PHPUnit integration tests against a live Craft install. P
 
 | Member | Kind | Purpose |
 |--------|------|---------|
-| `IntegrationTestCase` | abstract class | Base for all integration tests. Provides component swap/restore, generic DB helpers, marker cleanup, queue drain helper, and a `cleanupExternalState()` hook. |
+| `IntegrationTestCase` | abstract class | Base for all integration tests. Provides component swap/restore, generic DB helpers, marker cleanup, fixture lifecycle helpers, queue drain helper, and a `cleanupExternalState()` hook. |
 | `StubConsoleRequest` | final class | Test double extending `craft\console\Request` that adds the web-only `getUserIP()` / `getUserAgent()` / `getReferrer()` accessors. Use when installing on `Craft::$app->set('request', …)` so mode-detection stays honest. |
 | `StubWebRequest` | final class | Test double extending `yii\web\Request` with the same three accessors. Use when the service under test type-hints `yii\web\Request` (or `craft\web\Request`) as a method parameter. |
 | `bootstrap()` | function | Initialises Craft as a console application from a test bootstrap file. |
@@ -31,11 +31,16 @@ abstract class IntegrationTestCase extends \PHPUnit\Framework\TestCase
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `cleanupExternalState()` | `void` | Override hook for non-DB cleanup (Redis, filesystem, external backends). Default is a no-op; subclasses do not need to call parent. |
+| `cleanupExternalState()` | `void` | Override hook for non-DB cleanup (Redis, plugin caches, external backends). Default is a no-op; subclasses do not need to call parent. |
 | `swapPluginComponent(string $handle, string $componentId, object $stub)` | `void` | Swap a plugin's Yii service component for a test double. Original is auto-restored in `tearDown` (LIFO order). Throws `\RuntimeException` if the plugin isn't installed/enabled. |
 | `countRows(string $table, array $where = [])` | `int` | Yii `Query::count()` wrapper. Pass tables in `{{%name}}` form. |
 | `fetchRow(string $table, array $where)` | `?array` | Yii `Query::one()` wrapper. Returns `null` on no match. |
 | `purgeRowsByMarker(string $table, string $column, string $prefix)` | `void` | `DELETE FROM $table WHERE $column LIKE '$prefix%'`. The canonical cleanup pattern for marker-tagged test rows. |
+| `nextTestMarker(string $prefix, string $kind = '')` | `string` | Return a unique marker for the current test instance, e.g. `__plugin_test_form_1_ab12cd34`. |
+| `saveTestElement(ElementInterface $element, bool $runValidation = false, bool $propagate = true, bool $updateSearchIndex = true)` | `ElementInterface` | Save a Craft element through the element service and hard-delete it automatically in teardown. |
+| `trackElementForCleanup(int $elementId)` | `void` | Register an existing Craft element ID for hard-delete cleanup in teardown. |
+| `createTrackedTempDirectory(string $prefix)` | `string` | Create a unique directory under `sys_get_temp_dir()` and remove it recursively in teardown. |
+| `trackTempPath(string $path)` | `void` | Register a file, symlink, or directory path for teardown cleanup. |
 | `drainQueueJob(BaseJob $job, callable $isDone, int $maxIterations = 50)` | `void` | Run `$job->execute(Craft::$app->queue)` in a loop until `$isDone()` returns true. Capped to surface hangs as failures. |
 
 ### `swapPluginComponent()`
@@ -103,6 +108,56 @@ Per-plugin marker conventions in use:
 
 - `__sm_test_…` — search-manager (general)
 - `__sm_dedup_test__` — search-manager API key tests
+
+### Fixture lifecycle helpers
+
+Use the base helpers for lifecycle mechanics, and keep domain-specific seeders in the plugin test case.
+
+Base should own:
+
+- marker generation
+- saving and tracking Craft elements
+- hard-deleting tracked elements in teardown
+- creating and removing temporary directories/files
+
+Plugins should still own:
+
+- which model/element class to instantiate
+- which required properties make a valid fixture
+- plugin-specific row cleanup and cache invalidation
+
+```php
+protected function seedShortLink(array $overrides = []): ShortLink
+{
+    $marker = $this->nextTestMarker('sl-test-', 'link');
+
+    $element = new ShortLink();
+    $element->slug = $overrides['slug'] ?? $marker;
+    $element->destinationUrl = $overrides['destinationUrl'] ?? 'https://example.com/test';
+    $element->siteId = Craft::$app->getSites()->getPrimarySite()->id;
+
+    /** @var ShortLink $element */
+    $element = $this->saveTestElement($element, false);
+
+    return $element;
+}
+```
+
+`saveTestElement()` tracks the saved element ID only after the save succeeds. During `tearDown()`, base reloads tracked IDs with `status(null)` and hard-deletes them through Craft's element service. This is safer than deleting only the plugin table row because Craft elements usually have related rows in `elements`, `elements_sites`, content tables, search indexes, and plugin-specific tables.
+
+```php
+$root = $this->createTrackedTempDirectory('__icon_test_');
+file_put_contents($root . '/fixture.svg', '<svg></svg>');
+```
+
+Use `trackTempPath()` for paths a test creates manually:
+
+```php
+$file = tempnam(sys_get_temp_dir(), 'export_helper_test_');
+$this->trackTempPath($file);
+```
+
+Tracked temp paths are removed in reverse order. Directories are removed recursively; files and symlinks are unlinked.
 
 ### `drainQueueJob()`
 
