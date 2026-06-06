@@ -40,6 +40,15 @@ final class UrlSafetyHelperTest extends IntegrationTestCase
         self::assertSame('/', UrlSafetyHelper::sanitizeRedirectUrl(''));
     }
 
+    public function testRejectsProtocolRelativeUrls(): void
+    {
+        // `//host` resolves to an external origin in the browser.
+        self::assertSame('/', UrlSafetyHelper::sanitizeRedirectUrl('//evil.com'));
+        self::assertSame('/', UrlSafetyHelper::sanitizeRedirectUrl('//evil.com/phishing'));
+        self::assertSame('/404', UrlSafetyHelper::sanitizeRedirectUrl('//evil.com', '/404'));
+        self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('//evil.com'));
+    }
+
     public function testHonorsCustomFallback(): void
     {
         self::assertSame('/404', UrlSafetyHelper::sanitizeRedirectUrl('javascript:alert(1)', '/404'));

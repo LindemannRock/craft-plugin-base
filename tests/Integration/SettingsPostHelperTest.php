@@ -128,8 +128,9 @@ final class SettingsPostHelperTest extends IntegrationTestCase
                 'floatValue' => 'abc',
                 'booleanValue' => 'maybe',
                 'arrayValue' => 'not-array',
+                'stringValue' => ['nope'],
             ],
-            allowedAttributes: ['integerValue', 'floatValue', 'booleanValue', 'arrayValue'],
+            allowedAttributes: ['integerValue', 'floatValue', 'booleanValue', 'arrayValue', 'stringValue'],
         );
 
         self::assertTrue($result->hasErrors);
@@ -138,6 +139,7 @@ final class SettingsPostHelperTest extends IntegrationTestCase
         self::assertSame(['Value must be a number.'], $settings->getErrors('floatValue'));
         self::assertSame(['Value must be either true or false.'], $settings->getErrors('booleanValue'));
         self::assertSame(['Value must be an array.'], $settings->getErrors('arrayValue'));
+        self::assertSame(['Value must be a string.'], $settings->getErrors('stringValue'));
     }
 
     public function testApplyUsesAdaptersBeforeNormalizationAndSettersForAssignment(): void

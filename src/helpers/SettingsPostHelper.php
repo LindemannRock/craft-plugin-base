@@ -205,9 +205,9 @@ class SettingsPostHelper
     }
 
     /**
-     * @return array{valid: bool, value?: string|null}
+     * @return array{valid: bool, value?: string|null, message?: string}
      */
-    private static function normalizeString(mixed $value, bool $allowsNull): ?array
+    private static function normalizeString(mixed $value, bool $allowsNull): array
     {
         if ($value === null && $allowsNull) {
             return ['valid' => true, 'value' => null];
@@ -217,7 +217,10 @@ class SettingsPostHelper
             return ['valid' => true, 'value' => (string)$value];
         }
 
-        return null;
+        return [
+            'valid' => false,
+            'message' => Craft::t('lindemannrock-base', 'Value must be a string.'),
+        ];
     }
 
     /**

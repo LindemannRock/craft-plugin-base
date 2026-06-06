@@ -39,8 +39,9 @@ class UrlSafetyHelper
     {
         $url = trim($url);
 
-        // Allow relative URLs.
-        if (str_starts_with($url, '/')) {
+        // Allow relative URLs — but not protocol-relative (`//host`), which the
+        // browser resolves to an external origin.
+        if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
             return $url;
         }
 
@@ -67,7 +68,7 @@ class UrlSafetyHelper
     {
         $url = trim($url);
 
-        if (str_starts_with($url, '/')) {
+        if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
             return true;
         }
 
