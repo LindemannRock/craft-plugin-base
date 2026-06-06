@@ -20,6 +20,7 @@ return [
     // Validation messages
     'Value must be a whole number.' => 'De waarde moet een geheel getal zijn.',
     'Value must be a number.' => 'De waarde moet een getal zijn.',
+    'Value must be a string.' => 'De waarde moet een tekenreeks zijn.',
     'Value must be either true or false.' => 'De waarde moet waar of onwaar zijn.',
     'Value must be an array.' => 'De waarde moet een array zijn.',
 

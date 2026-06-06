@@ -20,6 +20,7 @@ return [
     // Validation messages
     'Value must be a whole number.' => 'Value must be a whole number.',
     'Value must be a number.' => 'Value must be a number.',
+    'Value must be a string.' => 'Value must be a string.',
     'Value must be either true or false.' => 'Value must be either true or false.',
     'Value must be an array.' => 'Value must be an array.',
 

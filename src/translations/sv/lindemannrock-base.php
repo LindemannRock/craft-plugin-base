@@ -20,6 +20,7 @@ return [
     // Validation messages
     'Value must be a whole number.' => 'Värdet måste vara ett heltal.',
     'Value must be a number.' => 'Värdet måste vara ett tal.',
+    'Value must be a string.' => 'Värdet måste vara en sträng.',
     'Value must be either true or false.' => 'Värdet måste vara antingen true eller false.',
     'Value must be an array.' => 'Värdet måste vara en array.',
 

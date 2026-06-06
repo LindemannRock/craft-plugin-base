@@ -20,6 +20,7 @@ return [
     // Validation messages
     'Value must be a whole number.' => '値は整数でなければなりません。',
     'Value must be a number.' => '値は数値である必要があります。',
+    'Value must be a string.' => '値は文字列である必要があります。',
     'Value must be either true or false.' => '値は true または false である必要があります。',
     'Value must be an array.' => '値は配列である必要があります。',
 

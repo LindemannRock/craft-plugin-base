@@ -20,6 +20,7 @@ return [
     // Validation messages
     'Value must be a whole number.' => 'El valor debe ser un número entero.',
     'Value must be a number.' => 'El valor debe ser un número.',
+    'Value must be a string.' => 'El valor debe ser una cadena.',
     'Value must be either true or false.' => 'El valor debe ser verdadero o falso.',
     'Value must be an array.' => 'El valor debe ser un array.',
 

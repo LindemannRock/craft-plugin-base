@@ -20,6 +20,7 @@ return [
     // Validation messages
     'Value must be a whole number.' => 'يجب أن تكون القيمة عدداً صحيحاً.',
     'Value must be a number.' => 'يجب أن تكون القيمة رقمًا.',
+    'Value must be a string.' => 'يجب أن تكون القيمة سلسلة نصية.',
     'Value must be either true or false.' => 'يجب أن تكون القيمة إما true أو false.',
     'Value must be an array.' => 'يجب أن تكون القيمة مصفوفة.',
 
