@@ -1262,7 +1262,7 @@ a.lr-unified-card-link:active {
 }
 
 /* Plugin credit footer */
-#lr-plugin-footer {
+.lr-plugin-footer {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
