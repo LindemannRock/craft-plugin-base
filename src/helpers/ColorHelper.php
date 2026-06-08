@@ -240,7 +240,7 @@ class ColorHelper
             ],
 
             // =================================================================
-            // ENVIRONMENT TYPE - development = pink, staging = orange, production = blue
+            // ENVIRONMENT TYPE - development = orange, staging = purple, production = blue
             // =================================================================
             'environmentType' => [
                 'development' => self::PALETTE['orange'],
