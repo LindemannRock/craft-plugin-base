@@ -1,0 +1,110 @@
+{#
+ # Integration Card
+ #
+ # Embeddable card for a single third-party / sibling-plugin integration on a
+ # settings page: a header (title, status badge, description, on/off toggle)
+ # plus a collapsible body the consumer fills via {% block body %}.
+ #
+ # The body show/hide on toggle is handled generically in components.js, so no
+ # per-page JS is needed for that. This partial emits no translatable strings
+ # of its own — pass pre-translated text in.
+ #
+ # Parameters:
+ # - title: Card title (translated string)                        (required)
+ # - description: Short description under the title (translated)   (optional)
+ # - available: Plugin installed AND enabled (bool)                (required) — body renders only when true
+ # - installed: Plugin installed (bool)                            (optional) — "disabled" vs "not installed" badge
+ # - installUrl: URL for the install link when not installed       (optional)
+ # - statusLabels: { active, disabled, notInstalled, install } translated labels (used by the default status block)
+ # - toggleId / toggleName: lightswitch id + form name             (required)
+ # - toggleOn: lightswitch initial state (bool)
+ # - toggleDisabled: lightswitch disabled (bool)
+ # - bodyId: id for the body element (so consumer JS can target it)
+ # - bodyVisible: whether the body starts visible (bool, defaults to toggleOn)
+ #
+ # Blocks:
+ # - status: status badge area (defaults to the 3-state plugin-status badge)
+ # - body: collapsible body content (filled by the consumer; re-import forms there)
+ #
+ # Usage:
+ #   {% embed 'lindemannrock-base/_partials/integration-card' with {
+ #       title: "SEOmatic Integration"|t('my-plugin'),
+ #       description: "Push events to GTM..."|t('my-plugin'),
+ #       available: available, installed: installed,
+ #       installUrl: 'https://plugins.craftcms.com/seomatic',
+ #       statusLabels: {
+ #           active: 'Installed & Active'|t('my-plugin'),
+ #           disabled: 'Installed but Disabled'|t('my-plugin'),
+ #           notInstalled: 'Not Installed'|t('my-plugin'),
+ #           install: 'Install Plugin'|t('my-plugin'),
+ #       },
+ #       toggleId: 'enableSeomaticIntegration', toggleName: 'enableSeomaticIntegration',
+ #       toggleOn: enabled, toggleDisabled: not available,
+ #       bodyId: 'seomatic-settings', bodyVisible: enabled,
+ #   } %}
+ #       {% block body %}
+ #           {% import "_includes/forms" as forms %}
+ #           ...plugin-specific settings...
+ #       {% endblock %}
+ #   {% endembed %}
+ #}
+
+{% import "_includes/forms" as forms %}
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set available = available ?? false %}
+{% set installed = installed ?? false %}
+{% set statusLabels = statusLabels ?? {} %}
+{% set bodyVisible = bodyVisible ?? (toggleOn ?? false) %}
+
+<div class="lr-integration-card">
+    <div class="lr-integration-card__header{{ not available ? ' is-unavailable' }}">
+        <div class="lr-integration-card__main">
+            <strong class="lr-integration-card__title">{{ title }}</strong>
+            <div class="lr-integration-card__meta">
+                {% block status %}
+                    {% if available %}
+                        {% include 'lindemannrock-base/_components/badge' with {
+                            label: statusLabels.active ?? null,
+                            value: 'active',
+                            colorSet: 'pluginStatus',
+                        } only %}
+                    {% elseif installed %}
+                        {% include 'lindemannrock-base/_components/badge' with {
+                            label: statusLabels.disabled ?? null,
+                            value: 'disabled',
+                            colorSet: 'pluginStatus',
+                        } only %}
+                    {% else %}
+                        {% include 'lindemannrock-base/_components/badge' with {
+                            label: statusLabels.notInstalled ?? null,
+                            value: 'notInstalled',
+                            colorSet: 'pluginStatus',
+                        } only %}
+                        {% if installUrl is defined and installUrl %}
+                            <a href="{{ installUrl }}" target="_blank" class="go">{{ statusLabels.install ?? null }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endblock %}
+            </div>
+            {% if description is defined and description %}
+                <p class="light lr-integration-card__desc">{{ description }}</p>
+            {% endif %}
+        </div>
+        <div class="lr-flex-none">
+            {{ forms.lightswitchField({
+                label: false,
+                id: toggleId,
+                name: toggleName,
+                on: toggleOn ?? false,
+                disabled: toggleDisabled ?? false,
+            }) }}
+        </div>
+    </div>
+
+    {% if available %}
+        <div id="{{ bodyId }}" class="lr-integration-card__body {{ not bodyVisible ? 'hidden' }}">
+            {% block body %}{% endblock %}
+        </div>
+    {% endif %}
+</div>

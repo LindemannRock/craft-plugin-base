@@ -1369,3 +1369,222 @@ a.lr-unified-card-link:active {
 	fill: #6b7280;
 	transition: fill 0.3s ease;
 }
+
+/* Integration cards
+   ------------------------------------------------------------------------
+   Used by the _partials/integration-card.twig embed. The body show/hide
+   behavior on toggle lives in components.js (lrIntegrationCards). */
+.lr-integration-card {
+	margin-bottom: 10px;
+	border: 1px solid var(--hairline-color, #e3e5e8);
+	border-radius: 4px;
+	background: var(--white, #fff);
+}
+
+.lr-integration-card__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 15px;
+	padding: 15px;
+	background: #f7f7f7;
+}
+
+.lr-integration-card__header.is-unavailable {
+	background: #f9f9f9;
+}
+
+.lr-integration-card__main {
+	flex: 1;
+	min-width: 0;
+}
+
+.lr-integration-card__title {
+	font-size: 15px;
+}
+
+.lr-integration-card__header.is-unavailable .lr-integration-card__title {
+	color: #999;
+}
+
+.lr-integration-card__meta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 5px;
+}
+
+.lr-integration-card__desc {
+	margin: 8px 0 0;
+	font-size: 12px;
+}
+
+.lr-integration-card__body {
+	padding: 20px;
+	border-top: 1px solid var(--hairline-color, #e3e5e8);
+}
+
+/* Integration config sub-panel */
+.lr-integration-section {
+	margin-bottom: 20px;
+	padding: 15px;
+	border: 1px solid var(--hairline-color, #e3e5e8);
+	border-radius: 4px;
+	background: #fafafa;
+}
+
+.lr-integration-section__title {
+	margin: 0 0 15px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+/* Integration toggle option rows */
+.lr-option-rows {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.lr-option-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 15px;
+	padding: 10px;
+	border-radius: 4px;
+	background: #fafafa;
+}
+
+.lr-option-row__desc {
+	display: block;
+	margin-top: 2px;
+	font-size: 12px;
+}
+
+/* Active tracking scripts list */
+.lr-integration-scripts {
+	margin-bottom: 20px;
+}
+
+.lr-integration-scripts__heading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.lr-integration-scripts__heading strong {
+	font-size: 13px;
+}
+
+.lr-integration-scripts__heading .light {
+	font-size: 11px;
+}
+
+.lr-integration-scripts__item {
+	margin-bottom: 8px;
+	padding: 10px 12px;
+	border: 1px solid var(--hairline-color, #e3e5e8);
+	border-radius: 3px;
+	background: #f7f7f7;
+}
+
+.lr-integration-scripts__name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+
+.lr-integration-scripts__name strong {
+	font-size: 13px;
+}
+
+.lr-integration-scripts__sites {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-left: 16px;
+}
+
+.lr-integration-scripts__site {
+	padding: 3px 8px;
+	border: 1px solid var(--hairline-color, #e3e5e8);
+	border-radius: 2px;
+	font-size: 11px;
+	background: var(--white, #fff);
+}
+
+.lr-integration-scripts__site code {
+	margin-left: 4px;
+	color: #666;
+}
+
+/* Integration event-structure disclosure */
+.lr-integration-details {
+	margin-bottom: 15px;
+}
+
+.lr-integration-details > summary {
+	padding: 10px 0;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 600;
+	user-select: none;
+}
+
+.lr-integration-details > summary .light {
+	margin-left: 8px;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.lr-code-block {
+	margin-top: 10px;
+	padding: 15px;
+	border-radius: 4px;
+	background: #f7f7f7;
+	font-family: monospace;
+	font-size: 11px;
+	overflow-x: auto;
+}
+
+.lr-code-block pre {
+	margin: 0;
+	line-height: 1.5;
+}
+
+/* Integration help text inside info boxes */
+.lr-integration-help-list {
+	margin: 8px 0 12px;
+	padding-left: 20px;
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.lr-integration-help-list--flush {
+	margin-bottom: 0;
+}
+
+.lr-integration-help-list > li {
+	margin-bottom: 6px;
+}
+
+.lr-integration-help-list > li:last-child {
+	margin-bottom: 0;
+}
+
+.lr-integration-help-note {
+	margin: 0;
+	font-size: 11px;
+	color: #666;
+}
+
+/* Config-override warning spacing */
+.lr-config-override-note {
+	margin-bottom: 20px;
+}
+
+.lr-flex-none {
+	flex-shrink: 0;
+}

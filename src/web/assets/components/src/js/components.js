@@ -225,3 +225,33 @@
         initCredits();
     }
 })();
+
+(() => {
+    // Integration cards (_partials/integration-card.twig): show/hide a card's
+    // body when its header lightswitch is toggled. Garnish fires the switch
+    // change via jQuery, which native 'change' listeners miss, so react to the
+    // user interaction directly and read aria-checked after Garnish updates it.
+    if (window.lrIntegrationCardsInit) return;
+    window.lrIntegrationCardsInit = true;
+
+    const toggleBody = (target) => {
+        const lightswitch = target.closest('.lightswitch');
+        if (!lightswitch || !lightswitch.closest('.lr-integration-card__header')) return;
+
+        const card = lightswitch.closest('.lr-integration-card');
+        const body = card ? card.querySelector('.lr-integration-card__body') : null;
+        if (!body) return;
+
+        requestAnimationFrame(() => {
+            const isOn = lightswitch.getAttribute('aria-checked') === 'true';
+            body.classList.toggle('hidden', !isOn);
+        });
+    };
+
+    document.addEventListener('click', (e) => toggleBody(e.target));
+    document.addEventListener('keyup', (e) => {
+        if (e.key === ' ' || e.key === 'Enter' || e.key === 'Spacebar') {
+            toggleBody(e.target);
+        }
+    });
+})();
