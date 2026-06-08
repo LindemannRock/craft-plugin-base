@@ -1588,3 +1588,81 @@ a.lr-unified-card-link:active {
 .lr-flex-none {
 	flex-shrink: 0;
 }
+
+/* Import preview tables
+   ------------------------------------------------------------------------
+   Shared chrome for import-export preview pages: a scrollable table with a
+   sticky, status-tinted header. Status tints are literal for now; a later
+   base color-token pass may consolidate them. */
+.lr-preview-table {
+	max-height: 300px;
+	overflow: auto;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+}
+
+.lr-preview-table--tall {
+	max-height: 500px;
+}
+
+.lr-preview-table > table {
+	margin: 0;
+}
+
+.lr-preview-table thead {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: #f7f7f7;
+}
+
+.lr-preview-table thead.is-warning {
+	background: #fffbf0;
+}
+
+.lr-preview-table thead.is-error {
+	background: #fef2f2;
+}
+
+.lr-preview-table thead.is-info {
+	background: #f8fafc;
+}
+
+.lr-preview-table code {
+	font-size: 11px;
+}
+
+/* Clip a long cell value to one line with an ellipsis (pair with title="") */
+.lr-cell-clip {
+	display: block;
+	max-width: 280px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	word-break: normal;
+	overflow-wrap: normal;
+}
+
+/* "Ready to import" summary panel */
+.lr-import-summary {
+	margin: 20px 0;
+	padding: 20px;
+	border-radius: 4px;
+	background: #f7f7f7;
+}
+
+.lr-import-summary .buttons {
+	margin-top: 15px;
+}
+
+.lr-nowrap {
+	white-space: nowrap;
+}
+
+.lr-text-sm {
+	font-size: 11px;
+}
+
+.lr-text-danger {
+	color: #dc3545;
+}
