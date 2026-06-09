@@ -229,6 +229,16 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 |--------|---------|-------------|
 | `sanitizeRedirectUrl(string $url, string $fallback = '/')` | `string` | Return the URL if it's a safe redirect target (relative path or `http(s)`), otherwise the fallback |
 | `isSafeRedirectUrl(string $url)` | `bool` | Whether the URL is a safe redirect target |
+| `hasDangerousScheme(string $url)` | `bool` | Whether the URL uses an executable scheme (`javascript:`/`vbscript:`/`data:`/`file:`), incl. obfuscated variants — a denylist guard that leaves custom app deep links (`myapp://`) alone |
+
+### ContentSafetyHelper
+
+`lindemannrock\base\helpers\ContentSafetyHelper`
+[Full docs](../feature-tour/content-safety-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `containsMaliciousMarkup(string $content, &$threats = [])` | `bool` | Whether free text contains dangerous HTML/script markup (`<script>`, `<iframe>`, `on*=`, `javascript:`, …) anywhere in the value, incl. entity-encoded; `$threats` is populated by reference with matched labels |
 
 ### StoragePathHelper
 

@@ -42,6 +42,7 @@
             "feature-tour/safe-segment-helper",
             "feature-tour/asset-volume-helper",
             "feature-tour/url-safety-helper",
+            "feature-tour/content-safety-helper",
             "feature-tour/storage-path-validator",
             "feature-tour/testing"
         ]
