@@ -255,3 +255,45 @@
         }
     });
 })();
+
+(() => {
+    // Copy input (_components/copy-input): clicking a [data-lr-copy] button
+    // writes its value to the clipboard and shows the CP notice from
+    // [data-lr-copied]. Uses the async Clipboard API with an execCommand
+    // fallback for non-secure contexts / older browsers.
+    if (window.lrCopyInputInit) return;
+    window.lrCopyInputInit = true;
+
+    const copyText = (text) => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text);
+        }
+
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+        } catch (e) {
+            // no-op
+        }
+        document.body.removeChild(textarea);
+        return Promise.resolve();
+    };
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-lr-copy]');
+        if (!btn) return;
+
+        copyText(btn.getAttribute('data-lr-copy')).then(() => {
+            const message = btn.getAttribute('data-lr-copied');
+            if (message && window.Craft && Craft.cp && Craft.cp.displayNotice) {
+                Craft.cp.displayNotice(message);
+            }
+        });
+    });
+})();

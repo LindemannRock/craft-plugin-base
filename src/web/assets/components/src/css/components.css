@@ -1706,3 +1706,26 @@ a.lr-unified-card-link:active {
 	background: #f3f4f6;
 	font-size: 12px;
 }
+
+/* Copy input (_components/copy-input) — readonly value + joined copy button */
+.lr-copy-input {
+	padding-inline: 0;
+}
+
+.lr-copy-input__row {
+	gap: 8px;
+}
+
+.lr-copy-input__field {
+	flex-grow: 1;
+}
+
+.lr-copy-input__value {
+	border: none;
+	padding-inline: var(--m) var(--s);
+}
+
+.lr-copy-input__btn {
+	border-start-start-radius: 0;
+	border-end-start-radius: 0;
+}

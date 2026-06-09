@@ -1,0 +1,46 @@
+{#
+ # Copy Input
+ #
+ # A readonly value (e.g. an element's URL) shown in a borderless input with a
+ # joined "Copy" button that writes the value to the clipboard. Wrapped in a
+ # fieldset with an optional legend.
+ #
+ # The copy behavior is handled generically by the delegated [data-lr-copy]
+ # handler in components.js (clipboard API + execCommand fallback + CP notice).
+ # This component emits no translatable strings of its own — pass pre-translated
+ # legend / copyLabel / copiedMessage.
+ #
+ # Parameters:
+ # - value: The value shown and copied (required)
+ # - copyLabel: Copy button text, translated (required)
+ # - copiedMessage: CP notice shown after copying, translated (optional)
+ # - legend: Fieldset legend text, translated (optional — omit for no legend)
+ # - id: Input id (optional)
+ #
+ # Usage:
+ #   {% include 'lindemannrock-base/_components/copy-input' with {
+ #       legend: "{pluginName} URL"|t('my-plugin', {pluginName: helper.displayName}),
+ #       value: element.getUrl(),
+ #       id: 'my-url',
+ #       copyLabel: 'Copy'|t('my-plugin'),
+ #       copiedMessage: 'URL copied to clipboard'|t('my-plugin'),
+ #   } only %}
+ #}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+<fieldset>
+    {% if legend is defined and legend %}
+        <legend class="h6">{{ legend }}</legend>
+    {% endif %}
+    <div class="meta lr-copy-input">
+        <div class="flex lr-copy-input__row">
+            <div class="textwrapper lr-copy-input__field">
+                <input type="text" class="text fullwidth lr-copy-input__value" readonly value="{{ value }}"{% if id is defined and id %} id="{{ id }}"{% endif %}>
+            </div>
+            <button type="button" class="btn lr-copy-input__btn" data-lr-copy="{{ value }}"{% if copiedMessage is defined and copiedMessage %} data-lr-copied="{{ copiedMessage }}"{% endif %}>
+                {{ copyLabel }}
+            </button>
+        </div>
+    </div>
+</fieldset>
