@@ -734,6 +734,13 @@ a.lr-unified-card-link:active {
     gap: 4px;
 }
 
+.lr-control-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .lr-heading-tight {
     margin: 0 0 10px;
 }
@@ -789,6 +796,10 @@ a.lr-unified-card-link:active {
     color: #f39c12;
 }
 
+.lr-text-orange {
+    color: #E67E22;
+}
+
 .lr-chart-height-200 {
     height: 200px;
 }
@@ -814,12 +825,28 @@ a.lr-unified-card-link:active {
     height: 100% !important;
 }
 
+.lr-mt-8 {
+    margin-top: 8px;
+}
+
+.lr-mt-12 {
+    margin-top: 12px;
+}
+
+.lr-mt-20 {
+    margin-top: 20px;
+}
+
 .lr-mt-24 {
     margin-top: 24px;
 }
 
 .lr-mt-30 {
     margin-top: 30px;
+}
+
+.lr-mb-12 {
+    margin-bottom: 12px;
 }
 
 .lr-mb-16 {
@@ -1665,4 +1692,17 @@ a.lr-unified-card-link:active {
 
 .lr-text-danger {
 	color: #dc3545;
+}
+
+/* Horizontal-scroll wrapper for wide tables (e.g. import column mapping) */
+.lr-table-scroll-x {
+	overflow-x: auto;
+}
+
+/* CSV column-list example block (import pages) */
+.lr-csv-columns {
+	padding: 8px;
+	border-radius: 4px;
+	background: #f3f4f6;
+	font-size: 12px;
 }
