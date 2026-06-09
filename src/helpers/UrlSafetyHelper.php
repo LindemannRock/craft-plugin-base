@@ -24,6 +24,45 @@ namespace lindemannrock\base\helpers;
 class UrlSafetyHelper
 {
     /**
+     * Schemes that can execute script or read local resources when handed to a
+     * browser. These are never a legitimate stored link target.
+     *
+     * @since 5.27.0
+     */
+    private const DANGEROUS_SCHEMES = ['javascript', 'vbscript', 'data', 'file'];
+
+    /**
+     * Whether the URL uses a dangerous executable scheme (`javascript:`,
+     * `vbscript:`, `data:`, `file:`), including whitespace- or entity-obfuscated
+     * variants such as `java\tscript:` or `&#106;avascript:`.
+     *
+     * This is a denylist primitive: callers keep their own allowed-scheme rules
+     * and add this as an extra guard, so custom app deep links (`myapp://`,
+     * `fb://`) still pass while script-bearing URLs are blocked. Use it where a
+     * permissive validator (e.g. `filter_var(..., FILTER_VALIDATE_URL)`) would
+     * otherwise let an executable scheme through.
+     *
+     * @param string $url The candidate URL.
+     * @return bool True when the URL resolves to a dangerous scheme.
+     * @since 5.27.0
+     */
+    public static function hasDangerousScheme(string $url): bool
+    {
+        // Browsers ignore control chars/whitespace inside a scheme and decode
+        // HTML entities — normalize both before anchoring the prefix check.
+        $normalized = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $normalized = strtolower(preg_replace('/[\x00-\x20]+/', '', $normalized) ?? '');
+
+        foreach (self::DANGEROUS_SCHEMES as $scheme) {
+            if (str_starts_with($normalized, $scheme . ':')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Return the URL if it is a safe redirect target, otherwise the fallback.
      *
      * Safe means a relative path (starts with `/`) or an `http`/`https` absolute

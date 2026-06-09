@@ -69,4 +69,40 @@ final class UrlSafetyHelperTest extends IntegrationTestCase
         self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('mailto:x@y.com'));
         self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl(''));
     }
+
+    public function testHasDangerousSchemeFlagsExecutableSchemes(): void
+    {
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('javascript:alert(1)'));
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('vbscript:msgbox'));
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('data:text/html,<script>'));
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('file:///etc/passwd'));
+        // Case-insensitive, and the `//comment` form that fools naive prefix checks.
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('JavaScript:alert(1)'));
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('javascript://%0aalert(1)'));
+    }
+
+    public function testHasDangerousSchemeSeesThroughObfuscation(): void
+    {
+        // Leading whitespace, embedded control chars, and HTML entities are all
+        // ignored by the browser when resolving the scheme.
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('  javascript:alert(1)'));
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme("java\tscript:alert(1)"));
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme("java\nscript:alert(1)"));
+        self::assertTrue(UrlSafetyHelper::hasDangerousScheme('&#106;avascript:alert(1)'));
+    }
+
+    public function testHasDangerousSchemeAllowsSafeAndAppSchemes(): void
+    {
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('https://example.com'));
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('http://example.com'));
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('/relative/path'));
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('mailto:x@y.com'));
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('tel:+15551234567'));
+        // Custom app deep links must keep working.
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('myapp://open/profile'));
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('fb://profile/33138223345'));
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme(''));
+        // A path that merely contains a dangerous word is not a dangerous scheme.
+        self::assertFalse(UrlSafetyHelper::hasDangerousScheme('https://x.com/javascript:foo'));
+    }
 }

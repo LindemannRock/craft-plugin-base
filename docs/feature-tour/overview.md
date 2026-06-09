@@ -28,6 +28,8 @@ Utility classes for common operations:
 - **[AssetVolumeHelper](asset-volume-helper.md)** — Server-side validation that a submitted asset ID belongs to an allowed volume and the user holds the matching view permission
 - **[StoragePathHelper + StoragePathValidator](storage-path-validator.md)** — Resolve and validate plugin storage paths, aliases, env vars, and webroot guards
 - **[StorageVolumeHelper + StorageVolumeValidator](storage-path-validator.md#storage-volume-validator)** — Validate asset volumes used as plugin storage and block local volumes inside `@webroot`
+- **[UrlSafetyHelper](url-safety-helper.md)** — Constrain a URL to a safe redirect target, and flag executable schemes (`javascript:`/`data:`/…) without blocking app deep links
+- **[ContentSafetyHelper](content-safety-helper.md)** — Detect dangerous HTML/script markup (`<script>`, `on*=`, …) in free text before it's stored and rendered
 
 ### PHP Traits
 

@@ -38,6 +38,31 @@ if (!UrlSafetyHelper::isSafeRedirectUrl($url)) {
 return $this->redirect(UrlSafetyHelper::sanitizeRedirectUrl($url));
 ```
 
+## Guard a Stored URL's Scheme @since(5.27.0)
+
+`sanitizeRedirectUrl()` / `isSafeRedirectUrl()` are deliberately strict — they only accept `http(s)` or a relative path, which is right for a *redirect target* but too narrow for a field that legitimately stores other schemes (e.g. a deep link `myapp://`, or `mailto:`/`tel:`). When you need to keep those working but still block executable schemes, use `hasDangerousScheme()` as a denylist guard on top of your own validation:
+
+```php
+use lindemannrock\base\helpers\UrlSafetyHelper;
+
+// Reject only the executable schemes; let app deep links through.
+if (UrlSafetyHelper::hasDangerousScheme($url)) {
+    // javascript:, vbscript:, data:, file: — block it
+}
+```
+
+It blocks `javascript:`, `vbscript:`, `data:`, and `file:`, including whitespace- or entity-obfuscated variants (`java\tscript:`, `&#106;avascript:`, `javascript://%0a…`), while leaving `https://`, `myapp://`, `fb://`, `mailto:` and the like untouched:
+
+```php
+UrlSafetyHelper::hasDangerousScheme('javascript:alert(1)');     // true
+UrlSafetyHelper::hasDangerousScheme('javascript://%0aalert(1)'); // true (obfuscated)
+UrlSafetyHelper::hasDangerousScheme('file:///etc/passwd');      // true
+UrlSafetyHelper::hasDangerousScheme('myapp://open/profile');    // false (app deep link)
+UrlSafetyHelper::hasDangerousScheme('https://example.com');     // false
+```
+
+Unlike `isSafeRedirectUrl()`, this is anchored at the **scheme**: a URL such as `https://x.com/path?u=javascript:y` is *not* flagged, because `javascript:` isn't the scheme.
+
 ## Scope
 
 - `sanitizeRedirectUrl()` accepts a single-leading-slash relative path (`/path`) but rejects scheme-relative `//host` URLs — the browser resolves `//host` to an external origin, so it collapses to the fallback like any other off-site target without an explicit `http(s)://` scheme.
