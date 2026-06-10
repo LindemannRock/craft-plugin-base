@@ -228,11 +228,11 @@ return [
     'Configuration Required' => '設定が必要です',
     'IP hash salt is missing.' => 'IP ハッシュソルトが設定されていません。',
     'Analytics tracking requires a secure salt for privacy protection.' => 'アナリティクストラッキングには、プライバシー保護のための安全なソルトが必要です。',
-    'Run one of these commands in your terminal:' => '次のいずれかのコマンドをターミナルで実行してください。',
-    'Standard:' => '標準 :',
-    'DDEV:' => 'DDEV :',
+    'Run one of these commands in your terminal:' => '次のいずれかのコマンドをターミナルで実行してください：',
+    'Standard:' => '標準：',
+    'DDEV:' => 'DDEV：',
     'This will automatically add {envVar} to your .env file.' => 'これにより、 {envVar} が .env ファイルに自動的に追加されます。',
-    'Warning:' => '警告 :',
+    'Warning:' => '警告：',
     'Copy the same salt to staging and production environments.' => 'ステージング環境および本番環境に同じソルトをコピーしてください。',
 
     // Storage volume validation

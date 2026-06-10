@@ -76,7 +76,7 @@ return [
     'Failed to open temporary ZIP file.' => 'Échec de l\'ouverture du fichier ZIP temporaire.',
     '{feature} requires the {edition} edition.' => '{feature} nécessite l\'édition {edition}.',
     'This feature requires the {edition} edition.' => 'Cette fonctionnalité nécessite l\'édition {edition}.',
-    'Export' => 'Export',
+    'Export' => 'Exporter',
     'Export as Excel' => 'Exporter en Excel',
     'Export as CSV' => 'Exporter en CSV',
     'Export as JSON' => 'Exporter en JSON',
