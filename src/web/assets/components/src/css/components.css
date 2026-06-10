@@ -1699,6 +1699,13 @@ a.lr-unified-card-link:active {
 	overflow-x: auto;
 }
 
+/* Wrap long unbreakable strings (URLs, referrers) in table cells */
+.lr-break-word {
+	white-space: normal;
+	word-break: break-word;
+	overflow-wrap: break-word;
+}
+
 /* CSV column-list example block (import pages) */
 .lr-csv-columns {
 	padding: 8px;
