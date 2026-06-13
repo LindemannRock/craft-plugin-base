@@ -84,6 +84,22 @@ Typical uses:
 - settings footers
 - diagnostics and support output
 
+## Plugin Icon @since(5.27.0)
+
+Read the plugin's `src/icon.svg` as a string:
+
+```php
+$svg = PluginHelper::getIconSvg($this);
+```
+
+Returns the trimmed SVG markup, or `null` when the plugin has no `src/icon.svg` or it cannot be read. The file is located by reflection on the plugin class, so no path needs to be passed.
+
+Typical uses:
+
+- install experience branding
+- inline icon rendering in the control panel
+- deriving a brand colour with [`ColorHelper::primaryHexFromSvg()`](color-helper.md)
+
 ## Plugin Name Override
 
 Apply a custom plugin name from the config file:

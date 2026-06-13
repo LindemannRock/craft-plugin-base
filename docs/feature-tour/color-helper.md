@@ -159,6 +159,17 @@ In Twig:
 {{ lrDefaultColor() }}     {# default color array #}
 ```
 
+## Brand Color from SVG @since(5.27.0)
+
+Extract a brand colour from an SVG string — the first hex colour that is not pure white or black:
+
+```php
+$svg = PluginHelper::getIconSvg($this);
+$brand = ColorHelper::primaryHexFromSvg($svg);  // e.g. '#1A73E8'
+```
+
+The match accepts both `#RGB` and `#RRGGBB` forms, skips `#FFF`/`#FFFFFF`/`#000`/`#000000`, and returns the colour upper-cased. Returns `null` for empty input or an SVG with no usable colour. Pairs with [`PluginHelper::getIconSvg()`](plugin-helper.md) to derive a plugin's accent colour from its icon — the install experience uses exactly this to tint its UI.
+
 ## Next Steps
 
 - [Components](../template-guides/components.md) — using colors with badge, filter-status, and filter-dropdown components
