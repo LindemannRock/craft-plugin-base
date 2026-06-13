@@ -121,4 +121,55 @@ final class ColorHelperTest extends IntegrationTestCase
         self::assertSame('#FF0000', ColorHelper::mix('#FF0000', 'nope', 0.5));
         self::assertSame('#000000', ColorHelper::mix('nope', 'nope'));
     }
+
+    public function testLuminance(): void
+    {
+        self::assertSame(255, ColorHelper::luminance('#FFFFFF'));
+        self::assertSame(0, ColorHelper::luminance('#000000'));
+        self::assertSame(30, ColorHelper::luminance('#1E1E1E'));
+        self::assertSame(102, ColorHelper::luminance('#1A73E8'));
+        self::assertSame(0, ColorHelper::luminance('not-a-hex'));
+    }
+
+    public function testWithAlpha(): void
+    {
+        self::assertSame('#1A73E8FF', ColorHelper::withAlpha('#1A73E8', 1.0));
+        self::assertSame('#1A73E880', ColorHelper::withAlpha('#1A73E8', 0.5));
+        self::assertSame('#FFFFFF00', ColorHelper::withAlpha('#FFF', 0.0));   // 3-digit expands
+
+        // Alpha clamps to [0, 1].
+        self::assertSame('#000000FF', ColorHelper::withAlpha('#000000', 2.0));
+        self::assertSame('#00000000', ColorHelper::withAlpha('#000000', -1.0));
+
+        // Unparseable colour falls back to black, alpha still applied.
+        self::assertSame('#00000080', ColorHelper::withAlpha('nope', 0.5));
+    }
+
+    public function testIconColorRoles(): void
+    {
+        // accent = most saturated, ink = least-saturated non-accent (order-independent).
+        self::assertSame(
+            ['accent' => '#FFD138', 'ink' => '#1E1E1E'],
+            ColorHelper::iconColorRoles('<svg><path fill="#FFD138"/><g fill="#1E1E1E"/></svg>'),
+        );
+        self::assertSame(
+            ['accent' => '#1A73E8', 'ink' => '#FFFFFF'],
+            ColorHelper::iconColorRoles('<svg><rect fill="#FFFFFF"/><path fill="#1A73E8"/></svg>'),
+        );
+
+        // Single-colour icons: ink falls back to white / near-black by contrast.
+        self::assertSame(
+            ['accent' => '#1A73E8', 'ink' => '#FFFFFF'],
+            ColorHelper::iconColorRoles('<svg><path fill="#1A73E8"/></svg>'),
+        );
+        self::assertSame(
+            ['accent' => '#FFD138', 'ink' => '#1E1E1E'],
+            ColorHelper::iconColorRoles('<svg><path fill="#FFD138"/></svg>'),
+        );
+
+        // No usable colour -> null.
+        self::assertNull(ColorHelper::iconColorRoles('<svg><path d="M0 0h24"/></svg>'));
+        self::assertNull(ColorHelper::iconColorRoles(null));
+        self::assertNull(ColorHelper::iconColorRoles(''));
+    }
 }

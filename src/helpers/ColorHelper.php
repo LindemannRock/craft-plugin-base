@@ -558,6 +558,98 @@ class ColorHelper
     }
 
     /**
+     * Perceived luminance of a hex colour on a 0–255 scale (Rec. 601 weights),
+     * for deciding light-vs-dark contrast. Unparseable input returns 0.
+     *
+     * @since 5.27.0
+     */
+    public static function luminance(string $hex): int
+    {
+        $rgb = self::hexToRgb($hex);
+        if ($rgb === null) {
+            return 0;
+        }
+
+        return (int) round(($rgb[0] * 299 + $rgb[1] * 587 + $rgb[2] * 114) / 1000);
+    }
+
+    /**
+     * Append an alpha channel to a hex colour, returning `#RRGGBBAA` — for dimmed
+     * text (e.g. a subtitle at 78% of the title colour). $alpha is clamped to
+     * 0.0–1.0; unparseable input falls back to opaque black.
+     *
+     * @since 5.27.0
+     */
+    public static function withAlpha(string $hex, float $alpha): string
+    {
+        $base = self::mix($hex, $hex, 0.0);   // normalise to #RRGGBB
+        $byte = (int) round(max(0.0, min(1.0, $alpha)) * 255);
+
+        return $base . sprintf('%02X', $byte);
+    }
+
+    /**
+     * Read the two brand roles out of icon SVG markup:
+     *  - `accent`: the most saturated colour (the badge / fill);
+     *  - `ink`: the least-saturated non-accent colour (the glyph).
+     *
+     * When the icon carries only one colour, `ink` falls back to white or a
+     * near-black by contrast with the accent. Returns null when the markup has
+     * no usable colour at all.
+     *
+     * @return array{accent: string, ink: string}|null
+     * @since 5.27.0
+     */
+    public static function iconColorRoles(?string $svg): ?array
+    {
+        if (!is_string($svg) || $svg === '') {
+            return null;
+        }
+
+        if (!preg_match_all('/#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/', $svg, $matches)) {
+            return null;
+        }
+
+        // Unique, normalised, order-preserving list of colours.
+        $colors = [];
+        foreach ($matches[0] as $hex) {
+            $colors[self::mix($hex, $hex, 0.0)] = true;
+        }
+        $colors = array_keys($colors);
+
+        // Accent = highest saturation (first wins ties).
+        $accent = $colors[0];
+        $accentSat = self::saturation($accent);
+        foreach ($colors as $c) {
+            $s = self::saturation($c);
+            if ($s > $accentSat) {
+                $accent = $c;
+                $accentSat = $s;
+            }
+        }
+
+        // Ink = lowest saturation among the rest (the neutral glyph colour).
+        $ink = null;
+        $inkSat = PHP_INT_MAX;
+        foreach ($colors as $c) {
+            if ($c === $accent) {
+                continue;
+            }
+            $s = self::saturation($c);
+            if ($s < $inkSat) {
+                $ink = $c;
+                $inkSat = $s;
+            }
+        }
+
+        if ($ink === null) {
+            $ink = self::luminance($accent) < 128 ? '#FFFFFF' : '#1E1E1E';
+        }
+
+        return ['accent' => $accent, 'ink' => $ink];
+    }
+
+    /**
      * Parse a 3- or 6-digit hex string (optional leading `#`) into an [r, g, b] triple.
      *
      * @return array{0: int, 1: int, 2: int}|null
@@ -594,5 +686,19 @@ class ColorHelper
             max(0, min(255, $rgb[1])),
             max(0, min(255, $rgb[2])),
         );
+    }
+
+    /**
+     * Chroma (max − min channel) of a hex colour on 0–255, used as a saturation
+     * proxy. 0 = neutral grey/black/white. Unparseable input returns 0.
+     */
+    private static function saturation(string $hex): int
+    {
+        $rgb = self::hexToRgb($hex);
+        if ($rgb === null) {
+            return 0;
+        }
+
+        return max($rgb) - min($rgb);
     }
 }
