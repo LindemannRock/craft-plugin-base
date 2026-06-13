@@ -95,4 +95,30 @@ final class ColorHelperTest extends IntegrationTestCase
             $colorSets->setValue(null, $current);
         }
     }
+
+    public function testMixBlendsHexColors(): void
+    {
+        // weight 0 = pure A, weight 1 = pure B.
+        self::assertSame('#FF0000', ColorHelper::mix('#FF0000', '#0000FF', 0.0));
+        self::assertSame('#0000FF', ColorHelper::mix('#FF0000', '#0000FF', 1.0));
+
+        // Midpoint blends each channel (round half away from zero).
+        self::assertSame('#800080', ColorHelper::mix('#FF0000', '#0000FF', 0.5));
+
+        // Darken-toward-base — the documented hero use (#FACC15 → 0.6 toward #0B1220).
+        self::assertSame('#6B5C1C', ColorHelper::mix('#FACC15', '#0B1220', 0.6));
+
+        // 3-digit shorthand and a missing leading '#' are accepted.
+        self::assertSame('#808080', ColorHelper::mix('#FFF', '#000', 0.5));
+        self::assertSame('#FF0000', ColorHelper::mix('FF0000', '0000FF', 0.0));
+
+        // Weight is clamped to [0, 1].
+        self::assertSame('#0000FF', ColorHelper::mix('#FF0000', '#0000FF', 2.0));
+        self::assertSame('#FF0000', ColorHelper::mix('#FF0000', '#0000FF', -1.0));
+
+        // Unparseable input falls back to the parseable side; both bad → black.
+        self::assertSame('#0000FF', ColorHelper::mix('nope', '#0000FF', 0.5));
+        self::assertSame('#FF0000', ColorHelper::mix('#FF0000', 'nope', 0.5));
+        self::assertSame('#000000', ColorHelper::mix('nope', 'nope'));
+    }
 }

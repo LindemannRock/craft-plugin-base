@@ -524,4 +524,75 @@ class ColorHelper
 
         return null;
     }
+
+    /**
+     * Blend two hex colors, returning hex A mixed toward hex B by $weight
+     * (0.0 = pure A, 1.0 = pure B). Darken a color by mixing it toward a dark
+     * base, e.g. `ColorHelper::mix('#FACC15', '#0B1220', 0.6)`.
+     *
+     * Accepts 3- or 6-digit hex with or without a leading `#`; returns an
+     * uppercase `#RRGGBB`. Falls back to whichever input is parseable when the
+     * other is not.
+     *
+     * @since 5.27.0
+     */
+    public static function mix(string $hexA, string $hexB, float $weight = 0.5): string
+    {
+        $a = self::hexToRgb($hexA);
+        $b = self::hexToRgb($hexB);
+
+        if ($a === null) {
+            return $b === null ? '#000000' : self::rgbToHex($b);
+        }
+        if ($b === null) {
+            return self::rgbToHex($a);
+        }
+
+        $weight = max(0.0, min(1.0, $weight));
+
+        return self::rgbToHex([
+            (int) round($a[0] * (1 - $weight) + $b[0] * $weight),
+            (int) round($a[1] * (1 - $weight) + $b[1] * $weight),
+            (int) round($a[2] * (1 - $weight) + $b[2] * $weight),
+        ]);
+    }
+
+    /**
+     * Parse a 3- or 6-digit hex string (optional leading `#`) into an [r, g, b] triple.
+     *
+     * @return array{0: int, 1: int, 2: int}|null
+     */
+    private static function hexToRgb(string $hex): ?array
+    {
+        $hex = ltrim(trim($hex), '#');
+
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            return null;
+        }
+
+        return [
+            (int) hexdec(substr($hex, 0, 2)),
+            (int) hexdec(substr($hex, 2, 2)),
+            (int) hexdec(substr($hex, 4, 2)),
+        ];
+    }
+
+    /**
+     * Format an [r, g, b] triple as an uppercase `#RRGGBB` string (channels clamped to 0–255).
+     *
+     * @param array{0: int, 1: int, 2: int} $rgb
+     */
+    private static function rgbToHex(array $rgb): string
+    {
+        return sprintf(
+            '#%02X%02X%02X',
+            max(0, min(255, $rgb[0])),
+            max(0, min(255, $rgb[1])),
+            max(0, min(255, $rgb[2])),
+        );
+    }
 }
