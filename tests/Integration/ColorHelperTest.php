@@ -49,6 +49,25 @@ final class ColorHelperTest extends IntegrationTestCase
         self::assertSame(ColorHelper::DEFAULT_COLOR, ColorHelper::getPaletteColor('not-a-color'));
     }
 
+    public function testPrimaryHexFromSvgPicksFirstNonMonochromeHex(): void
+    {
+        // Skips white/black (3- and 6-digit), returns the first real colour
+        // upper-cased. Order matters: #FFFFFF and #000 are skipped, #1a73e8 wins.
+        self::assertSame(
+            '#1A73E8',
+            ColorHelper::primaryHexFromSvg('<svg fill="#FFFFFF" stroke="#000"><path fill="#1a73e8"/><path fill="#820eff"/></svg>'),
+        );
+
+        // 3-digit shorthand is honoured.
+        self::assertSame('#ABC', ColorHelper::primaryHexFromSvg('<svg><path fill="#fff"/><path fill="#abc"/></svg>'));
+
+        // No usable colour → null: null, empty, monochrome-only, and no-hex.
+        self::assertNull(ColorHelper::primaryHexFromSvg(null));
+        self::assertNull(ColorHelper::primaryHexFromSvg(''));
+        self::assertNull(ColorHelper::primaryHexFromSvg('<svg fill="#fff" stroke="#000000"/>'));
+        self::assertNull(ColorHelper::primaryHexFromSvg('<svg><path d="M0 0h24"/></svg>'));
+    }
+
     public function testRegisterColorSetRoundTrip(): void
     {
         $set = [
