@@ -109,7 +109,33 @@ class PluginHelper
     }
 
     /**
-     * Read the plugin's src/icon.svg if available.
+     * Read a plugin or module's `icon.svg` from its source directory.
+     *
+     * Works from a directory path alone — no installed/enabled plugin instance is
+     * required — so it can be used at authoring time for plugins, Yii modules, or
+     * packages that aren't installed in the running Craft.
+     *
+     * @param string $srcDir The directory containing `icon.svg` (a plugin's `src/`).
+     * @return string|null Trimmed SVG markup, or null if absent/empty/unreadable.
+     * @since 5.27.0
+     */
+    public static function readIconSvg(string $srcDir): ?string
+    {
+        $iconPath = rtrim($srcDir, '/\\') . '/icon.svg';
+        if (!is_file($iconPath) || !is_readable($iconPath)) {
+            return null;
+        }
+
+        $svg = file_get_contents($iconPath);
+        if (!is_string($svg) || trim($svg) === '') {
+            return null;
+        }
+
+        return trim($svg);
+    }
+
+    /**
+     * Read an installed plugin's `src/icon.svg` if available.
      *
      * @param PluginInterface $plugin
      * @return string|null
@@ -124,17 +150,7 @@ class PluginHelper
                 return null;
             }
 
-            $iconPath = dirname($pluginFile) . '/icon.svg';
-            if (!is_file($iconPath) || !is_readable($iconPath)) {
-                return null;
-            }
-
-            $svg = file_get_contents($iconPath);
-            if (!is_string($svg) || trim($svg) === '') {
-                return null;
-            }
-
-            return trim($svg);
+            return self::readIconSvg(dirname($pluginFile));
         } catch (\Throwable) {
             return null;
         }

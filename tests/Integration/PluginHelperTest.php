@@ -47,6 +47,23 @@ final class PluginHelperTest extends IntegrationTestCase
         self::assertNull(PluginHelper::getIconSvg($plugin));
     }
 
+    public function testReadIconSvgReadsFromADirectoryWithoutAPluginInstance(): void
+    {
+        // The whole point: read an icon from a path alone — no installed/enabled
+        // plugin instance — so Yii modules and not-yet-installed packages work too.
+        $dir = dirname((string)(new ReflectionClass(StubPluginWithIcon::class))->getFileName());
+        $expected = trim((string)file_get_contents($dir . '/icon.svg'));
+
+        self::assertSame($expected, PluginHelper::readIconSvg($dir));
+    }
+
+    public function testReadIconSvgReturnsNullWhenDirectoryHasNoIcon(): void
+    {
+        $dir = dirname((string)(new ReflectionClass(StubPluginNoIcon::class))->getFileName());
+
+        self::assertNull(PluginHelper::readIconSvg($dir));
+    }
+
     public function testLrLogoFilePointsAtTheCanonicalAsset(): void
     {
         $file = PluginHelper::lrLogoFile();
