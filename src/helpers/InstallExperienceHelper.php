@@ -109,8 +109,8 @@ class InstallExperienceHelper
         $redirectUri = self::resolveRedirectUri($plugin, $options);
         $ctaUrl = (string)($options['ctaUrl'] ?? $redirectUri);
 
-        $iconSvg = self::readPluginIconSvg($plugin);
-        $iconColor = self::extractPrimaryHexColor($iconSvg);
+        $iconSvg = PluginHelper::getIconSvg($plugin);
+        $iconColor = ColorHelper::primaryHexFromSvg($iconSvg);
         $sidebarColor = trim((string)($options['sidebarColor'] ?? ''));
         $accent = (string)($options['accent'] ?? '#0f766e');
         $resolvedSidebarColor = $sidebarColor !== '' ? $sidebarColor : $iconColor;
@@ -225,64 +225,5 @@ class InstallExperienceHelper
     private static function labelFromHandle(string $handle): string
     {
         return ucwords(str_replace(['-', '_'], ' ', $handle));
-    }
-
-    /**
-     * Read the plugin's src/icon.svg if available.
-     *
-     * @param PluginInterface $plugin
-     * @return string|null
-     */
-    private static function readPluginIconSvg(PluginInterface $plugin): ?string
-    {
-        try {
-            $reflection = new \ReflectionClass($plugin);
-            $pluginFile = $reflection->getFileName();
-            if ($pluginFile === false) {
-                return null;
-            }
-
-            $iconPath = dirname($pluginFile) . '/icon.svg';
-            if (!is_file($iconPath) || !is_readable($iconPath)) {
-                return null;
-            }
-
-            $svg = file_get_contents($iconPath);
-            if (!is_string($svg) || trim($svg) === '') {
-                return null;
-            }
-
-            return trim($svg);
-        } catch (\Throwable) {
-            return null;
-        }
-    }
-
-    /**
-     * Extract the first non-white/non-black hex color from an SVG string.
-     *
-     * @param string|null $svg
-     * @return string|null
-     */
-    private static function extractPrimaryHexColor(?string $svg): ?string
-    {
-        if (!is_string($svg) || $svg === '') {
-            return null;
-        }
-
-        if (!preg_match_all('/#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/', $svg, $matches)) {
-            return null;
-        }
-
-        foreach ($matches[0] as $color) {
-            $normalized = strtoupper($color);
-            if (in_array($normalized, ['#FFF', '#FFFFFF', '#000', '#000000'], true)) {
-                continue;
-            }
-
-            return $normalized;
-        }
-
-        return null;
     }
 }

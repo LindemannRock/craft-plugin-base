@@ -109,6 +109,38 @@ class PluginHelper
     }
 
     /**
+     * Read the plugin's src/icon.svg if available.
+     *
+     * @param PluginInterface $plugin
+     * @return string|null
+     * @since 5.27.0
+     */
+    public static function getIconSvg(PluginInterface $plugin): ?string
+    {
+        try {
+            $reflection = new \ReflectionClass($plugin);
+            $pluginFile = $reflection->getFileName();
+            if ($pluginFile === false) {
+                return null;
+            }
+
+            $iconPath = dirname($pluginFile) . '/icon.svg';
+            if (!is_file($iconPath) || !is_readable($iconPath)) {
+                return null;
+            }
+
+            $svg = file_get_contents($iconPath);
+            if (!is_string($svg) || trim($svg) === '') {
+                return null;
+            }
+
+            return trim($svg);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Bootstrap the base module and configure common functionality
      *
      * This single method replaces:

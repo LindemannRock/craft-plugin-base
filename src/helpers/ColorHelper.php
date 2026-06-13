@@ -495,4 +495,33 @@ class ColorHelper
 
         return self::NEUTRAL_COLOR;
     }
+
+    /**
+     * Extract the first non-white/non-black hex color from an SVG string.
+     *
+     * @param string|null $svg
+     * @return string|null
+     * @since 5.27.0
+     */
+    public static function primaryHexFromSvg(?string $svg): ?string
+    {
+        if (!is_string($svg) || $svg === '') {
+            return null;
+        }
+
+        if (!preg_match_all('/#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/', $svg, $matches)) {
+            return null;
+        }
+
+        foreach ($matches[0] as $color) {
+            $normalized = strtoupper($color);
+            if (in_array($normalized, ['#FFF', '#FFFFFF', '#000', '#000000'], true)) {
+                continue;
+            }
+
+            return $normalized;
+        }
+
+        return null;
+    }
 }
