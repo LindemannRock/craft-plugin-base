@@ -46,4 +46,28 @@ final class PluginHelperTest extends IntegrationTestCase
 
         self::assertNull(PluginHelper::getIconSvg($plugin));
     }
+
+    public function testLrLogoFilePointsAtTheCanonicalAsset(): void
+    {
+        $file = PluginHelper::lrLogoFile();
+
+        self::assertStringEndsWith('/src/icons/lr-logo.svg', $file);
+        self::assertFileExists($file);
+    }
+
+    public function testLrLogoPathsAreTheBareLogoPaths(): void
+    {
+        $paths = PluginHelper::lrLogoPaths();
+
+        // Exactly the two logo paths, with no surrounding <svg>/<g> wrapper —
+        // the caller supplies those (with its own viewBox/fill).
+        self::assertSame(2, substr_count($paths, '<path'));
+        self::assertStringNotContainsString('<svg', $paths);
+        self::assertStringNotContainsString('<g', $paths);
+
+        // The geometry is the same data the canonical file carries.
+        $svg = (string)file_get_contents(PluginHelper::lrLogoFile());
+        self::assertStringContainsString('M1.01 19.05', $paths);
+        self::assertStringContainsString('M1.01 19.05', $svg);
+    }
 }

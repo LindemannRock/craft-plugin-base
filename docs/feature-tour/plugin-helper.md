@@ -100,6 +100,25 @@ Typical uses:
 - inline icon rendering in the control panel
 - deriving a brand colour with [`ColorHelper::primaryHexFromSvg()`](color-helper.md)
 
+## LindemannRock Logo @since(5.27.0)
+
+Base is the single owner of the LindemannRock logo — both its geometry and its location. Consumers reference it through these accessors rather than bundling their own copy or reaching into base's directory layout:
+
+```php
+$path = PluginHelper::lrLogoFile();   // absolute path to the canonical lr-logo.svg
+$paths = PluginHelper::lrLogoPaths();  // just the two <path> elements
+```
+
+`lrLogoPaths()` returns the logo's `<path>` elements with the outer `<svg>`/`<g>` stripped, so you can embed them in your own `<svg>` with a specific `viewBox` and `fill`:
+
+```twig
+<svg viewBox="0 -0.186 1350.04 682.02" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#E52521">
+        {{ pathsFromController|raw }}
+    </g>
+</svg>
+```
+
 ## Plugin Name Override
 
 Apply a custom plugin name from the config file:

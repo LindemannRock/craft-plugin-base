@@ -132,6 +132,7 @@ class InstallExperienceHelper
             'confettiPreset' => (string)($options['confettiPreset'] ?? 'surprise'),
             'iconSvg' => $iconSvg,
             'iconColor' => $iconColor,
+            'logoPaths' => PluginHelper::lrLogoPaths(),
             'sidebarColor' => $resolvedSidebarColor,
             'uiColor' => $uiColor !== '' ? $uiColor : ($resolvedSidebarColor ?: $accent),
         ];

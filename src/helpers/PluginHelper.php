@@ -141,6 +141,44 @@ class PluginHelper
     }
 
     /**
+     * Absolute filesystem path to the canonical LindemannRock logo SVG.
+     *
+     * Base is the single owner of the logo's location — consumers ask for the
+     * path here rather than reaching into base's directory layout.
+     *
+     * @since 5.27.0
+     */
+    public static function lrLogoFile(): string
+    {
+        return dirname(__DIR__) . '/icons/lr-logo.svg';
+    }
+
+    /**
+     * The LindemannRock logo's two `<path>` elements, with the outer `<svg>`
+     * and `<g>` wrappers stripped.
+     *
+     * For embedding inside a caller-controlled `<svg>`/`<g>` (its own viewBox
+     * and fill), so the logo geometry lives in exactly one place. Returns an
+     * empty string if the logo file is missing.
+     *
+     * @since 5.27.0
+     */
+    public static function lrLogoPaths(): string
+    {
+        $file = self::lrLogoFile();
+        if (!is_file($file)) {
+            return '';
+        }
+
+        $svg = (string)file_get_contents($file);
+        if (!preg_match_all('/<path\b[^>]*\/>/', $svg, $matches)) {
+            return '';
+        }
+
+        return implode("\n", $matches[0]);
+    }
+
+    /**
      * Bootstrap the base module and configure common functionality
      *
      * This single method replaces:
