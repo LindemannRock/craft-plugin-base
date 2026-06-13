@@ -94,11 +94,19 @@ $svg = PluginHelper::getIconSvg($this);
 
 Returns the trimmed SVG markup, or `null` when the plugin has no `src/icon.svg` or it cannot be read. The file is located by reflection on the plugin class, so no path needs to be passed.
 
+When you don't have a plugin instance — a Yii module, or a package that isn't installed/enabled — read the icon straight from a source directory instead:
+
+```php
+$svg = PluginHelper::readIconSvg($srcDir);   // $srcDir = the plugin's src/ folder
+```
+
+`getIconSvg()` is a thin wrapper over `readIconSvg()`: it resolves the plugin's `src/` by reflection and delegates. Same return contract (trimmed markup, or `null`).
+
 Typical uses:
 
 - install experience branding
 - inline icon rendering in the control panel
-- deriving a brand colour with [`ColorHelper::primaryHexFromSvg()`](color-helper.md)
+- deriving brand colours with [`ColorHelper::primaryHexFromSvg()`](color-helper.md) or [`ColorHelper::iconColorRoles()`](color-helper.md)
 
 ## LindemannRock Logo @since(5.27.0)
 

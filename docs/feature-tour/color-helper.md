@@ -159,6 +159,25 @@ In Twig:
 {{ lrDefaultColor() }}     {# default color array #}
 ```
 
+## Color Math @since(5.27.0)
+
+Derive new colours from existing ones — mixing, luminance, and alpha — without a colour library.
+
+```php
+// Blend two colours: hex A shifted toward hex B by a 0.0–1.0 weight.
+ColorHelper::mix('#FACC15', '#000000', 0.6);   // darken 60% toward black
+ColorHelper::mix('#820EFF', '#FFFFFF', 0.2);   // lighten 20% toward white
+
+// Perceived luminance on 0–255 (Rec. 601) — to choose light vs dark text.
+ColorHelper::luminance('#1E1E1E');   // 30  (dark)
+ColorHelper::luminance('#FFFFFF');   // 255 (light)
+
+// Append an alpha channel, returning #RRGGBBAA — e.g. a dimmed subtitle.
+ColorHelper::withAlpha('#1A73E8', 0.5);   // '#1A73E880'
+```
+
+All three accept `#RGB` or `#RRGGBB` (with or without the leading `#`) and return upper-cased hex. `mix()` clamps the weight to `0.0–1.0` and falls back to whichever input is parseable; `luminance()` returns `0` and `withAlpha()` falls back to opaque black for unparseable input.
+
 ## Brand Color from SVG @since(5.27.0)
 
 Extract a brand colour from an SVG string — the first hex colour that is not pure white or black:
@@ -169,6 +188,16 @@ $brand = ColorHelper::primaryHexFromSvg($svg);  // e.g. '#1A73E8'
 ```
 
 The match accepts both `#RGB` and `#RRGGBB` forms, skips `#FFF`/`#FFFFFF`/`#000`/`#000000`, and returns the colour upper-cased. Returns `null` for empty input or an SVG with no usable colour. Pairs with [`PluginHelper::getIconSvg()`](plugin-helper.md) to derive a plugin's accent colour from its icon — the install experience uses exactly this to tint its UI.
+
+For a fuller read of an icon's two brand roles, `iconColorRoles()` returns both the **accent** (the most saturated colour — the badge/fill) and the **ink** (the least-saturated non-accent colour — the glyph):
+
+```php
+$svg = PluginHelper::readIconSvg($srcDir);   // or getIconSvg($plugin)
+$roles = ColorHelper::iconColorRoles($svg);
+// ['accent' => '#1A73E8', 'ink' => '#FFFFFF']
+```
+
+When the icon has only one colour, `ink` falls back to white or a near-black by contrast with the accent. Returns `null` when the markup carries no usable colour. The README hero generator uses this to tint a banner and pick a contrasting text colour entirely from the plugin's icon.
 
 ## Next Steps
 

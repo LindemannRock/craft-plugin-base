@@ -31,6 +31,11 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | `getNeutralColor()` | `string` | Neutral gray hex (`#aab6c1`) |
 | `getDefaultColor()` | `array` | Default fallback color array |
 | `getFilterColor(string $set, string $key, ?string $current)` | `string` | Hex color for filter display |
+| `primaryHexFromSvg(?string $svg)` | `string\|null` | First non-black/white hex in an SVG (accent colour) @since(5.27.0) |
+| `iconColorRoles(?string $svg)` | `array\|null` | `{accent, ink}` brand roles from icon SVG @since(5.27.0) |
+| `mix(string $a, string $b, float $weight = 0.5)` | `string` | Blend two hex colours by weight (darken/lighten) @since(5.27.0) |
+| `luminance(string $hex)` | `int` | Perceived luminance on 0–255 (Rec. 601) @since(5.27.0) |
+| `withAlpha(string $hex, float $alpha)` | `string` | Append alpha, returns `#RRGGBBAA` @since(5.27.0) |
 
 ### DateFormatHelper
 
@@ -168,6 +173,10 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `getCacheKeyPrefix(string $handle, string $type)` | `string` | Cache key prefix |
 | `getCacheKeySet(string $handle, string $type)` | `string` | Redis key set name |
 | `registerTranslations($plugin, ?string $path, ?string $cat)` | `void` | Register translation source |
+| `getIconSvg(PluginInterface $plugin)` | `?string` | Read the plugin's `src/icon.svg` (located by reflection) @since(5.27.0) |
+| `readIconSvg(string $srcDir)` | `?string` | Read `icon.svg` from a source dir — no plugin instance needed @since(5.27.0) |
+| `lrLogoFile()` | `string` | Absolute path to the canonical LindemannRock logo SVG @since(5.27.0) |
+| `lrLogoPaths()` | `string` | The logo's two `<path>` elements, no `<svg>`/`<g>` wrapper @since(5.27.0) |
 
 ### JsonHelper
 
