@@ -25,6 +25,7 @@
             "feature-tour/date-format-helper",
             "feature-tour/date-range-helper",
             "feature-tour/schedule-helper",
+            "feature-tour/recurring-queue-helper",
             "feature-tour/color-helper",
             "feature-tour/config-file-helper",
             "feature-tour/export-helper",

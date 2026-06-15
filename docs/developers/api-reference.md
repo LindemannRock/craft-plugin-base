@@ -446,6 +446,9 @@ Extend this controller in a plugin's console namespace to expose `plugin-handle/
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `detectDeviceInfo(?string $ua, array $config)` | `array` | Detect device/browser/OS |
+| `detectLanguageFromConfig(array $overrideConfig = [])` | `string` | Detect browser language |
+| `buildDeviceModel(array $data, string $class, array $map)` | `object` | Map detection data to model |
+| `getDeviceDetectionConfig(): array` | `array` | Return config (default: `[]`) |
 
 ### QueueTtrTrait
 
@@ -457,9 +460,16 @@ Extend this controller in a plugin's console namespace to expose `plugin-handle/
 | `getTtr()` | `int` | Returns queue TTR used by retryable jobs |
 
 > `getTtr()` is used by yii2-queue when the job implements `RetryableJobInterface`.
-| `detectLanguageFromConfig(array $overrideConfig = [])` | `string` | Detect browser language |
-| `buildDeviceModel(array $data, string $class, array $map)` | `object` | Map detection data to model |
-| `getDeviceDetectionConfig(): array` | `array` | Return config (default: `[]`) |
+
+### RecurringQueueHelper
+
+[Full docs](../feature-tour/recurring-queue-helper.md) — Deployment-safe recurring queue-row ownership.
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `ensurePending(string $pluginToken, string $jobClass, int $delay, callable $jobFactory, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | `?string` | Atomically ensure one pending recurring row exists, collapsing duplicates. |
+| `deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | `int` | Delete pending rows for a recurring job identity. |
+| `hasPending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | `bool` | Check whether a pending row exists for a recurring job identity. |
 
 ### GeoLookupTrait
 

@@ -109,11 +109,8 @@ Convenience wrapper for queue scheduling — returns the seconds from now until 
 $delay = ScheduleHelper::calculateDelaySeconds('daily2am');
 // 41946 (or however many seconds until next 2am Riyadh)
 
-if ($delay > 0) {
-    Craft::$app->getQueue()->delay($delay)->push(new MyJob([
-        'reschedule' => true,
-    ]));
-}
+// Use RecurringQueueHelper for bootstrap/settings-change queue ownership.
+// Use direct queue push only from the job's execute-time self-reschedule path.
 ```
 
 ## Typical Job + Bootstrap Pattern
@@ -258,6 +255,8 @@ class MyScheduledJob extends BaseJob implements RetryableJobInterface
 ### Plugin bootstrap
 
 ```php
+use lindemannrock\base\helpers\RecurringQueueHelper;
+
 public function init(): void
 {
     parent::init();
@@ -274,32 +273,25 @@ private function scheduleMyJob(): void
         return;
     }
 
-    // Plain queue check — no cache flag. This is what makes the job
-    // recoverable from a manual "Release All Jobs" in the CP queue UI.
-    $existingJob = (new \craft\db\Query())
-        ->from('{{%queue}}')
-        ->where(['like', 'job', 'myplugin'])
-        ->andWhere(['like', 'job', 'MyScheduledJob'])
-        ->exists();
-
-    if ($existingJob) {
-        return;
-    }
-
     $next = ScheduleHelper::calculateNext($settings->myJobSchedule);
     if ($next === null) {
         return;
     }
 
-    $delay = $next->getTimestamp() - time();
+    $delay = $next->getTimestamp() - DateFormatHelper::now()->getTimestamp();
     if ($delay <= 0) {
         return;
     }
 
-    Craft::$app->getQueue()->delay($delay)->push(new MyScheduledJob([
-        'reschedule' => true,
-        'nextRunTime' => DateFormatHelper::formatCompactDatetime($next, false, false),
-    ]));
+    RecurringQueueHelper::ensurePending(
+        pluginToken: 'myplugin',
+        jobClass: MyScheduledJob::class,
+        delay: $delay,
+        jobFactory: fn() => new MyScheduledJob([
+            'reschedule' => true,
+            'nextRunTime' => DateFormatHelper::formatCompactDatetime($next, false, false),
+        ]),
+    );
 }
 ```
 
@@ -321,26 +313,16 @@ if ($oldEnabled !== $settings->enableMyScheduledJob ||
 public function handleMyScheduleChange(Settings $settings): void
 {
     // Always cancel pending rows so the new schedule applies immediately
-    Craft::$app->getDb()->createCommand()
-        ->delete('{{%queue}}', [
-            'and',
-            ['like', 'job', 'myplugin'],
-            ['like', 'job', 'MyScheduledJob'],
-        ])
-        ->execute();
+    RecurringQueueHelper::deletePending(
+        pluginToken: 'myplugin',
+        jobClass: MyScheduledJob::class,
+    );
 
     if (!$settings->enableMyScheduledJob || $settings->myJobSchedule === 'disabled') {
         return;
     }
 
-    $delay = ScheduleHelper::calculateDelaySeconds($settings->myJobSchedule);
-    if ($delay <= 0) {
-        return;
-    }
-
-    Craft::$app->getQueue()->delay($delay)->push(new MyScheduledJob([
-        'reschedule' => true,
-    ]));
+    $this->scheduleMyJob();
 }
 ```
 
@@ -352,7 +334,8 @@ These are the common failure modes to avoid when wiring a recurring queue job to
 |---------|---------|-----|
 | Using `new DateTime()` instead of `DateFormatHelper::now()` | Schedule math drifts when PHP TZ ≠ Craft TZ | Use `DateFormatHelper::now()` (already done inside the helper — only matters if you compute "now" yourself) |
 | Using `date('M j, g:ia', time() + $delay)` for the display string | Display in wrong TZ; baked into serialized payload, so old jobs keep stale string until re-push | `DateFormatHelper::formatCompactDatetime($next, false, false)` |
-| Cache-flag dedup in bootstrap | Manual "Release All Jobs" deletes the row but cache still says "scheduled" — job stays gone for hours | Plain `{{%queue}}` LIKE-check, no cache flag |
+| Plain check-then-push dedup in bootstrap | Concurrent deploy/bootstrap requests can all pass the empty check and push duplicate delayed rows | `RecurringQueueHelper::ensurePending()` |
+| Cache-flag dedup in bootstrap | Manual "Release All Jobs" deletes the row but cache still says "scheduled" — job stays gone for hours | `RecurringQueueHelper::ensurePending()` |
 | Self-reschedule LIKE-checks the queue | False-matches the still-reserved row of the currently-executing job, kills the reschedule silently | Just push from inside `execute()`'s reschedule path; no dedup needed |
 | `handleScheduleChange()` early-returns when a job exists | User changes schedule, but the previously-queued job still fires on the OLD delay | Always `delete()` then `push()` — never short-circuit |
 | Settings cache reset AFTER the change handler | Job's `init()` reads `getSettings()` from stale cache, generates display string for the OLD schedule | Reset (`$plugin->setSettings([])`) BEFORE calling the handler |
@@ -361,4 +344,5 @@ These are the common failure modes to avoid when wiring a recurring queue job to
 ## Next Steps
 
 - [DateFormatHelper](date-format-helper.md) — TZ-aware "now" + display formatting (used internally by `ScheduleHelper`)
+- [RecurringQueueHelper](recurring-queue-helper.md) — deployment-safe ownership for recurring queue rows
 - [QueueTtrTrait](queue-ttr.md) — shared queue TTR for jobs
