@@ -106,6 +106,20 @@ final class UrlSafetyHelperTest extends IntegrationTestCase
         self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('mailto:x@y.com'));
     }
 
+    public function testIsHttpUrlWithHost(): void
+    {
+        self::assertTrue(UrlSafetyHelper::isHttpUrlWithHost('https://example.com'));
+        self::assertTrue(UrlSafetyHelper::isHttpUrlWithHost('http://x'));
+        self::assertTrue(UrlSafetyHelper::isHttpUrlWithHost('HTTPS://example.com'));
+        // Bare scheme or host-less form is not a usable URL.
+        self::assertFalse(UrlSafetyHelper::isHttpUrlWithHost('https://'));
+        self::assertFalse(UrlSafetyHelper::isHttpUrlWithHost('http://'));
+        self::assertFalse(UrlSafetyHelper::isHttpUrlWithHost('https:///path'));
+        // Not an http(s) URL.
+        self::assertFalse(UrlSafetyHelper::isHttpUrlWithHost('/relative'));
+        self::assertFalse(UrlSafetyHelper::isHttpUrlWithHost('mailto:x@y.com'));
+    }
+
     public function testHasDangerousSchemeFlagsExecutableSchemes(): void
     {
         self::assertTrue(UrlSafetyHelper::hasDangerousScheme('javascript:alert(1)'));

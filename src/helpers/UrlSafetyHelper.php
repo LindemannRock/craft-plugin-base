@@ -108,9 +108,7 @@ class UrlSafetyHelper
             return true;
         }
 
-        // Require a host character after the scheme so a bare `https://` (or
-        // `https:///path`, which has no host) is not treated as a valid target.
-        if (preg_match('#^https?://[^/\s]#i', $url)) {
+        if (self::isHttpUrlWithHost($url)) {
             return true;
         }
 
@@ -122,5 +120,19 @@ class UrlSafetyHelper
         }
 
         return false;
+    }
+
+    /**
+     * Whether the URL is an absolute http(s) URL with a host. A bare scheme
+     * (`https://`) or a host-less form (`https:///path`) returns false. Callers
+     * that may receive padded input should trim before calling.
+     *
+     * @param string $url The candidate URL.
+     * @return bool
+     * @since 5.27.0
+     */
+    public static function isHttpUrlWithHost(string $url): bool
+    {
+        return preg_match('#^https?://[^/\s]#i', $url) === 1;
     }
 }
