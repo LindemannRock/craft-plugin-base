@@ -193,12 +193,17 @@ class MyScheduledJob extends BaseJob implements RetryableJobInterface
         parent::init();
 
         if ($this->reschedule && !$this->nextRunTime) {
-            $next = ScheduleHelper::calculateNext(
-                MyPlugin::$plugin->getSettings()->myJobSchedule
-            );
+            $settings = MyPlugin::$plugin->getSettings();
+            $next = ScheduleHelper::calculateNext($settings->myJobSchedule);
             if ($next !== null) {
                 // calculateNext returns DateTime in Craft TZ — pass isUtc=false
-                $this->nextRunTime = DateFormatHelper::formatCompactDatetime($next, false, false);
+                $this->nextRunTime = DateFormatHelper::formatCompactDatetimeFromSettings(
+                    $next,
+                    $settings,
+                    null,
+                    false,
+                    pluginHandle: 'my-plugin',
+                );
             }
         }
     }
@@ -246,7 +251,13 @@ class MyScheduledJob extends BaseJob implements RetryableJobInterface
 
         Craft::$app->getQueue()->delay($delay)->push(new self([
             'reschedule' => true,
-            'nextRunTime' => DateFormatHelper::formatCompactDatetime($next, false, false),
+            'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
+                $next,
+                $settings,
+                null,
+                false,
+                pluginHandle: 'my-plugin',
+            ),
         ]));
     }
 }
@@ -289,7 +300,13 @@ private function scheduleMyJob(): void
         delay: $delay,
         jobFactory: fn() => new MyScheduledJob([
             'reschedule' => true,
-            'nextRunTime' => DateFormatHelper::formatCompactDatetime($next, false, false),
+            'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
+                $next,
+                $settings,
+                null,
+                false,
+                pluginHandle: 'my-plugin',
+            ),
         ]),
     );
 }
@@ -333,7 +350,7 @@ These are the common failure modes to avoid when wiring a recurring queue job to
 | Pitfall | Symptom | Fix |
 |---------|---------|-----|
 | Using `new DateTime()` instead of `DateFormatHelper::now()` | Schedule math drifts when PHP TZ ≠ Craft TZ | Use `DateFormatHelper::now()` (already done inside the helper — only matters if you compute "now" yourself) |
-| Using `date('M j, g:ia', time() + $delay)` for the display string | Display in wrong TZ; baked into serialized payload, so old jobs keep stale string until re-push | `DateFormatHelper::formatCompactDatetime($next, false, false)` |
+| Using `date('M j, g:ia', time() + $delay)` for the display string | Display in wrong TZ; baked into serialized payload, so old jobs keep stale string until re-push | `DateFormatHelper::formatCompactDatetimeFromSettings($next, $settings, null, false, pluginHandle: 'my-plugin')` |
 | Plain check-then-push dedup in bootstrap | Concurrent deploy/bootstrap requests can all pass the empty check and push duplicate delayed rows | `RecurringQueueHelper::ensurePending()` |
 | Cache-flag dedup in bootstrap | Manual "Release All Jobs" deletes the row but cache still says "scheduled" — job stays gone for hours | `RecurringQueueHelper::ensurePending()` |
 | Self-reschedule LIKE-checks the queue | False-matches the still-reserved row of the currently-executing job, kills the reschedule silently | Just push from inside `execute()`'s reschedule path; no dedup needed |

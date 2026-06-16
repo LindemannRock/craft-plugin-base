@@ -48,13 +48,21 @@ private function scheduleMyJob(): void
         delay: $delay,
         jobFactory: fn() => new MyScheduledJob([
             'reschedule' => true,
-            'nextRunTime' => DateFormatHelper::formatCompactDatetime($next, false, false),
+            'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
+                $next,
+                $settings,
+                null,
+                false,
+                pluginHandle: 'my-plugin',
+            ),
         ]),
     );
 }
 ```
 
 `pluginToken` is a stable string found in the serialized queue payload. For LindemannRock plugins this is usually the namespace handle without punctuation, such as `searchmanager`, `redirectmanager`, or `formieratingfield`.
+
+The queue description timestamp is serialized when Craft queues the row. If date/time display settings change later, existing delayed rows keep their old label until they run or are requeued. New rows use the current effective settings. Queue labels stay compact: `numeric` months render numerically, while `short` and `long` month settings both render as short month names.
 
 ## Extra Identity Tokens
 
@@ -118,7 +126,13 @@ private function scheduleNextRun(): void
 
     Craft::$app->getQueue()->delay($delay)->push(new self([
         'reschedule' => true,
-        'nextRunTime' => DateFormatHelper::formatCompactDatetime($next, false, false),
+        'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
+            $next,
+            $settings,
+            null,
+            false,
+            pluginHandle: 'my-plugin',
+        ),
     ]));
 }
 ```

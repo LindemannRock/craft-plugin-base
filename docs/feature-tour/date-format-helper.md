@@ -106,22 +106,28 @@ DateFormatHelper::formatCompactDatetime($date, pluginHandle: 'my-plugin');
 
 Short datetime without year from an already-resolved plugin settings object. Use this for serialized strings such as queue descriptions, where the plugin settings object is available and the output should not depend on request-order config cache state.
 
+Pass `pluginHandle` for queue labels so nullable "Use global default" settings inherit from `config/lindemannrock-base.php` and plugin config. Queue labels stay compact: `numeric` months render numerically, while `short` and `long` month settings both render as short month names.
+
 ```php
 DateFormatHelper::formatCompactDatetimeFromSettings(
     $nextRun,
     MyPlugin::$plugin->getSettings(),
+    null,
     false,
-    false,
-); // "May 25 18:57"
+    pluginHandle: 'my-plugin',
+); // "25 May 18:57"
 
 DateFormatHelper::formatCompactDatetimeFromSettings(
     $nextRun,
     MyPlugin::$plugin->getSettings(),
-    false,
+    null,
     false,
     true,
-); // "2027 May 25 18:57" when the queue label needs the year
+    pluginHandle: 'my-plugin',
+); // "25 May 2027 18:57" when the queue label needs the year
 ```
+
+Craft serializes queue job descriptions when rows are queued. If date/time settings change while a delayed row is already pending, that row keeps its old label until it runs or is requeued.
 
 ### formatRelative()
 
