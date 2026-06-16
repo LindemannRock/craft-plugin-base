@@ -14,6 +14,8 @@
  #   - suffix: (optional) Suffix to append (e.g., '%', 'ms')
  #   - prefix: (optional) Prefix to prepend (e.g., '$')
  #   - size: (optional) 'small' for compact version
+ #   - class: (optional) Additional CSS classes
+ #   - valueIsFormatted: (optional) true when value should render as provided
  #
  # Examples:
  #   // Basic (default blue value)
@@ -41,6 +43,9 @@
 {% set valuePrefix = prefix ?? '' %}
 {% set isSmall = (size ?? '') == 'small' %}
 {% set paletteName = palette ?? null %}
+{% set extraClass = class ?? '' %}
+{% set isValueFormatted = valueIsFormatted ?? false %}
+{% set hasCustomColor = color is defined and color %}
 
 {# Get palette color data if specified #}
 {% if paletteName %}
@@ -49,16 +54,21 @@
     {% set rgbValue = paletteColor.rgb ?? '13, 120, 242' %}
     {% set boxStyle = 'background: rgba(' ~ rgbValue ~ ', 0.12); border-color: rgba(' ~ rgbValue ~ ', 0.35);' %}
 {% else %}
-    {% set valueColor = color ?? '#0d78f2' %}
+    {% set valueColor = hasCustomColor ? color : null %}
     {% set boxStyle = '' %}
 {% endif %}
+{% set valueStyle = valueColor ? 'color: ' ~ valueColor ~ ';' : '' %}
 
-<div class="lr-stat-box {% if isSmall %}lr-stat-box-small{% endif %}{% if paletteName %} lr-stat-box-colored{% endif %}"
+<div class="lr-stat-box {% if isSmall %}lr-stat-box-small{% endif %}{% if paletteName %} lr-stat-box-colored{% endif %} {{ extraClass }}"
      {% if boxStyle %}style="{{ boxStyle }}"{% endif %}>
     <div class="lr-stat-value"
          {% if valueId %}id="{{ valueId }}"{% endif %}
-         style="color: {{ valueColor }};">
-        {{ valuePrefix }}{{ value|number_format }}{{ valueSuffix }}
+         {% if valueStyle %}style="{{ valueStyle }}"{% endif %}>
+        {% if isValueFormatted %}
+            {{ valuePrefix }}{{ value }}{{ valueSuffix }}
+        {% else %}
+            {{ valuePrefix }}{{ value|number_format }}{{ valueSuffix }}
+        {% endif %}
     </div>
     <div class="lr-stat-label">{{ label }}</div>
 </div>

@@ -136,6 +136,8 @@ Pass a palette color name for a fully colored box (tinted background and border)
 | `suffix` | `string` | | Suffix (e.g., `'%'`, `'ms'`) |
 | `prefix` | `string` | | Prefix (e.g., `'$'`) |
 | `size` | `string` | | `'small'` for compact version |
+| `class` | `string` | | Additional CSS classes |
+| `valueIsFormatted` | `bool` | `false` | Render `value` as provided instead of applying `number_format` |
 
 ### Grid Layout
 
@@ -151,6 +153,91 @@ Wrap stat boxes in `.lr-analytics-stats` for a responsive grid. Add `.compact` f
     } only %}
 </div>
 ```
+
+---
+
+## Dashboard Widget Components
+
+Compact components for Craft dashboard widgets. Use these for widget body templates so repeated stat grids, ranked metric lists, empty states, and footer links share the same spacing and styles.
+
+### Dashboard Widget Stats
+
+**Path:** `lindemannrock-base/_components/dashboard-widget-stats`
+
+```twig
+{% include 'lindemannrock-base/_components/dashboard-widget-stats' with {
+    stats: [
+        {value: 7, label: 'Total Interactions'},
+        {value: 3, label: 'Unique Visitors'},
+        {value: 2, label: 'Active Links'},
+        {value: 66, suffix: '%', label: 'Engagement Rate'},
+    ],
+    topItem: {
+        label: 'Top Performer',
+        title: 'Summer campaign',
+        url: cpUrl('my-plugin/items/1'),
+        meta: '7 interactions',
+    },
+    footer: {
+        url: cpUrl('my-plugin/analytics'),
+        label: 'View full analytics',
+    },
+} only %}
+```
+
+This component composes `stat-box` for each metric. Pass `valueIsFormatted: true` on a stat when the value already contains localized or custom formatting.
+
+### Dashboard Widget List
+
+**Path:** `lindemannrock-base/_components/dashboard-widget-list`
+
+```twig
+{% include 'lindemannrock-base/_components/dashboard-widget-list' with {
+    primaryHeader: 'Link',
+    valueHeader: 'Interactions',
+    rows: [
+        {
+            primary: 'Summer campaign',
+            primaryUrl: cpUrl('my-plugin/items/1'),
+            meta: '/go/summer',
+            value: 7|number,
+        },
+    ],
+    empty: {
+        title: 'No links yet',
+        message: 'Create your first link to see it here.',
+    },
+    footer: {
+        url: cpUrl('my-plugin/items'),
+        label: 'View all links',
+    },
+} only %}
+```
+
+Row variants use shared badge/link styling:
+
+- `primaryVariant`: `default`, `danger`, `success`, `warning`, `neutral`
+- `badgeVariant`: `default`, `danger`, `success`, `warning`, `neutral`
+- `primaryHtml`, `metaHtml`, and `valueHtml` are available for server-rendered markup when plain text is not enough.
+
+### Empty State and Footer
+
+Use these directly when a widget does not need the full stats/list wrappers:
+
+```twig
+{% include 'lindemannrock-base/_components/dashboard-widget-empty' with {
+    title: 'No data yet',
+    message: 'Activity will appear here after the first event.',
+    type: 'empty',
+} only %}
+
+{% include 'lindemannrock-base/_components/dashboard-widget-footer' with {
+    url: cpUrl('my-plugin/analytics'),
+    label: 'View full analytics',
+} only %}
+```
+
+Empty-state `type` supports `empty`, `success`, `warning`, and `error`.
 
 ---
 

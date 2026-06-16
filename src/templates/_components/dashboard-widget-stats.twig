@@ -1,0 +1,75 @@
+{#
+ # Dashboard Widget Stats Component
+ #
+ # Compact stat grid for Craft dashboard widgets, with optional top item and
+ # footer action. Composes stat-box.twig for individual metric cards.
+ #
+ # Parameters:
+ # - stats: Array of stat objects: {value, label, suffix, prefix, palette, color, valueIsFormatted}
+ # - columns: Optional fixed column count, default 2
+ # - topItem: Optional object: {label, title, url, titleHtml, meta, metaHtml}
+ # - footer: Optional object: {url, label}
+ # - class: Optional extra wrapper class
+ #
+ # @link      https://lindemannrock.com
+ # @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set widgetStats = stats ?? [] %}
+{% set statColumns = columns ?? 2 %}
+{% set widgetTopItem = topItem ?? null %}
+{% set widgetFooter = footer ?? null %}
+{% set extraClass = class ?? '' %}
+
+<div class="lr-dashboard-widget lr-dashboard-widget-stats {{ extraClass }}">
+    {% if widgetStats|length %}
+        <div class="lr-dashboard-widget-stats__grid cols-{{ statColumns }}">
+            {% for stat in widgetStats %}
+                {% include 'lindemannrock-base/_components/stat-box' with {
+                    value: stat.value ?? 0,
+                    label: stat.label ?? '',
+                    id: stat.id ?? null,
+                    color: stat.color ?? null,
+                    palette: stat.palette ?? null,
+                    suffix: stat.suffix ?? '',
+                    prefix: stat.prefix ?? '',
+                    size: 'small',
+                    class: 'lr-stat-box-widget',
+                    valueIsFormatted: stat.valueIsFormatted ?? false,
+                } only %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if widgetTopItem %}
+        <div class="lr-dashboard-widget-feature">
+            {% if widgetTopItem.label is defined and widgetTopItem.label %}
+                <div class="lr-dashboard-widget-feature__label">{{ widgetTopItem.label }}</div>
+            {% endif %}
+            <div class="lr-dashboard-widget-feature__content">
+                {% if widgetTopItem.titleHtml is defined and widgetTopItem.titleHtml %}
+                    {{ widgetTopItem.titleHtml|raw }}
+                {% elseif widgetTopItem.url is defined and widgetTopItem.url %}
+                    <a href="{{ widgetTopItem.url }}" class="lr-dashboard-widget-feature__title">{{ widgetTopItem.title ?? '' }}</a>
+                {% else %}
+                    <div class="lr-dashboard-widget-feature__title">{{ widgetTopItem.title ?? '' }}</div>
+                {% endif %}
+
+                {% if widgetTopItem.metaHtml is defined and widgetTopItem.metaHtml %}
+                    <div class="lr-dashboard-widget-meta">{{ widgetTopItem.metaHtml|raw }}</div>
+                {% elseif widgetTopItem.meta is defined and widgetTopItem.meta %}
+                    <div class="lr-dashboard-widget-meta">{{ widgetTopItem.meta }}</div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if widgetFooter %}
+        {% include 'lindemannrock-base/_components/dashboard-widget-footer' with {
+            url: widgetFooter.url ?? null,
+            label: widgetFooter.label ?? null,
+        } only %}
+    {% endif %}
+</div>

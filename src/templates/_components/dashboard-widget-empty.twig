@@ -1,0 +1,30 @@
+{#
+ # Dashboard Widget Empty State Component
+ #
+ # Shared empty, success, permission, and disabled states for dashboard widgets.
+ #
+ # Parameters:
+ # - title: Primary message
+ # - message: Optional secondary message
+ # - type: Optional visual type: empty, success, warning, error (default: empty)
+ # - class: Optional extra wrapper class
+ #
+ # @link      https://lindemannrock.com
+ # @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set stateTitle = title ?? null %}
+{% set stateMessage = message ?? null %}
+{% set stateType = type ?? 'empty' %}
+{% set extraClass = class ?? '' %}
+
+<div class="lr-dashboard-widget-empty lr-dashboard-widget-empty--{{ stateType }} {{ extraClass }}">
+    {% if stateTitle %}
+        <p>{{ stateTitle }}</p>
+    {% endif %}
+    {% if stateMessage %}
+        <p class="light">{{ stateMessage }}</p>
+    {% endif %}
+</div>

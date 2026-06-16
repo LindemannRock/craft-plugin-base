@@ -73,7 +73,7 @@ Reusable Twig templates for building consistent CP pages:
 - **[CP Analytics Layout](../template-guides/cp-analytics-layout.md)** — Analytics dashboards with tabs, charts, stat boxes, and date filters
 - **[CP Utilities Layout](../template-guides/cp-utilities-layout.md)** — Utility pages with action sections and AJAX buttons
 - **[CP Table Utility Layout](../template-guides/cp-table-utility-layout.md)** — Table variant for utility pages
-- **[Components](../template-guides/components.md)** — Badge, info-box, export-menu, row-actions, stat-box, filter-status, filter-dropdown, phone-input
+- **[Components](../template-guides/components.md)** — Badge, info-box, export-menu, row-actions, stat-box, dashboard-widget helpers, filter-status, filter-dropdown, phone-input
 - **[Partials](../template-guides/partials.md)** — Analytics panel, CSV import, geo settings, backup list
 
 ## Next Steps

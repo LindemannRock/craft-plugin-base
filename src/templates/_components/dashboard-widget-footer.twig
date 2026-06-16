@@ -1,0 +1,25 @@
+{#
+ # Dashboard Widget Footer Component
+ #
+ # Shared footer action for Craft dashboard widget bodies.
+ #
+ # Parameters:
+ # - url: Footer link URL
+ # - label: Footer link label
+ # - class: Optional extra class on the footer wrapper
+ #
+ # @link      https://lindemannrock.com
+ # @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set footerUrl = url ?? null %}
+{% set footerLabel = label ?? null %}
+{% set extraClass = class ?? '' %}
+
+{% if footerUrl and footerLabel %}
+    <div class="lr-dashboard-widget-footer {{ extraClass }}">
+        <a href="{{ footerUrl }}" class="go">{{ footerLabel }}</a>
+    </div>
+{% endif %}

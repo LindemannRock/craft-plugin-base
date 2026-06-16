@@ -1,0 +1,91 @@
+{#
+ # Dashboard Widget List Component
+ #
+ # Compact two-column metric list for Craft dashboard widget bodies.
+ #
+ # Parameters:
+ # - primaryHeader: First column heading
+ # - valueHeader: Second column heading
+ # - rows: Array of row objects:
+ #   {
+ #     primary, primaryHtml, primaryUrl, primaryTitle, primaryVariant,
+ #     meta, metaHtml, value, valueHtml, valueTitle, badgeVariant
+ #   }
+ # - empty: Optional object: {title, message, type}
+ # - footer: Optional object: {url, label}
+ # - class: Optional extra wrapper class
+ #
+ # @link      https://lindemannrock.com
+ # @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set listRows = rows ?? [] %}
+{% set emptyState = empty ?? null %}
+{% set widgetFooter = footer ?? null %}
+{% set extraClass = class ?? '' %}
+
+<div class="lr-dashboard-widget lr-dashboard-widget-list {{ extraClass }}">
+    {% if listRows|length %}
+        <table class="data fullwidth lr-dashboard-widget-list__table">
+            <thead>
+                <tr>
+                    <th>{{ primaryHeader ?? '' }}</th>
+                    <th>{{ valueHeader ?? '' }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in listRows %}
+                    {% set rowVariant = row.primaryVariant ?? 'default' %}
+                    {% set badgeVariant = row.badgeVariant ?? rowVariant %}
+                    <tr>
+                        <td>
+                            <div class="lr-dashboard-widget-list__cell">
+                                {% if row.primaryHtml is defined and row.primaryHtml %}
+                                    {{ row.primaryHtml|raw }}
+                                {% elseif row.primaryUrl is defined and row.primaryUrl %}
+                                    <a href="{{ row.primaryUrl }}" class="lr-dashboard-widget-list__primary lr-dashboard-widget-list__primary--{{ rowVariant }}"{% if row.primaryTitle is defined %} title="{{ row.primaryTitle }}"{% endif %}>
+                                        {{ row.primary ?? '' }}
+                                    </a>
+                                {% else %}
+                                    <span class="lr-dashboard-widget-list__primary lr-dashboard-widget-list__primary--{{ rowVariant }}"{% if row.primaryTitle is defined %} title="{{ row.primaryTitle }}"{% endif %}>
+                                        {{ row.primary ?? '' }}
+                                    </span>
+                                {% endif %}
+
+                                {% if row.metaHtml is defined and row.metaHtml %}
+                                    <div class="lr-dashboard-widget-meta">{{ row.metaHtml|raw }}</div>
+                                {% elseif row.meta is defined and row.meta %}
+                                    <div class="lr-dashboard-widget-meta">{{ row.meta }}</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="lr-dashboard-widget-list__value">
+                            {% if row.valueHtml is defined and row.valueHtml %}
+                                {{ row.valueHtml|raw }}
+                            {% else %}
+                                <span class="lr-dashboard-widget-badge lr-dashboard-widget-badge--{{ badgeVariant }}"{% if row.valueTitle is defined %} title="{{ row.valueTitle }}"{% endif %}>
+                                    {{ row.value ?? '' }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if widgetFooter %}
+            {% include 'lindemannrock-base/_components/dashboard-widget-footer' with {
+                url: widgetFooter.url ?? null,
+                label: widgetFooter.label ?? null,
+            } only %}
+        {% endif %}
+    {% elseif emptyState %}
+        {% include 'lindemannrock-base/_components/dashboard-widget-empty' with {
+            title: emptyState.title ?? null,
+            message: emptyState.message ?? null,
+            type: emptyState.type ?? 'empty',
+        } only %}
+    {% endif %}
+</div>
