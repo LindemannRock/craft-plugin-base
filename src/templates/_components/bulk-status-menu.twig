@@ -1,0 +1,96 @@
+{#
+ # Bulk Status Menu Component
+ #
+ # Renders a Craft-style selected-row status menu for cp-table bulk actions.
+ # The component standardizes the button, menu structure, status dots, and
+ # MenuBtn initialization. Consuming templates still own click handlers and
+ # endpoint payloads via stable item IDs.
+ #
+ # Parameters:
+ # - id: Optional button ID (default: lr-bulk-status-btn)
+ # - label: Optional button label (default: Set status)
+ # - countId: Optional count span ID. Renders "Label (0)" as a placeholder.
+ # - menuId: Optional menu ID.
+ # - items: Array of status items:
+ #   - id: Anchor ID used by plugin JavaScript
+ #   - label: Display text
+ #   - status: Craft status class for status-dot
+ #   - value: Value to look up in colorSet
+ #   - colorSet: Color set name for status-dot
+ #   - color: Custom dot color
+ #   - class: Optional anchor class
+ #   - title: Optional tooltip
+ #   - permission: Optional permission required to show item
+ #   - showIf: Optional boolean condition
+ #   - hideIf: Optional boolean condition
+ #   - type: 'divider' for separator
+ #}
+
+{% set buttonId = id ?? 'lr-bulk-status-btn' %}
+{% set buttonLabel = label ?? 'Set status'|t('lindemannrock-base') %}
+{% set menuId = menuId ?? buttonId ~ '-menu' %}
+{% set countId = countId ?? null %}
+{% set items = items ?? [] %}
+
+{% set visibleItems = [] %}
+{% for item in items %}
+    {% set showItem = true %}
+
+    {% if item.permission is defined and item.permission and not currentUser.can(item.permission) %}
+        {% set showItem = false %}
+    {% endif %}
+
+    {% if showItem and item.showIf is defined and not item.showIf %}
+        {% set showItem = false %}
+    {% endif %}
+
+    {% if showItem and item.hideIf is defined and item.hideIf %}
+        {% set showItem = false %}
+    {% endif %}
+
+    {% if showItem %}
+        {% set visibleItems = visibleItems|merge([item]) %}
+    {% endif %}
+{% endfor %}
+
+{% if visibleItems|length %}
+    <div class="btngroup">
+        <button type="button" class="btn menubtn secondary" id="{{ buttonId }}" aria-label="{{ buttonLabel }}" aria-controls="{{ menuId }}">
+            <span class="lr-bulk-status-label">{{ buttonLabel }}</span>{% if countId %} (<span id="{{ countId }}">0</span>){% endif %}
+        </button>
+        <div class="menu" id="{{ menuId }}">
+            <ul>
+                {% for item in visibleItems %}
+                    {% if item.type is defined and item.type == 'divider' %}
+                        <li><hr class="padded"></li>
+                    {% else %}
+                        <li>
+                            <a id="{{ item.id ?? '' }}"
+                               {% if item.class is defined and item.class %}class="{{ item.class }}"{% endif %}
+                               {% if item.title is defined and item.title %}title="{{ item.title }}"{% endif %}>
+                                {% include 'lindemannrock-base/_components/status-dot' with {
+                                    status: item.status ?? null,
+                                    value: item.value ?? null,
+                                    colorSet: item.colorSet ?? null,
+                                    color: item.color ?? null,
+                                } only %}
+                                {{ item.label ?? '' }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script data-analytics-reinit>
+    (function() {
+        if (typeof Craft === 'undefined' || !Craft.MenuBtn) return;
+
+        var button = document.getElementById('{{ buttonId|e('js') }}');
+        if (button && !button.menuBtn) {
+            new Craft.MenuBtn(button);
+        }
+    })();
+    </script>
+{% endif %}

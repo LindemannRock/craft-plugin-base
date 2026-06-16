@@ -1,0 +1,93 @@
+{#
+ # Bulk Actions Menu Component
+ #
+ # Renders a Craft-style selected-row actions cog menu for cp-table bulk actions.
+ # The component standardizes the cog button, menu structure, optional count
+ # placeholder, and MenuBtn initialization. Consuming templates still own click
+ # handlers and endpoint payloads via stable item IDs.
+ #
+ # Parameters:
+ # - id: Optional button ID (default: lr-bulk-actions-btn)
+ # - label: Optional accessible label/title (default: Actions)
+ # - countId: Optional count span ID. Renders "Actions (0)" for non-icon labels,
+ #   or appends visually hidden count text for icon-only buttons.
+ # - icon: Optional button icon (default: settings)
+ # - menuId: Optional menu ID.
+ # - items: Array of action items:
+ #   - id: Anchor ID used by plugin JavaScript
+ #   - label: Display text
+ #   - class: Optional anchor class (e.g. error)
+ #   - title: Optional tooltip
+ #   - permission: Optional permission required to show item
+ #   - showIf: Optional boolean condition
+ #   - hideIf: Optional boolean condition
+ #   - type: 'divider' for separator
+ #}
+
+{% set buttonId = id ?? 'lr-bulk-actions-btn' %}
+{% set buttonLabel = label ?? 'Actions'|t('lindemannrock-base') %}
+{% set buttonIcon = icon ?? 'settings' %}
+{% set menuId = menuId ?? buttonId ~ '-menu' %}
+{% set countId = countId ?? null %}
+{% set items = items ?? [] %}
+
+{% set visibleItems = [] %}
+{% for item in items %}
+    {% set showItem = true %}
+
+    {% if item.permission is defined and item.permission and not currentUser.can(item.permission) %}
+        {% set showItem = false %}
+    {% endif %}
+
+    {% if showItem and item.showIf is defined and not item.showIf %}
+        {% set showItem = false %}
+    {% endif %}
+
+    {% if showItem and item.hideIf is defined and item.hideIf %}
+        {% set showItem = false %}
+    {% endif %}
+
+    {% if showItem %}
+        {% set visibleItems = visibleItems|merge([item]) %}
+    {% endif %}
+{% endfor %}
+
+{% if visibleItems|length %}
+    <form>
+        <button type="button" class="btn secondary menubtn" id="{{ buttonId }}" data-icon="{{ buttonIcon }}" title="{{ buttonLabel }}" aria-label="{{ buttonLabel }}" aria-controls="{{ menuId }}">
+            {% if not buttonIcon %}
+                <span class="lr-bulk-actions-label">{{ buttonLabel }}</span>{% if countId %} (<span id="{{ countId }}">0</span>){% endif %}
+            {% elseif countId %}
+                <span class="visually-hidden"> (<span id="{{ countId }}">0</span>)</span>
+            {% endif %}
+        </button>
+        <div class="menu" id="{{ menuId }}">
+            <ul>
+                {% for item in visibleItems %}
+                    {% if item.type is defined and item.type == 'divider' %}
+                        <li><hr class="padded"></li>
+                    {% else %}
+                        <li>
+                            <a id="{{ item.id ?? '' }}"
+                               {% if item.class is defined and item.class %}class="{{ item.class }}"{% endif %}
+                               {% if item.title is defined and item.title %}title="{{ item.title }}"{% endif %}>
+                                {{ item.label ?? '' }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </form>
+
+    <script data-analytics-reinit>
+    (function() {
+        if (typeof Craft === 'undefined' || !Craft.MenuBtn) return;
+
+        var button = document.getElementById('{{ buttonId|e('js') }}');
+        if (button && !button.menuBtn) {
+            new Craft.MenuBtn(button);
+        }
+    })();
+    </script>
+{% endif %}
