@@ -37,13 +37,14 @@
             param: 'status',
             current: statusFilter,
             label: 'Filters'|t('lindemannrock-base'),
+            colorSet: 'status',
             groups: [
                 {
                     // First group - no header, uses filter-level param/current
                     options: [
                         {value: 'all', label: 'All Status'|t('lindemannrock-base'), status: 'all'},
-                        {value: 'enabled', label: 'Enabled'|t('lindemannrock-base'), status: 'green'},
-                        {value: 'disabled', label: 'Disabled'|t('lindemannrock-base'), status: 'disabled'},
+                        {value: 'enabled', label: 'Enabled'|t('lindemannrock-base'), colorKey: 'enabled'},
+                        {value: 'disabled', label: 'Disabled'|t('lindemannrock-base'), colorKey: 'disabled'},
                     ],
                 },
                 {
