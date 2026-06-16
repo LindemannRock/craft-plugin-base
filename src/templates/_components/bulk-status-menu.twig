@@ -56,7 +56,7 @@
 {% if visibleItems|length %}
     <div class="btngroup">
         <button type="button" class="btn menubtn secondary" id="{{ buttonId }}" aria-label="{{ buttonLabel }}" aria-controls="{{ menuId }}">
-            <span class="lr-bulk-status-label">{{ buttonLabel }}</span>{% if countId %} (<span id="{{ countId }}">0</span>){% endif %}
+            <span class="lr-bulk-status-label">{{ buttonLabel }}</span>{% if countId %} &nbsp;(<span id="{{ countId }}" data-lr-selection-count>0</span>){% endif %}
         </button>
         <div class="menu" id="{{ menuId }}">
             <ul>

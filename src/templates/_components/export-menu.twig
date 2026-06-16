@@ -12,7 +12,7 @@
  # - pluginHandle: (optional) Plugin handle for config overrides (e.g., 'sms-manager')
  # - dateRangeParam: (optional) Current date range parameter name (default: 'dateRange')
  # - extraParams: (optional) Additional parameters to pass to export URL
- # - selectionAware: (optional) If true, shows count and passes selected IDs (default: false)
+ # - selectionAware: (optional) If true, shows the shared selection count and passes selected IDs (default: false)
  # - idsParam: (optional) Parameter name for selected IDs (default: 'ids')
  # - id: (optional) Unique ID for this menu instance (auto-generated if not provided)
  #
@@ -63,7 +63,7 @@
 
         <div class="btngroup" id="{{ menuId }}">
             <button type="button" class="btn menubtn" data-icon="download">
-                <span class="lr-export-label">{{ "Export"|t('lindemannrock-base') }}</span>
+                <span class="lr-export-label">{{ "Export"|t('lindemannrock-base') }}</span>{% if selectionAware %} &nbsp;(<span data-lr-selection-count>0</span>){% endif %}
             </button>
             <div class="menu" data-align="right">
                 <ul>
@@ -101,25 +101,18 @@
             };
 
             {% if selectionAware %}
-            var menuEl = document.getElementById('{{ menuId }}');
-            var label = menuEl ? menuEl.querySelector('.lr-export-label') : null;
-            var defaultLabel = '{{ "Export"|t('lindemannrock-base')|e('js') }}';
             var conf = window._lrExportConfigs['{{ menuId }}'];
 
-            function updateExportLabel(ids) {
+            function updateSelectedIds(ids) {
                 conf.selectedIds = ids;
-                if (label) {
-                    var count = ids.length;
-                    label.textContent = count > 0 ? defaultLabel + ' (' + count + ')' : defaultLabel;
-                }
             }
 
             document.addEventListener('lr:selectionChanged', function(e) {
-                updateExportLabel(e.detail.selectedIds || []);
+                updateSelectedIds(e.detail.selectedIds || []);
             });
 
             if (window.lrTableSelection) {
-                updateExportLabel(window.lrTableSelection.getSelectedIds());
+                updateSelectedIds(window.lrTableSelection.getSelectedIds());
             }
             {% endif %}
 

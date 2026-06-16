@@ -623,6 +623,9 @@
                 if (bulkActions) {
                     bulkActions.style.display = selectedIds.size > 0 ? '' : 'none';
                 }
+                document.querySelectorAll('[data-lr-selection-count]').forEach(function(el) {
+                    el.textContent = selectedIds.size;
+                });
                 // Dispatch custom event for plugins to listen to
                 document.dispatchEvent(new CustomEvent('lr:selectionChanged', {
                     detail: { selectedIds: Array.from(selectedIds), count: selectedIds.size }

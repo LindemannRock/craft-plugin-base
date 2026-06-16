@@ -9,8 +9,7 @@
  # Parameters:
  # - id: Optional button ID (default: lr-bulk-actions-btn)
  # - label: Optional accessible label/title (default: Actions)
- # - countId: Optional count span ID. Renders "Actions (0)" for non-icon labels,
- #   or appends visually hidden count text for icon-only buttons.
+ # - countId: Optional count span ID. Renders a visible "(0)" placeholder.
  # - icon: Optional button icon (default: settings)
  # - menuId: Optional menu ID.
  # - items: Array of action items:
@@ -56,9 +55,9 @@
     <form>
         <button type="button" class="btn secondary menubtn" id="{{ buttonId }}" data-icon="{{ buttonIcon }}" title="{{ buttonLabel }}" aria-label="{{ buttonLabel }}" aria-controls="{{ menuId }}">
             {% if not buttonIcon %}
-                <span class="lr-bulk-actions-label">{{ buttonLabel }}</span>{% if countId %} (<span id="{{ countId }}">0</span>){% endif %}
+                <span class="lr-bulk-actions-label">{{ buttonLabel }}</span>{% if countId %} (<span id="{{ countId }}" data-lr-selection-count>0</span>){% endif %}
             {% elseif countId %}
-                <span class="visually-hidden"> (<span id="{{ countId }}">0</span>)</span>
+                (<span id="{{ countId }}" data-lr-selection-count>0</span>)
             {% endif %}
         </button>
         <div class="menu" id="{{ menuId }}">
