@@ -67,30 +67,20 @@ class UrlSafetyHelper
      *
      * Safe means a relative path (starts with `/`) or an `http`/`https` absolute
      * URL. Everything else — `javascript:`, `data:`, `vbscript:`, bare words —
-     * collapses to `$fallback`.
+     * collapses to `$fallback`. Pass $extraSchemes to opt additional schemes
+     * into the allowlist (see {@see isSafeRedirectUrl()}).
      *
      * @param string $url The candidate redirect URL.
      * @param string $fallback Returned when the candidate is not a safe target.
+     * @param string[] $extraSchemes Lowercase scheme names to also treat as safe, without the colon (e.g. ['mailto', 'tel']). @since 5.27.0
      * @return string The original URL when safe, otherwise the fallback.
      * @since 5.26.0
      */
-    public static function sanitizeRedirectUrl(string $url, string $fallback = '/'): string
+    public static function sanitizeRedirectUrl(string $url, string $fallback = '/', array $extraSchemes = []): string
     {
         $url = trim($url);
 
-        // Allow relative URLs — but not protocol-relative (`//host`), which the
-        // browser resolves to an external origin.
-        if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
-            return $url;
-        }
-
-        // Allow http and https absolute URLs.
-        if (preg_match('#^https?://#i', $url)) {
-            return $url;
-        }
-
-        // Reject everything else (javascript:, data:, vbscript:, etc.).
-        return $fallback;
+        return self::isSafeRedirectUrl($url, $extraSchemes) ? $url : $fallback;
     }
 
     /**
@@ -99,11 +89,18 @@ class UrlSafetyHelper
      * Useful when the caller wants to log or branch on a blocked value rather
      * than silently fall back.
      *
+     * Pass $extraSchemes to opt additional schemes into the allowlist (e.g.
+     * ['mailto', 'tel'] for action links). The default is empty, so existing
+     * callers keep the strict relative-or-http(s) contract. Dangerous schemes
+     * are never allowed unless a caller explicitly lists them; pair this with
+     * {@see hasDangerousScheme()} when accepting caller-supplied scheme lists.
+     *
      * @param string $url The candidate redirect URL.
+     * @param string[] $extraSchemes Lowercase scheme names to also treat as safe, without the colon (e.g. ['mailto', 'tel']). @since 5.27.0
      * @return bool
      * @since 5.26.0
      */
-    public static function isSafeRedirectUrl(string $url): bool
+    public static function isSafeRedirectUrl(string $url, array $extraSchemes = []): bool
     {
         $url = trim($url);
 
@@ -111,6 +108,17 @@ class UrlSafetyHelper
             return true;
         }
 
-        return (bool) preg_match('#^https?://#i', $url);
+        if (preg_match('#^https?://#i', $url)) {
+            return true;
+        }
+
+        $lowerUrl = strtolower($url);
+        foreach ($extraSchemes as $scheme) {
+            if (str_starts_with($lowerUrl, strtolower($scheme) . ':')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

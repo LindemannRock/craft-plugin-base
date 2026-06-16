@@ -70,6 +70,30 @@ final class UrlSafetyHelperTest extends IntegrationTestCase
         self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl(''));
     }
 
+    public function testOptInExtraSchemesArePermitted(): void
+    {
+        $schemes = ['mailto', 'tel', 'whatsapp', 'slack', 'msteams'];
+
+        // Opted-in schemes pass for both the bool check and the sanitizer.
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('mailto:x@y.com', $schemes));
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('tel:+15551234567', $schemes));
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('slack://channel', $schemes));
+        self::assertSame('mailto:x@y.com', UrlSafetyHelper::sanitizeRedirectUrl('mailto:x@y.com', '/', $schemes));
+
+        // Scheme matching is case-insensitive.
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('MAILTO:x@y.com', $schemes));
+
+        // relative + http(s) still pass, //host still rejected, even with extra schemes.
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('/relative', $schemes));
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('https://example.com', $schemes));
+        self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('//evil.com', $schemes));
+
+        // A scheme that is not on the opt-in list stays rejected.
+        self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('ftp://example.com', $schemes));
+        // The default (no extra schemes) is unchanged — strict relative-or-http(s).
+        self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('mailto:x@y.com'));
+    }
+
     public function testHasDangerousSchemeFlagsExecutableSchemes(): void
     {
         self::assertTrue(UrlSafetyHelper::hasDangerousScheme('javascript:alert(1)'));
