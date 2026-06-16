@@ -609,6 +609,9 @@
             let selectedIds = new Set();
 
             function toggleCheckbox(checkbox, checked) {
+                if (!checkbox) return;
+
+                checkbox.classList.remove('indeterminate');
                 if (checked) {
                     checkbox.classList.add('checked');
                     checkbox.setAttribute('aria-checked', 'true');
@@ -616,9 +619,31 @@
                     checkbox.classList.remove('checked');
                     checkbox.setAttribute('aria-checked', 'false');
                 }
+
+                checkbox.closest('tr.lr-data-row')?.classList.toggle('sel', checked);
+            }
+
+            function updateSelectAllState() {
+                if (!selectAllCheckbox) return;
+
+                const checkboxes = Array.from(getCheckboxes());
+                const selectedCount = checkboxes.filter(checkbox => checkbox.classList.contains('checked')).length;
+
+                selectAllCheckbox.classList.remove('checked', 'indeterminate');
+                if (checkboxes.length > 0 && selectedCount === checkboxes.length) {
+                    selectAllCheckbox.classList.add('checked');
+                    selectAllCheckbox.setAttribute('aria-checked', 'true');
+                } else if (selectedCount > 0) {
+                    selectAllCheckbox.classList.add('indeterminate');
+                    selectAllCheckbox.setAttribute('aria-checked', 'mixed');
+                } else {
+                    selectAllCheckbox.setAttribute('aria-checked', 'false');
+                }
             }
 
             function updateBulkActions() {
+                updateSelectAllState();
+
                 const bulkActions = document.getElementById('lr-bulk-actions');
                 if (bulkActions) {
                     bulkActions.style.display = selectedIds.size > 0 ? '' : 'none';
