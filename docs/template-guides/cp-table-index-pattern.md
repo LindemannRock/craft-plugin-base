@@ -397,17 +397,9 @@ The base `row-actions` component renders each menu item as `<a data-action="<jsA
     });
 
     // ---------------------------------------------------------------------
-    // Bulk actions: mirror selection count into button labels, then dispatch
-    // via Craft.sendActionRequest.
+    // Bulk actions: base `cp-table` owns `[data-lr-selection-count]` updates;
+    // plugin scripts only dispatch the selected IDs.
     // ---------------------------------------------------------------------
-    document.addEventListener('lr:selectionChanged', function(e) {
-        const ids = (e.detail && Array.isArray(e.detail.selectedIds))
-            ? e.detail.selectedIds
-            : [];
-        document.querySelectorAll('.lr-bulk-count').forEach(function(el) {
-            el.textContent = ids.length;
-        });
-    });
 
     function selectedIds() {
         return window.lrTableSelection ? window.lrTableSelection.getSelectedIds() : [];

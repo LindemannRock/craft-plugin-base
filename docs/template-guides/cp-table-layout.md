@@ -333,9 +333,12 @@ Buttons shown when items are selected via checkboxes.
 
 ```twig
 {% block bulkActions %}
-    <button type="button" class="btn secondary" id="lr-bulk-delete-btn">
-        Delete (<span id="lr-selected-count">0</span>)
-    </button>
+    {% include 'lindemannrock-base/_components/bulk-actions-menu' with {
+        countId: 'bulk-actions-count',
+        items: [
+            {id: 'lr-bulk-delete-btn', label: 'Delete'|t('my-plugin'), class: 'error'},
+        ],
+    } only %}
 {% endblock %}
 ```
 

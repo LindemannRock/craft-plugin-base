@@ -178,15 +178,20 @@
    ============================================================================ #}
 
 {% block bulkActions %}
-    <button type="button" class="btn" id="lr-bulk-enable-btn">
-        {{ 'Enable'|t('lindemannrock-base') }}
-    </button>
-    <button type="button" class="btn" id="lr-bulk-disable-btn">
-        {{ 'Disable'|t('lindemannrock-base') }}
-    </button>
-    <button type="button" class="btn secondary" id="lr-bulk-delete-btn">
-        {{ 'Delete'|t('lindemannrock-base') }} (<span id="lr-selected-count">0</span>)
-    </button>
+    {% include 'lindemannrock-base/_components/bulk-status-menu' with {
+        countId: 'example-bulk-status-count',
+        items: [
+            {id: 'lr-bulk-enable-btn', label: 'Enable'|t('lindemannrock-base'), status: 'enabled'},
+            {id: 'lr-bulk-disable-btn', label: 'Disable'|t('lindemannrock-base'), status: 'disabled'},
+        ],
+    } only %}
+
+    {% include 'lindemannrock-base/_components/bulk-actions-menu' with {
+        countId: 'example-bulk-actions-count',
+        items: [
+            {id: 'lr-bulk-delete-btn', label: 'Delete'|t('lindemannrock-base'), class: 'error'},
+        ],
+    } only %}
 {% endblock %}
 
 
@@ -312,14 +317,6 @@
 
 {% block scripts %}
     <script>
-    // Update selected count
-    document.addEventListener('lr:selectionChanged', function(e) {
-        const countSpan = document.getElementById('lr-selected-count');
-        if (countSpan) {
-            countSpan.textContent = e.detail.count;
-        }
-    });
-
     // Bulk delete handler
     const bulkDeleteBtn = document.getElementById('lr-bulk-delete-btn');
     if (bulkDeleteBtn) {
