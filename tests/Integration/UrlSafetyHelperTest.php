@@ -49,6 +49,18 @@ final class UrlSafetyHelperTest extends IntegrationTestCase
         self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('//evil.com'));
     }
 
+    public function testRejectsHostlessHttpUrls(): void
+    {
+        // A scheme with no host is effectively empty — not a usable target.
+        self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('https://'));
+        self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('http://'));
+        self::assertFalse(UrlSafetyHelper::isSafeRedirectUrl('https:///path'));
+        self::assertSame('/', UrlSafetyHelper::sanitizeRedirectUrl('https://'));
+        // A real host still passes (including IPv6 literals).
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('https://x'));
+        self::assertTrue(UrlSafetyHelper::isSafeRedirectUrl('https://[::1]'));
+    }
+
     public function testHonorsCustomFallback(): void
     {
         self::assertSame('/404', UrlSafetyHelper::sanitizeRedirectUrl('javascript:alert(1)', '/404'));

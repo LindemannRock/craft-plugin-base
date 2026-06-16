@@ -108,7 +108,9 @@ class UrlSafetyHelper
             return true;
         }
 
-        if (preg_match('#^https?://#i', $url)) {
+        // Require a host character after the scheme so a bare `https://` (or
+        // `https:///path`, which has no host) is not treated as a valid target.
+        if (preg_match('#^https?://[^/\s]#i', $url)) {
             return true;
         }
 
