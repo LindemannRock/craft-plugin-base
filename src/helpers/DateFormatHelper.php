@@ -434,6 +434,7 @@ class DateFormatHelper
      * @param bool|null $showSeconds Override settings default (null = use settings)
      * @param bool $isUtc Whether string timestamps are in UTC (true) or already in local time (false)
      * @param bool $includeYear Whether to include year in the date portion
+     * @param string|null $pluginHandle Explicit plugin handle for base/plugin config cascade defaults
      * @return string|null Example: "Jan 23 15:45" or "23 Jan 15:45"
      * @since 5.26.0
      */
@@ -443,17 +444,20 @@ class DateFormatHelper
         ?bool $showSeconds = null,
         bool $isUtc = true,
         bool $includeYear = false,
+        ?string $pluginHandle = null,
     ): ?string {
         $date = self::toCraftTimezone($date, $isUtc);
         if ($date === null) {
             return null;
         }
 
-        $monthFormat = (string) self::settingValue($settings, 'monthFormat', 'numeric');
-        $dateOrder = (string) self::settingValue($settings, 'dateOrder', 'ymd');
-        $dateSeparator = (string) self::settingValue($settings, 'dateSeparator', '/');
-        $timeFormat = (string) self::settingValue($settings, 'timeFormat', '24');
-        $showSeconds ??= (bool) self::settingValue($settings, 'showSeconds', false);
+        $defaults = self::getConfig($pluginHandle);
+
+        $monthFormat = (string) self::settingValue($settings, 'monthFormat', $defaults['monthFormat'] ?? 'numeric');
+        $dateOrder = (string) self::settingValue($settings, 'dateOrder', $defaults['dateOrder'] ?? 'ymd');
+        $dateSeparator = (string) self::settingValue($settings, 'dateSeparator', $defaults['dateSeparator'] ?? '/');
+        $timeFormat = (string) self::settingValue($settings, 'timeFormat', $defaults['timeFormat'] ?? '24');
+        $showSeconds ??= (bool) self::settingValue($settings, 'showSeconds', $defaults['showSeconds'] ?? false);
 
         $datePart = match ($monthFormat) {
             'numeric' => $date->format(match ($dateOrder) {
@@ -469,10 +473,10 @@ class DateFormatHelper
                 default => $includeYear ? 'j M Y' : 'j M',
             }),
             'long' => $date->format(match ($dateOrder) {
-                'dmy' => $includeYear ? 'j F Y' : 'j F',
-                'mdy' => $includeYear ? 'F j, Y' : 'F j',
-                'ymd' => $includeYear ? 'Y F j' : 'F j',
-                default => $includeYear ? 'j F Y' : 'j F',
+                'dmy' => $includeYear ? 'j M Y' : 'j M',
+                'mdy' => $includeYear ? 'M j, Y' : 'M j',
+                'ymd' => $includeYear ? 'Y M j' : 'M j',
+                default => $includeYear ? 'j M Y' : 'j M',
             }),
             default => $date->format(match ($dateOrder) {
                 'dmy' => $includeYear ? "d{$dateSeparator}m{$dateSeparator}Y" : "d{$dateSeparator}m",

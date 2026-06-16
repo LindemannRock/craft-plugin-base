@@ -143,6 +143,27 @@ final class DateFormatHelperTest extends IntegrationTestCase
     }
 
     /**
+     * @since 5.27.0
+     */
+    public function testCompactDatetimeFromSettingsTreatsLongMonthsAsShort(): void
+    {
+        $settings = (object) [
+            'timeFormat' => '24',
+            'dateOrder' => 'dmy',
+            'monthFormat' => 'long',
+            'dateSeparator' => '/',
+            'showSeconds' => false,
+        ];
+
+        $date = new DateTime('2026-06-16 00:00:00', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame(
+            '16 Jun 00:00',
+            DateFormatHelper::formatCompactDatetimeFromSettings($date, $settings, false, false),
+        );
+    }
+
+    /**
      * @since 5.26.0
      */
     public function testCompactDatetimeFromSettingsCanShowNumericDatesAndSeconds(): void
@@ -160,6 +181,41 @@ final class DateFormatHelperTest extends IntegrationTestCase
         self::assertSame(
             '25-05 6:57:14 PM',
             DateFormatHelper::formatCompactDatetimeFromSettings($date, $settings, null, false),
+        );
+    }
+
+    /**
+     * @since 5.27.0
+     */
+    public function testCompactDatetimeFromSettingsFallsBackToPluginCascadeConfig(): void
+    {
+        $this->setDateFormatConfig([
+            'timeFormat' => '24',
+            'dateOrder' => 'dmy',
+            'monthFormat' => 'short',
+            'dateSeparator' => '/',
+            'showSeconds' => true,
+        ], 'test-plugin');
+
+        $settings = (object) [
+            'timeFormat' => null,
+            'dateOrder' => null,
+            'monthFormat' => null,
+            'dateSeparator' => null,
+            'showSeconds' => null,
+        ];
+
+        $date = new DateTime('2026-06-16 00:00:00', new DateTimeZone(Craft::$app->getTimeZone()));
+
+        self::assertSame(
+            '16 Jun 00:00:00',
+            DateFormatHelper::formatCompactDatetimeFromSettings(
+                $date,
+                $settings,
+                null,
+                false,
+                pluginHandle: 'test-plugin',
+            ),
         );
     }
 
