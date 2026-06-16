@@ -69,9 +69,9 @@ class ColorHelper
     public const PALETTE = [
         'teal' => [
             'class' => 'teal',
-            'color' => '#14b8a6',
-            'rgb' => '20, 184, 166',
-            'text' => '#115e59',
+            'color' => '#11a697',
+            'rgb' => '17, 166, 151',
+            'text' => '#134e4a',
         ],
         'cyan' => [
             'class' => 'cyan',
