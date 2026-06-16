@@ -442,15 +442,19 @@
             </div>
         </div>
 
-        {# Right side: bulk actions + footer actions + extra footer grouped together #}
-        <div class="flex flex-nowrap" style="gap: 8px;">
-            {# Bulk actions container (shown when items selected) #}
-            {% if checkboxesEnabled %}
-                <div id="lr-bulk-actions" class="flex" style="display: none; gap: 8px;">
-                    {% block bulkActions %}{% endblock %}
-                </div>
-            {% endif %}
+        <div class="flex-grow"></div>
 
+        {# Selected-row actions (shown when items are selected) #}
+        {% if checkboxesEnabled %}
+            <div id="lr-bulk-actions" class="flex" style="display: none; gap: 8px;">
+                {% block bulkActions %}{% endblock %}
+            </div>
+        {% endif %}
+
+        <div class="flex-grow"></div>
+
+        {# Persistent footer actions #}
+        <div class="flex flex-nowrap" style="gap: 8px;">
             {# Footer actions #}
             {% if footerActions|length %}
                 {% for action in footerActions %}
