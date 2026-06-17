@@ -14,6 +14,7 @@ use Craft;
 use craft\db\Query;
 use craft\queue\BaseJob;
 use lindemannrock\base\helpers\RecurringQueueHelper;
+use lindemannrock\base\helpers\RecurringQueueResult;
 use lindemannrock\base\testing\IntegrationTestCase;
 
 /**
@@ -37,24 +38,31 @@ final class RecurringQueueHelperTest extends IntegrationTestCase
 
     public function testEnsurePendingKeepsOnePendingRowForRepeatedBootstrapCalls(): void
     {
-        $firstId = RecurringQueueHelper::ensurePending(
+        $firstResult = RecurringQueueHelper::ensurePending(
             pluginToken: 'lindemannrockbase',
             jobClass: RecurringQueueTestJob::class,
             delay: 300,
             jobFactory: fn() => new RecurringQueueTestJob(),
         );
 
-        self::assertNotNull($firstId);
+        self::assertSame(RecurringQueueResult::STATUS_CREATED, $firstResult->status);
+        self::assertTrue($firstResult->wasCreated());
+        self::assertNotNull($firstResult->jobId);
+        self::assertSame(0, $firstResult->duplicatesDeleted);
         self::assertSame(1, $this->countTestQueueRows());
 
-        $secondId = RecurringQueueHelper::ensurePending(
+        $secondResult = RecurringQueueHelper::ensurePending(
             pluginToken: 'lindemannrockbase',
             jobClass: RecurringQueueTestJob::class,
             delay: 300,
             jobFactory: fn() => new RecurringQueueTestJob(),
         );
 
-        self::assertSame($firstId, $secondId);
+        self::assertSame(RecurringQueueResult::STATUS_EXISTING, $secondResult->status);
+        self::assertFalse($secondResult->wasCreated());
+        self::assertTrue($secondResult->hasPending());
+        self::assertSame($firstResult->jobId, $secondResult->jobId);
+        self::assertSame(0, $secondResult->duplicatesDeleted);
         self::assertSame(1, $this->countTestQueueRows());
     }
 
@@ -64,16 +72,18 @@ final class RecurringQueueHelperTest extends IntegrationTestCase
         Craft::$app->getQueue()->delay(300)->push(new RecurringQueueTestJob());
         self::assertSame(2, $this->countTestQueueRows());
 
-        $keptId = RecurringQueueHelper::ensurePending(
+        $result = RecurringQueueHelper::ensurePending(
             pluginToken: 'lindemannrockbase',
             jobClass: RecurringQueueTestJob::class,
             delay: 300,
             jobFactory: fn() => new RecurringQueueTestJob(),
         );
 
-        self::assertNotNull($keptId);
+        self::assertSame(RecurringQueueResult::STATUS_EXISTING, $result->status);
+        self::assertNotNull($result->jobId);
+        self::assertSame(1, $result->duplicatesDeleted);
         self::assertSame(1, $this->countTestQueueRows());
-        self::assertSame((string) $keptId, (string) $this->fetchOnlyTestQueueId());
+        self::assertSame((string) $result->jobId, (string) $this->fetchOnlyTestQueueId());
     }
 
     public function testEnsurePendingIgnoresFailedRowsAndQueuesFreshPendingRow(): void
@@ -86,16 +96,34 @@ final class RecurringQueueHelperTest extends IntegrationTestCase
         self::assertSame(1, $this->countTestQueueRows());
         self::assertSame(0, $this->countPendingTestQueueRows());
 
-        $queuedId = RecurringQueueHelper::ensurePending(
+        $result = RecurringQueueHelper::ensurePending(
             pluginToken: 'lindemannrockbase',
             jobClass: RecurringQueueTestJob::class,
             delay: 300,
             jobFactory: fn() => new RecurringQueueTestJob(),
         );
 
-        self::assertNotNull($queuedId);
+        self::assertSame(RecurringQueueResult::STATUS_CREATED, $result->status);
+        self::assertNotNull($result->jobId);
+        self::assertSame(0, $result->duplicatesDeleted);
         self::assertSame(2, $this->countTestQueueRows());
         self::assertSame(1, $this->countPendingTestQueueRows());
+    }
+
+    public function testEnsurePendingSkipsNonPositiveDelay(): void
+    {
+        $result = RecurringQueueHelper::ensurePending(
+            pluginToken: 'lindemannrockbase',
+            jobClass: RecurringQueueTestJob::class,
+            delay: 0,
+            jobFactory: fn() => new RecurringQueueTestJob(),
+        );
+
+        self::assertSame(RecurringQueueResult::STATUS_SKIPPED, $result->status);
+        self::assertTrue($result->wasSkipped());
+        self::assertFalse($result->hasPending());
+        self::assertNull($result->jobId);
+        self::assertSame(0, $this->countTestQueueRows());
     }
 
     public function testDeletePendingRemovesOnlyPendingRows(): void

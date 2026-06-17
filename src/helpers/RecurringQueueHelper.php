@@ -33,7 +33,7 @@ class RecurringQueueHelper
      * @param string[] $extraLikeTokens Additional serialized-payload tokens that identify the recurring row
      * @param string|null $mutexName Optional explicit mutex name
      * @param int $mutexTimeout Seconds to wait for the scheduler lock
-     * @return string|null Existing or newly queued job ID; null when skipped
+     * @return RecurringQueueResult Queue ownership result
      */
     public static function ensurePending(
         string $pluginToken,
@@ -43,16 +43,16 @@ class RecurringQueueHelper
         array $extraLikeTokens = [],
         ?string $mutexName = null,
         int $mutexTimeout = 5,
-    ): ?string {
+    ): RecurringQueueResult {
         if ($delay <= 0) {
-            return null;
+            return new RecurringQueueResult(RecurringQueueResult::STATUS_SKIPPED);
         }
 
         $lockName = $mutexName ?? self::mutexName($pluginToken, $jobClass, $extraLikeTokens);
         $mutex = Craft::$app->getMutex();
 
         if (!$mutex->acquire($lockName, $mutexTimeout)) {
-            return null;
+            return new RecurringQueueResult(RecurringQueueResult::STATUS_LOCK_MISSED);
         }
 
         try {
@@ -60,9 +60,13 @@ class RecurringQueueHelper
 
             if ($rows !== []) {
                 $keptId = (string) $rows[0]['id'];
-                self::deleteRowsAfterFirst($rows);
+                $duplicatesDeleted = self::deleteRowsAfterFirst($rows);
 
-                return $keptId;
+                return new RecurringQueueResult(
+                    RecurringQueueResult::STATUS_EXISTING,
+                    $keptId,
+                    $duplicatesDeleted,
+                );
             }
 
             $job = $jobFactory();
@@ -70,7 +74,10 @@ class RecurringQueueHelper
                 throw new \InvalidArgumentException('Recurring queue job factory must return a Craft BaseJob instance.');
             }
 
-            return Craft::$app->getQueue()->delay($delay)->push($job);
+            return new RecurringQueueResult(
+                RecurringQueueResult::STATUS_CREATED,
+                Craft::$app->getQueue()->delay($delay)->push($job),
+            );
         } finally {
             $mutex->release($lockName);
         }
