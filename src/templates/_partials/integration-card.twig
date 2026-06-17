@@ -20,6 +20,7 @@
  # - toggleOn: lightswitch initial state (bool)
  # - toggleDisabled: lightswitch disabled (bool)
  # - bodyId: id for the body element (so consumer JS can target it)
+ # - hasBody: whether to render the body wrapper (bool, defaults to true)
  # - bodyVisible: whether the body starts visible (bool, defaults to toggleOn)
  #
  # Blocks:
@@ -55,6 +56,7 @@
 {% set available = available ?? false %}
 {% set installed = installed ?? false %}
 {% set statusLabels = statusLabels ?? {} %}
+{% set hasBody = hasBody ?? true %}
 {% set bodyVisible = bodyVisible ?? (toggleOn ?? false) %}
 
 <div class="lr-integration-card">
@@ -102,7 +104,7 @@
         </div>
     </div>
 
-    {% if available %}
+    {% if available and hasBody %}
         <div id="{{ bodyId }}" class="lr-integration-card__body {{ not bodyVisible ? 'hidden' }}">
             {% block body %}{% endblock %}
         </div>
