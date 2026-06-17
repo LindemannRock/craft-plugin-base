@@ -19,6 +19,7 @@ Utility classes for common operations:
 - **Shared install experience** — One-time CP install modal with version metadata, branding, and preset-driven confetti
 - **[BooleanHelper](boolean-helper.md)** — Normalize boolean-like config, env, POST, and HTML attribute values
 - **[DbHelper](db-helper.md)** — DB-agnostic JSON extraction and GROUP_CONCAT
+- **[GqlHelper](gql-helper.md)** — GraphQL schema permission checks plus shared `site` / `siteId` argument resolution
 - **[ConfigFileHelper](config-file-helper.md)** — Read handle-keyed sections from plugin config files and merge config-defined records with database-defined records
 - **[CsvImportHelper](csv-import-helper.md)** — CSV file upload parsing with automatic delimiter detection
 - **[CpNavHelper](cp-nav-helper.md)** — CP navigation building for plugin sub-pages

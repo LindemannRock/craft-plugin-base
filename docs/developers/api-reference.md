@@ -188,6 +188,18 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 |--------|---------|-------------|
 | `htmlSafeJson(mixed $value)` | `string` | JSON-encode a value using HTML-safe flags for inline script/template output |
 
+### GqlHelper
+
+`lindemannrock\base\helpers\GqlHelper`
+[Full docs](../feature-tour/gql-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `canQuery(string $component, ?GqlSchema $schema = null)` | `bool` | Check whether the active schema includes a plugin-owned read scope, such as `redirectManager.all:read` |
+| `resolveSiteId(array $arguments, ?int $fallbackSiteId = null)` | `int\|null` | Resolve Craft-style GraphQL `site` / `siteId` arguments to a concrete site ID |
+| `siteHandle(?int $siteId)` | `string\|null` | Resolve a site ID into a handle for virtual GraphQL `site` fields |
+| `nullIfEmptyString(mixed $value)` | `mixed` | Return `null` for empty strings while preserving `0`, `'0'`, `false`, arrays, and other values |
+
 ### SettingsPostHelper
 
 `lindemannrock\base\helpers\SettingsPostHelper`

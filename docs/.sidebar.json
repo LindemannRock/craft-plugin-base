@@ -35,6 +35,7 @@
             "feature-tour/queue-ttr",
             "feature-tour/boolean-helper",
             "feature-tour/db-helper",
+            "feature-tour/gql-helper",
             "feature-tour/csv-import-helper",
             "feature-tour/cp-nav-helper",
             "feature-tour/console-help",
