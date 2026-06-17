@@ -42,7 +42,7 @@ private function scheduleMyJob(): void
 
     $delay = $next->getTimestamp() - DateFormatHelper::now()->getTimestamp();
 
-    RecurringQueueHelper::ensurePending(
+    $result = RecurringQueueHelper::ensurePending(
         pluginToken: 'myplugin',
         jobClass: MyScheduledJob::class,
         delay: $delay,
@@ -57,12 +57,30 @@ private function scheduleMyJob(): void
             ),
         ]),
     );
+
+    if ($result->wasCreated()) {
+        // Optional: record that this request created the pending row.
+    }
 }
 ```
 
 `pluginToken` is a stable string found in the serialized queue payload. For LindemannRock plugins this is usually the namespace handle without punctuation, such as `searchmanager`, `redirectmanager`, or `formieratingfield`.
 
 The queue description timestamp is serialized when Craft queues the row. If date/time display settings change later, existing delayed rows keep their old label until they run or are requeued. New rows use the current effective settings. Queue labels stay compact: `numeric` months render numerically, while `short` and `long` month settings both render as short month names.
+
+## Result Object
+
+`ensurePending()` returns a `RecurringQueueResult` so callers can distinguish a newly queued row from an existing healthy row:
+
+| Property / method | Description |
+|-------------------|-------------|
+| `$result->status` | One of `created`, `existing`, `skipped`, or `lock-missed`. |
+| `$result->jobId` | Existing or newly queued job ID, or `null` when no pending row was ensured. |
+| `$result->duplicatesDeleted` | Number of duplicate pending rows collapsed after keeping the earliest row. |
+| `$result->wasCreated()` | `true` only when this call pushed a new queue row. |
+| `$result->hasPending()` | `true` when the result has an existing or newly queued pending row. |
+
+Use `wasCreated()` for INFO-level operational logs. Routine bootstrap calls that find an existing row should usually stay quiet.
 
 ## Extra Identity Tokens
 
@@ -141,7 +159,7 @@ private function scheduleNextRun(): void
 
 | Method | Purpose |
 |---|---|
-| `ensurePending(string $pluginToken, string $jobClass, int $delay, callable $jobFactory, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | Atomically ensure one pending recurring row exists. Returns the existing or new job ID, or `null` when skipped. |
+| `ensurePending(string $pluginToken, string $jobClass, int $delay, callable $jobFactory, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | Atomically ensure one pending recurring row exists. Returns `RecurringQueueResult` with status, job ID, and duplicate-collapse metadata. |
 | `deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | Delete pending rows for a recurring job identity. |
 | `hasPending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | Check whether a pending row exists for a recurring job identity. |
 

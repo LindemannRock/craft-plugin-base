@@ -467,9 +467,19 @@ Extend this controller in a plugin's console namespace to expose `plugin-handle/
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `ensurePending(string $pluginToken, string $jobClass, int $delay, callable $jobFactory, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | `?string` | Atomically ensure one pending recurring row exists, collapsing duplicates. |
+| `ensurePending(string $pluginToken, string $jobClass, int $delay, callable $jobFactory, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | `RecurringQueueResult` | Atomically ensure one pending recurring row exists, returning `created`, `existing`, `skipped`, or `lock-missed` status plus duplicate-collapse metadata. |
 | `deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | `int` | Delete pending rows for a recurring job identity. |
 | `hasPending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | `bool` | Check whether a pending row exists for a recurring job identity. |
+
+### RecurringQueueResult
+
+| Property / Method | Returns | Description |
+|-------------------|---------|-------------|
+| `$status` | `string` | One of `created`, `existing`, `skipped`, or `lock-missed`. |
+| `$jobId` | `string|null` | Existing or newly queued job ID. |
+| `$duplicatesDeleted` | `int` | Number of duplicate pending rows removed. |
+| `wasCreated()` | `bool` | Whether this call pushed a new queue row. |
+| `hasPending()` | `bool` | Whether the result has an existing or newly queued pending row. |
 
 ### GeoLookupTrait
 
