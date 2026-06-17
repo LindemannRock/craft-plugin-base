@@ -191,6 +191,25 @@ footerActions: [
 
 When row checkboxes are enabled, auto-refresh pauses while one or more rows are selected so bulk-action state is not replaced underneath the user. Refresh resumes after the selection is cleared.
 
+AJAX endpoints may return metadata for the layout to keep the footer in sync:
+
+```json
+{
+  "success": true,
+  "pagination": {
+    "page": 1,
+    "limit": 100,
+    "totalCount": 0,
+    "totalPages": 1
+  },
+  "refresh": {
+    "enabled": false
+  }
+}
+```
+
+`pagination` updates the footer count and previous/next button state. `refresh.enabled: false` stops the polling timers and hides the refresh notice. Endpoints that only return `totalCount` still update the footer count as a compatibility fallback.
+
 ### sidebarMenu
 
 Optional left sidebar navigation.

@@ -257,6 +257,10 @@ All events are dispatched on `document`.
 
 CP table auto-refresh pauses while `lrTableSelection.getCount()` is greater than zero and resumes when selection is cleared.
 
+When an AJAX response includes `pagination`, the layout updates the footer count and previous/next button state before dispatching `lr:refresh`. When an AJAX response includes `refresh.enabled: false`, the layout stops polling and hides the refresh notice.
+
+AJAX row renderers that insert Craft menu buttons can call `window.lrInitMenuButtons(container)` after replacing markup. The helper requires a container and only initializes `.menubtn` elements inside that container; the table layout also calls it for `#lr-table-body` on the next animation frame after `lr:refresh`.
+
 ```javascript
 document.addEventListener('lr:selectionChanged', function(e) {
     document.getElementById('bulk-count').textContent = e.detail.count;
