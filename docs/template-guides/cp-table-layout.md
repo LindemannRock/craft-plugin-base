@@ -189,6 +189,8 @@ footerActions: [
 | `interval` | `int` | Refresh interval in seconds |
 | `endpoint` | `string` | Controller action URL |
 
+When row checkboxes are enabled, auto-refresh pauses while one or more rows are selected so bulk-action state is not replaced underneath the user. Refresh resumes after the selection is cleared.
+
 ### sidebarMenu
 
 Optional left sidebar navigation.
@@ -372,7 +374,7 @@ Additional JavaScript.
 
 ## JavaScript API
 
-The table layout exposes several globals for plugin scripts: `lrTableSelection` (selection management), `lrBuildUrl` (URL building), `lrTableConfig` (config), and `lrViewSettings` (column visibility). It also fires `lr:selectionChanged` and `lr:refresh` events.
+The table layout exposes several globals for plugin scripts: `lrTableSelection` (selection management), `lrBuildUrl` (URL building), `lrTableConfig` (config), and `lrViewSettings` (column visibility). It also fires `lr:selectionChanged` and `lr:refresh` events. AJAX refresh pauses automatically while `lrTableSelection.getCount()` is greater than zero.
 
 See [JavaScript API](../developers/javascript-api.md#table-selection-api) for the full reference.
 

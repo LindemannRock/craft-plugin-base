@@ -111,6 +111,7 @@ return [
     'of' => 'من',
     'Auto-refresh' => 'تحديث تلقائي',
     'Refreshing' => 'جار التحديث',
+    'Paused' => 'متوقف مؤقتاً',
 
     // Import + backups
     'Import from CSV' => 'استيراد من CSV',

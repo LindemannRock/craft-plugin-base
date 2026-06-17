@@ -111,6 +111,7 @@ return [
     'of' => 'van',
     'Auto-refresh' => 'Automatisch vernieuwen',
     'Refreshing' => 'Vernieuwen',
+    'Paused' => 'Gepauzeerd',
 
     // Import + backups
     'Import from CSV' => 'Importeren uit CSV',

@@ -111,6 +111,7 @@ return [
     'of' => 'af',
     'Auto-refresh' => 'Automatisk opdatering',
     'Refreshing' => 'Opdaterer',
+    'Paused' => 'Sat på pause',
 
     // Import + backups
     'Import from CSV' => 'Importer fra CSV',

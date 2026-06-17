@@ -111,6 +111,7 @@ return [
     'of' => 'of',
     'Auto-refresh' => 'Auto-refresh',
     'Refreshing' => 'Refreshing',
+    'Paused' => 'Paused',
 
     // Import + backups
     'Import from CSV' => 'Import from CSV',

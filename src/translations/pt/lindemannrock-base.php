@@ -111,6 +111,7 @@ return [
     'of' => 'de',
     'Auto-refresh' => 'Atualização automática',
     'Refreshing' => 'A atualizar',
+    'Paused' => 'Em pausa',
 
     // Import + backups
     'Import from CSV' => 'Importar de CSV',

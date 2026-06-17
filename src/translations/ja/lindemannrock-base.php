@@ -111,6 +111,7 @@ return [
     'of' => '/',
     'Auto-refresh' => '自動更新',
     'Refreshing' => '更新中',
+    'Paused' => '一時停止中',
 
     // Import + backups
     'Import from CSV' => 'CSV からインポートする',

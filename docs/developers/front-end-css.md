@@ -252,6 +252,7 @@ Display config file contents on hover.
 |-------|-------------|
 | `.lr-refresh-notice` | Inline notice with countdown |
 | `.lr-refresh-notice.is-refreshing` | Animated spinner state |
+| `.lr-refresh-notice.is-paused` | Refresh is paused because rows are selected |
 
 ## Utility Classes
 

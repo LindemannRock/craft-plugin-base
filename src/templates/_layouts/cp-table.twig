@@ -660,28 +660,24 @@
             // Function to get current selectable checkboxes (re-queries DOM each time)
             // Excludes disabled checkboxes (config items that can't be edited)
             function getCheckboxes() {
-                return document.querySelectorAll('#lr-table-body .lr-data-row[data-selectable="true"] .checkbox:not(.disabled)');
+                return document.querySelectorAll('#lr-table-body .lr-data-row:not([data-selectable="false"]) .checkbox:not(.disabled)');
             }
 
-            // Function to bind checkbox click listeners
-            function bindCheckboxListeners() {
-                getCheckboxes().forEach(checkbox => {
-                    if (checkbox._lrBound) return; // Already bound
-                    checkbox._lrBound = true;
-                    checkbox.addEventListener('click', function(e) {
-                        e.stopPropagation(); // Don't trigger row click
-                        if (this.classList.contains('disabled')) return; // Skip disabled checkboxes
-                        const isChecked = !this.classList.contains('checked');
-                        toggleCheckbox(this, isChecked);
-                        const id = this.closest('tr').dataset.id;
-                        if (isChecked) {
-                            selectedIds.add(id);
-                        } else {
-                            selectedIds.delete(id);
-                        }
-                        updateBulkActions();
-                    });
-                });
+            function handleCheckboxClick(checkbox) {
+                if (checkbox.classList.contains('disabled')) return;
+
+                const row = checkbox.closest('tr.lr-data-row');
+                if (!row || row.dataset.selectable === 'false') return;
+
+                const isChecked = !checkbox.classList.contains('checked');
+                toggleCheckbox(checkbox, isChecked);
+                const id = row.dataset.id;
+                if (isChecked) {
+                    selectedIds.add(id);
+                } else {
+                    selectedIds.delete(id);
+                }
+                updateBulkActions();
             }
 
             if (selectAllCheckbox) {
@@ -702,16 +698,19 @@
                 });
             }
 
-            // Initial binding
-            bindCheckboxListeners();
+            document.getElementById('lr-table-body')?.addEventListener('click', function(e) {
+                const checkbox = e.target.closest('.lr-data-row .checkbox');
+                if (!checkbox || !this.contains(checkbox)) return;
+
+                e.stopPropagation(); // Don't trigger row click
+                handleCheckboxClick(checkbox);
+            });
 
             // Re-bind after AJAX refresh
             document.addEventListener('lr:refresh', function() {
                 // Clear selection after refresh (rows may have changed)
                 selectedIds.clear();
                 toggleCheckbox(selectAllCheckbox, false);
-                // Bind listeners to new checkboxes after a short delay (let DOM update)
-                setTimeout(bindCheckboxListeners, 50);
                 updateBulkActions();
             });
 
@@ -724,7 +723,7 @@
                     document.querySelectorAll('.checkbox.checked').forEach(cb => toggleCheckbox(cb, false));
                     updateBulkActions();
                 },
-                rebindCheckboxes: bindCheckboxListeners
+                rebindCheckboxes: updateBulkActions
             };
         }
 
@@ -762,19 +761,34 @@
                 return seconds + 's';
             }
 
+            function isRefreshPaused() {
+                return window.lrTableSelection?.getCount?.() > 0;
+            }
+
             function updateNotice() {
                 if (!noticeEl || !textEl) return;
-                if (isRefreshing) {
+                if (isRefreshPaused()) {
+                    noticeEl.classList.remove('is-refreshing');
+                    noticeEl.classList.add('is-paused');
+                    textEl.textContent = '{{ "Paused"|t("lindemannrock-base") }}';
+                } else if (isRefreshing) {
                     noticeEl.classList.add('is-refreshing');
+                    noticeEl.classList.remove('is-paused');
                     textEl.textContent = '{{ "Refreshing"|t("lindemannrock-base") }}';
                 } else {
-                    noticeEl.classList.remove('is-refreshing');
+                    noticeEl.classList.remove('is-refreshing', 'is-paused');
                     textEl.textContent = formatTime(countdown);
                 }
             }
 
             async function refresh() {
                 if (isRefreshing) return;
+                if (isRefreshPaused()) {
+                    countdown = config.ajaxInterval;
+                    updateNotice();
+                    return;
+                }
+
                 isRefreshing = true;
                 updateNotice();
 
@@ -812,6 +826,7 @@
 
             // Start auto-refresh
             updateNotice();
+            document.addEventListener('lr:selectionChanged', updateNotice);
             refreshTimer = setInterval(refresh, config.ajaxInterval * 1000);
             countdownTimer = setInterval(tickCountdown, 1000);
         }

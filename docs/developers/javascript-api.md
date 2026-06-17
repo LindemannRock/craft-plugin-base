@@ -255,6 +255,8 @@ All events are dispatched on `document`.
 | `lr:selectionChanged` | `{ selectedIds, count }` | Row checkbox selection changes |
 | `lr:refresh` | AJAX response data | Auto-refresh completes |
 
+CP table auto-refresh pauses while `lrTableSelection.getCount()` is greater than zero and resumes when selection is cleared.
+
 ```javascript
 document.addEventListener('lr:selectionChanged', function(e) {
     document.getElementById('bulk-count').textContent = e.detail.count;
