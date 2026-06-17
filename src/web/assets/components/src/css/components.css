@@ -1879,8 +1879,27 @@ a.lr-dashboard-widget-list__primary:hover {
 }
 
 .lr-dashboard-widget-list__value {
-	text-align: left;
+	text-align: end;
 	white-space: nowrap;
+}
+
+.lr-dashboard-widget-list__detail-row td {
+	padding-top: 0;
+}
+
+.lr-dashboard-widget-list__detail {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	color: #6b7280;
+	font-size: 11px;
+	line-height: 1.4;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.lr-dashboard-widget-list__detail-message {
+	white-space: normal;
 }
 
 .lr-dashboard-widget-badge {

@@ -9,7 +9,8 @@
  # - rows: Array of row objects:
  #   {
  #     primary, primaryHtml, primaryUrl, primaryTitle, primaryVariant,
- #     meta, metaHtml, value, valueHtml, valueTitle, badgeVariant
+ #     meta, metaHtml, value, valueHtml, valueTitle, badgeVariant,
+ #     detail, detailHtml
  #   }
  # - empty: Optional object: {title, message, type}
  # - footer: Optional object: {url, label}
@@ -32,7 +33,7 @@
             <thead>
                 <tr>
                     <th>{{ primaryHeader ?? '' }}</th>
-                    <th>{{ valueHeader ?? '' }}</th>
+                    <th class="lr-dashboard-widget-list__value">{{ valueHeader ?? '' }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,6 +72,19 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% if row.detailHtml is defined and row.detailHtml %}
+                        <tr class="lr-dashboard-widget-list__detail-row">
+                            <td colspan="2">
+                                <div class="lr-dashboard-widget-list__detail">{{ row.detailHtml|raw }}</div>
+                            </td>
+                        </tr>
+                    {% elseif row.detail is defined and row.detail %}
+                        <tr class="lr-dashboard-widget-list__detail-row">
+                            <td colspan="2">
+                                <div class="lr-dashboard-widget-list__detail">{{ row.detail }}</div>
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>
