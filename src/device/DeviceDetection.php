@@ -9,6 +9,7 @@
 namespace lindemannrock\base\device;
 
 use Craft;
+use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
 use lindemannrock\base\helpers\PluginHelper;
 
@@ -46,6 +47,18 @@ class DeviceDetection
         'NZ' => 'en',
         'IE' => 'en',
     ];
+
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private const DEFAULT_SYSTEM_AGENTS = [
+        'CacheManager/1.0' => [
+            'name' => 'Cache Manager',
+            'category' => 'Service Agent',
+            'producerName' => 'LindemannRock',
+        ],
+    ];
+
     private array $config;
     private ?DeviceDetector $detector = null;
 
@@ -65,17 +78,15 @@ class DeviceDetection
     {
         $config = array_replace($this->config, $overrideConfig);
         $userAgent = $userAgent ?? Craft::$app->getRequest()->getUserAgent() ?? '';
+        $clientHints = $this->buildClientHints($config);
+        $clientHintsData = $this->normalizeClientHints($clientHints);
 
         if (!empty($config['cacheEnabled']) && $userAgent) {
-            $cached = $this->getCachedDeviceInfo($userAgent, $config);
+            $cached = $this->getCachedDeviceInfo($userAgent, $config, $clientHintsData);
             if ($cached !== null) {
                 return $cached;
             }
         }
-
-        $detector = $this->getDetector();
-        $detector->setUserAgent($userAgent);
-        $detector->parse();
 
         $deviceInfo = [
             'userAgent' => $userAgent,
@@ -91,23 +102,70 @@ class DeviceDetection
             'isRobot' => false,
             'isMobileApp' => false,
             'botName' => null,
+            'botCategory' => null,
+            'botUrl' => null,
+            'botProducerName' => null,
+            'botProducerUrl' => null,
+            'isSystemAgent' => false,
+            'trafficType' => 'human',
             'isMobile' => null,
             'isTablet' => null,
             'isDesktop' => null,
             'platform' => null,
             'vendor' => null,
             'language' => null,
+            'clientHints' => $clientHintsData,
+            'clientHintsUsed' => $clientHints !== null,
+            'architecture' => $clientHintsData['architecture'] ?? null,
+            'bitness' => $clientHintsData['bitness'] ?? null,
+            'formFactors' => $clientHintsData['formFactors'] ?? [],
+            'appId' => $clientHintsData['app'] ?? null,
         ];
+
+        $systemAgent = $this->matchSystemAgent($userAgent, $config);
+        if ($systemAgent !== null) {
+            $deviceInfo['isRobot'] = true;
+            $deviceInfo['isSystemAgent'] = true;
+            $deviceInfo['trafficType'] = 'system';
+            $deviceInfo['botName'] = $systemAgent['name'] ?? null;
+            $deviceInfo['botCategory'] = $systemAgent['category'] ?? null;
+            $deviceInfo['botUrl'] = $systemAgent['url'] ?? null;
+            $deviceInfo['botProducerName'] = $systemAgent['producerName'] ?? null;
+            $deviceInfo['botProducerUrl'] = $systemAgent['producerUrl'] ?? null;
+            if (!empty($config['includePlatform'])) {
+                $deviceInfo['platform'] = 'system';
+                $deviceInfo['vendor'] = $systemAgent['producerName'] ?? null;
+            }
+            if (!empty($config['cacheEnabled']) && $userAgent) {
+                $this->cacheDeviceInfo($userAgent, $deviceInfo, $config, $clientHintsData);
+            }
+            return $deviceInfo;
+        }
+
+        $detector = $this->getDetector();
+        $detector->setUserAgent($userAgent);
+        $detector->setClientHints($clientHints);
+        $detector->parse();
 
         if ($detector->isBot()) {
             $deviceInfo['isRobot'] = true;
+            $deviceInfo['trafficType'] = 'bot';
             $botInfo = $detector->getBot();
-            $deviceInfo['botName'] = $botInfo['name'] ?? null;
+            if (is_array($botInfo)) {
+                $deviceInfo['botName'] = $botInfo['name'] ?? null;
+                $deviceInfo['botCategory'] = $botInfo['category'] ?? null;
+                $deviceInfo['botUrl'] = $botInfo['url'] ?? null;
+                $producer = $botInfo['producer'] ?? null;
+                if (is_array($producer)) {
+                    $deviceInfo['botProducerName'] = $producer['name'] ?? null;
+                    $deviceInfo['botProducerUrl'] = $producer['url'] ?? null;
+                }
+            }
             if (!empty($config['includePlatform'])) {
                 $deviceInfo['platform'] = 'other';
             }
             if (!empty($config['cacheEnabled']) && $userAgent) {
-                $this->cacheDeviceInfo($userAgent, $deviceInfo, $config);
+                $this->cacheDeviceInfo($userAgent, $deviceInfo, $config, $clientHintsData);
             }
             return $deviceInfo;
         }
@@ -151,7 +209,7 @@ class DeviceDetection
         }
 
         if (!empty($config['cacheEnabled']) && $userAgent) {
-            $this->cacheDeviceInfo($userAgent, $deviceInfo, $config);
+            $this->cacheDeviceInfo($userAgent, $deviceInfo, $config, $clientHintsData);
         }
 
         return $deviceInfo;
@@ -360,9 +418,9 @@ class DeviceDetection
     /**
      * @return array<string, mixed>|null
      */
-    private function getCachedDeviceInfo(string $userAgent, array $config): ?array
+    private function getCachedDeviceInfo(string $userAgent, array $config, array $clientHintsData = []): ?array
     {
-        $cacheKey = $this->getCacheKey($userAgent, $config);
+        $cacheKey = $this->getCacheKey($userAgent, $config, $clientHintsData);
         $cacheStorage = $config['cacheStorageMethod'] ?? 'file';
 
         if ($cacheStorage === 'redis') {
@@ -378,7 +436,7 @@ class DeviceDetection
             return null;
         }
 
-        $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($userAgent) . '.cache';
+        $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($this->getCacheIdentity($userAgent, $clientHintsData)) . '.cache';
         if (!file_exists($cacheFile)) {
             return null;
         }
@@ -402,9 +460,9 @@ class DeviceDetection
         return $decoded;
     }
 
-    private function cacheDeviceInfo(string $userAgent, array $data, array $config): void
+    private function cacheDeviceInfo(string $userAgent, array $data, array $config, array $clientHintsData = []): void
     {
-        $cacheKey = $this->getCacheKey($userAgent, $config);
+        $cacheKey = $this->getCacheKey($userAgent, $config, $clientHintsData);
         $cacheStorage = $config['cacheStorageMethod'] ?? 'file';
         $duration = (int)($config['cacheDuration'] ?? 0);
 
@@ -431,7 +489,7 @@ class DeviceDetection
                 \craft\helpers\FileHelper::createDirectory($cachePath);
             }
 
-            $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($userAgent) . '.cache';
+            $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($this->getCacheIdentity($userAgent, $clientHintsData)) . '.cache';
             file_put_contents($cacheFile, json_encode($data), LOCK_EX);
         } catch (\Throwable $e) {
             $this->logError('Failed to cache device info', $config, [
@@ -440,10 +498,165 @@ class DeviceDetection
         }
     }
 
-    private function getCacheKey(string $userAgent, array $config): string
+    private function getCacheKey(string $userAgent, array $config, array $clientHintsData = []): string
     {
         $prefix = $config['cacheKeyPrefix'] ?? 'device:';
-        return $prefix . md5($userAgent);
+        return $prefix . md5($this->getCacheIdentity($userAgent, $clientHintsData));
+    }
+
+    /**
+     * @param array<string, mixed> $clientHintsData
+     */
+    private function getCacheIdentity(string $userAgent, array $clientHintsData = []): string
+    {
+        if (empty($clientHintsData)) {
+            return $userAgent;
+        }
+
+        $encoded = json_encode($clientHintsData);
+        if (!is_string($encoded)) {
+            return $userAgent;
+        }
+
+        return $userAgent . '|' . $encoded;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function buildClientHints(array $config): ?ClientHints
+    {
+        $configuredHints = $config['clientHints'] ?? null;
+        if ($configuredHints instanceof ClientHints) {
+            return $configuredHints;
+        }
+        if (is_array($configuredHints)) {
+            return ClientHints::factory($configuredHints);
+        }
+
+        if (($config['includeClientHints'] ?? true) === false) {
+            return null;
+        }
+
+        $request = Craft::$app->getRequest();
+        if (!method_exists($request, 'getHeaders')) {
+            return null;
+        }
+
+        $headers = $request->getHeaders();
+        $hintHeaders = [];
+        foreach ([
+            'Sec-CH-UA',
+            'Sec-CH-UA-Arch',
+            'Sec-CH-UA-Bitness',
+            'Sec-CH-UA-Full-Version',
+            'Sec-CH-UA-Full-Version-List',
+            'Sec-CH-UA-Mobile',
+            'Sec-CH-UA-Model',
+            'Sec-CH-UA-Platform',
+            'Sec-CH-UA-Platform-Version',
+            'Sec-CH-UA-Form-Factors',
+            'X-Requested-With',
+        ] as $name) {
+            $value = $headers->get($name);
+            if (is_string($value) && $value !== '') {
+                $hintHeaders[$name] = $value;
+            }
+        }
+
+        return !empty($hintHeaders) ? ClientHints::factory($hintHeaders) : null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeClientHints(?ClientHints $clientHints): array
+    {
+        if ($clientHints === null) {
+            return [];
+        }
+
+        return array_filter([
+            'model' => $clientHints->getModel() ?: null,
+            'platform' => $clientHints->getOperatingSystem() ?: null,
+            'platformVersion' => $clientHints->getOperatingSystemVersion() ?: null,
+            'brandVersion' => $clientHints->getBrandVersion() ?: null,
+            'brands' => $clientHints->getBrandList(),
+            'mobile' => $clientHints->isMobile(),
+            'architecture' => $clientHints->getArchitecture() ?: null,
+            'bitness' => $clientHints->getBitness() ?: null,
+            'app' => $clientHints->getApp() ?: null,
+            'formFactors' => $clientHints->getFormFactors(),
+        ], static fn($value): bool => $value !== null && $value !== [] && $value !== '');
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     * @return array<string, mixed>|null
+     */
+    private function matchSystemAgent(string $userAgent, array $config): ?array
+    {
+        if ($userAgent === '') {
+            return null;
+        }
+
+        $customAgents = $config['systemAgents'] ?? [];
+        $agents = array_replace(self::DEFAULT_SYSTEM_AGENTS, is_array($customAgents) ? $customAgents : []);
+        foreach ($agents as $key => $agent) {
+            if (!is_array($agent)) {
+                continue;
+            }
+
+            $match = $agent['userAgent'] ?? $key;
+            if (is_string($match) && $match !== '' && $userAgent === $match) {
+                return $this->normalizeSystemAgent($agent);
+            }
+
+            $pattern = $agent['pattern'] ?? null;
+            if (is_string($pattern) && $pattern !== '' && @preg_match($pattern, $userAgent) === 1) {
+                return $this->normalizeSystemAgent($agent);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $agent
+     * @return array{name: string|null, category: string|null, url: string|null, producerName: string|null, producerUrl: string|null}
+     */
+    private function normalizeSystemAgent(array $agent): array
+    {
+        $producer = $agent['producer'] ?? null;
+
+        return [
+            'name' => is_string($agent['name'] ?? null) ? $agent['name'] : null,
+            'category' => is_string($agent['category'] ?? null) ? $agent['category'] : null,
+            'url' => is_string($agent['url'] ?? null) ? $agent['url'] : null,
+            'producerName' => $this->normalizeSystemAgentProducerValue($agent, $producer, 'producerName', 'name'),
+            'producerUrl' => $this->normalizeSystemAgentProducerValue($agent, $producer, 'producerUrl', 'url'),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $agent
+     * @param mixed $producer
+     */
+    private function normalizeSystemAgentProducerValue(
+        array $agent,
+        mixed $producer,
+        string $agentKey,
+        string $producerKey,
+    ): ?string {
+        if (is_string($agent[$agentKey] ?? null)) {
+            return $agent[$agentKey];
+        }
+
+        if (is_array($producer) && is_string($producer[$producerKey] ?? null)) {
+            return $producer[$producerKey];
+        }
+
+        return null;
     }
 
     /**

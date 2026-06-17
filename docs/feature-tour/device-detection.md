@@ -47,6 +47,9 @@ class AnalyticsService extends Component
 | `cacheKeySet` | `string` | `''` | Redis key set name |
 | `includeLanguage` | `bool` | `false` | Include browser language detection |
 | `includePlatform` | `bool` | `false` | Include detailed platform info |
+| `includeClientHints` | `bool` | `true` | Read browser Client Hints from the current request and pass them to Matomo Device Detector |
+| `clientHints` | `array\|ClientHints` | `null` | Explicit Client Hints for non-request contexts or tests |
+| `systemAgents` | `array` | Includes `CacheManager/1.0` | First-party service agents to classify separately from human and external bot traffic |
 
 ## Detecting Device Info
 
@@ -66,12 +69,24 @@ $info = $this->detectDeviceInfo($userAgent);
 //     'isRobot' => false,
 //     'isMobileApp' => false,
 //     'botName' => null,
+//     'botCategory' => null,
+//     'botUrl' => null,
+//     'botProducerName' => null,
+//     'botProducerUrl' => null,
+//     'isSystemAgent' => false,
+//     'trafficType' => 'human',       // human, bot, or system
 //     'isMobile' => false,
 //     'isTablet' => false,
 //     'isDesktop' => true,
 //     'platform' => 'x64',            // If includePlatform is true
 //     'vendor' => 'Apple',
 //     'language' => 'en',             // If includeLanguage is true
+//     'clientHints' => [],
+//     'clientHintsUsed' => false,
+//     'architecture' => null,
+//     'bitness' => null,
+//     'formFactors' => [],
+//     'appId' => null,
 // ]
 
 // Without user agent (uses current request)
@@ -82,6 +97,73 @@ $info = $this->detectDeviceInfo($userAgent, [
     'includeLanguage' => true,
 ]);
 ```
+
+## Bot and System-Agent Classification
+
+Matomo Device Detector identifies known crawler and service-agent user agents.
+Base preserves the bot name, category, source URL, and producer metadata when
+Matomo provides it.
+
+First-party service agents can be configured separately from public bots. Base
+ships with `CacheManager/1.0` classified as a system agent so analytics
+consumers can separate cache warming from human traffic:
+
+```php
+$info = $this->detectDeviceInfo('CacheManager/1.0');
+// $info['trafficType'] === 'system'
+// $info['isSystemAgent'] === true
+```
+
+Add plugin-specific service agents with exact user-agent strings or trusted
+regular expressions:
+
+```php
+return [
+    'systemAgents' => [
+        'MyWarmup/1.0' => [
+            'name' => 'My Warmup',
+            'category' => 'Service Agent',
+            'producerName' => 'My Plugin',
+        ],
+        [
+            'pattern' => '/^MyWorker\/\d+\.\d+/',
+            'name' => 'My Worker',
+            'category' => 'Service Agent',
+            'producer' => [
+                'name' => 'My Plugin',
+                'url' => 'https://example.com',
+            ],
+        ],
+    ],
+];
+```
+
+## Client Hints
+
+When available, base passes browser Client Hints to Matomo Device Detector and
+also exposes the normalized hint data in the returned array. This improves
+device, OS, browser, architecture, app, and form-factor detection for modern
+reduced user-agent strings.
+
+In normal web requests no extra setup is required. For queued jobs, imports, or
+tests, pass explicit hint data:
+
+```php
+$info = $this->detectDeviceInfo($userAgent, [
+    'clientHints' => [
+        'Sec-CH-UA-Model' => '"Pixel 8"',
+        'Sec-CH-UA-Platform' => '"Android"',
+        'Sec-CH-UA-Mobile' => '?1',
+        'Sec-CH-UA-Arch' => '"arm"',
+        'Sec-CH-UA-Bitness' => '"64"',
+        'Sec-CH-UA-Form-Factors' => '"Mobile"',
+        'X-Requested-With' => 'com.example.app',
+    ],
+]);
+```
+
+Client Hints are included in device-detection cache keys, so the same reduced
+user-agent string can cache different results for different hint sets.
 
 ## Detecting Language
 
