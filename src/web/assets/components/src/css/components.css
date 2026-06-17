@@ -615,6 +615,11 @@ a.lr-unified-card-link:active {
     font-weight: 600;
 }
 
+.lr-chart-subtitle {
+    margin: -10px 0 15px;
+    font-size: 12px;
+}
+
 .lr-chart-container canvas {
     max-height: 300px;
     max-width: 100%;
@@ -1746,13 +1751,19 @@ a.lr-unified-card-link:active {
    ============================================================================= */
 
 .lr-dashboard-widget {
-	padding: 0;
+    padding: 0;
+}
+
+.lr-dashboard-widget-chart {
+    border: 0;
+    background: transparent;
+    padding: 20px 20px 10px;
 }
 
 .lr-dashboard-widget-stats__grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .lr-dashboard-widget-stats__grid.cols-1 {

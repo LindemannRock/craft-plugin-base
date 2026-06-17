@@ -389,7 +389,7 @@ A standalone status indicator dot without a label. Uses the same color system as
 
 ## Chart Container
 
-Wrapper for Chart.js canvas elements with consistent styling. Used inside [CP Analytics Layout](cp-analytics-layout.md) pages.
+Wrapper for Chart.js canvas elements with consistent styling. Used inside [CP Analytics Layout](cp-analytics-layout.md) pages and dashboard widgets that need reusable chart rendering.
 
 **Path:** `lindemannrock-base/_components/chart-container`
 
@@ -401,6 +401,8 @@ Wrapper for Chart.js canvas elements with consistent styling. Used inside [CP An
 } only %}
 ```
 
+When `data` is provided, the component registers the base analytics assets and initializes the chart from the shared components JavaScript. This avoids inline widget scripts and supports Craft dashboard widget refreshes after settings are saved.
+
 ### Parameters
 
 | Parameter | Type | Default | Description |
@@ -409,7 +411,12 @@ Wrapper for Chart.js canvas elements with consistent styling. Used inside [CP An
 | `title` | `string` | | Chart heading |
 | `subtitle` | `string` | | Subtitle below heading |
 | `fullWidth` | `bool` | `false` | Span full grid width |
-| `height` | `string` | | Custom canvas height (e.g., `'200px'`) |
+| `height` | `string|int` | | Height utility: `200`, `250`, or `300` |
+| `center` | `bool` | `false` | Center the chart canvas in the container |
+| `type` | `string` | `line` | Chart.js type when `data` is provided |
+| `data` | `array` | | Chart.js data object |
+| `options` | `array` | `[]` | Chart.js options object |
+| `percentageTooltip` | `bool` | `false` | Add value and percentage tooltip labels |
 | `class` | `string` | | Additional CSS classes |
 
 ---

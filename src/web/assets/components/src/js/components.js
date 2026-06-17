@@ -257,6 +257,115 @@
 })();
 
 (() => {
+    if (window.lrChartContainerInit) return;
+    window.lrChartContainerInit = true;
+
+    const addPercentageTooltip = (config) => {
+        if (!config.percentageTooltip) {
+            return config.options || {};
+        }
+
+        const options = config.options || {};
+        options.plugins = options.plugins || {};
+        options.plugins.tooltip = options.plugins.tooltip || {};
+        options.plugins.tooltip.callbacks = options.plugins.tooltip.callbacks || {};
+        options.plugins.tooltip.callbacks.label = (context) => {
+            const values = context.dataset.data || [];
+            const total = values.reduce((sum, value) => sum + Number(value || 0), 0);
+            const current = Number(context.parsed || 0);
+            const percentage = total > 0 ? ((current / total) * 100).toFixed(1) : '0.0';
+
+            return `${context.label}: ${current} (${percentage}%)`;
+        };
+
+        return options;
+    };
+
+    const initChart = (canvas, attempt = 0) => {
+        if (canvas.dataset.lrChartBound) return;
+
+        const rawConfig = canvas.dataset.lrChartConfig;
+        if (!rawConfig) return;
+
+        if (typeof Chart === 'undefined') {
+            if (attempt < 20) {
+                window.setTimeout(() => initChart(canvas, attempt + 1), 50);
+            }
+
+            return;
+        }
+
+        let config = {};
+        try {
+            config = JSON.parse(rawConfig);
+        } catch (e) {
+            console.warn('lrChartContainer: Invalid chart config', e);
+            return;
+        }
+
+        const type = config.type || 'line';
+        const data = config.data || {};
+        const options = addPercentageTooltip(config);
+
+        if (typeof window.lrCreateChart === 'function') {
+            window.lrCreateChart(canvas.id, type, data, options);
+        } else {
+            new Chart(canvas, { type, data, options });
+        }
+
+        canvas.dataset.lrChartBound = 'true';
+    };
+
+    const initCharts = () => {
+        document.querySelectorAll('[data-lr-chart-config]').forEach((canvas) => {
+            initChart(canvas);
+        });
+    };
+
+    const observeChartInsertions = () => {
+        if (!document.body || !window.MutationObserver) {
+            return;
+        }
+
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.addedNodes.length === 0) {
+                    continue;
+                }
+
+                for (const node of mutation.addedNodes) {
+                    if (!(node instanceof Element)) {
+                        continue;
+                    }
+
+                    if (node.matches('[data-lr-chart-config]') || node.querySelector('[data-lr-chart-config]')) {
+                        initCharts();
+                        return;
+                    }
+                }
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            observeChartInsertions();
+        });
+    } else {
+        initCharts();
+        observeChartInsertions();
+    }
+
+    window.lrInitChartContainers = initCharts;
+})();
+
+(() => {
     // Copy input (_components/copy-input): clicking a [data-lr-copy] button
     // writes its value to the clipboard and shows the CP notice from
     // [data-lr-copied]. Uses the async Clipboard API with an execCommand

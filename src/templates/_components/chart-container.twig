@@ -8,7 +8,12 @@
  #   - title: (optional) Chart title
  #   - subtitle: (optional) Subtitle/description
  #   - fullWidth: (optional) Span full grid width
- #   - height: (optional) Custom canvas height (e.g., '200px')
+ #   - height: (optional) Canvas height utility: 200, 250, or 300
+ #   - center: (optional) Center the chart canvas in the container
+ #   - type: (optional) Chart.js type when data is provided
+ #   - data: (optional) Chart.js data object
+ #   - options: (optional) Chart.js options object
+ #   - percentageTooltip: (optional) Add value + percentage tooltip labels
  #   - class: (optional) Additional CSS classes
  #
  # Example:
@@ -17,14 +22,37 @@
  #       title: 'Daily Trend',
  #       fullWidth: true,
  #   } only %}
- #}
+#}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
 
 {% set chartId = id ?? '' %}
 {% set chartTitle = title ?? '' %}
 {% set chartSubtitle = subtitle ?? '' %}
 {% set isFullWidth = fullWidth ?? false %}
-{% set canvasHeight = height ?? '' %}
+{% set canvasHeight = (height ?? '')|replace({'px': ''}) %}
+{% set isCentered = center ?? false %}
 {% set extraClass = class ?? '' %}
+{% set chartType = type ?? 'line' %}
+{% set chartData = data ?? null %}
+{% set chartOptions = options ?? {} %}
+{% set usePercentageTooltip = percentageTooltip ?? false %}
+{% set heightClasses = {
+    '200': 'lr-chart-height-200',
+    '250': 'lr-chart-height-250',
+    '300': 'lr-chart-height-300',
+} %}
+{% set heightClass = heightClasses[canvasHeight] ?? '' %}
+{% set chartConfig = chartData is not null ? {
+    type: chartType,
+    data: chartData,
+    options: chartOptions,
+    percentageTooltip: usePercentageTooltip,
+} : null %}
+
+{% if chartConfig %}
+    {% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\analytics\\AnalyticsAsset') %}
+{% endif %}
 
 <div class="lr-chart-container {% if isFullWidth %}full-width{% endif %} {{ extraClass }}">
     {% if chartTitle %}
@@ -32,11 +60,17 @@
     {% endif %}
 
     {% if chartSubtitle %}
-        <p class="light" style="margin: -10px 0 15px; font-size: 12px;">{{ chartSubtitle }}</p>
+        <p class="light lr-chart-subtitle">{{ chartSubtitle }}</p>
     {% endif %}
 
     {% if chartId %}
-        <canvas id="{{ chartId }}" {% if canvasHeight %}style="max-height: {{ canvasHeight }} !important;"{% endif %}></canvas>
+        <div class="{% if heightClass %}{{ heightClass }}{% endif %}{% if isCentered %} lr-chart-center{% endif %}">
+            <canvas
+                id="{{ chartId }}"
+                class="lr-chart-canvas"
+                {% if chartConfig %}data-lr-chart-config="{{ chartConfig|json_encode|e('html_attr') }}"{% endif %}
+            ></canvas>
+        </div>
     {% endif %}
 
     {# Allow custom content inside #}
