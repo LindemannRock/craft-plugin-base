@@ -1096,6 +1096,21 @@ a.lr-unified-card-link:active {
     background: #d1d5db !important;
 }
 
+/* Keep editable controls readable when Craft's selected-row state flips
+   row-level text variables to white. */
+table.data tbody tr.sel input:not([type='checkbox']):not([type='radio']),
+table.data tbody tr.sel textarea,
+table.data tbody tr.sel select,
+table.data tbody tr.selected input:not([type='checkbox']):not([type='radio']),
+table.data tbody tr.selected textarea,
+table.data tbody tr.selected select {
+    --text-color: #3f4d5a;
+    --light-text-color: #596673;
+    --ui-control-color: #596673;
+    color: var(--text-color);
+    background-color: var(--white, #fff);
+}
+
 .lr-context-row td {
     padding: 0 !important;
 }
