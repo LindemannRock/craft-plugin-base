@@ -99,6 +99,30 @@ Alert and notification banners for warnings, errors, tips, and success messages.
 
 ---
 
+## Config Override Warning
+
+Manual config-file override notice for settings UI areas that are not rendered through Craft/Base field helpers.
+
+**Path:** `lindemannrock-base/_components/config-override-warning`
+
+```twig
+{% include 'lindemannrock-base/_components/config-override-warning' with {
+    message: 'This is being overridden by the <code>enabledIntegrations</code> setting in <code>config/my-plugin.php</code>.',
+} only %}
+```
+
+Use field-level `warning:` options when rendering a normal Craft field. Use this component for manual notices inside custom card bodies or grouped settings markup.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `message` | `string` | | Pre-translated warning message |
+| `allowHtml` | `bool` | `true` | Render message as raw HTML |
+| `hiddenPrefix` | `bool` | `true` | Include the base-translated visually hidden `Warning:` prefix |
+
+---
+
 ## Stat Box
 
 Single metric display for analytics dashboards. Formats numeric values with `number_format`.

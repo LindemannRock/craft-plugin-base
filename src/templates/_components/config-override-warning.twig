@@ -1,0 +1,29 @@
+{#
+  Config Override Warning Component
+
+  Renders the shared warning chrome for manual config override notices that
+  live outside Craft/Base field helpers.
+
+  Usage:
+  {% include 'lindemannrock-base/_components/config-override-warning' with {
+      message: 'This is being overridden by ...',
+      allowHtml: true,       // default true for trusted CP templates
+      hiddenPrefix: true,    // default true; uses base "Warning:" translation
+  } %}
+
+  @link      https://lindemannrock.com
+  @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set allowHtml = allowHtml ?? true %}
+{% set hiddenPrefix = hiddenPrefix ?? true %}
+
+<p class="warning has-icon lr-config-override-note">
+    <span class="icon" aria-hidden="true"></span>
+    {% if hiddenPrefix %}
+        <span class="visually-hidden">{{ 'Warning:'|t('lindemannrock-base') }} </span>
+    {% endif %}
+    <span>{{ allowHtml ? message|raw : message }}</span>
+</p>
