@@ -1,5 +1,52 @@
 # Changelog
 
+## [5.27.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.26.0...v5.27.0) - 2026-06-18
+
+
+### Added
+
+* add bulk actions and status menu components for cp-table ([abeda6f](https://github.com/LindemannRock/craft-plugin-base/commit/abeda6ff98aa0a011d26412117708f066b71cda8))
+* add config override warning component for manual notices ([8175681](https://github.com/LindemannRock/craft-plugin-base/commit/81756810f0414d5ade85a1f885fa9d23353abce1))
+* add copy input component for clipboard functionality ([7964f5e](https://github.com/LindemannRock/craft-plugin-base/commit/7964f5e94dd0473c969e3ad49211e5c63443e004))
+* add dashboard widget components for empty state, footer, list, and stats ([a9822b1](https://github.com/LindemannRock/craft-plugin-base/commit/a9822b196b6e203b274386e75eaefbe4457395d2))
+* add integration card partial for third-party plugin integration ([d2192fc](https://github.com/LindemannRock/craft-plugin-base/commit/d2192fc497adf1285d31ef2bd82a1ebf6dad71bb))
+* add isHttpUrlWithHost method to validate URLs with hosts ([e0ca731](https://github.com/LindemannRock/craft-plugin-base/commit/e0ca731ca98c350ffd2f209bd75eccff58a21058))
+* add lr-logo.svg icon for branding ([98008e3](https://github.com/LindemannRock/craft-plugin-base/commit/98008e3cca39fda3645de092444c352c40350b49))
+* add support for opt-in extra URL schemes in UrlSafetyHelper ([0430f17](https://github.com/LindemannRock/craft-plugin-base/commit/0430f171e93d7cd4cf161682842a4cb29f4f529d))
+* **chart:** enhance chart container with additional parameters and structure ([a5e4c46](https://github.com/LindemannRock/craft-plugin-base/commit/a5e4c468bfad490b2bdbaa1da0d46c10d1467702))
+* **cp-table:** add pagination info and refresh functionality ([a515848](https://github.com/LindemannRock/craft-plugin-base/commit/a51584891791bc95c8feb488ea50141d0a159663))
+* **cp:** add bulk actions and status menu components with selection count ([071f94f](https://github.com/LindemannRock/craft-plugin-base/commit/071f94fe1ae4c3eff16d067d5ba9cc946935eab4))
+* **cp:** add select all checkbox functionality to bulk actions ([d6a3c04](https://github.com/LindemannRock/craft-plugin-base/commit/d6a3c04c616f467b998c21e67e1e8773268fc369))
+* **cp:** add selection count display to bulk action and status menus ([9348a31](https://github.com/LindemannRock/craft-plugin-base/commit/9348a31dd99e4a3018633a886a19eaefecc4146c))
+* **cp:** keep editable controls readable in selected-row state ([4f7ad33](https://github.com/LindemannRock/craft-plugin-base/commit/4f7ad337fe66f66163fd636b152a8cdd9e37ed29))
+* **css:** add lr-break-word class to wrap long unbreakable strings ([57f69ad](https://github.com/LindemannRock/craft-plugin-base/commit/57f69ad821030df18d072f66692a19f673687c19))
+* **css:** add lr-mt-10 class for 10px top margin ([bde5043](https://github.com/LindemannRock/craft-plugin-base/commit/bde50437b9af3d6dca64580b2792d42a90165888))
+* **css:** add new utility classes for layout and spacing ([13c0f77](https://github.com/LindemannRock/craft-plugin-base/commit/13c0f7740a2125c22c037f6e2c0afb32fcad7900))
+* **date-format:** add pluginHandle parameter for compact datetime formatting ([8238d9a](https://github.com/LindemannRock/craft-plugin-base/commit/8238d9a93f42e3a9b693f3963d86dec8bf6d2646))
+* **device:** add client hints support for enhanced device detection ([2438849](https://github.com/LindemannRock/craft-plugin-base/commit/24388491e3a0a7d47d996b672ec8ae244e7ee432))
+* **docs:** add icon SVG files for plugin assets ([e23d6c9](https://github.com/LindemannRock/craft-plugin-base/commit/e23d6c912e72d3d1229c6f97a64553f0d7cc994c))
+* **gql:** add GqlHelper class for GraphQL query and type handling ([9dbbe64](https://github.com/LindemannRock/craft-plugin-base/commit/9dbbe646921c5f020987ec4b51991eef40954919))
+* **helpers:** add ContentSafetyHelper to detect dangerous markup ([a1c0f37](https://github.com/LindemannRock/craft-plugin-base/commit/a1c0f37fd0aba2655d14af411e01959044e0af37))
+* **helpers:** add hasDangerousScheme method to validate URL schemes ([b775c38](https://github.com/LindemannRock/craft-plugin-base/commit/b775c3813c47c168ece5be51b2cc8d628792be62))
+* **helpers:** add lrLogoPaths method to retrieve logo SVG paths ([38212ad](https://github.com/LindemannRock/craft-plugin-base/commit/38212ad66a4c4d93477f1f866994983c8ecc219f))
+* **helpers:** add luminance and withAlpha methods for color manipulation ([6d8a46a](https://github.com/LindemannRock/craft-plugin-base/commit/6d8a46a3d45251eebc2f4df4dce0f06f1950c7ba))
+* **helpers:** add mix method to blend hex colors and parse hex strings ([60eacd4](https://github.com/LindemannRock/craft-plugin-base/commit/60eacd4a62c85afd5b4943c8ffcace1428b16c5a))
+* **helpers:** add pluginHandle parameter for date formatting settings ([4181cac](https://github.com/LindemannRock/craft-plugin-base/commit/4181cac3ae1c99cc33ae129d3bcfc217382083b2))
+* **helpers:** add primaryHexFromSvg method to extract color from SVG ([da46e85](https://github.com/LindemannRock/craft-plugin-base/commit/da46e85c01984e889089b86804207ee95320cbb1))
+* **helpers:** add readIconSvg method to retrieve SVG from directory ([afd8083](https://github.com/LindemannRock/craft-plugin-base/commit/afd808361079e49a1079f7db8c1b66b22bfe2bc3))
+* **helpers:** add RecurringQueueHelper for managing recurring jobs ([9fa2776](https://github.com/LindemannRock/craft-plugin-base/commit/9fa277681e7695853d1ba2701fa35a675f52fdfb))
+* **i18n:** translate 'Export' and related terms in multiple languages ([c2a7cdb](https://github.com/LindemannRock/craft-plugin-base/commit/c2a7cdba3c04861e4d8b3d8f70e47d4c58d373ca))
+* **import-export:** add styles for import-export preview tables and summary panel ([2480f00](https://github.com/LindemannRock/craft-plugin-base/commit/2480f00ad7a85c17aee4f35d3a8680b89cf4c214))
+* **partials:** add env-command-error partial for missing env vars ([4e7b1bb](https://github.com/LindemannRock/craft-plugin-base/commit/4e7b1bbf21e66e6aecaa59d5706253f88520f022))
+* **queue:** add RecurringQueueResult for job ownership management ([9539fad](https://github.com/LindemannRock/craft-plugin-base/commit/9539fad9338d523a080cf5616bbf83c1d3777286))
+* **queue:** document RecurringQueueResult and ensurePending method return values ([9d706c2](https://github.com/LindemannRock/craft-plugin-base/commit/9d706c23e6bc0a62336945f5e2aa659491432654))
+* **tests:** add integration tests for PluginHelper and color extraction ([629dcc8](https://github.com/LindemannRock/craft-plugin-base/commit/629dcc8519dd83185531b051482e5fea5420090d))
+
+
+### Fixed
+
+* reject hostless HTTP URLs in UrlSafetyHelper ([46b681a](https://github.com/LindemannRock/craft-plugin-base/commit/46b681a7f18919426eb7c80d1ba0393335e9038c))
+
 ## [5.26.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.25.0...v5.26.0) - 2026-06-07
 
 
