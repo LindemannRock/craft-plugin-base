@@ -1,0 +1,136 @@
+{#
+  Environment Command Error Partial @since 5.26.0
+
+  Displays a warning info-box for a missing environment value and shows
+  copyable Standard/DDEV commands that can generate or configure it.
+
+  Parameters:
+  - pluginHandle (required, string) — plugin handle used for command paths.
+  - envVarName (required, string) — environment variable name.
+  - commandPath (required, string) — command path after plugin handle.
+  - messageHtml (required, markup/string) — plugin-specific explanation.
+
+  @link      https://lindemannrock.com
+  @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% set pluginHandle = pluginHandle ?? 'app' %}
+{% set plugin = craft.app.plugins.getPlugin(pluginHandle) %}
+{% set pluginId = plugin and plugin.id is defined and plugin.id ? plugin.id : pluginHandle %}
+{% set envVarName = envVarName ?? null %}
+{% set commandPath = commandPath ?? null %}
+
+{% if envVarName and commandPath and messageHtml is defined %}
+    {% set boxId = 'lr-env-command-' ~ random(999999999) %}
+    {% set standardCommand = 'php craft ' ~ pluginId ~ '/' ~ commandPath %}
+    {% set ddevCommand = 'ddev craft ' ~ pluginId ~ '/' ~ commandPath %}
+
+    {% set bodyHtml %}
+        <strong>{{ 'Configuration Required'|t('lindemannrock-base') }}</strong>
+
+        <p style="margin: 0.5rem 0;">
+            {{ messageHtml|raw }}
+        </p>
+
+        <p style="margin: 0.75rem 0 0.5rem;">
+            <strong>{{ 'Run one of these commands in your terminal:'|t('lindemannrock-base') }}</strong>
+        </p>
+
+        <div id="{{ boxId }}">
+            <div style="margin-bottom: 0.5rem;">
+                <p class="light" style="margin: 0 0 0.25rem;">{{ 'Standard:'|t('lindemannrock-base') }}</p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text"
+                           readonly
+                           class="text fullwidth lr-env-command-input"
+                           value="{{ standardCommand }}"
+                           style="font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; cursor: copy; flex: 1;">
+                    <button type="button"
+                            class="btn lr-env-command-copy-btn"
+                            data-original-label="{{ 'Copy'|t('lindemannrock-base')|e('html_attr') }}"
+                            data-copied-label="{{ 'Copied!'|t('lindemannrock-base')|e('html_attr') }}"
+                            style="white-space: nowrap;">{{ 'Copy'|t('lindemannrock-base') }}</button>
+                </div>
+            </div>
+
+            <div>
+                <p class="light" style="margin: 0 0 0.25rem;">{{ 'DDEV:'|t('lindemannrock-base') }}</p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text"
+                           readonly
+                           class="text fullwidth lr-env-command-input"
+                           value="{{ ddevCommand }}"
+                           style="font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; cursor: copy; flex: 1;">
+                    <button type="button"
+                            class="btn lr-env-command-copy-btn"
+                            data-original-label="{{ 'Copy'|t('lindemannrock-base')|e('html_attr') }}"
+                            data-copied-label="{{ 'Copied!'|t('lindemannrock-base')|e('html_attr') }}"
+                            style="white-space: nowrap;">{{ 'Copy'|t('lindemannrock-base') }}</button>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin: 0.75rem 0 0.25rem;">
+            {{ 'This will automatically add {envVar} to your .env file.'|t('lindemannrock-base', {envVar: '<code>' ~ envVarName ~ '</code>'})|raw }}
+        </p>
+    {% endset %}
+
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: bodyHtml,
+        type: 'warning',
+        variant: 'colored',
+        margin: 'bottom',
+        allowHtml: true,
+    } only %}
+
+    <script>
+    (function() {
+        var box = document.getElementById({{ boxId|json_encode|raw }});
+        if (!box) return;
+
+        var inputs = box.querySelectorAll('.lr-env-command-input');
+        var buttons = box.querySelectorAll('.lr-env-command-copy-btn');
+
+        function showCopiedFeedback(button) {
+            var copiedLabel = button.dataset.copiedLabel;
+            var originalLabel = button.dataset.originalLabel;
+            button.textContent = copiedLabel;
+            button.classList.add('secondary');
+            setTimeout(function() {
+                button.textContent = originalLabel;
+                button.classList.remove('secondary');
+            }, 2000);
+        }
+
+        function fallbackCopy(input, button) {
+            input.select();
+            try {
+                document.execCommand('copy');
+                showCopiedFeedback(button);
+            } catch (_) {
+                alert({{ 'Failed to copy to clipboard'|t('lindemannrock-base')|json_encode|raw }});
+            }
+        }
+
+        inputs.forEach(function(input) {
+            input.addEventListener('click', function() {
+                this.select();
+            });
+        });
+
+        buttons.forEach(function(button, index) {
+            button.addEventListener('click', function() {
+                var input = inputs[index];
+                if (!input) return;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(input.value).then(function() {
+                        showCopiedFeedback(button);
+                    }).catch(function() { fallbackCopy(input, button); });
+                } else {
+                    fallbackCopy(input, button);
+                }
+            });
+        });
+    })();
+    </script>
+{% endif %}

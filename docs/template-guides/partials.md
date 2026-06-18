@@ -213,6 +213,71 @@ The partial automatically shows an HTTP warning when ip-api.com is selected with
 
 ---
 
+## env-command-error
+
+A warning info-box for missing environment configuration that can be fixed with a console command. Use it when a plugin needs an env var such as an API token, signing secret, or salt, and already has a console command that can generate and write the value.
+
+The partial renders a **Configuration Required** warning, plugin-provided explanatory text, copyable Standard and DDEV commands, and the env var name that will be added to `.env`.
+
+### Usage
+
+```twig
+{% include 'lindemannrock-base/_partials/env-command-error' with {
+    pluginHandle: 'redirect-manager',
+    envVarName: 'REDIRECT_MANAGER_API_TOKEN',
+    commandPath: 'security/generate-api-token',
+    messageHtml: 'REDIRECT_MANAGER_API_TOKEN is not configured. Add it to your environment before running endpoint tests.'|t('redirect-manager'),
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `pluginHandle` | `string` | Plugin handle used to resolve the plugin ID for command paths |
+| `envVarName` | `string` | Environment variable name shown in the `.env` message |
+| `commandPath` | `string` | Command path after the plugin handle, for example `security/generate-api-token` |
+| `messageHtml` | `string` | Plugin-owned explanation rendered inside the warning body |
+
+### Output
+
+For the example above, the partial renders copyable commands:
+
+```bash
+php craft redirect-manager/security/generate-api-token
+ddev craft redirect-manager/security/generate-api-token
+```
+
+The partial uses base-owned labels for **Configuration Required**, **Standard**, **DDEV**, **Copy**, and the `.env` helper text. Keep the specific missing-value explanation in the consuming plugin's translation category.
+
+---
+
+## ip-salt-error
+
+Error banner for settings pages when IP hash salt is missing but analytics is enabled. It shows copy-to-clipboard commands for generating the salt and explains that the same salt should be copied to staging and production.
+
+### Usage
+
+```twig
+{% include 'lindemannrock-base/_partials/ip-salt-error' with {
+    pluginHandle: 'redirect-manager',
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `pluginHandle` | `string` | Plugin handle used for plugin settings lookup and command paths |
+| `translationCategory` | `string` | Legacy alias for `pluginHandle` |
+| `envVarName` | `string` | Optional env var name override. Defaults to `<PLUGIN_HANDLE>_IP_SALT` with hyphens converted to underscores |
+
+The banner only renders when the plugin's `enableAnalytics` setting is `true` and `ipHashSalt` is missing or still set to the raw variable reference.
+
+For other missing env values that are fixed by a console command, use [`env-command-error`](#env-command-error).
+
+---
+
 ## backup-list
 
 Lightweight containers for async backup history loading. Provides loading spinner, empty state, and error message containers.

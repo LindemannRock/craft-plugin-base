@@ -808,27 +808,6 @@ window.lrPhoneInput.sanitize('+1 (202) 555-1234')  // '12025551234'
 
 ---
 
-## IP Salt Error
-
-Error banner for settings pages when IP hash salt is missing but analytics is enabled. Shows copy-to-clipboard commands for generating the salt.
-
-**Path:** `lindemannrock-base/_partials/ip-salt-error`
-
-```twig
-{% include 'lindemannrock-base/_partials/ip-salt-error' with {
-    translationCategory: 'redirect-manager',
-} %}
-```
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `translationCategory` | `string` | Plugin translation category (also used as plugin ID lookup) |
-| `envVarName` | `string` | Optional env var name override (defaults to `<CATEGORY>_IP_SALT`) |
-
-The banner only renders when `enableAnalytics` is `true` and the salt is missing or still set to the raw variable reference.
-
----
-
 ## Plugin Credit
 
 LindemannRock branded footer for plugin settings pages. Shows the logo with an animated hover effect.
