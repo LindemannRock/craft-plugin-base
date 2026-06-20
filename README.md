@@ -19,6 +19,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **DbHelper** — DB-agnostic JSON extraction and GROUP_CONCAT
 - **GqlHelper** — schema permission checks and site argument resolution for plugin-owned GraphQL queries
 - **BooleanHelper** — normalize boolean-like config, env, POST, and HTML attribute values
+- **ExperimentalFeatureHelper** — env-flag gating for internal or launch-deferred features
 - **CsvImportHelper** — CSV upload parsing with configurable options
 - **CpNavHelper** — CP subnav building with permission checks
 - **LabelHelper** — strip numbering and truncate long field labels for compact UI contexts (`|lrShortLabel` Twig filter)

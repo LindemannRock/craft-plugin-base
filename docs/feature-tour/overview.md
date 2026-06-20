@@ -17,6 +17,7 @@ Utility classes for common operations:
 - **[GeoHelper](geo-helper.md)** — Country names, dial codes, phone validation, and country select options
 - **[PluginHelper](plugin-helper.md)** — Plugin bootstrap, cache paths/keys, Redis cache safeguard, and cross-plugin detection
 - **Shared install experience** — One-time CP install modal with version metadata, branding, and preset-driven confetti
+- **[ExperimentalFeatureHelper](experimental-feature-helper.md)** — Env-flag gate for internal or launch-deferred features that must stay hidden until explicitly enabled
 - **[BooleanHelper](boolean-helper.md)** — Normalize boolean-like config, env, POST, and HTML attribute values
 - **[DbHelper](db-helper.md)** — DB-agnostic JSON extraction and GROUP_CONCAT
 - **[GqlHelper](gql-helper.md)** — GraphQL schema permission checks plus shared `site` / `siteId` argument resolution

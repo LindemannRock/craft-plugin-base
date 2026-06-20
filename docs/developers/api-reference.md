@@ -315,6 +315,16 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `isBooleanLike(mixed $value)` | `bool` | Check whether a value is a recognized boolean-like value |
 | `toStyleValue(mixed $value, bool $default = false)` | `string` | Normalize a boolean-like value to `'1'` or `'0'` for style config |
 
+### ExperimentalFeatureHelper
+
+`lindemannrock\base\helpers\ExperimentalFeatureHelper`
+[Full docs](../feature-tour/experimental-feature-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `isEnabled(string $envFlag, bool $requireDevMode = false)` | `bool` | Check whether an internal feature is explicitly enabled by env flag, optionally also requiring Craft dev mode |
+| `requireEnabled(string $envFlag, bool $requireDevMode = false)` | `void` | Throw a 404 when the internal feature is disabled |
+
 ### ConsoleHelpHelper
 
 `lindemannrock\base\helpers\ConsoleHelpHelper`
