@@ -4,7 +4,7 @@
 
 | Requirement | Version |
 |-------------|---------|
-| [Craft CMS](https://craftcms.com/) | 5.0+ |
+| [Craft CMS](https://craftcms.com/) | 5.10+ |
 | [PHP](https://php.net/) | 8.2+ |
 
 ## Module Type
@@ -19,5 +19,5 @@ The following packages are installed automatically via Composer:
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| [matomo/device-detector](https://github.com/matomo-org/device-detector) | 6.4+ | User-agent parsing for device detection (DeviceDetectionTrait) |
+| [matomo/device-detector](https://github.com/matomo-org/device-detector) | 6.5+ | User-agent parsing for device detection (DeviceDetectionTrait) |
 | [phpoffice/phpspreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) | 3.0+ or 5.0+ | Excel (.xlsx) export support (ExportHelper) |
