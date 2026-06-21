@@ -199,10 +199,10 @@ Initialises Craft as a console application so PHPUnit tests can use `Craft::$app
 
 ### Auto-detection
 
-When `$projectRoot` is null, walks up from `__DIR__` (the location of `bootstrap.php` inside base) looking for the first directory that contains **both** a `bootstrap.php` file **and** a `vendor/` directory. That pair uniquely identifies a Craft project root in both supported layouts:
+When `$projectRoot` is null, walks up from `__DIR__` (the location of the base testing bootstrap) looking for the first directory that contains **both** a `bootstrap.php` file **and** a `vendor/` directory. That pair uniquely identifies a Craft project root in both supported layouts:
 
-- **In-tree workspace:** `plugins/base/src/testing/bootstrap.php` → walks to the workspace repo root
-- **Vendor-installed:** `vendor/lindemannrock/craft-plugin-base/src/testing/bootstrap.php` → walks to the consumer project root
+- **Source checkout:** the base testing bootstrap walks to the project root
+- **Vendor-installed:** `vendor/lindemannrock/craft-plugin-base/src/testing/bootstrap.php` walks to the consumer project root
 
 If auto-detection reaches the filesystem root without a match, the function exits with a stderr message asking for an explicit `$projectRoot`.
 
@@ -333,9 +333,13 @@ Defaults are reasonable for "give me a working request" — override any propert
 
 ## `phpunit.xml.dist.template`
 
-Located at `plugins/base/src/testing/phpunit.xml.dist.template`. Copy verbatim to your plugin's root as `phpunit.xml.dist`:
+Located at `vendor/lindemannrock/craft-plugin-base/src/testing/phpunit.xml.dist.template` in a Composer-installed project. In a source checkout, use the equivalent relative path from your plugin directory. Copy it verbatim to your plugin's root as `phpunit.xml.dist`:
 
-```bash
+```bash title="Composer install"
+cp vendor/lindemannrock/craft-plugin-base/src/testing/phpunit.xml.dist.template phpunit.xml.dist
+```
+
+```bash title="Workspace path"
 cp ../base/src/testing/phpunit.xml.dist.template phpunit.xml.dist
 ```
 

@@ -318,7 +318,7 @@ Files:
 
 The bundle is generated via:
 
-```bash
+```bash title="NPM"
 npm run build:install
 ```
 

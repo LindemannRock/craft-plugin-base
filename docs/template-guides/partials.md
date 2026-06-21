@@ -243,8 +243,11 @@ The partial renders a **Configuration Required** warning, plugin-provided explan
 
 For the example above, the partial renders copyable commands:
 
-```bash
+```bash title="PHP"
 php craft redirect-manager/security/generate-api-token
+```
+
+```bash title="DDEV"
 ddev craft redirect-manager/security/generate-api-token
 ```
 

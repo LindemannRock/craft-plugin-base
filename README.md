@@ -38,7 +38,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 
 ## Installation
 
-```bash
+```bash title="Composer"
 composer require lindemannrock/craft-plugin-base
 ```
 

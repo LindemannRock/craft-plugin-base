@@ -1,10 +1,15 @@
-# Console Help @since(5.26.0)
+# Console help @since(5.26.0)
 
 Plugin-level console help gives operators a predictable discovery command:
 
-```bash
+```bash title="PHP"
 php craft my-plugin/help
 php craft my-plugin/help maintenance/clean-by-type
+```
+
+```bash title="DDEV"
+ddev craft my-plugin/help
+ddev craft my-plugin/help maintenance/clean-by-type
 ```
 
 Craft/Yii already support exact-command help with `php craft help my-plugin/group/action`, but users need to know the exact group and action first. The base console help pattern fills that gap with a concise plugin catalog and focused command pages.
@@ -63,7 +68,7 @@ if (Craft::$app instanceof \craft\console\Application) {
 }
 ```
 
-## Manifest Fields
+## Manifest fields
 
 Top-level fields:
 
@@ -109,7 +114,7 @@ Option entries use:
 ]
 ```
 
-## Output Guidelines
+## Output guidelines
 
 Keep the top-level catalog brief:
 
@@ -128,17 +133,21 @@ Focused command help should include:
 
 Avoid dumping internal class names, service names, or every implementation detail. The help command is for operators first; developer reference can stay in docs.
 
-## Unknown Commands
+## Unknown commands
 
 When a user asks for a command that is not in the manifest, the helper suggests the closest known command. This is useful when the action name is right but the group is wrong:
 
-```bash
+```bash title="PHP"
 php craft my-plugin/help translations/clean-by-type
+```
+
+```bash title="DDEV"
+ddev craft my-plugin/help translations/clean-by-type
 ```
 
 Can suggest:
 
-```text
+```text title="Suggested commands"
 php craft my-plugin/help maintenance/clean-by-type
 php craft my-plugin/maintenance/clean-by-type
 ```

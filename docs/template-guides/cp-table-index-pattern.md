@@ -614,9 +614,9 @@ Don't skip items 2 / 6 just because "the migration looks done." A controller tha
 The candidates considered — `sortX()`, `compareNullableDates()`, `parseBulkIds()`, the param-allowlist boilerplate — each look like duplication across plugins. They aren't, on inspection:
 
 - **`sortX()` is resource-specific.** The `match` over allowlist fields names domain columns and the comparators are domain comparisons. Extracting a base helper would mean either (a) a generic "sort by Closure" wrapper that wraps `usort` with extra ceremony, or (b) a registry of column-name → comparator closures that's harder to read than the inline `match`. Neither is better than what's in `ApiKeysController` today.
-- **`compareNullableDates()` is one screen of code.** Pure utility, no domain coupling, candidate for `plugins/base/src/helpers/DateFormatHelper`. Worth revisiting once two plugins land it as a private method.
+- **`compareNullableDates()` is one screen of code.** Pure utility, no domain coupling, and a possible future fit for `DateFormatHelper`. Worth revisiting once two plugins land it as a private method.
 - **`parseBulkIds()` is one screen of defensive code.** Same story as `compareNullableDates` — fine as a private method; promote to base if a second plugin needs it.
-- **Param-allowlist boilerplate is ~20 lines per controller.** Extracting it would mean either a fluent `ParamValidator` API or an array-of-rules config. Both obscure what the controller is doing for a small line-count saving. Three similar lines is better than a premature abstraction (per `plugins/CLAUDE.md`).
+- **Param-allowlist boilerplate is ~20 lines per controller.** Extracting it would mean either a fluent `ParamValidator` API or an array-of-rules config. Both obscure what the controller is doing for a small line-count saving. Three similar lines are easier to audit than a premature abstraction.
 
 **Out of scope but worth flagging.** A potentially better future direction: have `row-actions` emit a custom DOM event (e.g. `row-action:clicked` with `detail: {action, id, data}`). Plugin JS then listens for the event instead of wiring delegated selectors against the rendered DOM. That would obsolete the row-action JS pattern entirely. Touches base internals plus every plugin — out of scope for a per-page pattern doc; revisit when there's a budgeted base-side project.
 
@@ -625,5 +625,5 @@ The candidates considered — `sortX()`, `compareNullableDates()`, `parseBulkIds
 - [CP Table Layout](cp-table-layout.md) — the layout this guide complements.
 - [Components](components.md) — `row-actions`, `badge`, `filter-*`, etc.
 - [JavaScript API](../developers/javascript-api.md) — `lrTableSelection`, `lr:selectionChanged`, `lr:refresh`.
-- Reference code (in-memory): `plugins/search-manager/src/controllers/ApiKeysController.php` + `templates/api-keys/index.twig`.
-- Reference code (SQL-paginated): `plugins/search-manager/src/controllers/PendingSyncsController.php` + `templates/pending-syncs/index.twig` + `services/sync/PendingSyncRepository.php`.
+- Reference code (in-memory): a controller like `ApiKeysController` plus its `templates/api-keys/index.twig` table.
+- Reference code (SQL-paginated): a controller like `PendingSyncsController` plus its repository and `templates/pending-syncs/index.twig` table.

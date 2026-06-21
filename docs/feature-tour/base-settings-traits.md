@@ -379,7 +379,7 @@ It's reflection-driven so it covers every nullable property generically — not 
 
 ## Translations
 
-All shared strings (field labels, instructions, option labels, the generic `{setting}/{handle}` override-warning template) live in `base/translations/{lang}/lindemannrock-base.php` × 12 languages. Plugins adopting these traits **remove** the duplicated keys from their own translation files.
+All shared strings (field labels, instructions, option labels, the generic `{setting}/{handle}` override-warning template) live in `src/translations/{lang}/lindemannrock-base.php` × 12 languages. Plugins adopting these traits **remove** the duplicated keys from their own translation files.
 
 The only plugin-specific translation surface that survives is plugin-specific instructions text (e.g., `field-items-per-page`'s `instructions:` prop), which is passed in by the caller using the plugin's own translation category.
 
