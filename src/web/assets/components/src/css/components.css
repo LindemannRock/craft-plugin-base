@@ -1766,7 +1766,12 @@ table.data tbody tr.selected select {
    ============================================================================= */
 
 .lr-dashboard-widget {
-    padding: 0;
+	min-width: 0;
+	padding: 0;
+}
+
+.lr-dashboard-widget-list {
+	min-width: 0;
 }
 
 .lr-dashboard-widget-chart {
@@ -1882,6 +1887,7 @@ a.lr-dashboard-widget-list__primary:hover {
 }
 
 .lr-dashboard-widget-list__table {
+	min-width: 0;
 	margin-bottom: 0;
 }
 
@@ -1891,6 +1897,12 @@ a.lr-dashboard-widget-list__primary:hover {
 
 .lr-dashboard-widget-list__cell {
 	min-width: 0;
+}
+
+.lr-dashboard-widget-list__primary {
+	white-space: normal;
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 .lr-dashboard-widget-list__value {
