@@ -1,6 +1,6 @@
 # ColorHelper @since(5.8.0)
 
-Centralized color definitions for badges, filters, and status indicators. Provides a unified palette of 18 colors and 15 built-in color sets that plugins share for consistent styling.
+Centralized color definitions for badges, filters, and status indicators. Provides a unified palette of 18 colors and 16 built-in color sets that plugins share for consistent styling.
 
 ## Palette Colors
 

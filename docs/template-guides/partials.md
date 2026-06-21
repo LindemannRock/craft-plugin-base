@@ -314,6 +314,92 @@ The partial creates these elements for your JavaScript to target:
 
 ---
 
+## integration-card
+
+An embeddable card for a single third-party / sibling-plugin integration on a settings page: a header (title, status badge, description, on/off lightswitch) plus a collapsible body the consumer fills via a `{% block body %}`. The body show/hide on toggle is handled generically in `components.js`, so no per-page JS is needed.
+
+Use `{% embed %}` (not `{% include %}`) so you can supply the body. The partial emits no translatable strings of its own — pass pre-translated text in.
+
+### Usage
+
+```twig
+{% embed 'lindemannrock-base/_partials/integration-card' with {
+    title: 'SEOmatic Integration'|t('my-plugin'),
+    description: 'Push events to your GTM container.'|t('my-plugin'),
+    available: available,
+    installed: installed,
+    installUrl: 'https://plugins.craftcms.com/seomatic',
+    statusLabels: {
+        active: 'Installed & Active'|t('my-plugin'),
+        disabled: 'Installed but Disabled'|t('my-plugin'),
+        notInstalled: 'Not Installed'|t('my-plugin'),
+        install: 'Install Plugin'|t('my-plugin'),
+    },
+    toggleId: 'enableSeomaticIntegration',
+    toggleName: 'enableSeomaticIntegration',
+    toggleOn: enabled,
+    toggleDisabled: not available,
+    bodyId: 'seomatic-settings',
+    bodyVisible: enabled,
+} %}
+    {% block body %}
+        {% import '_includes/forms' as forms %}
+        {# plugin-specific settings #}
+    {% endblock %}
+{% endembed %}
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `title` | `string` | Card title (translated) — **required** |
+| `description` | `string` | Short description under the title (translated) |
+| `available` | `bool` | Plugin installed **and** enabled — **required**; body renders only when `true` |
+| `installed` | `bool` | Plugin installed — drives the "disabled" vs "not installed" badge |
+| `installUrl` | `string` | URL for the install link when not installed |
+| `statusLabels` | `object` | `{ active, disabled, notInstalled, install }` translated labels for the default status block |
+| `toggleId` / `toggleName` | `string` | Lightswitch id + form name — **required** |
+| `toggleOn` | `bool` | Lightswitch initial state |
+| `toggleDisabled` | `bool` | Lightswitch disabled |
+| `bodyId` | `string` | ID for the body element (so consumer JS can target it) |
+| `hasBody` | `bool` | Whether to render the body wrapper (default `true`) |
+| `bodyVisible` | `bool` | Whether the body starts visible (default = `toggleOn`) |
+
+### Blocks
+
+| Block | Purpose |
+|-------|---------|
+| `status` | Status badge area (defaults to the 3-state plugin-status badge) |
+| `body` | Collapsible body content filled by the consumer |
+
+---
+
+## error-summary
+
+A reusable validation error summary for settings/edit pages — the standard Craft "Found N errors" banner with a linked list that jumps to each errored field. Include it at the top of a form when `$model->getErrors()` may be populated.
+
+### Usage
+
+```twig
+{% include 'lindemannrock-base/_partials/error-summary' with {
+    errors: settings.getErrors(),
+    translationCategory: 'my-plugin',
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `errors` | `object` | `{}` | Map of `field => [messages]`, e.g. from `model.getErrors()` |
+| `linkMode` | `string` | `'field-id'` | `'field-id'` links to `#{field}-field`; `'data-key'` emits `data-field-error-key` for JS-driven focus |
+| `translationCategory` | `string` | `'app'` | Translation category for the "error(s)" heading |
+
+The banner renders nothing when there are no errors. The count uses an ICU plural, so it reads "1 error" / "N errors" correctly across locales.
+
+---
+
 ## Next Steps
 
 - [Components](components.md) — small UI elements (badge, stat-box, filter, export-menu)

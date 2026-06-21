@@ -32,6 +32,7 @@
             "feature-tour/export-helper",
             "feature-tour/geo-helper",
             "feature-tour/geo-lookup",
+            "feature-tour/analytics-ip-helper",
             "feature-tour/device-detection",
             "feature-tour/queue-ttr",
             "feature-tour/boolean-helper",
@@ -47,6 +48,8 @@
             "feature-tour/url-safety-helper",
             "feature-tour/content-safety-helper",
             "feature-tour/storage-path-validator",
+            "feature-tour/settings-validators",
+            "feature-tour/install-experience",
             "feature-tour/testing"
         ]
     },

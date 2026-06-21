@@ -81,6 +81,10 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 
 {% set options = lrDateRangeOptions('array', true) %}
 {# Includes {'value': 'custom', 'label': 'Custom Range'} as the final option #}
+
+{# Resolved date/time format config (cascade: plugin config > plugin settings > base config > defaults) #}
+{% set fmt = lrDateFormatConfig() %}                  {# {timeFormat, dateOrder, dateSeparator, monthFormat, showSeconds} #}
+{% set fmt = lrDateFormatConfig('my-plugin') %}       {# Check plugin-specific config first #}
 ```
 
 ## Color Functions

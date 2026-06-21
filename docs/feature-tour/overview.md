@@ -8,7 +8,7 @@ LindemannRock Base is a shared toolkit that provides common utilities for all Li
 
 Utility classes for common operations:
 
-- **[ColorHelper](color-helper.md)** — 18 palette colors, 15 built-in color sets, and custom color set registration for badges and filters
+- **[ColorHelper](color-helper.md)** — 18 palette colors, 16 built-in color sets, and custom color set registration for badges and filters
 - **[DateFormatHelper](date-format-helper.md)** — Configurable date/time formatting for display, exports, and DB-agnostic timezone-aware SQL
 - **[DateRangeHelper](date-range-helper.md)** — Standard date ranges (today, last 7 days, etc.) with bounds calculation and query integration
 - **[ScheduleHelper](schedule-helper.md)** — Cron-style scheduling for recurring queue jobs (daily, daily2am, weekly, monthly, etc.) with TZ-aware next-run calculation, dropdown options, and validation allowlist
@@ -16,7 +16,9 @@ Utility classes for common operations:
 - **[ExportHelper](export-helper.md)** — CSV, JSON, and Excel exports with configurable format availability and date formatting
 - **[GeoHelper](geo-helper.md)** — Country names, dial codes, phone validation, and country select options
 - **[PluginHelper](plugin-helper.md)** — Plugin bootstrap, cache paths/keys, Redis cache safeguard, and cross-plugin detection
-- **Shared install experience** — One-time CP install modal with version metadata, branding, and preset-driven confetti
+- **[Install experience](install-experience.md)** — One-time CP welcome modal shown after install, with version metadata, branding, and preset-driven confetti
+- **[AnalyticsIpHelper](analytics-ip-helper.md)** — One-step IP anonymization, hashing, and geo-lookup eligibility for analytics tracking
+- **[JsonHelper](../developers/api-reference.md)** — `htmlSafeJson()` for safely embedding JSON in inline HTML/JS
 - **[ExperimentalFeatureHelper](experimental-feature-helper.md)** — Env-flag gate for internal or launch-deferred features that must stay hidden until explicitly enabled
 - **[BooleanHelper](boolean-helper.md)** — Normalize boolean-like config, env, POST, and HTML attribute values
 - **[DbHelper](db-helper.md)** — DB-agnostic JSON extraction and GROUP_CONCAT
@@ -33,6 +35,7 @@ Utility classes for common operations:
 - **[StorageVolumeHelper + StorageVolumeValidator](storage-path-validator.md#storage-volume-validator)** — Validate asset volumes used as plugin storage and block local volumes inside `@webroot`
 - **[UrlSafetyHelper](url-safety-helper.md)** — Constrain a URL to a safe redirect target, and flag executable schemes (`javascript:`/`data:`/…) without blocking app deep links
 - **[ContentSafetyHelper](content-safety-helper.md)** — Detect dangerous HTML/script markup (`<script>`, `on*=`, …) in free text before it's stored and rendered
+- **[Settings validators](settings-validators.md)** — Yii validators for route prefixes, URL-or-path values, and template paths in plugin settings
 
 ### PHP Traits
 

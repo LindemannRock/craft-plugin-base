@@ -875,6 +875,98 @@ The component renders whatever `secret` you pass in. The caller is responsible f
 
 ---
 
+## Bulk Actions Menu
+
+A Craft-style "cog" menu for the selection-scoped bulk actions of a [CP Table Layout](cp-table-layout.md). It standardizes the button, menu markup, optional selection count, and `MenuBtn` wiring — the consuming template still owns the click handlers and endpoint payloads via stable item IDs.
+
+**Path:** `lindemannrock-base/_components/bulk-actions-menu`
+
+```twig
+{% include 'lindemannrock-base/_components/bulk-actions-menu' with {
+    countId: 'my-selection-count',
+    items: [
+        { id: 'bulk-enable', label: 'Enable'|t('my-plugin') },
+        { id: 'bulk-disable', label: 'Disable'|t('my-plugin') },
+        { type: 'divider' },
+        { id: 'bulk-delete', label: 'Delete'|t('my-plugin'), class: 'error', permission: 'myPlugin:deleteItems' },
+    ],
+} only %}
+```
+
+The whole menu is omitted when no items are visible after permission/condition filtering. Use the default `btn secondary` (gray) styling for these selection-scoped actions — red is reserved for top-toolbar one-shot destructive buttons.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `items` | `array` | `[]` | Action items (see below) |
+| `id` | `string` | `lr-bulk-actions-btn` | Button ID |
+| `label` | `string` | `'Actions'` | Accessible label/title (`lindemannrock-base` translation) |
+| `icon` | `string` | `'settings'` | Button icon; pass falsy to show the text label instead |
+| `countId` | `string` | *(none)* | ID for a `(0)` selection-count span |
+| `menuId` | `string` | `{id}-menu` | Menu element ID |
+
+Each item supports: `id` (anchor ID used by your JS), `label`, `class` (e.g. `error`), `title`, `permission` (hidden unless `currentUser.can()`), `showIf` / `hideIf` (booleans), and `type: 'divider'`.
+
+## Bulk Status Menu
+
+The status-setting sibling of the bulk actions menu — a labelled menu of status options, each rendered with a [Status Dot](#status-dot). Same selection-count and permission/condition handling.
+
+**Path:** `lindemannrock-base/_components/bulk-status-menu`
+
+```twig
+{% include 'lindemannrock-base/_components/bulk-status-menu' with {
+    label: 'Set status'|t('my-plugin'),
+    countId: 'my-selection-count',
+    items: [
+        { id: 'status-active', label: 'Active'|t('my-plugin'), value: 'active', colorSet: 'status' },
+        { id: 'status-disabled', label: 'Disabled'|t('my-plugin'), value: 'disabled', colorSet: 'status' },
+    ],
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `items` | `array` | `[]` | Status items (see below) |
+| `id` | `string` | `lr-bulk-status-btn` | Button ID |
+| `label` | `string` | `'Set status'` | Button label (`lindemannrock-base` translation) |
+| `countId` | `string` | *(none)* | ID for a `(0)` selection-count span |
+| `menuId` | `string` | `{id}-menu` | Menu element ID |
+
+Each item supports the dot inputs (`status`, or `value` + `colorSet`, or `color`) plus `id`, `label`, `class`, `title`, `permission`, `showIf` / `hideIf`, and `type: 'divider'`.
+
+## Copy Input
+
+A read-only value (e.g. an element URL) in a borderless input with a joined **Copy** button that writes it to the clipboard. Copy behaviour is delegated to the generic `[data-lr-copy]` handler in `components.js` (Clipboard API + `execCommand` fallback + CP notice), so no per-page JS is needed.
+
+**Path:** `lindemannrock-base/_components/copy-input`
+
+```twig
+{% include 'lindemannrock-base/_components/copy-input' with {
+    legend: 'Public URL'|t('my-plugin'),
+    value: element.getUrl(),
+    id: 'my-url',
+    copyLabel: 'Copy'|t('my-plugin'),
+    copiedMessage: 'URL copied to clipboard'|t('my-plugin'),
+} only %}
+```
+
+This component emits no translatable strings of its own — pass pre-translated `legend`, `copyLabel`, and `copiedMessage`.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `value` | `string` | *(required)* | The value shown and copied |
+| `copyLabel` | `string` | *(required)* | Copy button text (translated) |
+| `copiedMessage` | `string` | *(none)* | CP notice shown after copying (translated) |
+| `legend` | `string` | *(none)* | Fieldset legend; omit for no legend |
+| `id` | `string` | *(none)* | Input ID |
+
+---
+
 ## Next Steps
 
 - [CP Table Layout](cp-table-layout.md) — uses filters, badges, row-actions, search, and export-menu

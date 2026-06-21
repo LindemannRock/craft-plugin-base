@@ -30,6 +30,24 @@ ExportHelper::getFormatOptions();
 // [['value' => 'xlsx', 'label' => 'Excel (.xlsx)'], ['value' => 'csv', 'label' => 'CSV (.csv)']]
 ```
 
+### Merging the cascade @since(5.26.0)
+
+`mergeFormatConfig()` resolves the effective `csv`/`json`/`excel` toggles across a precedence cascade — later layers win, and only non-`null` values for the three known formats are applied. This is what [`ExportFormatSettingsTrait`](base-settings-traits.md#exportformatsettingstrait--per-plugin-export-format-toggles) uses to combine defaults, base config, the plugin's saved settings, and the plugin config file:
+
+```php
+ExportHelper::mergeFormatConfig(
+    $defaults,       // your plugin's defaults
+    $baseConfig,     // config/lindemannrock-base.php exports
+    $settingsValues, // saved plugin settings
+    $pluginConfig,   // config/my-plugin.php exports
+);
+// ['csv' => true, 'json' => false, 'excel' => true]
+```
+
+### Clearing the config cache @since(5.25.0)
+
+Resolved format config is cached statically per request. Call `ExportHelper::clearConfigCache()` after changing export settings in the same request (e.g. in a settings-save action or a test) so the next read reflects the new values.
+
 In Twig:
 
 ```twig

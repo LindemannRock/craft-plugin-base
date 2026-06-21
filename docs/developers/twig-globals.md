@@ -102,14 +102,22 @@ The base module registers five Twig extensions. All functions and filters are pr
 | `lrPluginEnabled(handle)` | Check if plugin is installed and enabled |
 | `lrPluginName(handle, fallback?)` | Plugin display name (respects custom `pluginName`) |
 
+### LabelExtension
+
+**1 filter:**
+
+| Filter | Purpose |
+|--------|---------|
+| `\|lrShortLabel(maxLength=60)` | Strip leading numbering and truncate long field labels — see [Label Filters](../template-guides/twig-filters-functions.md#label-filters) |
+
 ## Registration Flow
 
 Extensions are registered when the base module initializes:
 
 1. A plugin calls `PluginHelper::bootstrap()` in its `init()`
 2. `Base::register()` is called (idempotent — only runs once even if multiple plugins call it)
-3. The `Base` module registers all five extensions with Twig
-4. The plugin's helper variable is registered via `View::EVENT_BEFORE_RENDER_TEMPLATE`
+3. The `Base` module registers all six extensions with Twig
+4. The plugin's helper variable is registered as a Twig global via `View::EVENT_AFTER_CREATE_TWIG`
 
 Since `Base::register()` is idempotent, the extensions are available regardless of how many plugins bootstrap the base module.
 
