@@ -64,7 +64,7 @@ class ExperimentalFeatureHelper
      */
     private static function rawEnv(string $envFlag): ?string
     {
-        $value = $_SERVER[$envFlag] ?? $_ENV[$envFlag] ?? getenv($envFlag);
+        $value = $_SERVER[$envFlag] ?? $_ENV[$envFlag] ?? null;
 
         return is_string($value) ? $value : null;
     }

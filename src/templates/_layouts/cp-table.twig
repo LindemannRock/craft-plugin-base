@@ -507,7 +507,7 @@
         const config = {
             ajaxEnabled: {{ ajaxEnabled ? 'true' : 'false' }},
             ajaxInterval: {{ ajaxInterval }},
-            ajaxEndpoint: '{{ ajaxEndpoint }}',
+            ajaxEndpoint: {{ ajaxEndpoint|json_encode|raw }},
             checkboxesEnabled: {{ checkboxesEnabled ? 'true' : 'false' }},
             currentSort: {{ currentSort|json_encode|raw }},
             currentDir: {{ currentDir|json_encode|raw }},
@@ -521,9 +521,9 @@
                 of: {{ 'of'|t('lindemannrock-base')|json_encode|raw }},
             },
             urlParams: {{ urlParams|json_encode|raw }},
-            baseUrl: '{{ url(pluginHandle ~ '/' ~ selectedSubnavItem) }}',
+            baseUrl: {{ url(pluginHandle ~ '/' ~ selectedSubnavItem)|json_encode|raw }},
             viewEnabled: {{ viewEnabled ? 'true' : 'false' }},
-            viewStorageKey: '{{ viewStorageKey }}',
+            viewStorageKey: {{ viewStorageKey|json_encode|raw }},
             hideableColumns: {{ hideableColumns|map(c => c.key)|values|json_encode|raw }},
             columnKeys: {{ columns|map(c => c.key)|values|json_encode|raw }},
         };

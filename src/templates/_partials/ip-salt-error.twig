@@ -96,7 +96,7 @@
         </div>
 
         <p style="margin: 0.75rem 0 0.25rem;">
-            {{ 'This will automatically add {envVar} to your .env file.'|t('lindemannrock-base', {envVar: '<code>' ~ envVarName ~ '</code>'})|raw }}
+            {{ 'This will automatically add {envVar} to your .env file.'|t('lindemannrock-base', {envVar: '<code>' ~ (envVarName|e) ~ '</code>'})|raw }}
         </p>
 
         <p style="margin: 0;">
