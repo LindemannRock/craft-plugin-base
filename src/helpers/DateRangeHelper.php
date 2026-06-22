@@ -411,6 +411,10 @@ class DateRangeHelper
             return null;
         }
 
-        return new \DateTime($date, $tz);
+        try {
+            return new \DateTime($date, $tz);
+        } catch (\Exception) {
+            return null;
+        }
     }
 }

@@ -79,6 +79,19 @@ final class DateRangeHelperTest extends IntegrationTestCase
         self::assertGreaterThanOrEqual(365, DateRangeHelper::getDaysCount('last12months'));
     }
 
+    public function testMalformedCustomDatesAreTreatedAsOpenBounds(): void
+    {
+        $bounds = DateRangeHelper::getBounds(
+            'custom',
+            new DateTimeZone('Asia/Dubai'),
+            'not-a-date',
+            '2026-13-45',
+        );
+
+        self::assertNull($bounds['start']);
+        self::assertNull($bounds['end']);
+    }
+
     private function expectedStartOfCurrentWeek(DateTimeZone $tz): DateTime
     {
         $start = new DateTime('now', $tz);
