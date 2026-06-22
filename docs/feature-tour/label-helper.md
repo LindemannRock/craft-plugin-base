@@ -13,7 +13,7 @@ LabelHelper::shorten('1. This is a very long field label that will be truncated'
 // "This is a very long field label that will be truncated"  (under 60 chars — no ellipsis)
 
 LabelHelper::shorten('1. What is your preferred contact method? (Optional Field)', 40);
-// "What is your preferred contact…  (Optional Field)"
+// "What is your preferred... (Optional Field)"
 
 LabelHelper::shorten('10) Short label');
 // "Short label"

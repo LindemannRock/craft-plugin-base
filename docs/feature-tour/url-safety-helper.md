@@ -63,9 +63,24 @@ UrlSafetyHelper::hasDangerousScheme('https://example.com');     // false
 
 Unlike `isSafeRedirectUrl()`, this is anchored at the **scheme**: a URL such as `https://x.com/path?u=javascript:y` is *not* flagged, because `javascript:` isn't the scheme.
 
+## Allow Extra Schemes @since(5.27.0)
+
+When a field legitimately stores non-`http(s)` targets — action links like `mailto:`/`tel:`, or app deep links — pass an `$extraSchemes` allowlist to opt those schemes in while keeping everything else strict. Both `sanitizeRedirectUrl()` and `isSafeRedirectUrl()` accept it. Scheme names are lowercase and without the trailing colon:
+
+```php
+// Allow mailto: and tel: alongside relative paths and http(s):
+UrlSafetyHelper::isSafeRedirectUrl('mailto:hi@example.com', ['mailto', 'tel']); // true
+UrlSafetyHelper::isSafeRedirectUrl('mailto:hi@example.com');                    // false (strict default)
+
+UrlSafetyHelper::sanitizeRedirectUrl('tel:+15551234', '/', ['mailto', 'tel']);  // 'tel:+15551234'
+```
+
+The default is an empty list, so existing callers keep the strict relative-or-`http(s)` contract. Listing a scheme here is an explicit allow — it does **not** run the dangerous-scheme check, so pair it with `hasDangerousScheme()` whenever the scheme list itself comes from untrusted input.
+
 ## Scope
 
 - `sanitizeRedirectUrl()` accepts a single-leading-slash relative path (`/path`) but rejects scheme-relative `//host` URLs — the browser resolves `//host` to an external origin, so it collapses to the fallback like any other off-site target without an explicit `http(s)://` scheme.
+- `isHttpUrlWithHost()` @since(5.27.0) is the underlying predicate for the `http(s)`-with-host test: it returns `true` only for an absolute `http`/`https` URL that includes a host. A bare scheme (`https://`) or a host-less form (`https:///path`) returns `false`. Exposed for callers that need just that check without the relative-path branch.
 - This is a redirect-target guard only. It does not validate or normalize a URL for storage, display, or as a destination link — use the appropriate validator for those.
 
 ## Not For

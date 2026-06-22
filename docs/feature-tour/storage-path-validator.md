@@ -1,4 +1,4 @@
-# Storage Path Validator
+# Storage Path Validator @since(5.18.0)
 
 `StoragePathValidator` validates local filesystem paths used by plugin settings, such as backup and export directories. It is a Yii model adapter around `StoragePathHelper::validatePath()`, which is the shared raw-value validation API for dynamic or nested settings. Runtime/display code should use `StoragePathHelper::resolve()` for the same env-var + alias resolution contract.
 
@@ -77,7 +77,7 @@ Set `allowEnvVars => false` for settings that must be literal aliases only.
 | `allowEnvVars` | `bool` | `true` | Allow `$VARIABLE` values and validate their resolved path |
 | `translationCategory` | `string` | `'app'` | Translation category for validation errors |
 
-## Storage Volume Validator
+## Storage Volume Validator @since(5.26.0)
 
 `StorageVolumeValidator` validates optional Craft asset volume UIDs used as plugin-managed storage. Use it when a settings page lets an administrator choose between a local path and a Craft volume.
 
@@ -103,9 +103,9 @@ $errors = StorageVolumeHelper::validateVolume($settings['backupVolumeUid'] ?? nu
 ]);
 ```
 
-## Volume Display And Local Paths
+## Volume Display And Local Paths @since(5.26.0)
 
-Use `StorageVolumeHelper::displayPath($uid, 'my-plugin/backups')` for CP display. It returns a label such as `Volume: Uploads / my-plugin/backups`, which avoids exposing partial or unresolved filesystem paths.
+Use `StorageVolumeHelper::displayPath($uid, 'my-plugin/backups')` for CP display. It returns a label such as `Volume: Uploads/my-plugin/backups`, which avoids exposing partial or unresolved filesystem paths.
 
 Use `StorageVolumeHelper::localRootPath($uid)` only when the plugin really needs a local filesystem root. It returns `null` for remote volumes such as S3.
 
