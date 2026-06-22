@@ -89,19 +89,19 @@
         <script data-analytics-reinit>
         (function() {
             window._lrExportConfigs = window._lrExportConfigs || {};
-            window._lrExportConfigs['{{ menuId }}'] = {
+            window._lrExportConfigs[{{ menuId|json_encode|raw }}] = {
                 actionUrl: '{{ actionUrl(action)|e('js') }}',
                 csrfName: '{{ craft.app.config.general.csrfTokenName|e('js') }}',
                 csrfValue: '{{ craft.app.request.csrfToken|e('js') }}',
                 params: {{ baseParams|json_encode|raw }},
                 {% if selectionAware %}
                 selectedIds: [],
-                idsParam: '{{ idsParam }}',
+                idsParam: {{ idsParam|json_encode|raw }},
                 {% endif %}
             };
 
             {% if selectionAware %}
-            var conf = window._lrExportConfigs['{{ menuId }}'];
+            var conf = window._lrExportConfigs[{{ menuId|json_encode|raw }}];
 
             function updateSelectedIds(ids) {
                 conf.selectedIds = ids;

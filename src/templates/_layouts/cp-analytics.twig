@@ -279,8 +279,8 @@
 
         // Page configuration
         var config = {
-            prefix: '{{ chartPrefix }}',
-            dataEndpoint: '{{ chartDataEndpoint ? actionUrl(chartDataEndpoint) : '' }}',
+            prefix: {{ chartPrefix|json_encode|raw }},
+            dataEndpoint: {{ (chartDataEndpoint ? actionUrl(chartDataEndpoint) : '')|json_encode|raw }},
             dateRange: {{ dateRange|json_encode|raw }},
             siteId: {{ currentSiteId|json_encode|raw }},
             customFilters: {{ customFilterParams|json_encode|raw }},
