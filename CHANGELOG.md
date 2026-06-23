@@ -1,5 +1,21 @@
 # Changelog
 
+## [5.28.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.27.0...v5.28.0) - 2026-06-23
+
+
+### Added
+
+* add min-width and overflow handling for dashboard widgets ([26024d9](https://github.com/LindemannRock/craft-plugin-base/commit/26024d9a5967ae5b70bcf45d04d0c64f8668dbda))
+* **cli:** add smoke test scripts for Craft compatibility checks ([99b074d](https://github.com/LindemannRock/craft-plugin-base/commit/99b074da29ff4bfb5de29e602b4e6973bff725ba))
+* **helpers:** add ExperimentalFeatureHelper to manage internal features ([d804418](https://github.com/LindemannRock/craft-plugin-base/commit/d804418ddb10ebb2871a9262ea5a185e8faa50bb))
+
+
+### Fixed
+
+* encode remaining CP config strings in JS ([76d2982](https://github.com/LindemannRock/craft-plugin-base/commit/76d298246eddd8b93603260345cb31f17eb3a7b0))
+* **helpers:** handle exceptions when creating DateTime from string ([0d493d2](https://github.com/LindemannRock/craft-plugin-base/commit/0d493d21e7225ddfcb3b04ff5a01a1a1a5001892))
+* resolve audit 18 environment and escaping findings ([538fa8a](https://github.com/LindemannRock/craft-plugin-base/commit/538fa8acdd97623c142658be1eeb46632d8c6072))
+
 ## [5.27.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.26.0...v5.27.0) - 2026-06-18
 
 
