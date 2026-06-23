@@ -13,7 +13,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **Settings Traits** — database persistence, config file overrides, custom display names
 - **DateFormatHelper** — centralized date/time formatting with timezone-aware SQL expressions
 - **DateRangeHelper** — standardized date range selection, bounds, and query filtering
-- **ColorHelper** — 18-color palette and 15 built-in color sets for consistent styling
+- **ColorHelper** — 18-color palette and 16 built-in color sets for consistent styling
 - **ExportHelper** — CSV, JSON, and Excel export with configurable format availability
 - **GeoHelper** — ISO 3166-1 country lookups, dial codes, and phone validation
 - **DbHelper** — DB-agnostic JSON extraction and GROUP_CONCAT
