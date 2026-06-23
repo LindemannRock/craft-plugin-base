@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+php -r '
+require "bootstrap.php";
+require "vendor/craftcms/cms/bootstrap/console.php";
+
+\lindemannrock\base\Base::register();
+
+if (!\Craft::$app->hasModule("lindemannrock-base")) {
+    fwrite(STDERR, "Base module was not registered.\n");
+    exit(1);
+}
+
+$module = \Craft::$app->getModule("lindemannrock-base");
+if (!$module instanceof \lindemannrock\base\Base) {
+    fwrite(STDERR, "Registered base module has unexpected class.\n");
+    exit(1);
+}
+
+if (!\lindemannrock\base\helpers\BooleanHelper::normalize("yes")) {
+    fwrite(STDERR, "BooleanHelper smoke check failed.\n");
+    exit(1);
+}
+
+$segment = \lindemannrock\base\helpers\SafeSegmentHelper::filenamePart("Hello / Base!");
+if ($segment !== "hello-base") {
+    fwrite(STDERR, "SafeSegmentHelper smoke check failed: {$segment}\n");
+    exit(1);
+}
+
+$slug = \lindemannrock\base\helpers\SlugHandleHelper::normalizeSlug("Hello Base!");
+if ($slug !== "hello-base") {
+    fwrite(STDERR, "SlugHandleHelper smoke check failed: {$slug}\n");
+    exit(1);
+}
+
+echo "Base module smoke test passed.\n";
+'
