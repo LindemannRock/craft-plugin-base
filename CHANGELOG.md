@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.28.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.28.0...v5.28.1) - 2026-06-23
+
+
+### Fixed
+
+* correct number of built-in color sets in README ([ca610f4](https://github.com/LindemannRock/craft-plugin-base/commit/ca610f4da812f573645998848a250a336916050e))
+
 ## [5.28.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.27.0...v5.28.0) - 2026-06-23
 
 
