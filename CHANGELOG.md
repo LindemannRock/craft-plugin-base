@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.29.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.28.1...v5.29.0) (2026-06-24)
+
+
+### Added
+
+* **helpers:** add 'delete' status color to palette ([c5b41c6](https://github.com/LindemannRock/craft-plugin-base/commit/c5b41c69482585e06e8a000d5c58a3aea791c59c))
+* support preserved table params and canonical table URLs ([33e718c](https://github.com/LindemannRock/craft-plugin-base/commit/33e718c755ae24528f86b4bc96120ffffa3366d7))
+
 ## [5.28.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.28.0...v5.28.1) - 2026-06-23
 
 
