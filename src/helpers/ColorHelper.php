@@ -360,6 +360,7 @@ class ColorHelper
                 'manual' => self::PALETTE['cyan'],
                 'scheduled' => self::PALETTE['purple'],
                 'clean' => self::PALETTE['yellow'],
+                'delete' => self::PALETTE['red'],
                 'clear' => self::PALETTE['red'],
                 'maintenance' => self::PALETTE['gray'],
                 'other' => self::PALETTE['gray'],
