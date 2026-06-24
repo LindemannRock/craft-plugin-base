@@ -609,6 +609,7 @@ Dropdown with colored status indicators. Supports flat options or grouped sectio
         ],
     },
     urlParams: urlParams,
+    pageUrl: url('my-plugin/items'),
 } only %}
 ```
 
@@ -650,6 +651,7 @@ Selected items show their actual color; unselected items show neutral gray.
         ],
     },
     urlParams: urlParams,
+    pageUrl: url('my-plugin/items'),
 } only %}
 ```
 
@@ -677,6 +679,7 @@ Plain dropdown without status indicators.
         ],
     },
     urlParams: urlParams,
+    pageUrl: url('my-plugin/items'),
 } only %}
 ```
 
@@ -688,6 +691,8 @@ Plain dropdown without status indicators.
 | `filter.icon` | `string` | Optional button icon |
 | `filter.menuStyle` | `string` | Inline CSS style for the dropdown menu element |
 | `filter.options` | `array` | `{value, label}` pairs (options may include `extra` for secondary text) |
+| `urlParams` | `array` | Current query parameters to preserve in generated filter links |
+| `pageUrl` | `string` | Canonical page URL for generated filter links |
 
 ### Date Range Filter
 
@@ -703,6 +708,7 @@ Date range dropdown using options from [DateRangeHelper](../feature-tour/date-ra
         label: 'Date Range'|t('my-plugin'),
     },
     urlParams: urlParams,
+    pageUrl: url('my-plugin/items'),
 } only %}
 ```
 
@@ -713,6 +719,8 @@ Date range dropdown using options from [DateRangeHelper](../feature-tour/date-ra
 | `filter.label` | `string` | Default button label |
 | `filter.icon` | `string` | Optional button icon |
 | `filter.options` | `array` | Custom `{value, label}` pairs (defaults to `lrDateRangeOptions()`) |
+| `urlParams` | `array` | Current query parameters to preserve in generated filter links |
+| `pageUrl` | `string` | Canonical page URL for generated filter links |
 
 ---
 
@@ -727,6 +735,7 @@ Search field with clear button that preserves filter and sort state.
     placeholder: 'Search items...'|t('my-plugin'),
     value: search,
     filters: filters,
+    preserveParams: {language: currentLanguage},
     currentSort: sort,
     currentDir: dir,
 } only %}
@@ -737,6 +746,7 @@ Search field with clear button that preserves filter and sort state.
 | `placeholder` | `string` | Placeholder text |
 | `value` | `string` | Current search value |
 | `filters` | `array` | Active filters (rendered as hidden inputs) |
+| `preserveParams` | `array` | Extra hidden query params to preserve with search submissions |
 | `currentSort` | `string` | Current sort field |
 | `currentDir` | `string` | Current sort direction |
 

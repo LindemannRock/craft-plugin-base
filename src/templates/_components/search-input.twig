@@ -7,6 +7,7 @@
  # - placeholder: Search placeholder text
  # - value: Current search value
  # - filters: Array of filters (to include as hidden inputs)
+ # - preserveParams: Extra params to preserve as hidden inputs
  # - currentSort: Current sort field
  # - currentDir: Current sort direction
  #}
@@ -29,6 +30,9 @@
             aria-label="{{ 'Clear search'|t('lindemannrock-base') }}"></button>
 
     {# Hidden inputs to maintain filter state #}
+    {% for name, paramValue in preserveParams ?? {} %}
+        <input type="hidden" name="{{ name }}" value="{{ paramValue }}">
+    {% endfor %}
     {% for filter in filters %}
         <input type="hidden" name="{{ filter.param }}" value="{{ filter.current }}">
     {% endfor %}

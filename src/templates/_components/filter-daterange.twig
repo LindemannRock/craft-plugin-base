@@ -14,6 +14,7 @@
  #     ]
  # }
  # - urlParams: Current URL parameters to maintain
+ # - pageUrl: Canonical page URL for filter links
  #}
 
 {# Use centralized date range options from DateRangeHelper #}
@@ -39,7 +40,7 @@
                 <li>
                     {% set optionParams = urlParams|merge({(filter.param): option.value, page: 1}) %}
                     <a class="{{ filter.current == option.value ? 'sel' : '' }}"
-                       href="?{{ optionParams|url_encode }}">
+                       href="{{ pageUrl ?? '' }}?{{ optionParams|url_encode }}">
                         {{ option.label }}
                     </a>
                 </li>

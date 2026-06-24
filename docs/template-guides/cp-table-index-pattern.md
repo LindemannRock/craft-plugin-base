@@ -264,6 +264,7 @@ The template is **purely presentational** — it builds `tableConfig` and render
     page: {
         title: 'Things'|t('my-plugin'),
         subnav: 'things',
+        url: url('my-plugin/things'),
         crumbs: [
             { label: myHelper.fullName, url: url('my-plugin') },
             { label: 'Things'|t('my-plugin'), url: url('my-plugin/things') },

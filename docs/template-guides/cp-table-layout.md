@@ -15,6 +15,7 @@ A reusable layout for Control Panel pages with tabular data. Provides a unified 
     page: {
         title: 'My Items'|t('my-plugin'),
         subnav: 'my-items',
+        url: url('my-plugin/items'),
         crumbs: [
             { label: myHelper.fullName, url: url('my-plugin') },
         ],
@@ -66,6 +67,7 @@ A reusable layout for Control Panel pages with tabular data. Provides a unified 
 |-----|------|-------------|
 | `title` | `string` | Page title |
 | `subnav` | `string` | Active subnav item key |
+| `url` | `string` | Canonical URL for search, sort, filter, and pagination actions. Defaults to `url(plugin.handle ~ '/' ~ page.subnav)`. Set this when the selected subnav key is not the route path. |
 | `crumbs` | `array` | Breadcrumb trail |
 | `fullPageForm` | `bool` | Wrap page in a form (default: `false`) |
 
@@ -129,6 +131,20 @@ The `template` option lets you render custom cell content without overriding the
 |-----|------|-------------|
 | `placeholder` | `string` | Search input placeholder |
 | `value` | `string` | Current search value |
+
+### preserveParams
+
+Extra query parameters that should survive table search, clear-search, filters, sorting, pagination, and AJAX refresh.
+
+Use this for page state that is not itself a visible table filter, such as an active language, parent context, or return target:
+
+```twig
+preserveParams: {
+    language: currentLanguage,
+},
+```
+
+Visible filters should still use `filters`; `preserveParams` is for hidden page context.
 
 ### checkboxes
 

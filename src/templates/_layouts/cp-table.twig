@@ -16,6 +16,7 @@
  # │     page: {                                                     │
  # │         title: 'SMS Logs',                                      │
  # │         subnav: 'sms-logs',                                     │
+ # │         url: url('sms-manager/logs'),  // Optional canonical URL │
  # │         crumbs: [...],                                          │
  # │     },                                                          │
  # │     sidebarMenu: {  // Optional left sidebar navigation          │
@@ -90,6 +91,7 @@
 {% set pageConfig = config.page ?? {} %}
 {% set title = pageConfig.title ?? 'Listing' %}
 {% set selectedSubnavItem = pageConfig.subnav ?? '' %}
+{% set pageUrl = pageConfig.url ?? url(pluginHandle ~ '/' ~ selectedSubnavItem) %}
 {% set crumbs = pageConfig.crumbs ?? [] %}
 {% set fullPageForm = pageConfig.fullPageForm ?? false %}
 
@@ -101,6 +103,8 @@
 
 {# Filters #}
 {% set filters = config.filters ?? [] %}
+{# Extra non-filter query params that should survive search/filter/sort/pagination. #}
+{% set preserveParams = config.preserveParams ?? {} %}
 
 {# Search #}
 {% set searchConfig = config.search ?? {} %}
@@ -156,7 +160,7 @@
 {% set ajaxEndpoint = ajaxConfig.endpoint ?? '' %}
 
 {# Build URL params for filter/sort/pagination links #}
-{% set urlParams = {} %}
+{% set urlParams = preserveParams %}
 {% for filter in filters %}
     {% set urlParams = urlParams|merge({(filter.param): filter.current}) %}
     {% if filter.groups ?? false %}
@@ -186,16 +190,16 @@
 {% block toolbar %}
     <div id="toolbar" class="flex" style="align-items: flex-end;">
         <div class="flex-grow">
-            <form method="get" action="{{ url(pluginHandle ~ '/' ~ selectedSubnavItem) }}" id="lr-filter-form">
+            <form method="get" action="{{ pageUrl }}" id="lr-filter-form">
                 <div class="flex">
                     {# Render each filter #}
                     {% for filter in filters %}
                         {% if filter.type == 'status' %}
-                            {% include 'lindemannrock-base/_components/filter-status' with {filter: filter, urlParams: urlParams} only %}
+                            {% include 'lindemannrock-base/_components/filter-status' with {filter: filter, urlParams: urlParams, pageUrl: pageUrl} only %}
                         {% elseif filter.type == 'dropdown' %}
-                            {% include 'lindemannrock-base/_components/filter-dropdown' with {filter: filter, urlParams: urlParams} only %}
+                            {% include 'lindemannrock-base/_components/filter-dropdown' with {filter: filter, urlParams: urlParams, pageUrl: pageUrl} only %}
                         {% elseif filter.type == 'dateRange' %}
-                            {% include 'lindemannrock-base/_components/filter-daterange' with {filter: filter, urlParams: urlParams} only %}
+                            {% include 'lindemannrock-base/_components/filter-daterange' with {filter: filter, urlParams: urlParams, pageUrl: pageUrl} only %}
                         {% endif %}
                     {% endfor %}
 
@@ -207,6 +211,7 @@
                         placeholder: searchPlaceholder,
                         value: searchValue,
                         filters: filters,
+                        preserveParams: preserveParams,
                         currentSort: currentSort,
                         currentDir: currentDir,
                     } only %}
@@ -521,7 +526,7 @@
                 of: {{ 'of'|t('lindemannrock-base')|json_encode|raw }},
             },
             urlParams: {{ urlParams|json_encode|raw }},
-            baseUrl: {{ url(pluginHandle ~ '/' ~ selectedSubnavItem)|json_encode|raw }},
+            baseUrl: {{ pageUrl|json_encode|raw }},
             viewEnabled: {{ viewEnabled ? 'true' : 'false' }},
             viewStorageKey: {{ viewStorageKey|json_encode|raw }},
             hideableColumns: {{ hideableColumns|map(c => c.key)|values|json_encode|raw }},
@@ -603,7 +608,8 @@
                     params.delete(key);
                 }
             }
-            return window.location.pathname + '?' + params.toString();
+            const query = params.toString();
+            return config.baseUrl + (query ? '?' + query : '');
         }
 
         // Sort buttons
