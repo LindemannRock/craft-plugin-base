@@ -895,11 +895,16 @@
                 save: saveViewSettings,
                 toggleColumn: toggleColumnVisibility,
                 getHiddenColumns: getHiddenColumns,
+                apply: applyStoredSettings,
                 reset: function() {
                     localStorage.removeItem(config.viewStorageKey);
                     location.reload();
                 }
             };
+
+            document.addEventListener('lr:refresh', function() {
+                requestAnimationFrame(applyStoredSettings);
+            });
         }
 
         // Expose config globally for plugins
