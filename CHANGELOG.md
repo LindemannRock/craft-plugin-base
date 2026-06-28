@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.30.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.29.0...v5.30.0) (2026-06-28)
+
+
+### Added
+
+* **cp:** add applyStoredSettings functionality on lr:refresh event ([3a46a23](https://github.com/LindemannRock/craft-plugin-base/commit/3a46a23594096a10d86b77d630edb4555a27eee9))
+
 ## [5.29.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.28.1...v5.29.0) - 2026-06-24
 
 
