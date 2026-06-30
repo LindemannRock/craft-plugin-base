@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.31.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.30.0...v5.31.0) - 2026-06-30
+
+
+### Added
+
+* **cache:** add CacheHelper for plugin cache management ([557f75d](https://github.com/LindemannRock/craft-plugin-base/commit/557f75df40f4a8ed5c7dbef322b5cb7ae0833704))
+
 ## [5.30.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.29.0...v5.30.0) - 2026-06-28
 
 
