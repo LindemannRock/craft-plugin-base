@@ -178,6 +178,17 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `lrLogoFile()` | `string` | Absolute path to the canonical LindemannRock logo SVG @since(5.27.0) |
 | `lrLogoPaths()` | `string` | The logo's two `<path>` elements, no `<svg>`/`<g>` wrapper @since(5.27.0) |
 
+### CacheHelper
+
+`lindemannrock\base\helpers\CacheHelper`
+[Full docs](../feature-tour/cache-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `clearTrackedRedisKeys(string $pluginHandle, string $keyType, int $batchSize = 500)` | `int` | Clear cache entries tracked in a plugin-owned Redis set using `SSCAN` batches @since(5.31.0) |
+| `clearCacheFiles(string $directory, string $suffix = '.cache')` | `int` | Delete matching local cache files from a directory with `DirectoryIterator` @since(5.31.0) |
+| `countCacheFiles(string $directory, string $suffix = '.cache')` | `int` | Count matching local cache files in a directory with `DirectoryIterator` @since(5.31.0) |
+
 ### JsonHelper
 
 `lindemannrock\base\helpers\JsonHelper`

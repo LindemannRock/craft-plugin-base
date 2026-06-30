@@ -16,6 +16,7 @@
         "children": [
             "feature-tour/overview",
             "feature-tour/plugin-helper",
+            "feature-tour/cache-helper",
             "feature-tour/settings-persistence",
             "feature-tour/settings-post-helper",
             "feature-tour/settings-config",

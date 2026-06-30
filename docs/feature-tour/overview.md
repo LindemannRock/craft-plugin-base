@@ -16,6 +16,7 @@ Utility classes for common operations:
 - **[ExportHelper](export-helper.md)** — CSV, JSON, and Excel exports with configurable format availability and date formatting
 - **[GeoHelper](geo-helper.md)** — Country names, dial codes, phone validation, and country select options
 - **[PluginHelper](plugin-helper.md)** — Plugin bootstrap, cache paths/keys, Redis cache safeguard, and cross-plugin detection
+- **[CacheHelper](cache-helper.md)** — Bounded Redis tracked-set cleanup plus streaming local cache file count/delete helpers
 - **[Install experience](install-experience.md)** — One-time CP welcome modal shown after install, with version metadata, branding, and preset-driven confetti
 - **[AnalyticsIpHelper](analytics-ip-helper.md)** — One-step IP anonymization, hashing, and geo-lookup eligibility for analytics tracking
 - **[JsonHelper](../developers/api-reference.md)** — `htmlSafeJson()` for safely embedding JSON in inline HTML/JS
