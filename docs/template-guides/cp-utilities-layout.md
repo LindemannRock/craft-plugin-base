@@ -26,6 +26,13 @@ A reusable layout for plugin utility/overview pages with system overview cards a
     } only %}
 {% endblock %}
 
+{% block beforeQuickActions %}
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: '<strong>' ~ 'Site'|t('my-plugin') ~ ':</strong> ' ~ selectedSiteLabel,
+        margin: 'both',
+    } %}
+{% endblock %}
+
 {% block quickActions %}
     {% include 'lindemannrock-base/_layouts/cp-utilities/_action-section' with {
         title: 'Navigation'|t('my-plugin'),
@@ -97,6 +104,19 @@ System overview cards. Rendered inside an `.lr-unified-cards` grid container.
 {% endblock %}
 ```
 
+### beforeQuickActions
+
+Plugin-specific content between the overview grid and the Quick Actions pane. Use this for active filter summaries, contextual warnings, or other short status messages that should be visible before action buttons.
+
+```twig
+{% block beforeQuickActions %}
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: '<strong>' ~ 'Site'|t('my-plugin') ~ ':</strong> ' ~ selectedSiteLabel,
+        margin: 'both',
+    } %}
+{% endblock %}
+```
+
 ### quickActions
 
 Quick action sections. Use the `_action-section` sub-template to create grouped action buttons.
@@ -126,7 +146,7 @@ Quick action sections. Use the `_action-section` sub-template to create grouped 
 
 ### additionalContent
 
-Plugin-specific sections after the Quick Actions pane.
+Plugin-specific sections after the Quick Actions pane. For filter summaries or warnings that should appear before Quick Actions, use `beforeQuickActions`.
 
 ### scripts
 

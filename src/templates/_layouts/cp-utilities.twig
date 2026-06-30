@@ -16,6 +16,7 @@
  # Blocks:
  #   headerActions - Actions in header (e.g., site selector dropdown)
  #   overview - System overview cards (use lr-unified-cards grid)
+ #   beforeQuickActions - Plugin-specific content before Quick Actions
  #   quickActions - Quick action sections (navigation, cache, etc.)
  #   additionalContent - Plugin-specific sections after Quick Actions
  #   scripts - JavaScript handlers
@@ -87,6 +88,9 @@
     </div>
 </div>
 {% endif %}
+
+{# Content before Quick Actions #}
+{% block beforeQuickActions %}{% endblock %}
 
 {# Quick Actions #}
 {% set quickActionsContent %}{% block quickActions %}{% endblock %}{% endset %}
