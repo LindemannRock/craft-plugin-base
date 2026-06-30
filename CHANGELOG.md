@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.32.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.31.0...v5.32.0) (2026-06-30)
+
+
+### Added
+
+* add beforeQuickActions block for plugin-specific content ([7de81a2](https://github.com/LindemannRock/craft-plugin-base/commit/7de81a22f39bfcef1a4850f5e228dda1d2c7b79f))
+
 ## [5.31.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.30.0...v5.31.0) - 2026-06-30
 
 
