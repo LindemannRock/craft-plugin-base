@@ -11,7 +11,7 @@ Shared scaffolding for PHPUnit integration tests against a live Craft install. P
 
 | Member | Kind | Purpose |
 |--------|------|---------|
-| `IntegrationTestCase` | abstract class | Base for all integration tests. Provides component swap/restore, generic DB helpers, marker cleanup, fixture lifecycle helpers, queue drain helper, and a `cleanupExternalState()` hook. |
+| `IntegrationTestCase` | abstract class | Base for all integration tests. Provides component swap/restore, generic DB helpers, marker cleanup, user/permission helpers, fixture lifecycle helpers, queue drain helper, and a `cleanupExternalState()` hook. |
 | `StubConsoleRequest` | final class | Test double extending `craft\console\Request` that adds the web-only `getUserIP()` / `getUserAgent()` / `getReferrer()` accessors. Use when installing on `Craft::$app->set('request', …)` so mode-detection stays honest. |
 | `StubWebRequest` | final class | Test double extending `yii\web\Request` with the same three accessors. Use when the service under test type-hints `yii\web\Request` (or `craft\web\Request`) as a method parameter. |
 | `bootstrap()` | function | Initialises Craft as a console application from a test bootstrap file. |
@@ -39,6 +39,10 @@ abstract class IntegrationTestCase extends \PHPUnit\Framework\TestCase
 | `nextTestMarker(string $prefix, string $kind = '')` | `string` | Return a unique marker for the current test instance, e.g. `__plugin_test_form_1_ab12cd34`. |
 | `saveTestElement(ElementInterface $element, bool $runValidation = false, bool $propagate = true, bool $updateSearchIndex = true)` | `ElementInterface` | Save a Craft element through the element service and hard-delete it automatically in teardown. |
 | `trackElementForCleanup(int $elementId)` | `void` | Register an existing Craft element ID for hard-delete cleanup in teardown. |
+| `createTestUser(string $prefix, array $attributes = [])` | `craft\elements\User` | Create an active non-admin Craft user with marker-prefixed username/email defaults and hard-delete it automatically in teardown. |
+| `grantPermissions(User $user, array $permissions)` | `void` | Replace the direct permissions assigned to a test user. |
+| `actingAs(User $user)` | `void` | Make Craft permission checks act as the given user for the rest of the test. The previous identity is restored in teardown. |
+| `trackUserForCleanup(int $userId)` | `void` | Register an existing Craft user ID for hard-delete cleanup in teardown. |
 | `createTrackedTempDirectory(string $prefix)` | `string` | Create a unique directory under `sys_get_temp_dir()` and remove it recursively in teardown. |
 | `trackTempPath(string $path)` | `void` | Register a file, symlink, or directory path for teardown cleanup. |
 | `drainQueueJob(BaseJob $job, callable $isDone, int $maxIterations = 50)` | `void` | Run `$job->execute(Craft::$app->queue)` in a loop until `$isDone()` returns true. Capped to surface hangs as failures. |
@@ -158,6 +162,39 @@ $this->trackTempPath($file);
 ```
 
 Tracked temp paths are removed in reverse order. Directories are removed recursively; files and symlinks are unlinked.
+
+### User and permission helpers
+
+Use the auth helpers when a test needs to prove a CP permission gate works for a real non-admin user. Base owns the Craft user lifecycle and current-identity swap; plugin tests still provide their own permission constants and scenario-specific assertions.
+
+```php
+$user = $this->createTestUser('__my_plugin_auth_');
+$this->grantPermissions($user, [
+    MyPlugin::PERMISSION_VIEW_ITEMS,
+]);
+
+$this->actingAs($user);
+
+self::assertTrue(Craft::$app->getUser()->checkPermission(MyPlugin::PERMISSION_VIEW_ITEMS));
+self::assertFalse(Craft::$app->getUser()->checkPermission(MyPlugin::PERMISSION_DELETE_ITEMS));
+```
+
+`grantPermissions()` replaces the user's direct permission list. Grant only the permissions needed for the scenario so omitted permissions remain meaningful in the assertion. `actingAs()` uses Craft's current user identity directly, which works in the console-bootstrapped PHPUnit harness without relying on browser session state.
+
+For action/controller denial tests, configure the request shape the action expects, then dispatch as the restricted user:
+
+```php
+$user = $this->createTestUser('__my_plugin_auth_');
+$this->grantPermissions($user, [
+    MyPlugin::PERMISSION_VIEW_ITEMS,
+]);
+$this->actingAs($user);
+
+$this->expectException(\yii\web\ForbiddenHttpException::class);
+Craft::$app->runAction('my-plugin/items/delete');
+```
+
+Test users are active and non-admin by default, receive a generated password, and are hard-deleted during teardown. Pass `$attributes` only for scenario-specific fields such as `email`, `username`, `fullName`, or `active`.
 
 ### `drainQueueJob()`
 

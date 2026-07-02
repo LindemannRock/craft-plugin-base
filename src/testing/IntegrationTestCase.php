@@ -13,6 +13,7 @@ namespace lindemannrock\base\testing;
 use Craft;
 use craft\base\ElementInterface;
 use craft\db\Query;
+use craft\elements\User;
 use craft\helpers\FileHelper;
 use craft\queue\BaseJob;
 use PHPUnit\Framework\TestCase as PhpUnitTestCase;
@@ -40,6 +41,9 @@ use PHPUnit\Framework\TestCase as PhpUnitTestCase;
  *    seed rows, temp paths, and element handles
  *  - {@see saveTestElement()}, {@see trackElementForCleanup()} — save Craft
  *    elements and hard-delete them automatically during teardown
+ *  - {@see createTestUser()}, {@see grantPermissions()}, {@see actingAs()} —
+ *    create non-admin CP users with explicit permissions and make requests as
+ *    that user
  *  - {@see createTrackedTempDirectory()}, {@see trackTempPath()} — track temp
  *    files/directories for automatic teardown cleanup
  *  - {@see drainQueueJob()} — run a queueable job in a loop until a condition
@@ -72,6 +76,26 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
     private array $trackedElementIds = [];
 
     /**
+     * User IDs scheduled for hard-delete cleanup.
+     *
+     * @var list<int>
+     */
+    private array $trackedUserIds = [];
+
+    /**
+     * Original identity captured before the first {@see actingAs()} call in
+     * the current test.
+     */
+    private ?User $originalIdentity = null;
+
+    /**
+     * Whether {@see originalIdentity} has been captured for this test. A
+     * separate flag lets us distinguish an original guest identity from "not
+     * captured yet".
+     */
+    private bool $hasOriginalIdentity = false;
+
+    /**
      * Filesystem paths scheduled for cleanup.
      *
      * @var list<string>
@@ -84,6 +108,8 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
         // still installed — a stub that recorded calls during the test may
         // need to be consulted by cleanup logic.
         $this->cleanupExternalState();
+        $this->restoreActingUser();
+        $this->cleanupTrackedUsers();
         $this->cleanupTrackedElements();
         $this->cleanupTrackedTempPaths();
         $this->restoreSwappedComponents();
@@ -255,6 +281,96 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
     }
 
     /**
+     * Create an active non-admin Craft user and schedule it for teardown
+     * cleanup.
+     *
+     * Use marker prefixes that are unique to the plugin test suite so stale
+     * rows remain easy to identify if a run is interrupted.
+     *
+     * @param array<string, mixed> $attributes User attributes to override.
+     * @throws \RuntimeException when the user cannot be saved.
+     */
+    protected function createTestUser(string $prefix, array $attributes = []): User
+    {
+        $marker = $this->nextTestMarker($prefix, 'user');
+        $localPart = trim((string) preg_replace('/[^a-z0-9]+/i', '-', strtolower($marker)), '-');
+        if ($localPart === '') {
+            $localPart = 'test-user-' . bin2hex(random_bytes(4));
+        }
+        $localPart = substr($localPart, 0, 48);
+
+        $user = new User();
+        $user->username = $attributes['username'] ?? $localPart;
+        $user->email = $attributes['email'] ?? $localPart . '@example.test';
+        $user->fullName = $attributes['fullName'] ?? 'Test User ' . $marker;
+        $user->admin = false;
+        $user->active = $attributes['active'] ?? true;
+        $user->newPassword = $attributes['newPassword'] ?? 'TestPassword-' . bin2hex(random_bytes(8));
+
+        foreach ($attributes as $attribute => $value) {
+            if (in_array($attribute, ['username', 'email', 'fullName', 'active', 'newPassword', 'admin'], true)) {
+                continue;
+            }
+            $user->{$attribute} = $value;
+        }
+
+        $saved = Craft::$app->getElements()->saveElement($user, false);
+        if (!$saved || $user->id === null) {
+            throw new \RuntimeException('Test user failed to save: ' . json_encode($user->getErrors()));
+        }
+
+        $this->trackUserForCleanup((int) $user->id);
+
+        return $user;
+    }
+
+    /**
+     * Grant direct user permissions, replacing any permissions already
+     * assigned directly to the user.
+     *
+     * @param list<string> $permissions
+     * @throws \RuntimeException when permissions cannot be saved.
+     */
+    protected function grantPermissions(User $user, array $permissions): void
+    {
+        if ($user->id === null) {
+            throw new \RuntimeException('Cannot grant permissions to an unsaved test user.');
+        }
+
+        $saved = Craft::$app->getUserPermissions()->saveUserPermissions((int) $user->id, $permissions);
+        if (!$saved) {
+            throw new \RuntimeException('Test user permissions failed to save.');
+        }
+    }
+
+    /**
+     * Make Craft permission checks act as the given user for the rest of the
+     * test. The original identity is restored automatically during teardown.
+     */
+    protected function actingAs(User $user): void
+    {
+        $userSession = Craft::$app->getUser();
+        if (!$this->hasOriginalIdentity) {
+            $identity = $userSession->getIdentity();
+            $this->originalIdentity = $identity instanceof User ? $identity : null;
+            $this->hasOriginalIdentity = true;
+        }
+
+        $userSession->setIdentity($user);
+    }
+
+    /**
+     * Schedule an existing Craft user ID for hard-delete cleanup during
+     * teardown.
+     */
+    protected function trackUserForCleanup(int $userId): void
+    {
+        if (!in_array($userId, $this->trackedUserIds, true)) {
+            $this->trackedUserIds[] = $userId;
+        }
+    }
+
+    /**
      * Schedule an existing Craft element ID for hard-delete cleanup during
      * teardown.
      *
@@ -334,6 +450,41 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
             }
         }
         $this->trackedElementIds = [];
+    }
+
+    /**
+     * Restore the identity that was active before {@see actingAs()}.
+     */
+    private function restoreActingUser(): void
+    {
+        if (!$this->hasOriginalIdentity) {
+            return;
+        }
+
+        Craft::$app->getUser()->setIdentity($this->originalIdentity);
+        $this->originalIdentity = null;
+        $this->hasOriginalIdentity = false;
+    }
+
+    /**
+     * Hard-delete every user registered through {@see createTestUser()} or
+     * {@see trackUserForCleanup()}.
+     */
+    private function cleanupTrackedUsers(): void
+    {
+        foreach (array_reverse($this->trackedUserIds) as $userId) {
+            Craft::$app->getUserPermissions()->saveUserPermissions($userId, []);
+
+            $user = User::find()
+                ->id($userId)
+                ->status(null)
+                ->one();
+
+            if ($user instanceof User) {
+                Craft::$app->getElements()->deleteElement($user, true);
+            }
+        }
+        $this->trackedUserIds = [];
     }
 
     /**

@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace lindemannrock\base\tests\Integration;
 
+use Craft;
+use craft\elements\User;
 use lindemannrock\base\testing\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -55,5 +57,53 @@ final class IntegrationTestCaseFixtureLifecycleTest extends IntegrationTestCase
         $case->runBaseTearDown();
 
         self::assertDirectoryDoesNotExist($dir);
+    }
+
+    public function testTestUserPermissionsAndIdentityAreRestoredDuringTearDown(): void
+    {
+        $originalIdentity = Craft::$app->getUser()->getIdentity();
+
+        $case = new class ('user-auth') extends IntegrationTestCase {
+            public function seedUser(): User
+            {
+                return $this->createTestUser('__base_auth_');
+            }
+
+            /**
+             * @param list<string> $permissions
+             */
+            public function grant(User $user, array $permissions): void
+            {
+                $this->grantPermissions($user, $permissions);
+            }
+
+            public function become(User $user): void
+            {
+                $this->actingAs($user);
+            }
+
+            public function runBaseTearDown(): void
+            {
+                $this->tearDown();
+            }
+        };
+
+        $user = $case->seedUser();
+        $case->grant($user, ['accessCp']);
+        $case->become($user);
+
+        self::assertFalse(Craft::$app->getUser()->getIsAdmin());
+        self::assertTrue(Craft::$app->getUser()->checkPermission('accessCp'));
+        self::assertFalse(Craft::$app->getUser()->checkPermission('administrateUsers'));
+
+        $userId = (int) $user->id;
+        $case->runBaseTearDown();
+
+        $restoredIdentity = Craft::$app->getUser()->getIdentity();
+        $originalIdentityId = $originalIdentity instanceof User ? $originalIdentity->id : null;
+        $restoredIdentityId = $restoredIdentity instanceof User ? $restoredIdentity->id : null;
+
+        self::assertSame($originalIdentityId, $restoredIdentityId);
+        self::assertNull(User::find()->id($userId)->status(null)->one());
     }
 }
