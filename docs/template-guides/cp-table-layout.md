@@ -207,7 +207,9 @@ footerActions: [
 | `interval` | `int` | Refresh interval in seconds |
 | `endpoint` | `string` | Controller action URL |
 
-When row checkboxes are enabled, auto-refresh pauses while one or more rows are selected so bulk-action state is not replaced underneath the user. Refresh resumes after the selection is cleared.
+Refresh requests preserve the table's current filter, search, sort, and pagination parameters. If the endpoint already contains a query string, the layout appends refresh params with `&`.
+
+Auto-refresh pauses while one or more rows are selected or an expandable row is open, so bulk-action state and row detail content are not replaced underneath the user. Refresh resumes after the selection is cleared and all expanded rows are collapsed.
 
 AJAX endpoints may return metadata for the layout to keep the footer in sync:
 

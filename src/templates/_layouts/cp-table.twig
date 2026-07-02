@@ -843,7 +843,8 @@
             }
 
             function isRefreshPaused() {
-                return window.lrTableSelection?.getCount?.() > 0;
+                return (window.lrTableSelection?.getCount?.() || 0) > 0
+                    || document.querySelectorAll('.lr-data-row.lr-row-expanded').length > 0;
             }
 
             function updateNotice() {
@@ -907,7 +908,9 @@
                 try {
                     const params = new URLSearchParams(config.urlParams);
                     params.set('page', config.page);
-                    const response = await fetch(config.ajaxEndpoint + '?' + params.toString(), {
+                    const query = params.toString();
+                    const separator = config.ajaxEndpoint.includes('?') ? '&' : '?';
+                    const response = await fetch(config.ajaxEndpoint + (query ? separator + query : ''), {
                         headers: {
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'

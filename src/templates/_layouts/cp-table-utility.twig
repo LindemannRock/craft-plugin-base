@@ -661,26 +661,44 @@
                 return seconds + 's';
             }
 
+            function isRefreshPaused() {
+                return (window.lrTableSelection?.getCount?.() || 0) > 0
+                    || document.querySelectorAll('.lr-data-row.lr-row-expanded').length > 0;
+            }
+
             function updateNotice() {
                 if (!noticeEl || !textEl) return;
-                if (isRefreshing) {
+                if (isRefreshPaused()) {
+                    noticeEl.classList.remove('is-refreshing');
+                    noticeEl.classList.add('is-paused');
+                    textEl.textContent = '{{ "Paused"|t("lindemannrock-base") }}';
+                } else if (isRefreshing) {
                     noticeEl.classList.add('is-refreshing');
+                    noticeEl.classList.remove('is-paused');
                     textEl.textContent = '{{ "Refreshing"|t("lindemannrock-base") }}';
                 } else {
-                    noticeEl.classList.remove('is-refreshing');
+                    noticeEl.classList.remove('is-refreshing', 'is-paused');
                     textEl.textContent = formatTime(countdown);
                 }
             }
 
             async function refresh() {
                 if (isRefreshing) return;
+                if (isRefreshPaused()) {
+                    countdown = config.ajaxInterval;
+                    updateNotice();
+                    return;
+                }
+
                 isRefreshing = true;
                 updateNotice();
 
                 try {
                     const params = new URLSearchParams(config.urlParams);
                     params.set('page', config.page);
-                    const response = await fetch(config.ajaxEndpoint + '?' + params.toString(), {
+                    const query = params.toString();
+                    const separator = config.ajaxEndpoint.includes('?') ? '&' : '?';
+                    const response = await fetch(config.ajaxEndpoint + (query ? separator + query : ''), {
                         headers: {
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
@@ -711,6 +729,7 @@
 
             // Start auto-refresh
             updateNotice();
+            document.addEventListener('lr:selectionChanged', updateNotice);
             refreshTimer = setInterval(refresh, config.ajaxInterval * 1000);
             countdownTimer = setInterval(tickCountdown, 1000);
         }
