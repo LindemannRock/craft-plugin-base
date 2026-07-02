@@ -52,10 +52,10 @@ Each section supports these properties:
 | `key` | `string` | Unique identifier for the subnav item |
 | `label` | `string` | Display label |
 | `url` | `string` | URL path (e.g., `'my-plugin/logs'`). `route` is accepted as an alias |
-| `permissionsAll` | `string\|array` | User must have ALL listed permissions |
-| `permissionsAny` | `string\|array` | User must have at least ONE permission |
+| `permissionsAll` | `string or array` | User must have ALL listed permissions |
+| `permissionsAny` | `string or array` | User must have at least ONE permission |
 | `settingsFlag` | `string` | Property on Settings model that must be truthy |
-| `when` | `bool\|callable` | Custom condition — callable receives `($settings, $user)` |
+| `when` | `bool or callable` | Custom condition — callable receives `($settings, $user)` |
 | `enabled` | `bool` | Set to `false` to always hide |
 
 ### Permission Checks

@@ -58,6 +58,8 @@ Use this layout when you need table functionality (filters, search, pagination, 
 
 The configuration is identical to the [CP Table Layout](cp-table-layout.md) — all the same `tableConfig` keys, filter types, and overridable blocks are supported.
 
+Like the standalone layout, utility tables can build from a `page.url` that already includes query parameters. Filter links and JavaScript navigation preserve that existing query string and append additional table state with `&`, which matters in Craft utility contexts that carry `site`, language, or parent context in the URL.
+
 ### Key Differences from CP Table Layout
 
 | Feature | CP Table Layout | CP Table Utility Layout |

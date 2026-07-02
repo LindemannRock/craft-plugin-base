@@ -18,6 +18,8 @@
  #}
 
 {# Use centralized date range options from DateRangeHelper #}
+{% set pageUrl = pageUrl ?? '' %}
+{% set querySeparator = '?' in pageUrl ? '&' : '?' %}
 {% set options = filter.options ?? lrDateRangeOptions() %}
 
 {% set currentOption = null %}
@@ -40,7 +42,7 @@
                 <li>
                     {% set optionParams = urlParams|merge({(filter.param): option.value, page: 1}) %}
                     <a class="{{ filter.current == option.value ? 'sel' : '' }}"
-                       href="{{ pageUrl ?? '' }}?{{ optionParams|url_encode }}">
+                       href="{{ pageUrl }}{{ querySeparator }}{{ optionParams|url_encode }}">
                         {{ option.label }}
                     </a>
                 </li>

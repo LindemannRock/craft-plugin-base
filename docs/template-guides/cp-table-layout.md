@@ -71,6 +71,8 @@ A reusable layout for Control Panel pages with tabular data. Provides a unified 
 | `crumbs` | `array` | Breadcrumb trail |
 | `fullPageForm` | `bool` | Wrap page in a form (default: `false`) |
 
+The layout accepts a `page.url` that already contains query parameters. Filter links, sortable headers, pagination, and `lrBuildUrl()` append with `&` instead of a second `?` when needed, so Craft context URLs such as `url('my-plugin/items', {site: currentSite.handle})` remain valid.
+
 ### table
 
 | Key | Type | Description |
@@ -144,7 +146,7 @@ preserveParams: {
 },
 ```
 
-Visible filters should still use `filters`; `preserveParams` is for hidden page context.
+Visible filters should still use `filters`; `preserveParams` is for hidden page context. If the context is already present in `page.url`, you do not need to duplicate it here. Use one approach consistently so a value such as `site` or `language` is not sent twice.
 
 ### checkboxes
 

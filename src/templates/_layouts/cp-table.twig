@@ -610,7 +610,8 @@
                 }
             }
             const query = params.toString();
-            return config.baseUrl + (query ? '?' + query : '');
+            const separator = config.baseUrl.includes('?') ? '&' : '?';
+            return config.baseUrl + (query ? separator + query : '');
         }
 
         // Sort buttons
