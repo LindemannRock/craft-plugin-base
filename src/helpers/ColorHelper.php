@@ -269,13 +269,14 @@ class ColorHelper
             ],
 
             // =================================================================
-            // LOG LEVEL - debug = purple, info = sky, warning = orange, error = red
+            // LOG LEVEL - debug = purple, info = sky, warning = orange, error = red, unknown = gray
             // =================================================================
             'logLevel' => [
                 'debug' => self::PALETTE['purple'],
                 'info' => self::PALETTE['blue'],
                 'warning' => self::PALETTE['orange'],
                 'error' => self::PALETTE['red'],
+                'unknown' => self::PALETTE['gray'],
             ],
 
             // =================================================================
