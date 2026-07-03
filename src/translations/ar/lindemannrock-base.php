@@ -21,6 +21,7 @@ return [
     'Value must be a whole number.' => 'يجب أن تكون القيمة عدداً صحيحاً.',
     'Value must be a number.' => 'يجب أن تكون القيمة رقمًا.',
     'Value must be a string.' => 'يجب أن تكون القيمة سلسلة نصية.',
+    'Plugin name cannot contain HTML or control characters.' => 'لا يجوز أن يحتوي اسم الإضافة على HTML أو أحرف تحكم.',
     'Value must be either true or false.' => 'يجب أن تكون القيمة إما true أو false.',
     'Value must be an array.' => 'يجب أن تكون القيمة مصفوفة.',
 

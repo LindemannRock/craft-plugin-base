@@ -21,6 +21,7 @@ return [
     'Value must be a whole number.' => 'Il valore deve essere un numero intero.',
     'Value must be a number.' => 'Il valore deve essere un numero.',
     'Value must be a string.' => 'Il valore deve essere una stringa.',
+    'Plugin name cannot contain HTML or control characters.' => 'Il nome del plugin non può contenere HTML o caratteri di controllo.',
     'Value must be either true or false.' => 'Il valore deve essere true o false.',
     'Value must be an array.' => 'Il valore deve essere un array.',
 

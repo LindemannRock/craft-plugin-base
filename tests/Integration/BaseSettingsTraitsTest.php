@@ -242,7 +242,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
         self::assertSame([], $traitProps, 'PluginNameSettingsTrait must not declare any properties');
     }
 
-    public function testPluginNameSettingsRulesRequireValueAndCap255Chars(): void
+    public function testPluginNameSettingsRulesRequireValueCap255AndRejectMarkup(): void
     {
         // Adopter must already have a `public string $pluginName` property
         // for the trait's rules to validate against.
@@ -250,17 +250,39 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
             use PluginNameSettingsTrait;
 
             public string $pluginName = 'Test Plugin';
+
+            public function rules(): array
+            {
+                return $this->pluginNameSettingsRules();
+            }
         };
 
         $rules = $settings->pluginNameSettingsRules();
-        self::assertCount(2, $rules, 'expected required + max-length rule');
+        self::assertCount(4, $rules, 'expected trim filter + required + max-length + markup/control-character rule');
 
         $required = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'required'));
         $string = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'string'));
+        $filter = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'filter'));
+        $match = array_values(array_filter($rules, static fn(array $r): bool => ($r[1] ?? null) === 'match'));
 
+        self::assertSame(['pluginName'], $filter[0][0]);
+        self::assertSame('trim', $filter[0]['filter']);
         self::assertSame(['pluginName'], $required[0][0]);
         self::assertSame(['pluginName'], $string[0][0]);
         self::assertSame(255, $string[0]['max']);
+        self::assertSame(['pluginName'], $match[0][0]);
+
+        $settings->pluginName = '  Safe Plugin Name  ';
+        self::assertTrue($settings->validate());
+        self::assertSame('Safe Plugin Name', $settings->pluginName);
+
+        foreach (['<script>alert(1)</script>', "Unsafe\nName", "Unsafe\0Name"] as $unsafeName) {
+            $settings->clearErrors();
+            $settings->pluginName = $unsafeName;
+
+            self::assertFalse($settings->validate(), "pluginName should reject {$unsafeName}");
+            self::assertNotEmpty($settings->getErrors('pluginName'));
+        }
     }
 
     public function testPluginNameSettingsLabelHasOneEntry(): void

@@ -70,8 +70,15 @@ trait PluginNameSettingsTrait
     public function pluginNameSettingsRules(): array
     {
         return [
+            [['pluginName'], 'filter', 'filter' => 'trim'],
             [['pluginName'], 'required'],
             [['pluginName'], 'string', 'max' => 255],
+            [
+                ['pluginName'],
+                'match',
+                'pattern' => '/^[^\p{Cc}<>]+$/u',
+                'message' => Craft::t('lindemannrock-base', 'Plugin name cannot contain HTML or control characters.'),
+            ],
         ];
     }
 

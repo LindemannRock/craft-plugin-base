@@ -215,7 +215,7 @@ The `instructions` text is plugin-specific (the wording for "log entries" / "cam
 
 ## `PluginNameSettingsTrait` — shared plugin-name field
 
-Centralizes the `pluginName` validation rule (`required` + `string max:255`) and label. The trait **does not** declare the property — every plugin keeps its own `public string $pluginName = '...'` with a plugin-specific default ("Search Manager", "Logging Library", etc.).
+Centralizes the `pluginName` validation rules and label. The shared rules trim the submitted value, require a non-empty string, cap it at 255 characters, and reject HTML/control characters so the saved display name stays plain text. The trait **does not** declare the property — every plugin keeps its own `public string $pluginName = '...'` with a plugin-specific default ("Search Manager", "Logging Library", etc.).
 
 ```php
 use lindemannrock\base\traits\PluginNameSettingsTrait;

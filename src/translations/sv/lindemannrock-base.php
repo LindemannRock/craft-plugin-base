@@ -21,6 +21,7 @@ return [
     'Value must be a whole number.' => 'Värdet måste vara ett heltal.',
     'Value must be a number.' => 'Värdet måste vara ett tal.',
     'Value must be a string.' => 'Värdet måste vara en sträng.',
+    'Plugin name cannot contain HTML or control characters.' => 'Plugin-namnet får inte innehålla HTML eller kontrolltecken.',
     'Value must be either true or false.' => 'Värdet måste vara antingen true eller false.',
     'Value must be an array.' => 'Värdet måste vara en array.',
 
