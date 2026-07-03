@@ -1,5 +1,20 @@
 # Changelog
 
+## [5.33.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.32.0...v5.33.0) (2026-07-03)
+
+
+### Added
+
+* add unknown log level to color palette for better logging clarity ([9604842](https://github.com/LindemannRock/craft-plugin-base/commit/9604842f707e2932885cee7610ed3cf8b5bcea49))
+* add validation rules for plugin name to prevent HTML and control characters ([fdc1b6f](https://github.com/LindemannRock/craft-plugin-base/commit/fdc1b6f59135509db634530b86b0986f811c117f))
+* **cp:** add refresh pause functionality to table rows when expanded ([78fca71](https://github.com/LindemannRock/craft-plugin-base/commit/78fca71b8f0b3b51447db322654e694dc4f6c37c))
+* **testing:** add user and permission helpers for integration tests ([0ee19ad](https://github.com/LindemannRock/craft-plugin-base/commit/0ee19ad9dad425b9e14df6f7d2d675995748173e))
+
+
+### Fixed
+
+* standardize query parameter handling across filters ([05c4a9e](https://github.com/LindemannRock/craft-plugin-base/commit/05c4a9e6dd17504732e4f43c3c8a62edf79d6200))
+
 ## [5.32.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.31.0...v5.32.0) - 2026-06-30
 
 
