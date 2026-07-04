@@ -15,6 +15,7 @@
  #
  # Blocks:
  #   headerActions - Actions in header (e.g., site selector dropdown)
+ #   notices - Alert/info notices above the page header
  #   overview - System overview cards (use lr-unified-cards grid)
  #   beforeQuickActions - Plugin-specific content before Quick Actions
  #   quickActions - Quick action sections (navigation, cache, etc.)
@@ -57,6 +58,9 @@
 {% set pageTitle = config.page.title ?? 'Overview' %}
 {% set pageDescription = config.page.description ?? '' %}
 {% set overviewTitle = config.page.overviewTitle ?? 'System Overview'|t(pluginHandle) %}
+
+{# Notices #}
+{% block notices %}{% endblock %}
 
 {# Header #}
 {% set headerActionsContent %}{% block headerActions %}{% endblock %}{% endset %}

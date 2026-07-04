@@ -26,6 +26,16 @@ A reusable layout for plugin utility/overview pages with system overview cards a
     } only %}
 {% endblock %}
 
+{% block notices %}
+    {% include 'lindemannrock-base/_components/setup-incomplete' with {
+        complete: setupStatus.complete,
+        setupUrl: setupStatus.setupUrl,
+        heading: 'Setup incomplete'|t('my-plugin'),
+        message: 'Finish setup before using this utility.'|t('my-plugin'),
+        actionLabel: 'Open setup'|t('my-plugin'),
+    } only %}
+{% endblock %}
+
 {% block beforeQuickActions %}
     {% include 'lindemannrock-base/_components/info-box' with {
         message: '<strong>' ~ 'Site'|t('my-plugin') ~ ':</strong> ' ~ selectedSiteLabel,
@@ -80,6 +90,22 @@ Actions in the header area (e.g., a site selector dropdown). Renders beside the 
 {% endblock %}
 ```
 
+### notices
+
+Alert or info notices above the page header. Use this for setup-incomplete banners or high-priority warnings that should appear before the utility title and metrics.
+
+```twig
+{% block notices %}
+    {% include 'lindemannrock-base/_components/setup-incomplete' with {
+        complete: setupStatus.complete,
+        setupUrl: setupStatus.setupUrl,
+        heading: 'Setup incomplete'|t('my-plugin'),
+        message: 'Finish setup before using this utility.'|t('my-plugin'),
+        actionLabel: 'Open setup'|t('my-plugin'),
+    } only %}
+{% endblock %}
+```
+
 ### overview
 
 System overview cards. Rendered inside an `.lr-unified-cards` grid container.
@@ -106,7 +132,7 @@ System overview cards. Rendered inside an `.lr-unified-cards` grid container.
 
 ### beforeQuickActions
 
-Plugin-specific content between the overview grid and the Quick Actions pane. Use this for active filter summaries, contextual warnings, or other short status messages that should be visible before action buttons.
+Plugin-specific content between the overview grid and the Quick Actions pane. Use this for active filter summaries or contextual status messages tied to the overview. Use `notices` for high-priority alerts that should appear before the page header.
 
 ```twig
 {% block beforeQuickActions %}
@@ -146,7 +172,7 @@ Quick action sections. Use the `_action-section` sub-template to create grouped 
 
 ### additionalContent
 
-Plugin-specific sections after the Quick Actions pane. For filter summaries or warnings that should appear before Quick Actions, use `beforeQuickActions`.
+Plugin-specific sections after the Quick Actions pane. For filter summaries that should appear before Quick Actions, use `beforeQuickActions`; for high-priority banners above the page header, use `notices`.
 
 ### scripts
 
