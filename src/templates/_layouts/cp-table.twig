@@ -533,9 +533,7 @@
             columnKeys: {{ columns|map(c => c.key)|values|json_encode|raw }},
         };
 
-        // Auto-assign data-column attributes based on column index
-        // This ensures View button works even with custom tableRow blocks
-        (function() {
+        function applyDataColumns() {
             const startIndex = config.checkboxesEnabled ? 1 : 0;
             document.querySelectorAll('#lr-table-body .lr-data-row').forEach(row => {
                 const cells = row.querySelectorAll('td');
@@ -546,7 +544,11 @@
                     }
                 });
             });
-        })();
+        }
+
+        // Auto-assign data-column attributes based on column index
+        // This ensures View button works even with custom tableRow blocks
+        applyDataColumns();
 
         function initMenuButtons(container) {
             if (!container) return;
@@ -571,6 +573,7 @@
 
         document.addEventListener('lr:refresh', function() {
             requestAnimationFrame(function() {
+                applyDataColumns();
                 initMenuButtons(document.getElementById('lr-table-body'));
                 window.lrViewSettings?.apply?.();
             });
@@ -807,20 +810,23 @@
             };
         }
 
-        // Expandable rows
-        document.querySelectorAll('.lr-clickable-row').forEach(row => {
-            row.addEventListener('click', function(e) {
-                if (e.target.closest('.checkbox') || e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-                    return;
-                }
-                const entryId = this.dataset.entryId;
-                const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
-                if (contextRow) {
-                    const isVisible = contextRow.style.display !== 'none';
-                    contextRow.style.display = isVisible ? 'none' : 'table-row';
-                    this.classList.toggle('lr-row-expanded', !isVisible);
-                }
-            });
+        document.getElementById('lr-table-body')?.addEventListener('click', function(e) {
+            const row = e.target.closest('.lr-clickable-row');
+            if (!row || !this.contains(row)) {
+                return;
+            }
+
+            if (e.target.closest('.checkbox') || e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                return;
+            }
+
+            const entryId = row.dataset.entryId;
+            const contextRow = document.querySelector('.lr-context-row[data-entry-id="' + entryId + '"]');
+            if (contextRow) {
+                const isVisible = contextRow.style.display !== 'none';
+                contextRow.style.display = isVisible ? 'none' : 'table-row';
+                row.classList.toggle('lr-row-expanded', !isVisible);
+            }
         });
 
         // AJAX Auto-refresh with subtle notice
