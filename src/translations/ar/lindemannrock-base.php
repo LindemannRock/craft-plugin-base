@@ -105,6 +105,7 @@ return [
     'Actions' => 'الإجراءات',
     'Select all' => 'تحديد الكل',
     'Select' => 'تحديد',
+    'Set status' => 'تعيين الحالة',
     'Cannot modify config items' => 'لا يمكن تعديل عناصر الإعداد',
     'Previous Page' => 'الصفحة السابقة',
     'Next Page' => 'الصفحة التالية',
@@ -237,7 +238,7 @@ return [
     'Warning:' => 'تحذير:',
     'Copy the same salt to staging and production environments.' => 'انسخ مفتاح التجزئة نفسه إلى بيئات التدريج والإنتاج.',
 
-    // Setup incomplete notice (shared via _partials/setup-incomplete.twig)
+    // Setup incomplete notice (shared via _components/setup-incomplete.twig)
     'Setup incomplete' => 'الإعداد غير مكتمل',
     'Complete setup before using this plugin.' => 'أكمل الإعداد قبل استخدام هذه الإضافة.',
     'Open setup' => 'فتح الإعداد',

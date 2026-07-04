@@ -105,6 +105,7 @@ return [
     'Actions' => 'Handlinger',
     'Select all' => 'Vælg alle',
     'Select' => 'Vælg',
+    'Set status' => 'Sæt status',
     'Cannot modify config items' => 'Konfigurationselementer kan ikke ændres',
     'Previous Page' => 'Forrige side',
     'Next Page' => 'Næste side',
@@ -237,7 +238,7 @@ return [
     'Warning:' => 'Advarsel:',
     'Copy the same salt to staging and production environments.' => 'Kopiér det samme salt til staging- og produktionsmiljøer.',
 
-    // Setup incomplete notice (shared via _partials/setup-incomplete.twig)
+    // Setup incomplete notice (shared via _components/setup-incomplete.twig)
     'Setup incomplete' => 'Opsætning ikke fuldført',
     'Complete setup before using this plugin.' => 'Fuldfør opsætningen, før du bruger dette plugin.',
     'Open setup' => 'Åbn opsætning',

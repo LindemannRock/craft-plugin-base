@@ -105,6 +105,7 @@ return [
     'Actions' => 'アクション',
     'Select all' => 'すべて選択',
     'Select' => '選択',
+    'Set status' => 'ステータスを設定する',
     'Cannot modify config items' => '設定項目を変更できません',
     'Previous Page' => '前のページ',
     'Next Page' => '次のページ',
@@ -237,7 +238,7 @@ return [
     'Warning:' => '警告：',
     'Copy the same salt to staging and production environments.' => 'ステージング環境および本番環境に同じソルトをコピーしてください。',
 
-    // Setup incomplete notice (shared via _partials/setup-incomplete.twig)
+    // Setup incomplete notice (shared via _components/setup-incomplete.twig)
     'Setup incomplete' => 'セットアップ未完了',
     'Complete setup before using this plugin.' => 'このプラグインを使用する前にセットアップを完了してください。',
     'Open setup' => 'セットアップを開く',
