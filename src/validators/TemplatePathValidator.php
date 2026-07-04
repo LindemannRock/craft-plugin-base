@@ -4,6 +4,7 @@ namespace lindemannrock\base\validators;
 
 use Craft;
 use craft\helpers\App;
+use craft\web\View;
 use yii\validators\Validator;
 
 /**
@@ -86,7 +87,7 @@ class TemplatePathValidator extends Validator
 
             // If env vars are still unresolved, skip existence check.
             if ($templatePath !== '' && !str_contains($templatePath, '$') && !str_contains($templatePath, '{')) {
-                if (!Craft::$app->getView()->doesTemplateExist($templatePath)) {
+                if (!Craft::$app->getView()->doesTemplateExist($templatePath, View::TEMPLATE_MODE_SITE)) {
                     $model->addError(
                         $attribute,
                         Craft::t($this->translationCategory, 'Template "{path}" does not exist in your templates folder.', ['path' => $templatePath])
