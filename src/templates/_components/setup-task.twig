@@ -1,0 +1,121 @@
+{#
+ # Setup Task Component
+ #
+ # Renders one setup/readiness item. The parent setup layout owns the task list;
+ # this component only renders the complete or incomplete state for a single
+ # task definition.
+ #
+ # Parameters:
+ # - task: {
+ #     done: bool,
+ #     heading: string,
+ #     description: string,
+ #     complete: {heading, statusLabel, body, bodyHtml, type, variant, commands, footerHtml, actions, actionHtml},
+ #     incomplete: {heading, statusLabel, body, bodyHtml, type, variant, commands, footerHtml, actions, actionHtml}
+ #   }
+ #
+ # Backward-compatible direct parameters are also accepted for simple one-off
+ # includes: done, heading/title, status/statusLabel, body/bodyHtml, commands,
+ # footerHtml, actions/actionHtml, type, variant, margin.
+ #
+ # @copyright Copyright (c) 2026 LindemannRock
+ #}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set taskConfig = task ?? {} %}
+{% set isDone = taskConfig.done ?? done ?? false %}
+{% set stateConfig = isDone ? (taskConfig.complete ?? {}) : (taskConfig.incomplete ?? {}) %}
+
+{% set sectionHeading = taskConfig.heading ?? sectionHeading ?? null %}
+{% set sectionDescription = taskConfig.description ?? sectionDescription ?? null %}
+{% set taskHeading = stateConfig.heading ?? stateConfig.title ?? heading ?? title ?? '' %}
+{% set taskStatusLabel = stateConfig.statusLabel ?? statusLabel ?? null %}
+{% set taskBody = stateConfig.body ?? body ?? null %}
+{% set taskBodyHtml = stateConfig.bodyHtml ?? bodyHtml ?? null %}
+{% set taskFooterHtml = stateConfig.footerHtml ?? footerHtml ?? null %}
+{% set taskCommands = stateConfig.commands ?? commands ?? [] %}
+{% set taskActions = stateConfig.actions ?? actions ?? [] %}
+{% set taskActionHtml = stateConfig.actionHtml ?? actionHtml ?? null %}
+{% set taskStatus = stateConfig.status ?? status ?? (isDone ? 'complete' : 'warning') %}
+{% set allowedStatuses = ['complete', 'warning', 'error', 'pending', 'info', 'success'] %}
+{% set resolvedStatus = taskStatus in allowedStatuses ? taskStatus : 'pending' %}
+{% set infoBoxType = stateConfig.type ?? type ?? (resolvedStatus == 'complete' ? 'success' : (resolvedStatus == 'success' ? 'success' : (resolvedStatus == 'error' ? 'error' : (resolvedStatus == 'warning' ? 'warning' : 'info')))) %}
+{% set infoBoxVariant = stateConfig.variant ?? variant ?? (isDone ? 'subtle' : 'colored') %}
+{% set infoBoxMargin = stateConfig.margin ?? margin ?? 'none' %}
+
+{% set messageHtml %}
+    <strong class="lr-setup-task__heading">{{ taskHeading }}</strong>{% if taskStatusLabel %} <span class="light">{{ taskStatusLabel }}</span>{% endif %}
+
+    {% if taskBodyHtml %}
+        <div class="lr-setup-task__body">{{ taskBodyHtml|raw }}</div>
+    {% elseif taskBody %}
+        <p class="lr-setup-task__body">{{ taskBody }}</p>
+    {% endif %}
+
+    {% if taskCommands|length %}
+        <div class="lr-setup-task__commands">
+            {% for command in taskCommands %}
+                {% set commandValue = command.value ?? '' %}
+                <div class="lr-setup-task__command">
+                    {% if command.legend ?? null %}
+                        <p class="light lr-setup-task__legend">{{ command.legend }}</p>
+                    {% endif %}
+                    <div class="lr-setup-task__copy-control">
+                        <input type="text"
+                               readonly
+                               class="text fullwidth lr-setup-task__copy-value"
+                               value="{{ commandValue }}"{% if command.id ?? null %} id="{{ command.id }}"{% endif %}>
+                        <button type="button"
+                                class="btn lr-setup-task__copy-btn"
+                                data-lr-copy="{{ commandValue|e('html_attr') }}"
+                                data-lr-copied="{{ (command.copiedMessage ?? 'Copied!'|t('lindemannrock-base'))|e('html_attr') }}">
+                            {{ command.copyLabel ?? 'Copy'|t('lindemannrock-base') }}
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if taskFooterHtml %}
+        <div class="lr-setup-task__footer">
+            {{ taskFooterHtml|raw }}
+        </div>
+    {% endif %}
+
+    {% if taskActions|length or taskActionHtml %}
+        <div class="lr-setup-task__actions">
+            {% for action in taskActions %}
+                {% set actionType = action.type ?? 'secondary' %}
+                <a class="btn{% if actionType == 'primary' %} submit{% endif %}" href="{{ action.url ?? '#' }}"{% if action.external ?? false %} target="_blank" rel="noopener"{% endif %}>
+                    {{ action.label ?? '' }}
+                </a>
+            {% endfor %}
+            {% if taskActionHtml %}
+                {{ taskActionHtml|raw }}
+            {% endif %}
+        </div>
+    {% endif %}
+{% endset %}
+
+<section class="lr-setup-task">
+    {% if sectionHeading or sectionDescription %}
+        <div class="lr-setup-task__section-header">
+            {% if sectionHeading %}
+                <h3 class="lr-setup-task__section-heading">{{ sectionHeading }}</h3>
+            {% endif %}
+            {% if sectionDescription %}
+                <p class="lr-setup-task__section-description">{{ sectionDescription }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: messageHtml,
+        type: infoBoxType,
+        variant: infoBoxVariant,
+        margin: infoBoxMargin,
+        allowHtml: true,
+    } only %}
+</section>

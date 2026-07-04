@@ -20,6 +20,7 @@ use lindemannrock\base\twigextensions\ExportExtension;
 use lindemannrock\base\twigextensions\GeoExtension;
 use lindemannrock\base\twigextensions\LabelExtension;
 use lindemannrock\base\twigextensions\PluginExtension;
+use lindemannrock\base\twigextensions\PluginThemeStyleExtension;
 use yii\base\Event;
 use yii\base\Module;
 
@@ -86,6 +87,7 @@ class Base extends Module
         Craft::$app->getView()->registerTwigExtension(new GeoExtension());
         Craft::$app->getView()->registerTwigExtension(new LabelExtension());
         Craft::$app->getView()->registerTwigExtension(new PluginExtension());
+        Craft::$app->getView()->registerTwigExtension(new PluginThemeStyleExtension());
 
         self::$registered = true;
     }

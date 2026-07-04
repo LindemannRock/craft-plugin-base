@@ -1,0 +1,152 @@
+{#
+ # CP Plugin Setup Layout
+ #
+ # Standardized onboarding/readiness layout for plugin setup pages. This layout
+ # is intended for persistent setup routes such as `plugin-handle/setup`, not
+ # only for the one-time install modal.
+ #
+ # Configuration (setupConfig):
+ #   plugin:
+ #     handle: Plugin handle for translations and route defaults
+ #     name: Plugin display name
+#     version: Optional plugin version text
+#     iconSvg: Optional plugin icon SVG markup
+#     logoPaths: Optional LindemannRock logo path markup for the hero background
+#     heroStyle: Optional CSS custom properties from PluginThemeStyleHelper::heroCssVarsFromSvg()
+#     heroMarkRotation: Optional LR background mark rotation in degrees
+#     heroMarkTranslateX: Optional LR background mark X translation
+#     sidebarColor: Optional hero sidebar color
+ #   page:
+ #     title: Page title
+ #     description: Short setup intro
+ #     badge: Optional eyebrow/status text
+#   actions:
+#     primary: Optional primary link {label, url}
+#     secondary: Optional secondary link {label, url}
+#   tasks:
+#     Array of setup task definitions rendered via _components/setup-task
+ #
+ # Blocks:
+ #   heroMeta - Optional status/meta content below the hero description
+ #   summary - Optional content between hero and task list
+ #   tasks - Setup checklist/task components
+ #   additionalContent - Full-width content after the setup grid
+ #   scripts - JavaScript handlers
+ #   pluginCredit - Plugin credit (defaults to standard credit)
+ #
+ # @copyright Copyright (c) 2026 LindemannRock
+ #}
+
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+{% set config = setupConfig ?? {} %}
+{% set plugin = config.plugin ?? {} %}
+{% set page = config.page ?? {} %}
+{% set actions = config.actions ?? {} %}
+{% set setupTasks = config.tasks ?? [] %}
+{% set pluginHandle = plugin.handle ?? 'app' %}
+{% set pluginName = plugin.name ?? '' %}
+{% set pluginVersion = plugin.version ?? null %}
+{% set pluginIconSvg = plugin.iconSvg ?? null %}
+{% set logoPaths = plugin.logoPaths ?? null %}
+{% set heroStyle = plugin.heroStyle ?? null %}
+{% set heroMarkRotation = plugin.heroMarkRotation ?? (random(70) - 35) %}
+{% set heroMarkTranslateX = plugin.heroMarkTranslateX ?? '0' %}
+{% set sidebarColor = plugin.sidebarColor ?? '#0f172a' %}
+{% set uiColor = plugin.uiColor ?? sidebarColor %}
+{% set pageTitle = page.title ?? pluginName %}
+{% set pageDescription = page.description ?? '' %}
+{% set pageBadge = page.badge ?? null %}
+{% set primaryAction = actions.primary ?? null %}
+{% set secondaryAction = actions.secondary ?? null %}
+
+{% set heroMetaContent %}{% block heroMeta %}{% endblock %}{% endset %}
+{% set summaryContent %}{% block summary %}{% endblock %}{% endset %}
+{% set tasksContent %}{% block tasks %}{% endblock %}{% endset %}
+
+<div class="lr-plugin-setup">
+    <section class="lr-plugin-setup__hero" aria-labelledby="lr-plugin-setup-title" style="{% if heroStyle %}{{ heroStyle }};{% endif %}--plugin-hero-mark-rotate:{{ heroMarkRotation }}deg;--plugin-hero-mark-translate-x:{{ heroMarkTranslateX }}">
+        {% if logoPaths %}
+            <svg class="lr-plugin-setup__hero-bgmark" viewBox="0 -334.195 1350.04 1350.04" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g fill="currentColor">
+                    {{ logoPaths|raw }}
+                </g>
+            </svg>
+        {% endif %}
+
+        <div class="lr-plugin-setup__hero-inner">
+            <div class="lr-plugin-setup__hero-main">
+                <div class="lr-plugin-setup__hero-mobile-icon" aria-hidden="true">
+                    {% if pluginIconSvg %}
+                        {{ pluginIconSvg|raw }}
+                    {% else %}
+                        <span>{{ (pluginName|slice(0, 1))|upper }}</span>
+                    {% endif %}
+                </div>
+                {% if pageBadge %}
+                    <p class="lr-plugin-setup__badge">{{ pageBadge }}</p>
+                {% endif %}
+                <h2 id="lr-plugin-setup-title" class="lr-plugin-setup__title">{{ pageTitle }}</h2>
+                {% if pluginVersion %}
+                    <p class="lr-plugin-setup__version">{{ pluginVersion }}</p>
+                {% endif %}
+                {% if pageDescription %}
+                    <p class="lr-plugin-setup__description">{{ pageDescription }}</p>
+                {% endif %}
+                {% if heroMetaContent|trim %}
+                    <div class="lr-plugin-setup__hero-meta">
+                        {{ heroMetaContent|raw }}
+                    </div>
+                {% endif %}
+                {% if primaryAction or secondaryAction %}
+                    <div class="lr-plugin-setup__actions">
+                        {% if primaryAction %}
+                            <a class="btn submit" href="{{ primaryAction.url ?? cpUrl(pluginHandle) }}">
+                                {{ primaryAction.label ?? '' }}
+                            </a>
+                        {% endif %}
+                        {% if secondaryAction %}
+                            <a class="btn" href="{{ secondaryAction.url ?? cpUrl('settings/plugins/' ~ pluginHandle) }}">
+                                {{ secondaryAction.label ?? '' }}
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if pluginIconSvg %}
+                <div class="lr-plugin-setup__hero-art" aria-hidden="true">
+                    <div class="lr-plugin-setup__hero-icon">
+                        {{ pluginIconSvg|raw }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if summaryContent|trim %}
+        <div class="lr-plugin-setup__summary">
+            {{ summaryContent|raw }}
+        </div>
+    {% endif %}
+
+    <div class="lr-plugin-setup__main">
+        {% if setupTasks|length %}
+            {% for task in setupTasks %}
+                {% include 'lindemannrock-base/_components/setup-task' with {
+                    task: task,
+                } only %}
+            {% endfor %}
+        {% else %}
+            {{ tasksContent|raw }}
+        {% endif %}
+    </div>
+
+    {% block additionalContent %}{% endblock %}
+</div>
+
+{% block scripts %}{% endblock %}
+
+{% block pluginCredit %}
+    {% include 'lindemannrock-base/_components/plugin-credit' %}
+{% endblock %}

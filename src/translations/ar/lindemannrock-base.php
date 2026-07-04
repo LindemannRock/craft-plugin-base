@@ -237,6 +237,11 @@ return [
     'Warning:' => 'تحذير:',
     'Copy the same salt to staging and production environments.' => 'انسخ مفتاح التجزئة نفسه إلى بيئات التدريج والإنتاج.',
 
+    // Setup incomplete notice (shared via _partials/setup-incomplete.twig)
+    'Setup incomplete' => 'الإعداد غير مكتمل',
+    'Complete setup before using this plugin.' => 'أكمل الإعداد قبل استخدام هذه الإضافة.',
+    'Open setup' => 'فتح الإعداد',
+
     // Storage volume validation
     'Selected volume not found.' => 'لم يتم العثور على وحدة التخزين المحددة.',
     'Selected volume must use a local filesystem.' => 'يجب أن تستخدم وحدة التخزين المحددة نظام ملفات محلياً.',

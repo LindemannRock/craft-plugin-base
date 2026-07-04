@@ -2,7 +2,7 @@
     "name": "LindemannRock Base",
     "handle": "lindemannrock-base",
     "description": "Common utilities and building blocks for LindemannRock Craft CMS plugins — helpers, traits, layouts, and Twig extensions.",
-    "version": "5.32.0",
+    "version": "5.33.0",
     "developer": "LindemannRock",
     "developerUrl": "https://lindemannrock.com",
     "documentationUrl": "https://lindemannrock.com/craft-plugins/lindemannrock-base/docs"

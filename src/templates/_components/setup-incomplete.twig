@@ -1,0 +1,50 @@
+{#
+  Setup Incomplete Component
+
+  Thin wrapper around the shared info-box component for plugin-wide setup
+  reminders. Plugins own setup status; this component only renders the notice.
+
+  Parameters:
+  - complete: bool
+  - heading: string
+  - message: string
+  - setupUrl: string
+  - actionLabel: string
+  - type: string
+  - variant: string
+  - margin: string
+
+  @link      https://lindemannrock.com
+  @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% if not (complete ?? false) %}
+    {% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
+    {% set noticeHeading = heading ?? 'Setup incomplete'|t('lindemannrock-base') %}
+    {% set noticeMessage = message ?? 'Complete setup before using this plugin.'|t('lindemannrock-base') %}
+    {% set noticeActionLabel = actionLabel ?? 'Open setup'|t('lindemannrock-base') %}
+
+    {% set messageHtml %}
+        <div class="lr-setup-incomplete">
+            <div class="lr-setup-incomplete__content">
+                <strong class="lr-setup-incomplete__heading">{{ noticeHeading }}</strong>
+                <p class="lr-setup-incomplete__message">{{ noticeMessage }}</p>
+            </div>
+            {% if setupUrl ?? null %}
+                <div class="lr-setup-incomplete__action">
+                    <a class="btn submit" href="{{ url(setupUrl) }}">{{ noticeActionLabel }}</a>
+                </div>
+            {% endif %}
+        </div>
+    {% endset %}
+
+    {% include 'lindemannrock-base/_components/info-box' with {
+        message: messageHtml,
+        type: type ?? 'warning',
+        variant: variant ?? 'colored',
+        margin: margin ?? 'bottom',
+        extraClass: 'lr-info-box--setup-incomplete',
+        allowHtml: true,
+    } only %}
+{% endif %}

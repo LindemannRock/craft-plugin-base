@@ -37,6 +37,25 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 | `luminance(string $hex)` | `int` | Perceived luminance on 0–255 (Rec. 601) @since(5.27.0) |
 | `withAlpha(string $hex, float $alpha)` | `string` | Append alpha, returns `#RRGGBBAA` @since(5.27.0) |
 
+### PluginThemeStyleHelper
+
+`lindemannrock\base\helpers\PluginThemeStyleHelper`
+[Full docs](../feature-tour/plugin-theme-style-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `heroCssVarsFromSvg(?string $svg, string $style = 'lighter', ?string $fallbackAccent = null)` | `string` | CSS custom properties for plugin setup/documentation heroes @since(5.34.0) |
+| `docsShellCssVarsFromSvg(?string $svg, ?string $fallbackAccent = null)` | `string` | CSS custom properties for docs shell surfaces @since(5.34.0) |
+| `docsCssVarsFromSvg(?string $svg, string $style = 'lighter', ?string $fallbackAccent = null)` | `string` | Combined hero and docs shell CSS custom properties @since(5.34.0) |
+
+**Twig functions:**
+
+| Function | Maps to |
+|----------|---------|
+| `lrPluginHeroCssVars(svg, style='lighter', fallbackAccent=null)` | `heroCssVarsFromSvg()` |
+| `lrPluginDocsShellCssVars(svg, fallbackAccent=null)` | `docsShellCssVarsFromSvg()` |
+| `lrPluginDocsCssVars(svg, style='lighter', fallbackAccent=null)` | `docsCssVarsFromSvg()` |
+
 ### DateFormatHelper
 
 `lindemannrock\base\helpers\DateFormatHelper`

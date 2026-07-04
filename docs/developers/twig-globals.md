@@ -25,7 +25,7 @@ The variable is a `PluginNameHelper` instance that proxies to the plugin's Setti
 
 ## Registered Extensions
 
-The base module registers five Twig extensions. All functions and filters are prefixed with `lr` to avoid naming collisions.
+The base module registers seven Twig extensions. All functions and filters are prefixed with `lr` to avoid naming collisions.
 
 ### DateTimeExtension
 
@@ -34,13 +34,13 @@ The base module registers five Twig extensions. All functions and filters are pr
 | Filter | Purpose | Docs |
 |--------|---------|------|
 | `lrDatetime` | Full datetime | [Twig Filters](../template-guides/twig-filters-functions.md#display-formatting) |
-| `lrCompactDatetime` | Datetime without year | " |
-| `lrDate` | Date only | " |
-| `lrTime` | Time only | " |
-| `lrRelative` | Relative time ("2 hours ago") | " |
+| `lrCompactDatetime` | Datetime without year | [Twig Filters](../template-guides/twig-filters-functions.md#display-formatting) |
+| `lrDate` | Date only | [Twig Filters](../template-guides/twig-filters-functions.md#display-formatting) |
+| `lrTime` | Time only | [Twig Filters](../template-guides/twig-filters-functions.md#display-formatting) |
+| `lrRelative` | Relative time ("2 hours ago") | [Twig Filters](../template-guides/twig-filters-functions.md#display-formatting) |
 | `lrToDateTimeString` | `Y-m-d H:i:s` format | [Twig Filters](../template-guides/twig-filters-functions.md#machine-formatting) |
-| `lrToApiString` | ISO 8601 format | " |
-| `lrToFilenameString` | `Y-m-d-His` format | " |
+| `lrToApiString` | ISO 8601 format | [Twig Filters](../template-guides/twig-filters-functions.md#machine-formatting) |
+| `lrToFilenameString` | `Y-m-d-His` format | [Twig Filters](../template-guides/twig-filters-functions.md#machine-formatting) |
 
 **6 functions:**
 
@@ -102,13 +102,23 @@ The base module registers five Twig extensions. All functions and filters are pr
 | `lrPluginEnabled(handle)` | Check if plugin is installed and enabled |
 | `lrPluginName(handle, fallback?)` | Plugin display name (respects custom `pluginName`) |
 
+### PluginThemeStyleExtension
+
+**3 functions:**
+
+| Function | Purpose |
+|----------|---------|
+| `lrPluginHeroCssVars(svg, style?, fallbackAccent?)` | CSS custom properties for plugin-branded hero surfaces |
+| `lrPluginDocsShellCssVars(svg, fallbackAccent?)` | CSS custom properties for docs shell surfaces |
+| `lrPluginDocsCssVars(svg, style?, fallbackAccent?)` | Combined hero and docs shell CSS custom properties |
+
 ### LabelExtension
 
 **1 filter:**
 
 | Filter | Purpose |
 |--------|---------|
-| `\|lrShortLabel(maxLength=60)` | Strip leading numbering and truncate long field labels — see [Label Filters](../template-guides/twig-filters-functions.md#label-filters) |
+| `lrShortLabel(maxLength=60)` | Strip leading numbering and truncate long field labels — see [Label Filters](../template-guides/twig-filters-functions.md#label-filters) |
 
 ## Registration Flow
 
@@ -116,7 +126,7 @@ Extensions are registered when the base module initializes:
 
 1. A plugin calls `PluginHelper::bootstrap()` in its `init()`
 2. `Base::register()` is called (idempotent — only runs once even if multiple plugins call it)
-3. The `Base` module registers all six extensions with Twig
+3. The `Base` module registers all seven extensions with Twig
 4. The plugin's helper variable is registered as a Twig global via `View::EVENT_AFTER_CREATE_TWIG`
 
 Since `Base::register()` is idempotent, the extensions are available regardless of how many plugins bootstrap the base module.

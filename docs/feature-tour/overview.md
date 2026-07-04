@@ -9,6 +9,7 @@ LindemannRock Base is a shared toolkit that provides common utilities for all Li
 Utility classes for common operations:
 
 - **[ColorHelper](color-helper.md)** — 18 palette colors, 16 built-in color sets, and custom color set registration for badges and filters
+- **[PluginThemeStyleHelper](plugin-theme-style-helper.md)** — icon-derived CSS variables for branded setup heroes and docs shell surfaces
 - **[DateFormatHelper](date-format-helper.md)** — Configurable date/time formatting for display, exports, and DB-agnostic timezone-aware SQL
 - **[DateRangeHelper](date-range-helper.md)** — Standard date ranges (today, last 7 days, etc.) with bounds calculation and query integration
 - **[ScheduleHelper](schedule-helper.md)** — Cron-style scheduling for recurring queue jobs (daily, daily2am, weekly, monthly, etc.) with TZ-aware next-run calculation, dropdown options, and validation allowlist
@@ -61,6 +62,7 @@ Filters and functions available in all CP templates after bootstrap:
 - **Export functions** — `lrExportEnabled()`, `lrExportFormats()`, `lrExportFormatOptions()`
 - **Geo functions** — `lrCountries()`, `lrCountryName()`, `lrCountryDialCodeData()`, `lrDialCode()`, `lrCountryWithDialCode()`, `lrValidCountryCode()`
 - **Plugin functions** — `lrPluginInstalled()`, `lrPluginEnabled()`, `lrPluginName()`
+- **Plugin theme style functions** — `lrPluginHeroCssVars()`, `lrPluginDocsShellCssVars()`, `lrPluginDocsCssVars()`
 - **Label filters** — `|lrShortLabel`
 
 See [Twig Filters & Functions](../template-guides/twig-filters-functions.md) for the complete reference.
@@ -77,9 +79,10 @@ Reusable Twig templates for building consistent CP pages:
 
 - **[CP Table Layout](../template-guides/cp-table-layout.md)** — Full-featured table pages with filters, search, pagination, bulk actions, and AJAX refresh
 - **[CP Analytics Layout](../template-guides/cp-analytics-layout.md)** — Analytics dashboards with tabs, charts, stat boxes, and date filters
+- **[CP Plugin Setup Layout](../template-guides/cp-plugin-setup-layout.md)** — Onboarding/readiness pages with setup tasks, status checks, commands, and next actions
 - **[CP Utilities Layout](../template-guides/cp-utilities-layout.md)** — Utility pages with action sections and AJAX buttons
 - **[CP Table Utility Layout](../template-guides/cp-table-utility-layout.md)** — Table variant for utility pages
-- **[Components](../template-guides/components.md)** — Badge, info-box, export-menu, row-actions, stat-box, dashboard-widget helpers, filter-status, filter-dropdown, phone-input
+- **[Components](../template-guides/components.md)** — Badge, info-box, setup-incomplete, setup-task, export-menu, row-actions, stat-box, dashboard-widget helpers, filter-status, filter-dropdown, phone-input
 - **[Partials](../template-guides/partials.md)** — Analytics panel, CSV import, geo settings, env command warnings, backup list
 
 ## Next Steps

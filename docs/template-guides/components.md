@@ -977,9 +977,92 @@ This component emits no translatable strings of its own — pass pre-translated 
 
 ---
 
+## Setup Incomplete
+
+A compact plugin-wide setup reminder that wraps the shared [Info Box](#info-box) styling. Use it on plugin pages that should warn users when required setup tasks are not complete. The consuming plugin owns the status check and passes translated copy into the component.
+
+**Path:** `lindemannrock-base/_components/setup-incomplete`
+
+```twig
+{% include 'lindemannrock-base/_components/setup-incomplete' with {
+    complete: setupStatus.complete,
+    setupUrl: setupStatus.setupUrl,
+    heading: 'Setup incomplete'|t('my-plugin'),
+    message: 'Finish setup before using this plugin.'|t('my-plugin'),
+    actionLabel: 'Open setup'|t('my-plugin'),
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `complete` | `bool` | `false` | When true, nothing is rendered |
+| `heading` | `string` | `'Setup incomplete'` | Notice heading |
+| `message` | `string` | `'Complete setup before using this plugin.'` | Notice message |
+| `setupUrl` | `string` | *(none)* | CP route or URL passed through Craft's `url()` helper |
+| `actionLabel` | `string` | `'Open setup'` | Setup button label |
+| `type` | `string` | `'warning'` | `info-box` type |
+| `variant` | `string` | `'colored'` | `info-box` variant |
+| `margin` | `string` | `'bottom'` | `info-box` margin |
+
+The fallback strings are translated by Base, but plugin-specific headings, messages, and action labels should be passed in already translated with the consuming plugin's category.
+
+---
+
+## Setup Task
+
+A checklist row for plugin setup/readiness pages. Use it inside the [CP Plugin Setup Layout](cp-plugin-setup-layout.md) to show live configuration status, commands, and follow-up actions.
+
+**Path:** `lindemannrock-base/_components/setup-task`
+
+```twig
+{% include 'lindemannrock-base/_components/setup-task' with {
+    status: templatesReady ? 'complete' : 'warning',
+    statusLabel: templatesReady ? 'Ready'|t('my-plugin') : 'Required'|t('my-plugin'),
+    title: 'Copy starter templates'|t('my-plugin'),
+    body: templatesReady
+        ? 'Required templates are present.'|t('my-plugin')
+        : 'Copy the bundled starter templates before creating public links.'|t('my-plugin'),
+    commands: templatesReady ? [] : [
+        {
+            legend: 'DDEV'|t('my-plugin'),
+            value: 'ddev craft my-plugin/setup/copy-templates',
+            copyLabel: 'Copy'|t('my-plugin'),
+            copiedMessage: 'Command copied to clipboard'|t('my-plugin'),
+        },
+    ],
+    actions: [
+        {
+            type: 'primary',
+            label: 'Open settings'|t('my-plugin'),
+            url: cpUrl('settings/plugins/my-plugin'),
+        },
+    ],
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `title` | `string` | *(required)* | Task title |
+| `status` | `string` | `'pending'` | `complete`, `warning`, `error`, `pending`, or `info` |
+| `statusLabel` | `string` | *(none)* | Visible status badge label |
+| `body` | `string` | *(none)* | Plain text body copy |
+| `bodyHtml` | `string` | *(none)* | Trusted HTML body copy |
+| `commands` | `array` | `[]` | Copyable commands rendered through `copy-input` |
+| `actions` | `array` | `[]` | Link actions with `label`, `url`, optional `type: 'primary'`, and optional `external: true` |
+| `actionHtml` | `string` | *(none)* | Trusted custom HTML for plugin-owned forms or POST buttons |
+
+Each `commands` item supports `legend`, `value`, `copyLabel`, `copiedMessage`, and `id`. Pass translated labels and body copy from the consuming plugin.
+
+---
+
 ## Next Steps
 
 - [CP Table Layout](cp-table-layout.md) — uses filters, badges, row-actions, search, and export-menu
 - [CP Analytics Layout](cp-analytics-layout.md) — uses stat-box and chart-container
+- [CP Plugin Setup Layout](cp-plugin-setup-layout.md) — uses setup-task for onboarding and readiness checks
 - [ColorHelper](../feature-tour/color-helper.md) — palette colors and color sets for badges and filters
 - [Twig Filters & Functions](twig-filters-functions.md) — date, color, export, and geo template functions

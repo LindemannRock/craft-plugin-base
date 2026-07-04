@@ -237,6 +237,11 @@ return [
     'Warning:' => 'Varning:',
     'Copy the same salt to staging and production environments.' => 'Kopiera samma salt till staging- och produktionsmiljöer.',
 
+    // Setup incomplete notice (shared via _partials/setup-incomplete.twig)
+    'Setup incomplete' => 'Konfigurationen är inte klar',
+    'Complete setup before using this plugin.' => 'Slutför konfigurationen innan du använder detta plugin.',
+    'Open setup' => 'Öppna konfiguration',
+
     // Storage volume validation
     'Selected volume not found.' => 'Den valda volymen hittades inte.',
     'Selected volume must use a local filesystem.' => 'Den valda volymen måste använda ett lokalt filsystem.',

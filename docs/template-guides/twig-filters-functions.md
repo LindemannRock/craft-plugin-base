@@ -118,6 +118,28 @@ All Twig filters and functions provided by LindemannRock Base. These are availab
 {% set defaultColor = lrDefaultColor() %}
 ```
 
+## Plugin Theme Style Functions
+
+Use these when a Twig template needs plugin-branded CSS custom properties from an icon SVG. They wrap [PluginThemeStyleHelper](../feature-tour/plugin-theme-style-helper.md).
+
+```twig
+{# Setup/documentation hero variables only #}
+{% set heroStyle = lrPluginHeroCssVars(plugin.iconSvg ?? null) %}
+{% set deepHeroStyle = lrPluginHeroCssVars(plugin.iconSvg ?? null, 'deeper', '#0F766E') %}
+
+{# Docs shell variables only #}
+{% set shellStyle = lrPluginDocsShellCssVars(plugin.iconSvg ?? null, '#0F766E') %}
+
+{# Combined hero + docs shell variables #}
+{% set docsStyle = lrPluginDocsCssVars(plugin.iconSvg ?? null, 'lighter', '#0F766E') %}
+```
+
+| Function | Parameters | Description |
+|----------|------------|-------------|
+| `lrPluginHeroCssVars` | `svg`, `style='lighter'`, `fallbackAccent=null` | Returns `--plugin-hero-*` variables for branded hero surfaces |
+| `lrPluginDocsShellCssVars` | `svg`, `fallbackAccent=null` | Returns `--plugin-shell-*` variables for docs page chrome |
+| `lrPluginDocsCssVars` | `svg`, `style='lighter'`, `fallbackAccent=null` | Returns combined hero and docs shell variables |
+
 ## Export Functions
 
 ```twig

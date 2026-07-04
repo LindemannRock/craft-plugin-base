@@ -29,6 +29,7 @@
             "feature-tour/schedule-helper",
             "feature-tour/recurring-queue-helper",
             "feature-tour/color-helper",
+            "feature-tour/plugin-theme-style-helper",
             "feature-tour/config-file-helper",
             "feature-tour/export-helper",
             "feature-tour/geo-helper",
@@ -62,6 +63,7 @@
             "template-guides/cp-table-layout",
             "template-guides/cp-table-index-pattern",
             "template-guides/cp-analytics-layout",
+            "template-guides/cp-plugin-setup-layout",
             "template-guides/cp-utilities-layout",
             "template-guides/cp-table-utility-layout"
         ]
