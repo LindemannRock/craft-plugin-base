@@ -169,8 +169,27 @@
             };
         }
 
-        // Merge options
-        var mergedOptions = Object.assign({}, defaultOptions, options || {});
+        var isPlainObject = function(value) {
+            return Object.prototype.toString.call(value) === '[object Object]';
+        };
+
+        var mergeOptions = function(baseOptions, customOptions) {
+            var merged = Object.assign({}, baseOptions || {});
+
+            Object.keys(customOptions || {}).forEach(function(key) {
+                if (isPlainObject(merged[key]) && isPlainObject(customOptions[key])) {
+                    merged[key] = mergeOptions(merged[key], customOptions[key]);
+                    return;
+                }
+
+                merged[key] = customOptions[key];
+            });
+
+            return merged;
+        };
+
+        // Merge options while preserving nested Chart.js defaults.
+        var mergedOptions = mergeOptions(defaultOptions, options || {});
 
         // Create chart
         var chart = new Chart(ctx, {
