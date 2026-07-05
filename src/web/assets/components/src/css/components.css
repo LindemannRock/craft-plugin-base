@@ -1541,6 +1541,7 @@ table.data tbody tr.selected select {
     display: inline-block;
     width: 16px;
     height: 16px;
+    flex: 0 0 16px;
     color: currentColor;
     vertical-align: text-bottom;
 }
