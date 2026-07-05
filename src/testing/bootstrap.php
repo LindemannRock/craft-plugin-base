@@ -50,6 +50,28 @@ function bootstrap(?string $projectRoot = null): void
     // Application instance. Tests drive the app directly via Craft::$app — no
     // run() call needed.
     require $craftConsole;
+
+    configureTestCache();
+}
+
+/**
+ * Replace the project cache component with an isolated file cache for tests.
+ *
+ * Plugin integration tests run inside the consumer project's Craft app, so
+ * config/app.php and .env may point Craft's global cache at Redis, Memcached,
+ * or another shared backend. The default test harness should be deterministic;
+ * tests that need a specific backend can still install it explicitly.
+ *
+ * @since 5.34.0
+ */
+function configureTestCache(): void
+{
+    $config = \craft\helpers\App::cacheConfig();
+    $config['cachePath'] = \Craft::$app->getPath()->getTempPath()
+        . DIRECTORY_SEPARATOR
+        . 'lindemannrock-base-phpunit-cache';
+
+    \Craft::$app->set('cache', $config);
 }
 
 /**

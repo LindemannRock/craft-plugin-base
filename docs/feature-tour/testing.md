@@ -228,6 +228,8 @@ function bootstrap(?string $projectRoot = null): void
 
 Initialises Craft as a console application so PHPUnit tests can use `Craft::$app`, plugin services, and the live DB.
 
+After Craft boots, the harness replaces the project `cache` component with a test-local `FileCache`. This keeps plugin suites independent from the consumer project's `.env` cache backend, such as a shared DDEV Redis instance. Tests that specifically exercise Redis or another cache backend should install that backend explicitly inside the test and restore it during teardown.
+
 ### Parameters
 
 | Parameter | Type | Default | Description |
