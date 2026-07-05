@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.34.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.33.0...v5.34.0) (2026-07-05)
+
+
+### Added
+
+* **cp:** add notices block for alert/info messages above header ([f042d8f](https://github.com/LindemannRock/craft-plugin-base/commit/f042d8f5909094ead1fb7b8e0d3977a1cfeaad96))
+* **css:** add subheading and message styles for task components ([d66177f](https://github.com/LindemannRock/craft-plugin-base/commit/d66177fce9a90e69a50b612a2f3d4c9721bdd7f5))
+* **i18n:** add 'Set status' translation key across multiple locales ([133990b](https://github.com/LindemannRock/craft-plugin-base/commit/133990b5bbea0eeed41c1abb5fa3c00eb1484024))
+* **info-box:** add extraClass option for scoped styling ([ba44d81](https://github.com/LindemannRock/craft-plugin-base/commit/ba44d81dc14f6fb4829a85b9fec118967ae743e4))
+* **setup:** add standardized setup layout and task components ([33df700](https://github.com/LindemannRock/craft-plugin-base/commit/33df700397bbfa53366f5cc5c2bb386108aea538))
+* **status-icon:** add standalone semantic status icon component ([1002b99](https://github.com/LindemannRock/craft-plugin-base/commit/1002b99dd060121f18dbc74598c160b825dd6b8a))
+* **testing:** replace project cache with isolated file cache for tests ([0134c0a](https://github.com/LindemannRock/craft-plugin-base/commit/0134c0a3b1c94a1dbb37ae3401781b65b3a769d4))
+* **validators:** enhance template path validation with site mode check ([dcf69f8](https://github.com/LindemannRock/craft-plugin-base/commit/dcf69f8f704fe1fe70e47350b8fdae67a16d1a76))
+
 ## [5.33.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.32.0...v5.33.0) - 2026-07-03
 
 
