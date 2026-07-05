@@ -1087,6 +1087,14 @@ A checklist row for plugin setup/readiness pages. Use it inside the [CP Plugin S
 
 Each `commands` item supports `legend`, `value`, `copyLabel`, `copiedMessage`, and `id`. Pass translated labels and body copy from the consuming plugin.
 
+Use `.lr-setup-task__subheading` for subordinate headings inside trusted setup task body HTML:
+
+```twig
+<h4 class="lr-setup-task__subheading">
+    {{ 'Template locations'|t('my-plugin') }}
+</h4>
+```
+
 ---
 
 ## Next Steps
