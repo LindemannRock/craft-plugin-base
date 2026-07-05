@@ -1634,7 +1634,6 @@ table.data tbody tr.selected select {
 .lr-info-box__message div,
 .lr-info-box__message span,
 .lr-info-box__message strong,
-.lr-info-box__message a,
 .lr-info-box__message code,
 .lr-info-box__message input {
     color: var(--text-color);
