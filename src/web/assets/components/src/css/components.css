@@ -1529,6 +1529,31 @@ table.data tbody tr.selected select {
     }
 }
 
+/* Status icon */
+.lr-status-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    color: currentColor;
+    vertical-align: text-bottom;
+}
+
+.lr-status-icon--info {
+    color: #2196f3;
+}
+
+.lr-status-icon--success {
+    color: #10b981;
+}
+
+.lr-status-icon--warning {
+    color: #f59e0b;
+}
+
+.lr-status-icon--error {
+    color: #dc3545;
+}
+
 /* Info box wrapper */
 .lr-info-box {
     padding: 1rem;

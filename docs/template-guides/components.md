@@ -411,6 +411,36 @@ A standalone status indicator dot without a label. Uses the same color system as
 
 ---
 
+## Status Icon
+
+A standalone semantic status icon without a label. Uses the same icon shapes as the info box component.
+
+**Path:** `lindemannrock-base/_components/status-icon`
+
+```twig
+{# Colored icon #}
+{% include 'lindemannrock-base/_components/status-icon' with {
+    type: 'warning',
+} only %}
+
+{# Inherit surrounding text color #}
+{% include 'lindemannrock-base/_components/status-icon' with {
+    type: 'success',
+    colored: false,
+} only %}
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `type` | `string` | `'info'` | Icon type: `info`, `success`, `warning`, or `error` |
+| `colored` | `bool` | `true` | Apply the component's type color |
+| `class` | `string` | | Additional CSS classes |
+| `title` | `string` | | Tooltip text |
+
+---
+
 ## Chart Container
 
 Wrapper for Chart.js canvas elements with consistent styling. Used inside [CP Analytics Layout](cp-analytics-layout.md) pages and dashboard widgets that need reusable chart rendering.
