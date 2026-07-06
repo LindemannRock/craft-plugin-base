@@ -110,7 +110,7 @@ class SettingsPostHelper
         }
 
         $typeName = $type->getName();
-        if ($value === '' && $type->allowsNull()) {
+        if (($value === null || $value === '') && $type->allowsNull()) {
             return ['valid' => true, 'value' => null];
         }
 

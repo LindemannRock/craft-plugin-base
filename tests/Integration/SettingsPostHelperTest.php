@@ -31,16 +31,18 @@ final class SettingsPostHelperTest extends IntegrationTestCase
                 'integerValue' => '42',
                 'nullableIntegerValue' => '',
                 'floatValue' => '1.25',
+                'nullableFloatValue' => null,
                 'booleanValue' => 'on',
-                'nullableBooleanValue' => '',
+                'nullableBooleanValue' => null,
                 'stringValue' => 123,
-                'nullableStringValue' => '',
+                'nullableStringValue' => null,
                 'arrayValue' => ['a' => 'b'],
             ],
             allowedAttributes: [
                 'integerValue',
                 'nullableIntegerValue',
                 'floatValue',
+                'nullableFloatValue',
                 'booleanValue',
                 'nullableBooleanValue',
                 'stringValue',
@@ -52,6 +54,7 @@ final class SettingsPostHelperTest extends IntegrationTestCase
         self::assertSame(42, $settings->integerValue);
         self::assertNull($settings->nullableIntegerValue);
         self::assertSame(1.25, $settings->floatValue);
+        self::assertNull($settings->nullableFloatValue);
         self::assertTrue($settings->booleanValue);
         self::assertNull($settings->nullableBooleanValue);
         self::assertSame('123', $settings->stringValue);
@@ -62,6 +65,7 @@ final class SettingsPostHelperTest extends IntegrationTestCase
             'integerValue',
             'nullableIntegerValue',
             'floatValue',
+            'nullableFloatValue',
             'booleanValue',
             'nullableBooleanValue',
             'stringValue',
@@ -178,6 +182,8 @@ final class SettingsPostHelperTestModel extends Model
     public ?int $nullableIntegerValue = 1;
 
     public float $floatValue = 0.0;
+
+    public ?float $nullableFloatValue = 1.25;
 
     public bool $booleanValue = false;
 
