@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.34.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.0...v5.34.1) - 2026-07-06
+
+
+### Fixed
+
+* **settings:** treat null and empty string as valid for nullable attributes ([fff3155](https://github.com/LindemannRock/craft-plugin-base/commit/fff31554b27472f998cf6e12461ae596deb03c27))
+
 ## [5.34.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.33.0...v5.34.0) - 2026-07-05
 
 
