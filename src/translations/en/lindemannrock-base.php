@@ -243,6 +243,14 @@ return [
     'Complete setup before using this plugin.' => 'Complete setup before using this plugin.',
     'Open setup' => 'Open setup',
 
+    // Error summary (shared via _partials/error-summary.twig)
+    'error' => 'error',
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'Found {count, number} {count, plural, =1{error} other{errors}}',
+
+    // Utilities layout (shared via _layouts/cp-utilities.twig)
+    'System Overview' => 'System Overview',
+    'Quick Actions' => 'Quick Actions',
+
     // Storage volume validation
     'Selected volume not found.' => 'Selected volume not found.',
     'Selected volume must use a local filesystem.' => 'Selected volume must use a local filesystem.',

@@ -243,6 +243,14 @@ return [
     'Complete setup before using this plugin.' => 'Fuldfør opsætningen, før du bruger dette plugin.',
     'Open setup' => 'Åbn opsætning',
 
+    // Error summary (shared via _partials/error-summary.twig)
+    'error' => 'fejl',
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => '{count, number} {count, plural, =1{fejl} other{fejl}} fundet',
+
+    // Utilities layout (shared via _layouts/cp-utilities.twig)
+    'System Overview' => 'Systemoversigt',
+    'Quick Actions' => 'Hurtige handlinger',
+
     // Storage volume validation
     'Selected volume not found.' => 'Den valgte volumen blev ikke fundet.',
     'Selected volume must use a local filesystem.' => 'Den valgte volumen skal bruge et lokalt filsystem.',

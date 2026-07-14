@@ -190,7 +190,7 @@ Pairs with [`GeoSettingsTrait`](../feature-tour/base-settings-traits.md#geosetti
 ```twig
 {% include 'lindemannrock-base/_partials/cascade-geo-settings' with {
     settings: settings,
-    translationCategory: 'search-manager',
+    pluginHandle: 'search-manager',
 } %}
 ```
 
@@ -387,7 +387,6 @@ A reusable validation error summary for settings/edit pages — the standard Cra
 ```twig
 {% include 'lindemannrock-base/_partials/error-summary' with {
     errors: settings.getErrors(),
-    translationCategory: 'my-plugin',
 } only %}
 ```
 
@@ -397,7 +396,6 @@ A reusable validation error summary for settings/edit pages — the standard Cra
 |-----------|------|---------|-------------|
 | `errors` | `object` | `{}` | Map of `field => [messages]`, e.g. from `model.getErrors()` |
 | `linkMode` | `string` | `'field-id'` | `'field-id'` links to `#{field}-field`; `'data-key'` emits `data-field-error-key` for JS-driven focus |
-| `translationCategory` | `string` | `'app'` | Translation category for the "error(s)" heading |
 
 The banner renders nothing when there are no errors. The count uses an ICU plural, so it reads "1 error" / "N errors" correctly across locales.
 

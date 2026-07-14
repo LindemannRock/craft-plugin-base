@@ -4,11 +4,9 @@
  # Params:
  # - errors: map of field => [messages]
  # - linkMode: 'field-id' (default) or 'data-key'
- # - translationCategory: translation domain (default: 'app')
  #}
 {% set errors = errors ?? {} %}
 {% set linkMode = linkMode ?? 'field-id' %}
-{% set translationCategory = translationCategory ?? 'app' %}
 
 {% set errorCount = 0 %}
 {% for fieldErrors in errors %}
@@ -18,8 +16,8 @@
 {% if errorCount > 0 %}
     <div class="error-summary" tabindex="-1">
         <div>
-            <span class="notification-icon" data-icon="alert" aria-label="{{ 'error'|t(translationCategory) }}" role="img"></span>
-            <h2>{{ 'Found {count, number} {count, plural, =1{error} other{errors}}'|t(translationCategory, {count: errorCount}) }}</h2>
+            <span class="notification-icon" data-icon="alert" aria-label="{{ 'error'|t('lindemannrock-base') }}" role="img"></span>
+            <h2>{{ 'Found {count, number} {count, plural, =1{error} other{errors}}'|t('lindemannrock-base', {count: errorCount}) }}</h2>
         </div>
         <ul class="errors">
             {% for field, fieldErrors in errors %}

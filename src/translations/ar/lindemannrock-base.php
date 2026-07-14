@@ -243,6 +243,14 @@ return [
     'Complete setup before using this plugin.' => 'أكمل الإعداد قبل استخدام هذه الإضافة.',
     'Open setup' => 'فتح الإعداد',
 
+    // Error summary (shared via _partials/error-summary.twig)
+    'error' => 'خطأ',
+    'Found {count, number} {count, plural, =1{error} other{errors}}' => 'تم العثور على {count, number} {count, plural, =1{خطأ} other{أخطاء}}',
+
+    // Utilities layout (shared via _layouts/cp-utilities.twig)
+    'System Overview' => 'نظرة عامة على النظام',
+    'Quick Actions' => 'إجراءات سريعة',
+
     // Storage volume validation
     'Selected volume not found.' => 'لم يتم العثور على وحدة التخزين المحددة.',
     'Selected volume must use a local filesystem.' => 'يجب أن تستخدم وحدة التخزين المحددة نظام ملفات محلياً.',

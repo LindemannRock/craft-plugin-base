@@ -9,7 +9,6 @@ A reusable layout for plugin utility/overview pages with system overview cards a
 
 {% set utilitiesConfig = {
     plugin: {
-        handle: 'my-plugin',
         name: myHelper.fullName,
     },
     page: {
@@ -61,7 +60,6 @@ A reusable layout for plugin utility/overview pages with system overview cards a
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `handle` | `string` | Plugin handle (used for translations) |
 | `name` | `string` | Plugin display name |
 
 ### page
