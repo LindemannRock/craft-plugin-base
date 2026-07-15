@@ -255,32 +255,6 @@ The partial uses base-owned labels for **Configuration Required**, **Standard**,
 
 ---
 
-## ip-salt-error
-
-Error banner for settings pages when IP hash salt is missing but analytics is enabled. It shows copy-to-clipboard commands for generating the salt and explains that the same salt should be copied to staging and production.
-
-### Usage
-
-```twig
-{% include 'lindemannrock-base/_partials/ip-salt-error' with {
-    pluginHandle: 'redirect-manager',
-} only %}
-```
-
-### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `pluginHandle` | `string` | Plugin handle used for plugin settings lookup and command paths |
-| `translationCategory` | `string` | Legacy alias for `pluginHandle` |
-| `envVarName` | `string` | Optional env var name override. Defaults to `<PLUGIN_HANDLE>_IP_SALT` with hyphens converted to underscores |
-
-The banner only renders when the plugin's `enableAnalytics` setting is `true` and `ipHashSalt` is missing or still set to the raw variable reference.
-
-For other missing env values that are fixed by a console command, use [`env-command-error`](#env-command-error).
-
----
-
 ## backup-list
 
 Lightweight containers for async backup history loading. Provides loading spinner, empty state, and error message containers.

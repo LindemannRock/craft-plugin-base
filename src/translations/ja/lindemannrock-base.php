@@ -222,12 +222,12 @@ return [
     'Whether the Excel export option appears in this plugin\'s export menus.' => 'このプラグインのエクスポートメニューに Excel エクスポートオプションを表示するかどうかを設定します。',
     'Enabled' => '有効',
 
-    // Copy-to-clipboard controls (shared via _components/secret-reveal.twig + _partials/ip-salt-error.twig)
+    // Copy-to-clipboard controls (shared via _components/secret-reveal.twig, copy-input.twig, setup-task.twig + _partials/env-command-error.twig)
     'Copy' => 'コピー',
     'Copied!' => 'コピーしました！',
     'Failed to copy to clipboard' => 'クリップボードへのコピーに失敗しました',
 
-    // IP hash salt error (shared via _partials/ip-salt-error.twig)
+    // IP hash salt setup guidance (consumed by plugin setup templates + _partials/env-command-error.twig)
     'Configuration Required' => '設定が必要です',
     'IP hash salt is missing.' => 'IP ハッシュソルトが設定されていません。',
     'Analytics tracking requires a secure salt for privacy protection.' => 'アナリティクストラッキングには、プライバシー保護のための安全なソルトが必要です。',

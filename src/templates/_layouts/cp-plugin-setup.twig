@@ -44,7 +44,7 @@
 {% set page = config.page ?? {} %}
 {% set actions = config.actions ?? {} %}
 {% set setupTasks = config.tasks ?? [] %}
-{% set pluginHandle = plugin.handle ?? 'app' %}
+{% set pluginHandle = plugin.handle %}
 {% set pluginName = plugin.name ?? '' %}
 {% set pluginVersion = plugin.version ?? null %}
 {% set pluginIconSvg = plugin.iconSvg ?? null %}

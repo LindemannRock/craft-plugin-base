@@ -26,7 +26,6 @@
 #}
 
 {% import "_includes/forms" as forms %}
-{% set pluginHandle = pluginHandle ?? 'app' %}
 {% set inheritLabel = 'Use global default'|t('lindemannrock-base') %}
 {% set isOverridden = settings.isOverriddenByConfig('defaultDateRange') %}
 {# When overridden by config, display the cascade-resolved (effective) value

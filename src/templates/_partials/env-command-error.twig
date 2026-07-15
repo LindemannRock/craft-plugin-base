@@ -14,7 +14,6 @@
   @copyright Copyright (c) 2026 LindemannRock
 #}
 
-{% set pluginHandle = pluginHandle ?? 'app' %}
 {% set plugin = craft.app.plugins.getPlugin(pluginHandle) %}
 {% set pluginId = plugin and plugin.id is defined and plugin.id ? plugin.id : pluginHandle %}
 {% set envVarName = envVarName ?? null %}

@@ -222,12 +222,12 @@ return [
     'Whether the Excel export option appears in this plugin\'s export menus.' => 'Bepaalt of de Excel-exportoptie verschijnt in de exportmenu\'s van deze plugin.',
     'Enabled' => 'Ingeschakeld',
 
-    // Copy-to-clipboard controls (shared via _components/secret-reveal.twig + _partials/ip-salt-error.twig)
+    // Copy-to-clipboard controls (shared via _components/secret-reveal.twig, copy-input.twig, setup-task.twig + _partials/env-command-error.twig)
     'Copy' => 'Kopiëren',
     'Copied!' => 'Gekopieerd!',
     'Failed to copy to clipboard' => 'Kopiëren naar klembord mislukt',
 
-    // IP hash salt error (shared via _partials/ip-salt-error.twig)
+    // IP hash salt setup guidance (consumed by plugin setup templates + _partials/env-command-error.twig)
     'Configuration Required' => 'Configuratie vereist',
     'IP hash salt is missing.' => 'IP-hashsalt ontbreekt.',
     'Analytics tracking requires a secure salt for privacy protection.' => 'Analysetracking vereist een veilige salt voor privacybescherming.',

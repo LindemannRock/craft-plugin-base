@@ -222,12 +222,12 @@ return [
     'Whether the Excel export option appears in this plugin\'s export menus.' => 'Bestemmer om Excel-eksportindstillingen vises i eksportmenuerne for dette plugin.',
     'Enabled' => 'Aktiveret',
 
-    // Copy-to-clipboard controls (shared via _components/secret-reveal.twig + _partials/ip-salt-error.twig)
+    // Copy-to-clipboard controls (shared via _components/secret-reveal.twig, copy-input.twig, setup-task.twig + _partials/env-command-error.twig)
     'Copy' => 'Kopiér',
     'Copied!' => 'Kopieret!',
     'Failed to copy to clipboard' => 'Kopiering til udklipsholder mislykkedes',
 
-    // IP hash salt error (shared via _partials/ip-salt-error.twig)
+    // IP hash salt setup guidance (consumed by plugin setup templates + _partials/env-command-error.twig)
     'Configuration Required' => 'Konfiguration påkrævet',
     'IP hash salt is missing.' => 'IP-hash-salt mangler.',
     'Analytics tracking requires a secure salt for privacy protection.' => 'Analysesporing kræver et sikkert salt til beskyttelse af privatlivets fred.',
