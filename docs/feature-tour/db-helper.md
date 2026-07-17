@@ -128,6 +128,23 @@ $inner = new Expression('IFNULL(id, 0)');
 $sql = DbHelper::castToText($inner);
 ```
 
+## Boolean Aggregate Projection @since(5.35.0)
+
+### boolToInt()
+
+Projects a boolean column to `0`/`1` for use inside aggregate functions.
+
+PostgreSQL has no `MAX()`/`MIN()` aggregate over `boolean` — `MAX(isHit)` fails with `SQLSTATE 42883: function max(boolean) does not exist`. MySQL only allows it because its booleans are `tinyint(1)`, so the bug stays invisible until the query runs on PostgreSQL. The CASE projection is integer-typed on both drivers with unchanged semantics (`MAX(...) = 0` still means "no row in the group had the flag set"):
+
+```php
+$query->select([
+    'MAX(' . DbHelper::boolToInt('isHit') . ') AS [[isHit]]',
+]);
+// MAX(CASE WHEN [[isHit]] THEN 1 ELSE 0 END) AS [[isHit]]
+```
+
+Use it for **every** `MAX()`/`MIN()`/`SUM()` over a boolean column in raw SQL. Integer columns aggregate directly and must not be wrapped.
+
 ## Upsert Existing-Row References @since(5.35.0)
 
 ### existingColumn()

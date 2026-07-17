@@ -378,6 +378,7 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `groupConcat(string $expression, string $separator)` | `string` | DB-agnostic GROUP_CONCAT / STRING_AGG |
 | `castToText(string\|Expression $expression)` @since(5.25.0) | `string` | DB-agnostic CAST to text — `CAST(expr AS CHAR)` on MySQL, `(expr)::text` on PostgreSQL |
 | `existingColumn(string $table, string $column)` @since(5.35.0) | `string` | `{{%table}}.[[column]]` reference to the existing row inside an upsert's ON CONFLICT DO UPDATE expression — a bare column there is ambiguous on PostgreSQL |
+| `boolToInt(string $column)` @since(5.35.0) | `string` | `CASE WHEN [[column]] THEN 1 ELSE 0 END` — 0/1 projection of a boolean column for MAX/MIN/SUM (PostgreSQL has no boolean max/min) |
 
 Column-taking helpers wrap bare column references in Yii's `[[...]]` placeholder @since(5.35.0) so camelCase columns stay dialect-quoted on PostgreSQL; composed expressions pass through unchanged.
 
@@ -583,8 +584,8 @@ Same three accessors as `StubConsoleRequest`, but extends Yii's web request. **P
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `scanDirectory(string $directory, array $excludeSuffixes = [])` | `string[]` | Scan every `.php` file under a directory for raw SQL string literals with unbracketed camelCase columns or aliases (MySQL-safe, PostgreSQL-broken). Empty array when clean. |
-| `scanFile(string $absolutePath)` | `string[]` | Scan a single file. |
+| `scanDirectory(string $directory, array $excludeSuffixes = [], array $booleanColumns = [])` | `string[]` | Scan every `.php` file under a directory for PostgreSQL-unsafe raw SQL: unbracketed camelCase columns/aliases, bare identifiers in raw SQL statements, and MAX/MIN over declared boolean columns. Empty array when clean. |
+| `scanFile(string $absolutePath, array $booleanColumns = [])` | `string[]` | Scan a single file. |
 
 ### bootstrap()
 

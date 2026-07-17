@@ -406,8 +406,8 @@ Only string literals are inspected (via `token_get_all`), so comments and docblo
 
 | Method | Purpose |
 |--------|---------|
-| `scanDirectory(string $directory, array $excludeSuffixes = []): array` | Scan every `.php` file under a directory. `$excludeSuffixes` skips files by relative-path suffix (e.g. a MySQL-only dialect file). Returns human-readable violations; empty array when clean. |
-| `scanFile(string $absolutePath): array` | Scan a single file. |
+| `scanDirectory(string $directory, array $excludeSuffixes = [], array $booleanColumns = []): array` | Scan every `.php` file under a directory. `$excludeSuffixes` skips files by relative-path suffix (e.g. a MySQL-only dialect file). `$booleanColumns` names the plugin's boolean columns so bare `MAX()`/`MIN()` over one is flagged (a *type* error the identifier rules can't see). Returns human-readable violations; empty array when clean. |
+| `scanFile(string $absolutePath, array $booleanColumns = []): array` | Scan a single file. |
 
 Wire it into a plugin test:
 
@@ -418,7 +418,8 @@ public function testRawSqlLiteralsAreDialectSafe(): void
 {
     $violations = SqlDialectLinter::scanDirectory(
         dirname(__DIR__, 2) . '/src',
-        ['src/search/storage/MySqlStorage.php'], // MySQL-only dialect files
+        ['src/search/storage/MySqlStorage.php'],   // MySQL-only dialect files
+        ['isHit', 'wasRedirected', 'isRobot'],     // boolean columns used in aggregates
     );
 
     self::assertSame([], $violations, implode("\n", $violations));
@@ -427,11 +428,13 @@ public function testRawSqlLiteralsAreDialectSafe(): void
 
 What it flags:
 
-- `SUM(resultsCount)` / `MAX(isHit)` / `COUNT(DISTINCT queryRuleId)` — aggregate over an unbracketed camelCase column
+- `SUM(resultsCount)` / `COUNT(DISTINCT queryRuleId)` — aggregate over an unbracketed camelCase column
 - `CASE WHEN trafficType = ...` — CASE over an unbracketed camelCase column
 - `COUNT(*) as searchCount` — unbracketed camelCase alias in an SQL-looking literal
+- `MAX([[isHit]])` — MAX/MIN directly over a declared boolean column (PostgreSQL has no boolean max/min; use [`DbHelper::boolToInt()`](db-helper.md))
+- `SELECT DISTINCT indexHandle FROM ...` — bare camelCase identifier in a raw SQL statement literal (e.g. a `createCommand()` string)
 
-What passes: bracketed forms (`SUM([[resultsCount]])`, `as [[searchCount]]`), all-lowercase identifiers, and non-SQL strings.
+What passes: bracketed forms (`SUM([[resultsCount]])`, `as [[searchCount]]`), CASE-projected booleans (`MAX(CASE WHEN [[isHit]] THEN 1 ELSE 0 END)`), all-lowercase identifiers, camelCase inside SQL string values (`= 'someCamelValue'`) or `:param` placeholders, and non-SQL strings.
 
 ## Related
 

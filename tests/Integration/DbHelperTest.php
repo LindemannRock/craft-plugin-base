@@ -111,6 +111,23 @@ final class DbHelperTest extends IntegrationTestCase
         );
     }
 
+    public function testBoolToIntProjectsBooleanForAggregates(): void
+    {
+        // PostgreSQL has no MAX()/MIN() over boolean — the CASE projection
+        // makes the aggregate integer-typed on both drivers.
+        self::assertSame(
+            'CASE WHEN [[isHit]] THEN 1 ELSE 0 END',
+            DbHelper::boolToInt('isHit'),
+        );
+        self::assertSame(
+            'CASE WHEN [[a.isRobot]] THEN 1 ELSE 0 END',
+            DbHelper::boolToInt('a.isRobot'),
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        DbHelper::boolToInt("isHit'); DROP TABLE users;--");
+    }
+
     public function testExistingColumnBuildsQualifiedUpsertReference(): void
     {
         self::assertSame(
@@ -134,19 +151,26 @@ final class DbHelperTest extends IntegrationTestCase
 $unsafeAggregate = 'SUM(resultsCount) AS actionResults';
 $unsafeAlias = 'COUNT(*) as searchCount';
 $unsafeCase = "CASE WHEN trafficType = 'bot' THEN 1 ELSE 0 END";
+$unsafeBooleanMax = 'MAX([[isHit]]) = 0';
+$unsafeBareColumn = 'SELECT DISTINCT indexHandle FROM {{%searchmanager_search_documents}}';
 $safe = 'SUM([[resultsCount]]) AS [[actionResults]]';
 $safeLowercase = 'COUNT(DISTINCT query) as total';
+$safeBooleanCase = 'MAX(CASE WHEN [[isHit]] THEN 1 ELSE 0 END) = 0';
+$safeBareColumn = 'SELECT DISTINCT [[indexHandle]] FROM {{%searchmanager_search_documents}}';
+$safeSqlValue = "SELECT [[id]] FROM {{%t}} WHERE [[source]] = 'someCamelValue' AND [[key]] = :camelParam";
 PHP);
 
         try {
-            $violations = SqlDialectLinter::scanFile($fixture);
+            $violations = SqlDialectLinter::scanFile($fixture, ['isHit']);
         } finally {
             unlink($fixture);
         }
 
-        self::assertCount(3, $violations);
+        self::assertCount(5, $violations);
         self::assertStringContainsString('SUM(resultsCount)', $violations[0]);
         self::assertStringContainsString('unbracketed camelCase alias', $violations[1]);
         self::assertStringContainsString('CASE WHEN trafficType', $violations[2]);
+        self::assertStringContainsString('MAX/MIN over boolean column isHit', $violations[3]);
+        self::assertStringContainsString("bare camelCase identifier 'indexHandle'", $violations[4]);
     }
 }

@@ -220,6 +220,33 @@ class DbHelper
     }
 
     /**
+     * Returns a portable 0/1 projection of a boolean column for use inside
+     * aggregate functions.
+     *
+     * PostgreSQL has no MAX()/MIN() aggregate over boolean (SQLSTATE 42883
+     * "function max(boolean) does not exist"); MySQL only allows it because
+     * its booleans are tinyint(1). Wrapping the flag in a CASE makes the
+     * aggregate integer-typed on both drivers, with unchanged semantics
+     * (MAX(...) = 0 still means "no row in the group had the flag set"):
+     *
+     * ```php
+     * 'MAX(' . DbHelper::boolToInt('isHit') . ') AS [[isHit]]'
+     * // MAX(CASE WHEN [[isHit]] THEN 1 ELSE 0 END) AS [[isHit]]
+     * ```
+     *
+     * @param string $column Boolean column (bare or alias-qualified; bracketed passes through)
+     * @return string CASE WHEN [[column]] THEN 1 ELSE 0 END
+     * @throws \InvalidArgumentException if column contains unsafe characters
+     * @since 5.35.0
+     */
+    public static function boolToInt(string $column): string
+    {
+        self::validateIdentifier($column, 'column');
+
+        return 'CASE WHEN ' . self::bracketBareColumn($column) . ' THEN 1 ELSE 0 END';
+    }
+
+    /**
      * Wrap a bare column reference in Yii's [[...]] quoting placeholder.
      *
      * PostgreSQL folds unquoted identifiers to lowercase, so a camelCase
