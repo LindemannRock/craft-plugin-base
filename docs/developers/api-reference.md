@@ -377,6 +377,9 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `jsonExtractExpression(string $column, string\|string[] $path, ?string $alias)` | `Expression` | Yii Expression for JSON extraction, with optional alias. Pass an array for nested paths |
 | `groupConcat(string $expression, string $separator)` | `string` | DB-agnostic GROUP_CONCAT / STRING_AGG |
 | `castToText(string\|Expression $expression)` @since(5.25.0) | `string` | DB-agnostic CAST to text — `CAST(expr AS CHAR)` on MySQL, `(expr)::text` on PostgreSQL |
+| `existingColumn(string $table, string $column)` @since(5.35.0) | `string` | `{{%table}}.[[column]]` reference to the existing row inside an upsert's ON CONFLICT DO UPDATE expression — a bare column there is ambiguous on PostgreSQL |
+
+Column-taking helpers wrap bare column references in Yii's `[[...]]` placeholder @since(5.35.0) so camelCase columns stay dialect-quoted on PostgreSQL; composed expressions pass through unchanged.
 
 ### CsvImportHelper
 
@@ -573,6 +576,15 @@ Test double that adds web-only accessors (`getUserIP`, `getUserAgent`, `getRefer
 `lindemannrock\base\testing\StubWebRequest` (final, extends `yii\web\Request`)
 
 Same three accessors as `StubConsoleRequest`, but extends Yii's web request. **Pass directly as a method argument** when the service under test type-hints `yii\web\Request` (or `craft\web\Request`). Never install on `Craft::$app->set('request', …)` — a web request on a console-bootstrapped Craft fools mode-detection.
+
+### SqlDialectLinter @since(5.35.0)
+
+`lindemannrock\base\testing\SqlDialectLinter` (final)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `scanDirectory(string $directory, array $excludeSuffixes = [])` | `string[]` | Scan every `.php` file under a directory for raw SQL string literals with unbracketed camelCase columns or aliases (MySQL-safe, PostgreSQL-broken). Empty array when clean. |
+| `scanFile(string $absolutePath)` | `string[]` | Scan a single file. |
 
 ### bootstrap()
 

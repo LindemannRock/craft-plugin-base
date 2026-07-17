@@ -15,6 +15,7 @@ Shared scaffolding for PHPUnit integration tests against a live Craft install. P
 | `StubConsoleRequest` | final class | Test double extending `craft\console\Request` that adds the web-only `getUserIP()` / `getUserAgent()` / `getReferrer()` accessors. Use when installing on `Craft::$app->set('request', …)` so mode-detection stays honest. |
 | `StubWebRequest` | final class | Test double extending `yii\web\Request` with the same three accessors. Use when the service under test type-hints `yii\web\Request` (or `craft\web\Request`) as a method parameter. |
 | `bootstrap()` | function | Initialises Craft as a console application from a test bootstrap file. |
+| `SqlDialectLinter` @since(5.35.0) | final class | Static source scanner that flags raw SQL string literals that are MySQL-safe but PostgreSQL-broken (unbracketed camelCase columns/aliases). Lets a MySQL-only CI enforce dialect-safe SQL. |
 | `phpunit.xml.dist.template` | template file | Copy-once `phpunit.xml.dist` shipping strict mode and a sensible default suite layout. |
 
 Choose `StubWebRequest` when code accepts a web request argument, and choose `StubConsoleRequest` when code reads from `Craft::$app->request` inside the console-bootstrapped test harness.
@@ -393,7 +394,47 @@ The template ships with:
 
 Adjust only if your plugin has non-standard layout.
 
+## `SqlDialectLinter` @since(5.35.0)
+
+```php
+final class SqlDialectLinter
+```
+
+Static scanner for PHP source that flags raw SQL string literals that work on MySQL but break on PostgreSQL. MySQL treats unquoted identifiers case-insensitively; PostgreSQL folds them to lowercase — so a raw `SUM(resultsCount)` queries a non-existent column there, and an unquoted `as avgTime` alias comes back as the row key `avgtime`, silently breaking `$row['avgTime']` reads. The fix is Yii's `[[...]]` placeholder; the linter lets a MySQL-only CI enforce it without a live PostgreSQL install.
+
+Only string literals are inspected (via `token_get_all`), so comments and docblocks cannot false-positive.
+
+| Method | Purpose |
+|--------|---------|
+| `scanDirectory(string $directory, array $excludeSuffixes = []): array` | Scan every `.php` file under a directory. `$excludeSuffixes` skips files by relative-path suffix (e.g. a MySQL-only dialect file). Returns human-readable violations; empty array when clean. |
+| `scanFile(string $absolutePath): array` | Scan a single file. |
+
+Wire it into a plugin test:
+
+```php
+use lindemannrock\base\testing\SqlDialectLinter;
+
+public function testRawSqlLiteralsAreDialectSafe(): void
+{
+    $violations = SqlDialectLinter::scanDirectory(
+        dirname(__DIR__, 2) . '/src',
+        ['src/search/storage/MySqlStorage.php'], // MySQL-only dialect files
+    );
+
+    self::assertSame([], $violations, implode("\n", $violations));
+}
+```
+
+What it flags:
+
+- `SUM(resultsCount)` / `MAX(isHit)` / `COUNT(DISTINCT queryRuleId)` — aggregate over an unbracketed camelCase column
+- `CASE WHEN trafficType = ...` — CASE over an unbracketed camelCase column
+- `COUNT(*) as searchCount` — unbracketed camelCase alias in an SQL-looking literal
+
+What passes: bracketed forms (`SUM([[resultsCount]])`, `as [[searchCount]]`), all-lowercase identifiers, and non-SQL strings.
+
 ## Related
 
 - [Bootstrapping](../developers/bootstrapping.md) — how to initialize the base module
+- [DbHelper](db-helper.md) — DB-agnostic SQL expressions (the runtime side of dialect safety)
 - `phpunit.xml.dist.template` — copy-once suite setup for plugin integration tests

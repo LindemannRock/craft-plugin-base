@@ -17,7 +17,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **PluginThemeStyleHelper** — icon-derived CSS variables for branded plugin heroes and docs surfaces
 - **ExportHelper** — CSV, JSON, and Excel export with configurable format availability
 - **GeoHelper** — ISO 3166-1 country lookups, dial codes, and phone validation
-- **DbHelper** — DB-agnostic JSON extraction and GROUP_CONCAT
+- **DbHelper** — DB-agnostic JSON extraction, GROUP_CONCAT, text casting, and upsert existing-row references
 - **GqlHelper** — schema permission checks and site argument resolution for plugin-owned GraphQL queries
 - **BooleanHelper** — normalize boolean-like config, env, POST, and HTML attribute values
 - **ExperimentalFeatureHelper** — env-flag gating for internal or launch-deferred features
@@ -30,7 +30,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **CP Analytics Layout** — analytics dashboards with tabs, charts, stat boxes, and date filters
 - **Twig Extensions** — 30+ filters and functions for dates, colors, plugin theme styles, exports, geo, and plugin detection
 - **19 Twig Components** — badge, stat-box, dashboard-widget helpers, info-box, export-menu, row-actions, filters, and more
-- **Testing Utilities** — `IntegrationTestCase` abstract base with component swap/restore, generic DB helpers, marker cleanup, fixture lifecycle helpers for elements/temp paths, queue drain, and an external-state cleanup hook; plus a `bootstrap()` function and `phpunit.xml.dist` template for quick test-suite setup in consumer plugins
+- **Testing Utilities** — `IntegrationTestCase` abstract base with component swap/restore, generic DB helpers, marker cleanup, fixture lifecycle helpers for elements/temp paths, queue drain, and an external-state cleanup hook; a `SqlDialectLinter` that flags PostgreSQL-unsafe raw SQL from MySQL-only CI; plus a `bootstrap()` function and `phpunit.xml.dist` template for quick test-suite setup in consumer plugins
 
 ## Requirements
 

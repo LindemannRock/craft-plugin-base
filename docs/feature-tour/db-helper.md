@@ -2,6 +2,9 @@
 
 DB-agnostic SQL expressions for operations that differ between MySQL and PostgreSQL. Use these instead of writing MySQL-specific SQL like `JSON_EXTRACT` or `GROUP_CONCAT`.
 
+> [!NOTE]
+> Column-taking helpers wrap a bare column reference in Yii's `[[...]]` quoting placeholder @since(5.35.0). PostgreSQL folds unquoted identifiers to lowercase, so an unquoted camelCase column like `sessionId` would resolve to a non-existent `sessionid` there — bracketing keeps the emitted SQL dialect-quoted on both drivers. Already-bracketed references and composed expressions pass through unchanged.
+
 ## JSON Extraction
 
 Extract a text value from a JSON column. Generates the correct SQL for both MySQL and PostgreSQL.
@@ -14,8 +17,8 @@ Returns a raw SQL string for use in query conditions or raw SQL.
 use lindemannrock\base\helpers\DbHelper;
 
 $sql = DbHelper::jsonExtract('metadata', 'source');
-// MySQL:      JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.source'))
-// PostgreSQL: metadata->>'source'
+// MySQL:      JSON_UNQUOTE(JSON_EXTRACT([[metadata]], '$.source'))
+// PostgreSQL: [[metadata]]->>'source'
 ```
 
 Works with table aliases and special characters in keys:
@@ -23,15 +26,16 @@ Works with table aliases and special characters in keys:
 ```php
 // With table alias
 DbHelper::jsonExtract('a.metadata', 'clickType');
-// MySQL: JSON_UNQUOTE(JSON_EXTRACT(a.metadata, '$.clickType'))
+// MySQL: JSON_UNQUOTE(JSON_EXTRACT([[a.metadata]], '$.clickType'))
 
-// With Craft table-prefix syntax
+// With Craft table-prefix syntax — the {{%...}} token is preserved for Yii
+// to resolve and quote; only the column part is bracketed
 DbHelper::jsonExtract('{{%formie_submissions}}.content', $fieldUid);
-// Resolves {{%formie_submissions}} before validating the column reference.
+// MySQL: JSON_UNQUOTE(JSON_EXTRACT({{%formie_submissions}}.[[content]], '$....'))
 
 // Keys with hyphens get quoted for MySQL
 DbHelper::jsonExtract('metadata', 'utm-source');
-// MySQL: JSON_UNQUOTE(JSON_EXTRACT(metadata, '$."utm-source"'))
+// MySQL: JSON_UNQUOTE(JSON_EXTRACT([[metadata]], '$."utm-source"'))
 ```
 
 When building Yii-quoted column references, do not nest Craft table-prefix syntax inside `[[...]]`. Yii's expansion order can corrupt the column-reference parser. Prefer either a query-builder alias such as `s.content` / `[[s.content]]`, or pass `{{%table}}.column` directly to `DbHelper::jsonExtract()`.
@@ -76,13 +80,13 @@ Aggregate grouped values into a single string. Generates `GROUP_CONCAT` for MySQ
 
 ```php
 $sql = DbHelper::groupConcat('tag');
-// MySQL:      GROUP_CONCAT(tag SEPARATOR ',')
-// PostgreSQL: STRING_AGG((tag)::text, ',')
+// MySQL:      GROUP_CONCAT([[tag]] SEPARATOR ',')
+// PostgreSQL: STRING_AGG(([[tag]])::text, ',')
 
 // Custom separator
 $sql = DbHelper::groupConcat('category', ' | ');
-// MySQL:      GROUP_CONCAT(category SEPARATOR ' | ')
-// PostgreSQL: STRING_AGG((category)::text, ' | ')
+// MySQL:      GROUP_CONCAT([[category]] SEPARATOR ' | ')
+// PostgreSQL: STRING_AGG(([[category]])::text, ' | ')
 ```
 
 Usage in a query:
@@ -103,18 +107,18 @@ Cast a value to text/string for safe composition with text functions or COALESCE
 
 ```php
 $sql = DbHelper::castToText('id');
-// MySQL:      CAST(id AS CHAR)
-// PostgreSQL: (id)::text
+// MySQL:      CAST([[id]] AS CHAR)
+// PostgreSQL: ([[id]])::text
 ```
 
-Useful when a `COALESCE()` must fall back between a text column and a non-text column — the non-text side needs an explicit cast or PostgreSQL will reject the mixed-type expression. Common pattern: dedup a fan-out by composite identity:
+Useful when a `COALESCE()` must fall back between a text column and a non-text column — the non-text side needs an explicit cast or PostgreSQL will reject the mixed-type expression. Common pattern: dedup a fan-out by composite identity (note the `[[sessionId]]` bracketing — hand-written camelCase columns in raw SQL must be bracketed too, or PostgreSQL folds them to lowercase):
 
 ```php
 // "One row per search action" — sessionId when set, row id otherwise
-$identity = "COALESCE(sessionId, " . DbHelper::castToText('id') . ")";
+$identity = "COALESCE([[sessionId]], " . DbHelper::castToText('id') . ")";
 $query->select(["COUNT(DISTINCT $identity) as actions"]);
-// MySQL:      COUNT(DISTINCT COALESCE(sessionId, CAST(id AS CHAR)))
-// PostgreSQL: COUNT(DISTINCT COALESCE(sessionId, (id)::text))
+// MySQL:      COUNT(DISTINCT COALESCE(`sessionId`, CAST(`id` AS CHAR)))
+// PostgreSQL: COUNT(DISTINCT COALESCE("sessionId", ("id")::text))
 ```
 
 Accepts an `Expression` for composed inputs:
@@ -123,6 +127,28 @@ Accepts an `Expression` for composed inputs:
 $inner = new Expression('IFNULL(id, 0)');
 $sql = DbHelper::castToText($inner);
 ```
+
+## Upsert Existing-Row References @since(5.35.0)
+
+### existingColumn()
+
+Builds a reference to a target-table column for use inside an upsert's update value expression.
+
+PostgreSQL's `ON CONFLICT DO UPDATE` treats a bare column reference as ambiguous — the existing target row and the incoming `EXCLUDED` pseudo-row both expose it — and fails with `SQLSTATE 42702: column reference is ambiguous`. MySQL's upsert SQL never surfaces this, so the bug stays latent until the first conflicting write on a PostgreSQL install. Qualifying the reference with the table name resolves it to the existing row on both drivers:
+
+```php
+$db->createCommand()->upsert('{{%myplugin_terms}}', $values, [
+    // Keep the larger of the existing and incoming frequency
+    'frequency' => new Expression(
+        'GREATEST(' . DbHelper::existingColumn('myplugin_terms', 'frequency') . ', :incoming)',
+        [':incoming' => $frequency],
+    ),
+])->execute();
+// DbHelper::existingColumn('myplugin_terms', 'frequency')
+// returns: {{%myplugin_terms}}.[[frequency]]
+```
+
+Use it for **every** `new Expression(...)` update value that reads a column of the table being upserted (`GREATEST(...)`, `CASE WHEN [[status]] = ... THEN [[attemptCount]] ...`, counters). Plain scalar update values don't need it. The `EXCLUDED` (incoming) row can't be referenced portably across drivers — pass incoming values as `:params` instead.
 
 ## Next Steps
 
