@@ -43,8 +43,13 @@ class DbHelper
     /**
      * Returns a DB-agnostic expression to extract a text value from a JSON column.
      *
-     * MySQL:      JSON_UNQUOTE(JSON_EXTRACT(column, '$.key'))
-     * PostgreSQL: column->>'key'
+     * MySQL:      JSON_UNQUOTE(JSON_EXTRACT([[column]], '$.key'))
+     * PostgreSQL: [[column]]->>'key'
+     *
+     * A bare column reference (`column`, `a.column`, `{{%table}}.column`) is
+     * wrapped in Yii's [[...]] placeholder so it stays dialect-quoted —
+     * PostgreSQL folds unquoted identifiers to lowercase, which breaks
+     * camelCase columns. Already-bracketed references pass through unchanged.
      *
      * Pass an array for nested paths. Each segment is treated as a single key
      * (segments are NOT split on dots), so keys containing dots or other
@@ -57,8 +62,8 @@ class DbHelper
      */
     public static function jsonExtract(string $column, string|array $path): string
     {
-        $column = self::normalizeColumnReference($column);
-        self::validateIdentifier($column, 'column');
+        self::validateIdentifier(self::normalizeColumnReference($column), 'column');
+        $column = self::bracketBareColumn($column);
 
         $segments = is_array($path) ? array_values($path) : [$path];
         if ($segments === []) {
@@ -113,8 +118,11 @@ class DbHelper
     /**
      * Returns a DB-agnostic expression that casts a value to text/string.
      *
-     * MySQL:      CAST(expression AS CHAR)
-     * PostgreSQL: (expression)::text
+     * MySQL:      CAST([[column]] AS CHAR)
+     * PostgreSQL: ([[column]])::text
+     *
+     * A bare column argument is wrapped in [[...]] (see jsonExtract());
+     * composed expressions and Expression instances pass through unchanged.
      *
      * Useful when an expression must be compared as text or composed with
      * text functions — for example, a COALESCE() that falls back from a
@@ -131,6 +139,7 @@ class DbHelper
         $expressionSql = $expression instanceof Expression ? $expression->expression : $expression;
         if (!($expression instanceof Expression)) {
             self::validateExpression($expressionSql);
+            $expressionSql = self::bracketBareColumn($expressionSql);
         }
 
         if (Craft::$app->getDb()->getIsMysql()) {
@@ -143,8 +152,11 @@ class DbHelper
     /**
      * Returns a DB-agnostic expression to concatenate grouped values.
      *
-     * MySQL:      GROUP_CONCAT(expression SEPARATOR separator)
-     * PostgreSQL: STRING_AGG(expression::text, separator)
+     * MySQL:      GROUP_CONCAT([[column]] SEPARATOR separator)
+     * PostgreSQL: STRING_AGG(([[column]])::text, separator)
+     *
+     * A bare column argument is wrapped in [[...]] (see jsonExtract());
+     * composed expressions and Expression instances pass through unchanged.
      *
      * @param string|Expression $expression The SQL expression to aggregate
      * @param string $separator The separator between values (default ',')
@@ -156,6 +168,7 @@ class DbHelper
         $expressionSql = $expression instanceof Expression ? $expression->expression : $expression;
         if (!($expression instanceof Expression)) {
             self::validateExpression($expressionSql);
+            $expressionSql = self::bracketBareColumn($expressionSql);
         }
 
         $quotedSeparator = str_replace("'", "''", $separator);
@@ -166,6 +179,70 @@ class DbHelper
 
         // PostgreSQL
         return "STRING_AGG(($expressionSql)::text, '$quotedSeparator')";
+    }
+
+    /**
+     * Returns a reference to a target-table column for use inside an upsert's
+     * update value expression.
+     *
+     * In PostgreSQL's ON CONFLICT DO UPDATE, a bare column reference is
+     * ambiguous — the target row and the EXCLUDED pseudo-row both expose it —
+     * and raises SQLSTATE 42702. Qualifying with the table name resolves it to
+     * the existing row on both drivers ({{%table}} and [[column]] are expanded
+     * per driver by Yii).
+     *
+     * ```php
+     * $db->createCommand()->upsert('{{%mytable}}', $values, [
+     *     'frequency' => new Expression(
+     *         'GREATEST(' . DbHelper::existingColumn('mytable', 'frequency') . ', :incoming)',
+     *         [':incoming' => $frequency],
+     *     ),
+     * ]);
+     * ```
+     *
+     * @param string $table Table name without the {{%...}} wrapper (e.g. 'searchmanager_search_terms')
+     * @param string $column Column name of the existing row to reference
+     * @return string Raw SQL fragment: {{%table}}.[[column]]
+     * @throws \InvalidArgumentException if table or column is not a plain identifier
+     * @since 5.35.0
+     */
+    public static function existingColumn(string $table, string $column): string
+    {
+        foreach (['table' => $table, 'column' => $column] as $label => $value) {
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value)) {
+                throw new \InvalidArgumentException(
+                    "Invalid $label for existingColumn(): '$value'. Only a plain identifier is allowed."
+                );
+            }
+        }
+
+        return '{{%' . $table . '}}.[[' . $column . ']]';
+    }
+
+    /**
+     * Wrap a bare column reference in Yii's [[...]] quoting placeholder.
+     *
+     * PostgreSQL folds unquoted identifiers to lowercase, so a camelCase
+     * column embedded raw in generated SQL resolves to a non-existent column.
+     * Bracketing makes the emitted SQL dialect-quoted on both drivers.
+     * Anything that is not a bare (optionally alias-qualified) column —
+     * already-bracketed references, composed expressions — passes through
+     * unchanged.
+     */
+    private static function bracketBareColumn(string $value): string
+    {
+        // col or alias.col
+        if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$/', $value)) {
+            return '[[' . $value . ']]';
+        }
+
+        // {{%table}}.col — keep the table token, bracket the column. Never nest
+        // {{%...}} inside [[...]] (Yii's expansion order corrupts the parser).
+        if (preg_match('/^(\{\{%[a-zA-Z0-9_]+\}\})\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $value, $matches)) {
+            return $matches[1] . '.[[' . $matches[2] . ']]';
+        }
+
+        return $value;
     }
 
     /**
