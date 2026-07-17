@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.34.2](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.1...v5.34.2) (2026-07-17)
+
+
+### Fixed
+
+* **i18n:** correct translation category for error messages and quick actions ([13d9615](https://github.com/LindemannRock/craft-plugin-base/commit/13d9615e61b52a11a8a3b8cf718be9ed620e22e4))
+* **i18n:** correct translations across multiple locales ([f1824e7](https://github.com/LindemannRock/craft-plugin-base/commit/f1824e7f027f57998f66bc6904ad2d77fab310e0))
+
 ## [5.34.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.0...v5.34.1) - 2026-07-06
 
 
