@@ -428,13 +428,14 @@ public function testRawSqlLiteralsAreDialectSafe(): void
 
 What it flags:
 
-- `SUM(resultsCount)` / `COUNT(DISTINCT queryRuleId)` — aggregate over an unbracketed camelCase column
+- `SUM(resultsCount)` / `COUNT(DISTINCT a.linkId)` — aggregate over an unbracketed camelCase column, bare or alias-qualified
 - `CASE WHEN trafficType = ...` — CASE over an unbracketed camelCase column
-- `COUNT(*) as searchCount` — unbracketed camelCase alias in an SQL-looking literal
+- `COUNT(*) as searchCount` — unbracketed camelCase alias in an SQL-looking literal, including concatenation fragments (`'... END) as qrScans'`, `' as clickType'`)
+- `'l.id = a.linkId AND ...'` — unbracketed camelCase in a raw join/ON condition string
 - `MAX([[isHit]])` — MAX/MIN directly over a declared boolean column (PostgreSQL has no boolean max/min; use [`DbHelper::boolToInt()`](db-helper.md))
 - `SELECT DISTINCT indexHandle FROM ...` — bare camelCase identifier in a raw SQL statement literal (e.g. a `createCommand()` string)
 
-What passes: bracketed forms (`SUM([[resultsCount]])`, `as [[searchCount]]`), CASE-projected booleans (`MAX(CASE WHEN [[isHit]] THEN 1 ELSE 0 END)`), all-lowercase identifiers, camelCase inside SQL string values (`= 'someCamelValue'`) or `:param` placeholders, and non-SQL strings.
+What passes: bracketed forms (`SUM([[resultsCount]])`, `as [[searchCount]]`, `'[[l.id]] = [[a.linkId]]'`), CASE-projected booleans (`MAX(CASE WHEN [[isHit]] THEN 1 ELSE 0 END)`), all-lowercase identifiers, camelCase inside SQL string values (`= 'someCamelValue'`) or `:param` placeholders, and non-SQL strings.
 
 ## Related
 

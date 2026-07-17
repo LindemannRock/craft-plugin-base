@@ -153,6 +153,11 @@ $unsafeAlias = 'COUNT(*) as searchCount';
 $unsafeCase = "CASE WHEN trafficType = 'bot' THEN 1 ELSE 0 END";
 $unsafeBooleanMax = 'MAX([[isHit]]) = 0';
 $unsafeBareColumn = 'SELECT DISTINCT indexHandle FROM {{%searchmanager_search_documents}}';
+$unsafeQualifiedAggregate = 'COUNT(DISTINCT a.linkId)';
+$unsafeAliasFragment = ' as clickType';
+$unsafeJoinCondition = 'l.id = a.linkId AND c.siteId = a.siteId';
+$safeJoinCondition = '[[l.id]] = [[a.linkId]] AND [[c.siteId]] = [[a.siteId]]';
+$safeLowercaseJoin = 's.id = e.id';
 $safe = 'SUM([[resultsCount]]) AS [[actionResults]]';
 $safeLowercase = 'COUNT(DISTINCT query) as total';
 $safeBooleanCase = 'MAX(CASE WHEN [[isHit]] THEN 1 ELSE 0 END) = 0';
@@ -166,11 +171,14 @@ PHP);
             unlink($fixture);
         }
 
-        self::assertCount(5, $violations);
+        self::assertCount(8, $violations);
         self::assertStringContainsString('SUM(resultsCount)', $violations[0]);
         self::assertStringContainsString('unbracketed camelCase alias', $violations[1]);
         self::assertStringContainsString('CASE WHEN trafficType', $violations[2]);
         self::assertStringContainsString('MAX/MIN over boolean column isHit', $violations[3]);
         self::assertStringContainsString("bare camelCase identifier 'indexHandle'", $violations[4]);
+        self::assertStringContainsString('COUNT(DISTINCT a.linkId)', $violations[5]);
+        self::assertStringContainsString('as clickType', $violations[6]);
+        self::assertStringContainsString('raw join/condition string', $violations[7]);
     }
 }

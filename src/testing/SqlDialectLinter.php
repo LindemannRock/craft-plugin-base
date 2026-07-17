@@ -107,21 +107,35 @@ final class SqlDialectLinter
      */
     private static function literalViolation(string $literal, array $booleanColumns = []): ?string
     {
-        // Aggregate/CASE over an unbracketed camelCase column: PostgreSQL
-        // folds it to lowercase and errors with "column ... does not exist".
-        if (preg_match('/\b(?:SUM|MAX|MIN|AVG|COUNT)\(\s*(?:DISTINCT\s+)?[a-z][a-zA-Z0-9_]*[A-Z]/', $literal)
-            || preg_match('/\bCASE\s+WHEN\s+[a-z][a-zA-Z0-9_]*[A-Z]/', $literal)
+        // Aggregate/CASE over an unbracketed camelCase column (bare or
+        // alias-qualified, e.g. a.linkId): PostgreSQL folds it to lowercase
+        // and errors with "column ... does not exist".
+        if (preg_match('/\b(?:SUM|MAX|MIN|AVG|COUNT)\(\s*(?:DISTINCT\s+)?(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?[a-z][a-zA-Z0-9_]*[A-Z]/', $literal)
+            || preg_match('/\bCASE\s+WHEN\s+(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?[a-z][a-zA-Z0-9_]*[A-Z]/', $literal)
         ) {
             return 'unbracketed camelCase column in SQL';
         }
 
-        // Unbracketed camelCase alias in an SQL-looking literal: the alias
-        // folds to lowercase, breaking $row['camelCase'] reads and any
-        // orderBy(['camelCase' => ...]) referencing it.
-        if (preg_match('/\b(?:SELECT\s|SUM\(|COUNT\(|MAX\(|MIN\(|AVG\(|CASE\s+WHEN\s|GROUP\s+BY\s|ORDER\s+BY\s)/i', $literal)
-            && preg_match('/\b[Aa][Ss]\s+(?!\[\[)[a-z][a-zA-Z0-9_]*[A-Z][a-zA-Z0-9_]*/', $literal)
+        // Unbracketed camelCase alias. Three shapes:
+        // - in an SQL-looking literal (marker present),
+        // - after a closing paren ("... END) as qrScans" — catches fragments of
+        //   concatenation-built SQL, where the marker sits in another literal),
+        // - a literal that is nothing but an alias tail ("' as clickType'").
+        $aliasPattern = '/\b[Aa][Ss]\s+(?!\[\[)[a-z][a-zA-Z0-9_]*[A-Z][a-zA-Z0-9_]*/';
+        if ((preg_match('/\b(?:SELECT\s|SUM\(|COUNT\(|MAX\(|MIN\(|AVG\(|CASE\s+WHEN\s|GROUP\s+BY\s|ORDER\s+BY\s)/i', $literal) && preg_match($aliasPattern, $literal))
+            || preg_match('/\)\s*[Aa][Ss]\s+(?!\[\[)[a-z][a-zA-Z0-9_]*[A-Z]/', $literal)
+            || preg_match('/^\s*[Aa][Ss]\s+(?!\[\[)[a-z][a-zA-Z0-9_]*[A-Z][a-zA-Z0-9_]*\s*$/', $literal)
         ) {
             return 'unbracketed camelCase alias in SQL';
+        }
+
+        // Raw join/ON condition fragment ("l.id = a.linkId AND ...") — no
+        // SELECT marker, but the string is raw SQL and a qualified camelCase
+        // reference folds to lowercase on PostgreSQL.
+        if (preg_match('/^\s*[a-zA-Z_]\w*\.\w+\s*(?:=|<|>|!=)/', $literal)
+            && preg_match('/\b[a-zA-Z_]\w*\.[a-z][a-zA-Z0-9_]*[A-Z][a-zA-Z0-9_]*\b/', $literal)
+        ) {
+            return 'unbracketed camelCase in raw join/condition string';
         }
 
         // MAX()/MIN() directly over a known boolean column: PostgreSQL has no
