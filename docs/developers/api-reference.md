@@ -475,16 +475,14 @@ Extend this controller in a plugin's console namespace to expose `plugin-handle/
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `EDITION_STANDARD` | `'standard'` | Free tier |
-| `EDITION_LITE` | `'lite'` | Entry-level paid tier |
-| `EDITION_PRO` | `'pro'` | Full-featured paid tier |
+| `EDITION_STANDARD` | `'standard'` | Base edition — lower tier, free or paid |
+| `EDITION_PRO` | `'pro'` | Full-featured top tier |
 
 **Methods:**
 
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `editions()` | `string[]` | **(static)** Editions this plugin supports |
-| `isLite()` | `bool` | Check if Lite edition |
 | `isStandard()` | `bool` | Check if Standard edition |
 | `isPro()` | `bool` | Check if Pro edition |
 | `isAtLeast(string $edition)` | `bool` | At least this edition? |

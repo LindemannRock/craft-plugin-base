@@ -17,16 +17,21 @@ use yii\web\ForbiddenHttpException;
  * Provides standardized edition support for LindemannRock plugins.
  * Implements Craft's plugin edition system with consistent naming and helper methods.
  *
- * Edition Tiers (in order):
- * - STANDARD: Free tier (use for free-only plugins or free tier of tiered plugins)
- * - LITE: Entry-level paid tier
- * - PRO: Full-featured paid tier
+ * Single-edition plugins (free or paid) do NOT need this trait: Craft gives
+ * every plugin a default 'standard' edition, and price (including $0) is set
+ * per edition in the Plugin Store, never in code. Only multi-edition plugins
+ * use this trait.
  *
- * Not all plugins need all tiers. Common configurations:
- * - Free-only: [STANDARD] - can add PRO later without renaming
- * - Two paid tiers: [LITE, PRO]
- * - Free + paid: [STANDARD, PRO]
- * - Three tiers: [STANDARD, LITE, PRO]
+ * Edition Tiers (in order):
+ * - STANDARD: Craft's default edition handle — the base edition. Not inherently
+ *   free: the lower tier of a two-tier lineup can be free OR paid (e.g. Search
+ *   Manager sells a paid Standard).
+ * - PRO: full-featured top tier
+ *
+ * The suite's lineup is [STANDARD, PRO] (Standard free or paid). Additional
+ * tiers (a mid tier between Standard and Pro, or a tier above Pro) get a
+ * purpose-named handle added to this trait when actually decided — never
+ * invented per-plugin, never named before the product decision exists.
  *
  * Requirements:
  * - Using class must extend craft\base\Plugin
@@ -37,11 +42,11 @@ use yii\web\ForbiddenHttpException;
  * {
  *     use EditionTrait;
  *
- *     // Optional: Override editions for your tier model
+ *     // Override editions for your tier model
  *     public static function editions(): array
  *     {
  *         return [
- *             self::EDITION_LITE,
+ *             self::EDITION_STANDARD,
  *             self::EDITION_PRO,
  *         ];
  *     }
@@ -73,21 +78,13 @@ use yii\web\ForbiddenHttpException;
 trait EditionTrait
 {
     /**
-     * Free tier edition constant
+     * Default/base edition constant
      *
-     * Use for free-only plugins or as the free tier in a tiered plugin.
-     * Named "standard" (not "free") to sound professional and allow
-     * adding paid tiers later without renaming.
+     * Craft's default edition handle. Not inherently free — the price
+     * (including $0) is set per edition in the Plugin Store, never in code.
+     * Use as the lower tier (free or paid) of a two-tier lineup.
      */
     public const EDITION_STANDARD = 'standard';
-
-    /**
-     * Entry-level paid tier edition constant
-     *
-     * Use as the lower paid tier when offering two paid options.
-     * Typically includes core functionality without advanced features.
-     */
-    public const EDITION_LITE = 'lite';
 
     /**
      * Full-featured paid tier edition constant
@@ -104,39 +101,29 @@ trait EditionTrait
      * First = lowest tier, last = highest tier.
      *
      * Override this method in your plugin to define your tier model:
-     * - Free-only: return [self::EDITION_STANDARD]
-     * - Two paid: return [self::EDITION_LITE, self::EDITION_PRO]
-     * - Free + paid: return [self::EDITION_STANDARD, self::EDITION_PRO]
-     * - Three tiers: return [self::EDITION_STANDARD, self::EDITION_LITE, self::EDITION_PRO]
+     * - Two tiers: return [self::EDITION_STANDARD, self::EDITION_PRO]
+     *   (Standard free or paid — pricing lives in the Plugin Store, not code)
+     * - Additional tiers: add a purpose-named handle to this trait first
+     *   (never per-plugin)
      *
      * @return string[]
      */
     public static function editions(): array
     {
-        // Default: single free edition (override in plugin for paid tiers)
+        // Default: Craft's single default edition (multi-edition plugins override)
         return [
             self::EDITION_STANDARD,
         ];
     }
 
     /**
-     * Check if the current edition is Standard (free tier)
+     * Check if the current edition is Standard
      *
      * @return bool
      */
     public function isStandard(): bool
     {
         return $this->is(self::EDITION_STANDARD);
-    }
-
-    /**
-     * Check if the current edition is Lite
-     *
-     * @return bool
-     */
-    public function isLite(): bool
-    {
-        return $this->is(self::EDITION_LITE);
     }
 
     /**
@@ -153,8 +140,7 @@ trait EditionTrait
      * Check if the current edition is at least the specified edition
      *
      * Useful for features available to multiple tiers:
-     * - isAtLeast(LITE) = true for Lite and Pro
-     * - isAtLeast(PRO) = true only for Pro
+     * - isAtLeast(PRO) = true only for Pro (in a [STANDARD, PRO] lineup)
      *
      * @param string $edition The minimum required edition
      * @return bool
@@ -168,8 +154,7 @@ trait EditionTrait
      * Check if the current edition is below the specified edition
      *
      * Useful for showing upgrade prompts:
-     * - isBelow(PRO) = true for Standard and Lite
-     * - isBelow(LITE) = true only for Standard
+     * - isBelow(PRO) = true for Standard (in a [STANDARD, PRO] lineup)
      *
      * @param string $edition The edition to compare against
      * @return bool
@@ -224,7 +209,7 @@ trait EditionTrait
      * Useful for UI display and error messages.
      *
      * @param string|null $edition Edition constant, or null for current edition
-     * @return string Capitalized edition name (e.g., "Standard", "Lite", "Pro")
+     * @return string Capitalized edition name (e.g., "Standard", "Pro")
      */
     public function getEditionName(?string $edition = null): string
     {
@@ -238,7 +223,7 @@ trait EditionTrait
     /**
      * Get the current edition handle
      *
-     * @return string The current edition (e.g., 'standard', 'lite', 'pro')
+     * @return string The current edition (e.g., 'standard', 'pro')
      */
     public function getEditionHandle(): string
     {

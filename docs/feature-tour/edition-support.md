@@ -1,23 +1,20 @@
 # EditionTrait @since(5.5.0)
 
-Standardized edition support for plugins with Lite/Standard/Pro tiers. Provides helper methods for checking editions, gating features, and building comparison UIs.
+Standardized edition support for plugins with Standard/Pro tiers. Provides helper methods for checking editions, gating features, and building comparison UIs.
+
+> [!NOTE]
+> Single-edition plugins — free or paid — don't need this trait at all. Craft gives every plugin a default `standard` edition, and the price (including $0) is set per edition in the Plugin Store, never in code. Use this trait only when a plugin offers multiple editions.
 
 ## Edition Tiers
 
-Three constants, ordered from lowest to highest:
+Two constants, ordered from lowest to highest:
 
 | Constant | Value | Use Case |
 |----------|-------|----------|
-| `EDITION_STANDARD` | `'standard'` | Free tier or single-edition plugins |
-| `EDITION_LITE` | `'lite'` | Entry-level paid tier |
-| `EDITION_PRO` | `'pro'` | Full-featured paid tier |
+| `EDITION_STANDARD` | `'standard'` | Base edition — the lower tier, free or paid |
+| `EDITION_PRO` | `'pro'` | Full-featured top tier |
 
-Not every plugin uses all three. Common configurations:
-
-- **Free-only:** `[STANDARD]`
-- **Free + paid:** `[STANDARD, PRO]`
-- **Two paid tiers:** `[LITE, PRO]`
-- **Three tiers:** `[STANDARD, LITE, PRO]`
+The standard lineup is `[STANDARD, PRO]`, with Standard either free or paid. Additional tiers (a mid tier, or one above Pro) get a purpose-named constant added to this trait when the product decision exists — never invented per-plugin.
 
 ## Setup
 
@@ -32,7 +29,7 @@ class MyPlugin extends Plugin
     public static function editions(): array
     {
         return [
-            self::EDITION_LITE,
+            self::EDITION_STANDARD,
             self::EDITION_PRO,
         ];
     }
@@ -46,19 +43,17 @@ $plugin = MyPlugin::getInstance();
 
 // Exact edition check
 $plugin->isStandard();  // true if Standard
-$plugin->isLite();      // true if Lite
 $plugin->isPro();       // true if Pro
 
 // Minimum edition check
-$plugin->isAtLeast(MyPlugin::EDITION_LITE);  // true for Lite and Pro
 $plugin->isAtLeast(MyPlugin::EDITION_PRO);   // true only for Pro
 
 // Below edition check (for upgrade prompts)
-$plugin->isBelow(MyPlugin::EDITION_PRO);     // true for Standard and Lite
+$plugin->isBelow(MyPlugin::EDITION_PRO);     // true for Standard
 
 // Edition metadata
-$plugin->getEditionHandle();     // 'lite', 'pro', etc.
-$plugin->getEditionName();       // 'Lite', 'Pro', etc. (current edition)
+$plugin->getEditionHandle();     // 'standard', 'pro'
+$plugin->getEditionName();       // 'Standard', 'Pro' (current edition)
 $plugin->getEditionName('pro');  // 'Pro' (any edition by handle)
 $plugin->hasMultipleEditions();  // true if more than one edition
 ```
