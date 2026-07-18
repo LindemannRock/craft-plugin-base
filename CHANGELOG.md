@@ -1,6 +1,6 @@
 # Changelog
 
-## [5.35.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.2...v5.35.0) (2026-07-18)
+## [5.35.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.2...v5.35.0) - 2026-07-18
 
 
 ### Added
