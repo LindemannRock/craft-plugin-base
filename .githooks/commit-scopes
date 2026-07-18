@@ -5,6 +5,8 @@
 # sub-area of the plugin — never category words (robustness, security),
 # synonyms, plural/singular variants of an existing entry, or the plugin
 # NAME (the hook bans name-variant scopes automatically).
+analytics
+cache
 cli
 cp
 deps
@@ -12,8 +14,13 @@ geo
 helpers
 i18n
 icons
+import-export
+integrations
 logs
 models
 permissions
+providers
+queue
 settings
+storage
 templates
