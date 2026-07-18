@@ -1,5 +1,22 @@
 # Changelog
 
+## [5.35.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.2...v5.35.0) (2026-07-18)
+
+
+### Added
+
+* add portable orderByNullsLast method for consistent NULL sorting ([420acbc](https://github.com/LindemannRock/craft-plugin-base/commit/420acbcfa9503b4534e14bee56a9a33e16ae3a97))
+* **db-helper:** add boolToInt method for portable boolean aggregation ([f4c4f34](https://github.com/LindemannRock/craft-plugin-base/commit/f4c4f343ea00dc228a7396419b7351e9d809d180))
+* **db-helper:** add existingColumn helper for upsert expressions ([e346f88](https://github.com/LindemannRock/craft-plugin-base/commit/e346f88e21fe04e239ef2645dc16533ea929c94c))
+* **db-helper:** add SqlDialectLinter for SQL safety checks ([e346f88](https://github.com/LindemannRock/craft-plugin-base/commit/e346f88e21fe04e239ef2645dc16533ea929c94c))
+* **helpers:** add DB-agnostic JSON extraction and casting methods ([6b19632](https://github.com/LindemannRock/craft-plugin-base/commit/6b1963224570750fe76fcc9c40dc36cd4eea1a73))
+* **tests:** enhance DbHelperTest with additional MySQL dialect tests ([cb5cf34](https://github.com/LindemannRock/craft-plugin-base/commit/cb5cf343b0c9c52d384583138d7decbbd3da0d43))
+
+
+### Fixed
+
+* handle unbracketed camelCase columns and aliases in SQL literals ([87fd31a](https://github.com/LindemannRock/craft-plugin-base/commit/87fd31acb622552c44b4d2dd8b3e4a8cd39d0e35))
+
 ## [5.34.2](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.1...v5.34.2) - 2026-07-17
 
 
