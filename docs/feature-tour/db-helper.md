@@ -145,6 +145,27 @@ $query->select([
 
 Use it for **every** `MAX()`/`MIN()`/`SUM()` over a boolean column in raw SQL. Integer columns aggregate directly and must not be wrapped.
 
+## NULL-Last Ordering @since(5.35.0)
+
+### orderByNullsLast()
+
+Builds an ORDER BY fragment that keeps NULL values at the bottom of the list on both drivers, regardless of sort direction.
+
+MySQL sorts NULLs first for `ASC` and last for `DESC`; PostgreSQL defaults to the exact opposite — the same query visibly reorders rows between engines. For optional columns (an expiry that isn't set, an unassigned folder), empty means "nothing set" and belongs at the bottom whichever way real values sort. MySQL has no `NULLS LAST` syntax, so the portable form is the boolean `IS NULL` prefix:
+
+```php
+$query->orderBy(new Expression(DbHelper::orderByNullsLast('dateExpired', 'DESC')));
+// ([[dateExpired]] IS NULL) ASC, [[dateExpired]] DESC
+```
+
+Wrap the result in a `yii\db\Expression` — as a plain orderBy string it would be re-parsed by the query builder. Pass an `Expression` as the column for composed inputs like correlated subqueries. In element `sortOptions()`, use the callable form so the user's chosen direction flows in:
+
+```php
+'orderBy' => fn(int $dir) => new Expression(
+    DbHelper::orderByNullsLast('myplugin.dateExpired', $dir === SORT_DESC ? 'DESC' : 'ASC'),
+),
+```
+
 ## Upsert Existing-Row References @since(5.35.0)
 
 ### existingColumn()

@@ -247,6 +247,45 @@ class DbHelper
     }
 
     /**
+     * Returns a portable ORDER BY fragment that sorts NULL values last on
+     * both drivers, regardless of the main sort direction.
+     *
+     * MySQL sorts NULLs first for ASC and last for DESC; PostgreSQL defaults
+     * to the exact opposite — so the same ORDER BY reorders rows between
+     * engines. For optional columns, empty means "nothing set" and belongs at
+     * the bottom whichever way the real values sort. MySQL lacks NULLS LAST
+     * syntax, so the portable form is the boolean IS NULL prefix (0 for real
+     * values, 1 for NULL, on both engines):
+     *
+     * ```php
+     * $query->orderBy(new Expression(DbHelper::orderByNullsLast('dateExpired', 'DESC')));
+     * // ([[dateExpired]] IS NULL) ASC, [[dateExpired]] DESC
+     * ```
+     *
+     * Wrap the result in a yii\db\Expression — as a plain orderBy string it
+     * would be re-parsed. A bare column argument is bracketed (see
+     * jsonExtract()); pass an Expression for composed inputs (subqueries).
+     *
+     * @param string|Expression $column Column or expression to sort by
+     * @param string $direction 'ASC' or 'DESC' for the non-NULL values (anything else falls back to ASC)
+     * @return string Raw SQL fragment for use inside an Expression
+     * @throws \InvalidArgumentException if a string column contains unsafe characters
+     * @since 5.35.0
+     */
+    public static function orderByNullsLast(string|Expression $column, string $direction = 'ASC'): string
+    {
+        $columnSql = $column instanceof Expression ? $column->expression : $column;
+        if (!($column instanceof Expression)) {
+            self::validateExpression($columnSql);
+            $columnSql = self::bracketBareColumn($columnSql);
+        }
+
+        $dir = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
+
+        return "($columnSql IS NULL) ASC, $columnSql $dir";
+    }
+
+    /**
      * Wrap a bare column reference in Yii's [[...]] quoting placeholder.
      *
      * PostgreSQL folds unquoted identifiers to lowercase, so a camelCase

@@ -379,6 +379,7 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `castToText(string\|Expression $expression)` @since(5.25.0) | `string` | DB-agnostic CAST to text — `CAST(expr AS CHAR)` on MySQL, `(expr)::text` on PostgreSQL |
 | `existingColumn(string $table, string $column)` @since(5.35.0) | `string` | `{{%table}}.[[column]]` reference to the existing row inside an upsert's ON CONFLICT DO UPDATE expression — a bare column there is ambiguous on PostgreSQL |
 | `boolToInt(string $column)` @since(5.35.0) | `string` | `CASE WHEN [[column]] THEN 1 ELSE 0 END` — 0/1 projection of a boolean column for MAX/MIN/SUM (PostgreSQL has no boolean max/min) |
+| `orderByNullsLast(string\|Expression $column, string $direction)` @since(5.35.0) | `string` | `(col IS NULL) ASC, col DIR` — portable NULLs-last ordering (MySQL and PostgreSQL default NULL placement are opposites); wrap in an Expression |
 
 Column-taking helpers wrap bare column references in Yii's `[[...]]` placeholder @since(5.35.0) so camelCase columns stay dialect-quoted on PostgreSQL; composed expressions pass through unchanged.
 

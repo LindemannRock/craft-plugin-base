@@ -128,6 +128,27 @@ final class DbHelperTest extends IntegrationTestCase
         DbHelper::boolToInt("isHit'); DROP TABLE users;--");
     }
 
+    public function testOrderByNullsLastPinsNullPlacementOnBothDirections(): void
+    {
+        // MySQL and PostgreSQL default NULL ordering are opposites; the IS
+        // NULL prefix pins NULLs last on both engines, both directions.
+        self::assertSame(
+            '([[dateExpired]] IS NULL) ASC, [[dateExpired]] ASC',
+            DbHelper::orderByNullsLast('dateExpired'),
+        );
+        self::assertSame(
+            '([[dateExpired]] IS NULL) ASC, [[dateExpired]] DESC',
+            DbHelper::orderByNullsLast('dateExpired', 'desc'),
+        );
+
+        // Composed inputs (subqueries) pass through via Expression.
+        $sub = new \yii\db\Expression('(SELECT [[name]] FROM {{%t}} WHERE [[id]] = [[x.folderId]])');
+        self::assertSame(
+            '((SELECT [[name]] FROM {{%t}} WHERE [[id]] = [[x.folderId]]) IS NULL) ASC, (SELECT [[name]] FROM {{%t}} WHERE [[id]] = [[x.folderId]]) DESC',
+            DbHelper::orderByNullsLast($sub, 'DESC'),
+        );
+    }
+
     public function testExistingColumnBuildsQualifiedUpsertReference(): void
     {
         self::assertSame(
