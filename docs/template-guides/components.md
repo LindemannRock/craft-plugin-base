@@ -2,6 +2,9 @@
 
 Reusable Twig components for consistent UI across all plugins. Include them with `{% include %}` and pass parameters using `with { ... } only`.
 
+> [!NOTE]
+> **Self-contained component assets** @since(5.36.0) — Components that emit classes owned by `ComponentsAsset` register that bundle themselves. Include them directly from any Craft CP template; no particular base layout or manual asset registration is required. Craft deduplicates registrations when a layout also loads the bundle.
+
 ## Badge
 
 Colored label for status values, categories, and tags. Supports three color modes.

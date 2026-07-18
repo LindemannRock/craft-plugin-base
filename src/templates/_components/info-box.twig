@@ -22,6 +22,8 @@
   @copyright Copyright (c) 2026 LindemannRock
 #}
 
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
 {% set iconType = type ?? 'info' %}
 {% set variantStyle = variant ?? 'subtle' %}
 {% set marginStyle = margin ?? 'top' %}

@@ -2,7 +2,7 @@
 
 The base module ships a single CSS file (`components.css`) loaded by the `ComponentsAsset` bundle. It provides CSS classes for cards, stat boxes, chart containers, table enhancements, and utility helpers used across all LindemannRock plugins.
 
-The CSS loads automatically when a plugin uses the [CP Table Layout](../template-guides/cp-table-layout.md) or [CP Analytics Layout](../template-guides/cp-analytics-layout.md).
+The CSS loads automatically when a plugin uses the [CP Table Layout](../template-guides/cp-table-layout.md), [CP Analytics Layout](../template-guides/cp-analytics-layout.md), or a reusable template that emits `ComponentsAsset`-owned classes. **Styled Twig component self-registration** @since(5.36.0) makes those components independent of their surrounding layout; manual bundle registration is only needed when a template writes the raw CSS classes directly instead of including the corresponding base component or partial. Layout-level registrations remain in place and are safely deduplicated by Craft.
 
 ## Card Grids
 

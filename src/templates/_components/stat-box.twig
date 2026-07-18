@@ -38,6 +38,8 @@
  #   </div>
  #}
 
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
 {% set valueId = id ?? '' %}
 {% set valueSuffix = suffix ?? '' %}
 {% set valuePrefix = prefix ?? '' %}

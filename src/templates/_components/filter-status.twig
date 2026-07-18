@@ -34,6 +34,8 @@
  # - Unselected items show neutral gray (#aab6c1)
  #}
 
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
 {% set neutralColor = lrNeutralColor() %}
 {% set pageUrl = pageUrl ?? '' %}
 {% set querySeparator = '?' in pageUrl ? '&' : '?' %}

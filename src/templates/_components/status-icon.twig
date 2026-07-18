@@ -23,6 +23,8 @@
  # @since 5.34.0
  #}
 
+{% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+
 {% set iconType = type ?? 'info' %}
 {% if iconType not in ['info', 'success', 'warning', 'error'] %}
     {% set iconType = 'info' %}
