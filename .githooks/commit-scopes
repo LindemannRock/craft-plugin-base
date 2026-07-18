@@ -15,7 +15,6 @@ helpers
 i18n
 icons
 import-export
-integrations
 logs
 models
 permissions
