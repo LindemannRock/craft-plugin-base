@@ -11,6 +11,7 @@ cli
 components
 cp
 deps
+editions
 geo
 helpers
 i18n
