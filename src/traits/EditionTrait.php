@@ -9,6 +9,10 @@
 namespace lindemannrock\base\traits;
 
 use Craft;
+use craft\web\Application as WebApplication;
+use craft\web\Controller as WebController;
+use craft\web\Request as WebRequest;
+use craft\web\Response;
 use yii\web\ForbiddenHttpException;
 
 /**
@@ -200,6 +204,53 @@ trait EditionTrait
         }
 
         throw new ForbiddenHttpException($message);
+    }
+
+    /**
+     * Require a minimum edition, rendering an upgrade prompt for CP page requests
+     *
+     * Control Panel HTML page requests receive a standard upgrade screen. Action,
+     * JSON, site, API, and console requests retain the exception-based contract
+     * provided by {@see requireEdition()}.
+     *
+     * @param string $edition The minimum required edition
+     * @param string|null $featureName Optional feature name for the prompt or error message
+     * @return Response|null A CP upgrade screen, or null when the edition requirement is met
+     * @throws ForbiddenHttpException If the current edition is below the required edition outside a CP page request
+     * @since 5.36.0
+     */
+    public function requireEditionOrPrompt(string $edition, ?string $featureName = null): ?Response
+    {
+        if ($this->isAtLeast($edition)) {
+            return null;
+        }
+
+        $application = Craft::$app;
+        $request = $application->getRequest();
+
+        if (
+            $application instanceof WebApplication &&
+            $request instanceof WebRequest &&
+            $request->getIsCpRequest() &&
+            !$request->getIsActionRequest() &&
+            !$request->getAcceptsJson()
+        ) {
+            $controller = $application->controller;
+
+            if ($controller instanceof WebController) {
+                return $controller->asCpScreen()
+                    ->title((string)$this->name)
+                    ->contentTemplate('lindemannrock-base/_partials/edition-upgrade-prompt', [
+                        'plugin' => $this,
+                        'edition' => $edition,
+                        'featureName' => $featureName,
+                    ]);
+            }
+        }
+
+        $this->requireEdition($edition, $featureName);
+
+        return null;
     }
 
     /**

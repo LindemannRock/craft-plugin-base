@@ -76,6 +76,44 @@ MyPlugin::getInstance()->requireEdition(MyPlugin::EDITION_PRO, 'Advanced Export'
 // "Advanced Export requires the Pro edition."
 ```
 
+For gated Control Panel pages, use `requireEditionOrPrompt()` instead. It
+returns a standard upgrade screen for a normal CP HTML page request and throws
+the same `ForbiddenHttpException` as `requireEdition()` for action, JSON, site,
+API, and console requests.
+
+```php
+public function actionAnalytics(): Response
+{
+    if (($response = MyPlugin::getInstance()->requireEditionOrPrompt(
+        MyPlugin::EDITION_PRO,
+        'Analytics',
+    )) !== null) {
+        return $response;
+    }
+
+    // ... render the Pro analytics page
+}
+```
+
+The method renders `lindemannrock-base/_partials/edition-upgrade-prompt` and
+derives the plugin name, handle, Plugin Store URL, and edition label from the
+plugin instance. Include the same partial directly when a template or widget
+needs an inline prompt. Pass product-specific pitch copy already translated in
+the consumer plugin's category; base owns only the reusable prompt chrome.
+
+```twig
+{% include 'lindemannrock-base/_partials/edition-upgrade-prompt' with {
+    plugin: craft.myPlugin.plugin,
+    edition: constant('vendor\\myplugin\\MyPlugin::EDITION_PRO'),
+    featureName: 'Analytics',
+    pitch: 'My Plugin Pro adds analytics and advanced reporting.'|t('my-plugin'),
+    compact: true,
+} only %}
+```
+
+Set `compact` to `true` for an inline prompt without the surrounding pane or
+pitch line. Omit it for the full prompt.
+
 ### In Services
 
 ```php
@@ -96,10 +134,12 @@ public function getAnalytics(): array
     {# Pro-only features #}
     {% include 'my-plugin/_partials/analytics' %}
 {% else %}
-    {# Upgrade prompt #}
-    <div class="lr-upgrade-prompt">
-        <p>Upgrade to Pro to unlock analytics.</p>
-    </div>
+    {% include 'lindemannrock-base/_partials/edition-upgrade-prompt' with {
+        plugin: plugin,
+        edition: constant('vendor\\myplugin\\MyPlugin::EDITION_PRO'),
+        featureName: 'Analytics',
+        compact: true,
+    } only %}
 {% endif %}
 ```
 

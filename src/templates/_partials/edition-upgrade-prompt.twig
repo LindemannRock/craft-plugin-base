@@ -1,0 +1,47 @@
+{#
+  Edition Upgrade Prompt @since 5.36.0
+
+  Renders shared edition-gate chrome while keeping the optional product pitch
+  in the consumer plugin's translation category.
+
+  Parameters:
+  - plugin: Plugin instance using EditionTrait (required)
+  - edition: Required edition handle (required)
+  - featureName: Consumer-owned feature translation key (optional)
+  - pitch: Pre-translated consumer-owned product pitch (optional)
+  - compact: Render without the pane and pitch (optional, default false)
+
+  @link      https://lindemannrock.com
+  @copyright Copyright (c) 2026 LindemannRock
+#}
+
+{% set compact = compact ?? false %}
+{% set pluginName = plugin.name %}
+{% set pluginHandle = plugin.handle %}
+{% set editionName = plugin.getEditionName(edition) %}
+{% set featureLabel = featureName is defined and featureName
+    ? featureName|t(pluginHandle)
+    : 'This feature'|t('lindemannrock-base') %}
+
+<div{% if not compact %} class="pane"{% endif %}>
+    {% if compact %}
+        <p class="light">{{ '{feature} requires {plugin} {edition}'|t('lindemannrock-base', {
+            feature: featureLabel,
+            plugin: pluginName,
+            edition: editionName,
+        }) }}</p>
+    {% else %}
+        <h2>{{ '{feature} requires {plugin} {edition}'|t('lindemannrock-base', {
+            feature: featureLabel,
+            plugin: pluginName,
+            edition: editionName,
+        }) }}</h2>
+        {% if pitch ?? null %}
+            <p class="light">{{ pitch }}</p>
+        {% endif %}
+    {% endif %}
+    <a class="btn submit" href="{{ url('plugin-store/' ~ pluginHandle) }}">{{ 'View {plugin} {edition} in the Plugin Store'|t('lindemannrock-base', {
+        plugin: pluginName,
+        edition: editionName,
+    }) }}</a>
+</div>

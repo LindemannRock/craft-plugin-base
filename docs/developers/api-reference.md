@@ -488,6 +488,7 @@ Extend this controller in a plugin's console namespace to expose `plugin-handle/
 | `isAtLeast(string $edition)` | `bool` | At least this edition? |
 | `isBelow(string $edition)` | `bool` | Below this edition? |
 | `requireEdition(string $edition, ?string $feature)` | `void` | Throw if below edition |
+| `requireEditionOrPrompt(string $edition, ?string $feature)` | `?Response` | Render a CP upgrade screen or throw outside CP page requests |
 | `getEditionHandle()` | `string` | Current edition handle (e.g., `'pro'`) |
 | `getEditionName(?string $edition)` | `string` | Edition display name (e.g., `'Pro'`) |
 | `hasMultipleEditions()` | `bool` | Plugin has multiple editions? |
