@@ -1098,6 +1098,20 @@ Use `.lr-setup-task__subheading` for subordinate headings inside trusted setup t
 </h4>
 ```
 
+Use `.lr-setup-task__list` for a compact semantic list of findings or status details inside `bodyHtml`. It renders visible disc markers with an 8px vertical gap without changing the standard paragraph rhythm:
+
+```twig
+<p>{{ 'Review the configuration before continuing.'|t('my-plugin') }}</p>
+<ul class="lr-setup-task__list">
+    {% for finding in findings %}
+        <li>
+            <strong>{{ finding.label }}:</strong>
+            {{ finding.message }}
+        </li>
+    {% endfor %}
+</ul>
+```
+
 ---
 
 ## Next Steps
