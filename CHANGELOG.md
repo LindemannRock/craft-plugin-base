@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.36.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.35.0...v5.36.0) (2026-07-22)
+
+
+### Added
+
+* **components:** add task list styles to the setup component ([ee1c5e7](https://github.com/LindemannRock/craft-plugin-base/commit/ee1c5e7c1cf58e0f65d2f56090513c8c1155ea52))
+* **editions:** add shared edition gate and upgrade prompt ([af67f59](https://github.com/LindemannRock/craft-plugin-base/commit/af67f599d0c826d168d3e7828bf52ba4880f4af4))
+* register asset bundle for filter-status, info-box, stat-box, and status-icon templates ([02f0e7d](https://github.com/LindemannRock/craft-plugin-base/commit/02f0e7dd7ae48ff0176ff89f4350762a430e0541))
+
+
+### Fixed
+
+* correct edition tier documentation in EditionTrait ([33fbceb](https://github.com/LindemannRock/craft-plugin-base/commit/33fbceb21adb21831150c59b83f64f0c5b16c38f))
+
 ## [5.35.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.34.2...v5.35.0) - 2026-07-18
 
 
