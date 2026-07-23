@@ -406,3 +406,175 @@
         });
     });
 })();
+
+(() => {
+    // Error summary (_partials/error-summary): resolve model error keys to
+    // rendered fields, including fields inside inactive Craft CP tabs.
+    if (window.lrErrorSummaryInit) return;
+    window.lrErrorSummaryInit = true;
+
+    const isVisible = (element) => {
+        let current = element;
+
+        while (current) {
+            if (current.hidden
+                || current.classList.contains('hidden')
+                || current.getAttribute('aria-hidden') === 'true') {
+                return false;
+            }
+
+            const style = window.getComputedStyle(current);
+            if (style.display === 'none' || style.visibility === 'hidden') {
+                return false;
+            }
+
+            current = current.parentElement;
+        }
+
+        return true;
+    };
+
+    const firstVisible = (elements) => (
+        elements.find(isVisible) || elements[0] || null
+    );
+
+    const elementsWithAttributeValue = (attribute, value) => (
+        Array.from(document.querySelectorAll(`[${attribute}]`))
+            .filter((element) => element.getAttribute(attribute) === value)
+    );
+
+    const resolveField = (key) => {
+        // Tier 1: Craft's explicit field-error convention.
+        const explicitFields = elementsWithAttributeValue('data-error-key', key);
+        if (explicitFields.length > 0) {
+            return firstVisible(explicitFields);
+        }
+
+        // Tier 2a: conventional field IDs, progressively dropping leading
+        // dotted key segments while preserving the original case.
+        const segments = key.split('.');
+        for (let index = 0; index < segments.length; index += 1) {
+            const field = document.getElementById(`${segments.slice(index).join('-')}-field`);
+            if (field) {
+                return field;
+            }
+        }
+
+        // Tier 2b: Craft element-editor field layout containers.
+        const attributeFields = elementsWithAttributeValue('data-attribute', key)
+            .map((element) => element.closest('.field'))
+            .filter(Boolean);
+
+        return firstVisible(attributeFields);
+    };
+
+    const tabControls = (paneId) => {
+        const target = `#${paneId}`;
+
+        return Array.from(
+            document.querySelectorAll(
+                'a[href], [data-tab-target], [role="tab"][aria-controls], .pane-tabs [data-id], [role="tablist"] [data-id]',
+            ),
+        ).filter((control) => {
+            // Error-summary anchors are field links, never tab controls.
+            if (control.closest('.error-summary')) {
+                return false;
+            }
+
+            if (
+                control.getAttribute('data-tab-target') === target ||
+                control.getAttribute('aria-controls') === paneId ||
+                control.getAttribute('data-id') === paneId
+            ) {
+                return true;
+            }
+
+            const href = control.getAttribute('href');
+            if (!href) {
+                return false;
+            }
+
+            try {
+                return href === target || new URL(href, document.baseURI).hash === target;
+            } catch (error) {
+                return false;
+            }
+        });
+    };
+
+    const revealTabbedAncestors = (field) => {
+        const panes = [];
+        let ancestor = field.parentElement;
+
+        while (ancestor) {
+            if (ancestor.id && !isVisible(ancestor) && tabControls(ancestor.id).length > 0) {
+                panes.push(ancestor);
+            }
+            ancestor = ancestor.parentElement;
+        }
+
+        // Activate outer tab systems before nested ones.
+        panes.reverse().forEach((pane) => {
+            const controls = tabControls(pane.id);
+            const control = controls.find((candidate) => candidate.getAttribute('role') === 'tab')
+                || firstVisible(controls);
+
+            if (control && control.getAttribute('aria-selected') !== 'true') {
+                control.click();
+            }
+        });
+    };
+
+    const focusField = (field) => {
+        const focusableSelector = [
+            'input:not([type="hidden"]):not([disabled])',
+            'select:not([disabled])',
+            'textarea:not([disabled])',
+            'button:not([disabled])',
+            '[contenteditable="true"]',
+            '[tabindex]:not([tabindex="-1"])',
+        ].join(', ');
+
+        window.requestAnimationFrame(() => {
+            field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            const focusable = firstVisible(Array.from(field.querySelectorAll(focusableSelector)));
+            if (focusable) {
+                focusable.focus({ preventScroll: true });
+            }
+        });
+    };
+
+    // Capture base-owned summary clicks before Craft.ui's direct
+    // `.error-summary a` handler. Native Craft summaries do not carry the
+    // base marker and remain untouched.
+    document.addEventListener(
+        'click',
+        (event) => {
+            const eventTarget = event.target;
+            const origin = eventTarget instanceof Element
+                ? eventTarget
+                : eventTarget?.parentElement || null;
+            const link = origin ? origin.closest('a[data-field-error-key]') : null;
+
+            if (!link || !link.closest('[data-lr-error-summary]')) {
+                return;
+            }
+
+            // Keep Craft's direct summary handler from also processing base-owned
+            // links. This does not cancel the native anchor default.
+            event.stopPropagation();
+
+            const key = link.getAttribute('data-field-error-key');
+            const field = key ? resolveField(key) : null;
+            if (!field) {
+                return;
+            }
+
+            event.preventDefault();
+            revealTabbedAncestors(field);
+            focusField(field);
+        },
+        true,
+    );
+})();

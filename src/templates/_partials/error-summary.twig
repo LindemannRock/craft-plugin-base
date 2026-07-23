@@ -3,10 +3,17 @@
  #
  # Params:
  # - errors: map of field => [messages]
- # - linkMode: 'field-id' (default) or 'data-key'
+ #
+ # Field links resolve in this order:
+ # 1. A field container with data-error-key="{field}" (@since 5.37.0)
+ # 2. #{field with dots replaced by dashes}-field, progressively dropping
+ #    leading dotted segments, then [data-attribute="{field}"] closest .field
+ # 3. The native anchor fallback when no rendered field target exists
+ #
+ # Add data-error-key to a divergent rendered field container as an explicit
+ # opt-in. Keys with no rendered field are intentionally not jumpable.
  #}
 {% set errors = errors ?? {} %}
-{% set linkMode = linkMode ?? 'field-id' %}
 
 {% set errorCount = 0 %}
 {% for fieldErrors in errors %}
@@ -14,7 +21,8 @@
 {% endfor %}
 
 {% if errorCount > 0 %}
-    <div class="error-summary" tabindex="-1">
+    {% do view.registerAssetBundle('lindemannrock\\base\\web\\assets\\components\\ComponentsAsset') %}
+    <div class="error-summary" tabindex="-1" data-lr-error-summary>
         <div>
             <span class="notification-icon" data-icon="alert" aria-label="{{ 'error'|t('lindemannrock-base') }}" role="img"></span>
             <h2>{{ 'Found {count, number} {count, plural, =1{error} other{errors}}'|t('lindemannrock-base', {count: errorCount}) }}</h2>
@@ -23,11 +31,7 @@
             {% for field, fieldErrors in errors %}
                 {% for error in fieldErrors %}
                     <li>
-                        {% if linkMode == 'data-key' %}
-                            <a href="#" data-field-error-key="{{ field }}">{{ error }}</a>
-                        {% else %}
-                            <a href="#{{ field }}-field" data-field-error-key="{{ field }}">{{ error }}</a>
-                        {% endif %}
+                        <a href="#{{ field }}-field" data-field-error-key="{{ field }}">{{ error }}</a>
                     </li>
                 {% endfor %}
             {% endfor %}

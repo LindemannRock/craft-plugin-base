@@ -356,6 +356,8 @@ Use `{% embed %}` (not `{% include %}`) so you can supply the body. The partial 
 
 A reusable validation error summary for settings/edit pages — the standard Craft "Found N errors" banner with a linked list that jumps to each errored field. Include it at the top of a form when `$model->getErrors()` may be populated.
 
+> **Field-key resolution** @since(5.37.0)
+
 ### Usage
 
 ```twig
@@ -369,9 +371,24 @@ A reusable validation error summary for settings/edit pages — the standard Cra
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `errors` | `object` | `{}` | Map of `field => [messages]`, e.g. from `model.getErrors()` |
-| `linkMode` | `string` | `'field-id'` | `'field-id'` links to `#{field}-field`; `'data-key'` emits `data-field-error-key` for JS-driven focus |
 
-The banner renders nothing when there are no errors. The count uses an ICU plural, so it reads "1 error" / "N errors" correctly across locales.
+Every error link includes both a native `#field-field` anchor and the field's error key. The base components asset resolves that key in this order:
+
+1. A rendered field container whose `data-error-key` exactly matches the error key.
+2. A conventional field ID: dots become dashes, first using the full key and then progressively removing leading segments. For example, `settings.behavior.promotionBadgeText` tries `#settings-behavior-promotionBadgeText-field`, `#behavior-promotionBadgeText-field`, and `#promotionBadgeText-field`.
+3. A matching `[data-attribute="field"]` inside a Craft element editor, using its closest `.field`.
+
+Use Craft's `data-error-key` convention when a rendered field does not follow those ID conventions:
+
+```twig
+<div class="field" data-error-key="settings.analytics.analyticsSource">
+    {# Field markup #}
+</div>
+```
+
+When the target is inside an inactive Craft CP tab, the link activates the tab before scrolling the field into view and focusing its first available input. If no rendered target exists, the handler leaves the native anchor behavior unchanged. Validation keys for values that have no rendered field are intentionally not jumpable.
+
+The banner renders nothing when there are no errors. It registers `ComponentsAsset` itself, so consumers do not need to load JavaScript separately. The count uses an ICU plural, so it reads "1 error" / "N errors" correctly across locales.
 
 ---
 
