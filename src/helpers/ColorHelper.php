@@ -206,6 +206,7 @@ class ColorHelper
                 'disabled' => array_merge(self::PALETTE['gray'], ['dot' => 'disabled']),
                 'pending' => array_merge(self::PALETTE['orange'], ['dot' => 'pending']),
                 'expired' => array_merge(self::PALETTE['red'], ['dot' => 'expired']),
+                'error' => array_merge(self::PALETTE['red'], ['dot' => 'red']),
                 'live' => array_merge(self::PALETTE['teal'], ['dot' => 'live']),
                 'on' => array_merge(self::PALETTE['green'], ['dot' => 'on']),
                 'off' => array_merge(self::PALETTE['red'], ['dot' => 'off']),

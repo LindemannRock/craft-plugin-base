@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace lindemannrock\base\tests\Integration;
 
+use Craft;
+use craft\web\View;
 use lindemannrock\base\helpers\ColorHelper;
 use lindemannrock\base\testing\IntegrationTestCase;
 use ReflectionClass;
@@ -96,6 +98,73 @@ final class ColorHelperTest extends IntegrationTestCase
         }
     }
 
+    public function testGenericStatusErrorUsesRedWithoutChangingEnabledOrDisabled(): void
+    {
+        $status = ColorHelper::getColorSet('status');
+
+        self::assertArrayHasKey('error', $status);
+        self::assertSame(
+            array_merge(ColorHelper::PALETTE['red'], ['dot' => 'red']),
+            $status['error'],
+        );
+        self::assertSame(
+            array_merge(ColorHelper::PALETTE['teal'], ['dot' => 'enabled']),
+            $status['enabled'],
+        );
+        self::assertSame(
+            array_merge(ColorHelper::PALETTE['gray'], ['dot' => 'disabled']),
+            $status['disabled'],
+        );
+    }
+
+    public function testGenericStatusErrorRendersRedBadgeWithLabel(): void
+    {
+        $html = $this->renderComponent('badge', [
+            'label' => 'Error',
+            'value' => 'error',
+            'colorSet' => 'status',
+        ]);
+
+        self::assertStringContainsString('class="status-label red"', $html);
+        self::assertStringContainsString('<span class="status red"></span>', $html);
+        self::assertStringContainsString('<span class="status-label-text">Error</span>', $html);
+        self::assertStringNotContainsString('background: rgba(', $html);
+    }
+
+    public function testGenericStatusErrorRendersRedStatusDot(): void
+    {
+        $html = $this->renderComponent('status-dot', [
+            'value' => 'error',
+            'colorSet' => 'status',
+        ]);
+
+        self::assertStringContainsString('<span class="status red"></span>', $html);
+        self::assertStringNotContainsString('style=', $html);
+    }
+
+    public function testStatusFilterResolvesErrorAsRed(): void
+    {
+        $html = $this->renderComponent('filter-status', [
+            'filter' => [
+                'param' => 'status',
+                'current' => 'error',
+                'label' => 'All',
+                'colorSet' => 'status',
+                'options' => [
+                    ['value' => 'all', 'label' => 'All', 'status' => 'all'],
+                    ['value' => 'error', 'label' => 'Error', 'colorKey' => 'error'],
+                ],
+            ],
+            'urlParams' => [],
+            'pageUrl' => '/items',
+        ]);
+
+        self::assertSame('#dc2626', ColorHelper::getFilterColor('status', 'error', 'error'));
+        self::assertSame(2, substr_count($html, 'style="background: #dc2626;"'));
+        self::assertMatchesRegularExpression('/<button[^>]*>.*Error.*<\/button>/s', $html);
+        self::assertMatchesRegularExpression('/<a class="sel"[^>]*>.*Error.*<\/a>/s', $html);
+    }
+
     public function testMixBlendsHexColors(): void
     {
         // weight 0 = pure A, weight 1 = pure B.
@@ -171,5 +240,17 @@ final class ColorHelperTest extends IntegrationTestCase
         self::assertNull(ColorHelper::iconColorRoles('<svg><path d="M0 0h24"/></svg>'));
         self::assertNull(ColorHelper::iconColorRoles(null));
         self::assertNull(ColorHelper::iconColorRoles(''));
+    }
+
+    /**
+     * @param array<string, mixed> $variables
+     */
+    private function renderComponent(string $component, array $variables): string
+    {
+        return Craft::$app->getView()->renderTemplate(
+            'lindemannrock-base/_components/' . $component,
+            $variables,
+            View::TEMPLATE_MODE_CP,
+        );
     }
 }

@@ -23,6 +23,16 @@ Look up colors from a registered [color set](../feature-tour/color-helper.md):
 } only %}
 ```
 
+The generic `status` set accepts `enabled`, `disabled`, `pending`, `expired`, `error`, `live`, `on`, and `off`. Use `error` for a red error badge:
+
+```twig
+{% include 'lindemannrock-base/_components/badge' with {
+    label: 'Error',
+    value: 'error',
+    colorSet: 'status',
+} only %}
+```
+
 ### With Craft Status Class
 
 Use Craft's built-in status classes (`teal`, `gray`, `orange`, `red`, `blue`, `pink`, `disabled`):
@@ -390,8 +400,8 @@ A standalone status indicator dot without a label. Uses the same color system as
 
 {# Color set lookup #}
 {% include 'lindemannrock-base/_components/status-dot' with {
-    value: 'active',
-    colorSet: 'pluginStatus',
+    value: 'error',
+    colorSet: 'status',
 } only %}
 
 {# Custom hex color #}
@@ -639,6 +649,7 @@ Dropdown with colored status indicators. Supports flat options or grouped sectio
             {value: 'all', label: 'All'|t('my-plugin'), status: 'all'},
             {value: 'enabled', label: 'Enabled'|t('my-plugin'), colorKey: 'enabled'},
             {value: 'disabled', label: 'Disabled'|t('my-plugin'), colorKey: 'disabled'},
+            {value: 'error', label: 'Error'|t('my-plugin'), colorKey: 'error'},
         ],
     },
     urlParams: urlParams,

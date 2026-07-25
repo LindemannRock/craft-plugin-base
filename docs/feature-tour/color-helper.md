@@ -78,7 +78,7 @@ In Twig:
 
 | Color Set | Values | Use Case |
 |-----------|--------|----------|
-| `status` | enabled, disabled, pending, expired, live, on, off | Craft element status |
+| `status` | enabled, disabled, pending, expired, error, live, on, off | Generic status values; `error` uses the standard red palette |
 | `yesNo` | yes, no, true, false | Boolean indicators |
 | `handled` | yes, no, true, false | Handled state |
 | `configSource` | config, database | Configuration source |
