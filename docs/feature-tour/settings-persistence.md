@@ -116,6 +116,10 @@ $success = $settings->saveToDatabase();
 - Excluding fields listed in `excludeFromSave()`
 - Updating the `dateUpdated` timestamp
 
+## Failure behavior
+
+Database load failures keep the existing Settings instance or its defaults, and database save failures return `false`. Failure logs retain safe operational details—the load or save operation, Settings resource, exception class, and validated database codes when available—without including persisted values, credentials, SQL, or query parameters.
+
 ## Type Conversion Methods
 
 | Method | DB Type | PHP Type | Example |

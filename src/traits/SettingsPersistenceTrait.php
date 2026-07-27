@@ -11,6 +11,7 @@ namespace lindemannrock\base\traits;
 use Craft;
 use craft\db\Query;
 use craft\helpers\Db;
+use yii\db\Exception as DbException;
 
 /**
  * Settings Persistence Trait
@@ -158,7 +159,7 @@ trait SettingsPersistenceTrait
                 ->where(['id' => 1])
                 ->one();
         } catch (\Exception $e) {
-            Craft::error('Failed to load settings from database: ' . $e->getMessage(), __METHOD__);
+            static::logDatabaseFailure('load', $e, __METHOD__);
             return $settings;
         }
 
@@ -266,8 +267,41 @@ trait SettingsPersistenceTrait
 
             return true;
         } catch (\Exception $e) {
-            Craft::error('Failed to save settings to database: ' . $e->getMessage(), __METHOD__);
+            static::logDatabaseFailure('save', $e, __METHOD__);
             return false;
         }
+    }
+
+    /**
+     * Log a database persistence failure without exception details or persisted data.
+     */
+    private static function logDatabaseFailure(
+        string $operation,
+        \Exception $exception,
+        string $category,
+    ): void {
+        $diagnostics = [
+            'operation=' . $operation,
+            'resource=' . static::class,
+            'table=' . static::tableName(),
+            'exception=' . $exception::class,
+        ];
+
+        if ($exception instanceof DbException && is_array($exception->errorInfo)) {
+            $sqlState = $exception->errorInfo[0] ?? null;
+            if (is_string($sqlState) && preg_match('/^[A-Z0-9]{5}$/D', $sqlState) === 1) {
+                $diagnostics[] = 'sqlState=' . $sqlState;
+            }
+
+            $driverCode = $exception->errorInfo[1] ?? null;
+            if (
+                is_int($driverCode)
+                || (is_string($driverCode) && preg_match('/^\d+$/D', $driverCode) === 1)
+            ) {
+                $diagnostics[] = 'driverCode=' . $driverCode;
+            }
+        }
+
+        Craft::error('Settings database operation failed; ' . implode('; ', $diagnostics), $category);
     }
 }
