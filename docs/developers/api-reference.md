@@ -230,6 +230,15 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | `siteHandle(?int $siteId)` | `string\|null` | Resolve a site ID into a handle for virtual GraphQL `site` fields |
 | `nullIfEmptyString(mixed $value)` | `mixed` | Return `null` for empty strings while preserving `0`, `'0'`, `false`, arrays, and other values |
 
+### YiiRedisConnectionHelper
+
+`lindemannrock\base\helpers\YiiRedisConnectionHelper`
+[Full docs](../feature-tour/yii-redis-connection-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `createIndependentConnection(Connection $source, ?int $database, ?int $retries = null)` | `Connection` | Create an unopened, independently owned, non-persistent Yii Redis connection @since(5.37.0) |
+
 ### SettingsPostHelper
 
 `lindemannrock\base\helpers\SettingsPostHelper`

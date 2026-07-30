@@ -40,6 +40,7 @@
             "feature-tour/boolean-helper",
             "feature-tour/db-helper",
             "feature-tour/gql-helper",
+            "feature-tour/yii-redis-connection-helper",
             "feature-tour/csv-import-helper",
             "feature-tour/cp-nav-helper",
             "feature-tour/console-help",
