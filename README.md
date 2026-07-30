@@ -20,6 +20,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **DbHelper** — DB-agnostic JSON extraction, GROUP_CONCAT, text casting, and upsert existing-row references
 - **GqlHelper** — schema permission checks and site argument resolution for plugin-owned GraphQL queries
 - **YiiRedisConnectionHelper** — independently owned, non-persistent Yii Redis connections from Craft-compatible configuration
+- **Redis Database Diagnostics** — bounded, read-only point-in-time key counts for Craft's configured Redis-cache endpoint
 - **BooleanHelper** — normalize boolean-like config, env, POST, and HTML attribute values
 - **ExperimentalFeatureHelper** — env-flag gating for internal or launch-deferred features
 - **CsvImportHelper** — CSV upload parsing with configurable options

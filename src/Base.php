@@ -11,6 +11,7 @@
 namespace lindemannrock\base;
 
 use Craft;
+use craft\console\Application as ConsoleApplication;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\web\View;
 use lindemannrock\base\helpers\PluginHelper;
@@ -97,6 +98,10 @@ class Base extends Module
      */
     public function init(): void
     {
+        if (Craft::$app instanceof ConsoleApplication) {
+            $this->controllerNamespace = 'lindemannrock\base\console\controllers';
+        }
+
         parent::init();
 
         // Set alias for the base module

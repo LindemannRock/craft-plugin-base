@@ -435,6 +435,45 @@ Extend this controller in a plugin's console namespace to expose `plugin-handle/
 | `actionIndex(?string $command = null)` | Render overview or focused command help |
 | `helpManifest(): array` | **(abstract)** Return the command manifest consumed by `ConsoleHelpHelper` |
 
+### RedisDatabaseDiagnostics @since(5.37.0)
+
+`lindemannrock\base\services\RedisDatabaseDiagnostics`
+[Full docs](console-commands.md)
+
+Public service that runs bounded, read-only point-in-time key-count diagnostics
+on an independently owned Yii Redis connection.
+
+| Method | Description |
+|---|---|
+| `inspect(Connection $source, int $fromDatabase = 0, int $toDatabase = 15): RedisDatabaseDiagnosticsResult` | Read and normalize `$source->database`, probe connectivity/topology, and enumerate the approved range when safe |
+
+Range and source-database normalization are implementation details rather than
+additional public service methods.
+
+### RedisDatabaseDiagnosticsResult @since(5.37.0)
+
+`lindemannrock\base\services\RedisDatabaseDiagnosticsResult`
+
+Public immutable result carrying the stable outcome, topology, ping,
+enumeration booleans, requested range, completed database rows, and optional
+normalized source database. `toArray()` returns the exact untranslated JSON v1
+shape documented under [Console Commands](console-commands.md#json-output).
+
+### RedisController @since(5.37.0)
+
+`lindemannrock\base\console\controllers\RedisController`
+
+Exposes `lindemannrock-base/redis/databases` with `--from`, `--to`, and
+`--format=human|json`.
+
+### HelpController @since(5.37.0)
+
+`lindemannrock\base\console\controllers\HelpController`
+
+Exposes the manifest-backed `lindemannrock-base/help` and
+`lindemannrock-base/help redis/databases` discovery surfaces. Craft's native
+`help lindemannrock-base/redis/databases` route remains available.
+
 ---
 
 ## Traits

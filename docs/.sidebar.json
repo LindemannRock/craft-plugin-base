@@ -98,6 +98,7 @@
         "collapsable": true,
         "open": false,
         "children": [
+            "developers/console-commands",
             "developers/bootstrapping",
             "developers/twig-globals",
             "developers/javascript-api",

@@ -86,6 +86,8 @@ configuration values, or define plugin-specific storage and retry policy.
 
 ## Related
 
+- [Console Commands](../developers/console-commands.md) — Base's bounded,
+  read-only Redis database diagnostics
 - [CacheHelper](cache-helper.md) — bounded cleanup for plugin-owned Redis
   tracking sets
 - [PluginHelper](plugin-helper.md) — Craft cache component resolution and
