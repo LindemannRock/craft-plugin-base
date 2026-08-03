@@ -36,6 +36,8 @@ DateFormatHelper::formatDatetime($date, pluginHandle: 'my-plugin');
 
 To surface these settings in a plugin's CP, see [`DateFormatSettingsTrait`](../../src/traits/DateFormatSettingsTrait.php) and the shared partial `lindemannrock-base/_partials/cascade-date-format-settings.twig`.
 
+Resolved configuration is cached per plugin handle for the rest of the request. During Craft's plugin-loading phase, an explicit handle may be requested before that plugin has been registered. In that case, the startup call still receives the global Base and plugin-file layers, but the incomplete result is not cached. The next call after registration adds the plugin's database settings and caches the complete cascade normally. Handles that remain absent or disabled after plugin loading keep the normal cacheable fallback behavior.
+
 ## Display Formatting
 
 ### formatDatetime()
@@ -195,6 +197,8 @@ DateFormatHelper::getMonthFormat();    // 'numeric', 'short', or 'long'
 DateFormatHelper::clearConfigCache();             // Clear all cached config
 DateFormatHelper::clearConfigCache('my-plugin');  // Clear one plugin's cached config
 ```
+
+Clearing one handle leaves the global and other handle-specific entries intact. Calling `clearConfigCache()` without a handle clears the entire request-local configuration cache.
 
 ## SQL Expressions @since(5.15.0)
 

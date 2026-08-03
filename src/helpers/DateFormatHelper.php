@@ -93,7 +93,10 @@ class DateFormatHelper
      *     filters (`|lrTime` etc.) automatically respect the active plugin's
      *     overrides without needing to thread the handle through every call.
      *
-     * Result is cached per plugin handle for the lifetime of the request.
+     * Complete results are cached per plugin handle for the lifetime of the
+     * request. A plugin-specific result resolved recursively while Craft is
+     * still loading plugins is returned without caching so the registered
+     * plugin's database settings can participate in the next resolution.
      *
      * @param string|null $pluginHandle Optional explicit plugin handle. If null, auto-detected.
      * @return array
@@ -108,10 +111,14 @@ class DateFormatHelper
 
         if (!isset(self::$configCache[$cacheKey])) {
             $merged = Craft::$app->config->getConfigFromFile('lindemannrock-base') ?: [];
+            $cacheResult = true;
 
             if ($pluginHandle !== null) {
                 // Layer 2: plugin DB settings (overrides base)
                 $plugin = Craft::$app->plugins->getPlugin($pluginHandle);
+                if ($plugin === null && !Craft::$app->plugins->arePluginsLoaded()) {
+                    $cacheResult = false;
+                }
                 if ($plugin !== null) {
                     $settings = $plugin->getSettings();
                     if ($settings !== null) {
@@ -136,7 +143,11 @@ class DateFormatHelper
                 }
             }
 
-            self::$configCache[$cacheKey] = $merged;
+            if ($cacheResult) {
+                self::$configCache[$cacheKey] = $merged;
+            }
+
+            return $merged;
         }
 
         return self::$configCache[$cacheKey];

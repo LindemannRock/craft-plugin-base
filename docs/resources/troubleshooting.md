@@ -98,6 +98,18 @@ In Twig:
 
 ---
 
+## Saved Plugin Date Formats Are Ignored During Bootstrap
+
+**Symptom:** A plugin uses the global date/time format during startup and continues using it later in the same request, even though the plugin has saved format overrides.
+
+**Cause:** An older Base version can cache the plugin-specific cascade while Craft is still registering plugins. At that point the global Base and plugin-file layers are available, but the plugin's database settings are not.
+
+**Fix:** Update to LindemannRock Base 5.37+. Keep passing the plugin's explicit handle from startup and Craft-owned display contexts; removing the handle only hides the missing cascade. Current Base returns the usable startup result without caching it, then resolves and caches database settings after Craft registers the plugin.
+
+Manual cache clearing is still useful after changing settings within the same request, but it is not required to recover from normal plugin registration.
+
+---
+
 ## Export Button Not Showing
 
 **Symptom:** The export menu component renders nothing.

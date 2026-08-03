@@ -11,10 +11,15 @@ declare(strict_types=1);
 namespace lindemannrock\base\tests\Integration;
 
 use Craft;
+use craft\base\Model;
+use craft\base\PluginInterface;
+use craft\services\Config;
+use craft\services\Plugins;
 use DateTime;
 use DateTimeZone;
 use lindemannrock\base\helpers\DateFormatHelper;
 use lindemannrock\base\testing\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use yii\db\Expression;
 
@@ -49,6 +54,186 @@ final class DateFormatHelperTest extends IntegrationTestCase
         $existing = $configProperty->getValue();
         $existing[$cacheKey] = $config;
         $configProperty->setValue(null, $existing);
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function getDateFormatConfigCache(): array
+    {
+        $cache = new ReflectionClass(DateFormatHelper::class);
+        return $cache->getProperty('configCache')->getValue();
+    }
+
+    /**
+     * Put Craft's real Plugins service into a deterministic point in its load lifecycle.
+     *
+     * @param array<string, PluginInterface> $plugins
+     */
+    private function setPluginLifecycleState(Plugins $service, bool $loading, bool $loaded, array $plugins = []): void
+    {
+        $reflection = new ReflectionClass(Plugins::class);
+        $reflection->getProperty('_loadingPlugins')->setValue($service, $loading);
+        $reflection->getProperty('_pluginsLoaded')->setValue($service, $loaded);
+        $reflection->getProperty('_plugins')->setValue($service, $plugins);
+    }
+
+    /**
+     * Run an assertion block with deterministic config and plugin services.
+     *
+     * @param array<string, array<string, mixed>> $configFiles
+     * @param callable(Plugins): void $assertions
+     */
+    private function withDateFormatServices(array &$configFiles, callable $assertions): void
+    {
+        $originalConfig = Craft::$app->getConfig();
+        $originalPlugins = Craft::$app->getPlugins();
+        $config = $this->createMock(Config::class);
+        $config->method('getConfigFromFile')->willReturnCallback(
+            static function(string $handle) use (&$configFiles): array {
+                return $configFiles[$handle] ?? [];
+            },
+        );
+        $plugins = new Plugins();
+
+        Craft::$app->set('config', $config);
+        Craft::$app->set('plugins', $plugins);
+
+        try {
+            $assertions($plugins);
+        } finally {
+            DateFormatHelper::clearConfigCache();
+            Craft::$app->set('plugins', $originalPlugins);
+            Craft::$app->set('config', $originalConfig);
+        }
+    }
+
+    public function testPluginLoadingResultIsNotCachedBeforeDatabaseSettingsBecomeAvailable(): void
+    {
+        $configFiles = [
+            'lindemannrock-base' => [
+                'timeFormat' => '24',
+                'monthFormat' => 'long',
+                'dateOrder' => 'dmy',
+                'dateSeparator' => '/',
+                'showSeconds' => false,
+            ],
+            'lifecycle-plugin' => [
+                'timeFormat' => '12',
+                'dateSeparator' => '-',
+            ],
+        ];
+
+        $this->withDateFormatServices($configFiles, function(Plugins $plugins): void {
+            // This is the supported recursive state created by Plugins::loadPlugins():
+            // the plugin object is running init(), but _registerPlugin() has not run.
+            $this->setPluginLifecycleState($plugins, loading: true, loaded: false);
+
+            $startupConfig = DateFormatHelper::getConfig('lifecycle-plugin');
+
+            self::assertSame('12', $startupConfig['timeFormat'], 'startup still receives plugin-file overrides');
+            self::assertSame('long', $startupConfig['monthFormat'], 'startup still receives global Base config');
+            self::assertSame('-', $startupConfig['dateSeparator']);
+            self::assertArrayNotHasKey(
+                'lifecycle-plugin',
+                $this->getDateFormatConfigCache(),
+                'a pre-registration result must not poison the request cache',
+            );
+
+            $settings = new class extends Model {
+                public ?string $timeFormat = '24';
+                public ?string $monthFormat = 'numeric';
+                public ?string $dateOrder = null;
+                public ?string $dateSeparator = null;
+                public ?bool $showSeconds = true;
+            };
+            $plugin = $this->createMock(PluginInterface::class);
+            $plugin->method('getSettings')->willReturn($settings);
+            $this->setPluginLifecycleState(
+                $plugins,
+                loading: false,
+                loaded: true,
+                plugins: ['lifecycle-plugin' => $plugin],
+            );
+
+            $registeredConfig = DateFormatHelper::getConfig('lifecycle-plugin');
+
+            self::assertSame('12', $registeredConfig['timeFormat'], 'plugin config must continue to override database settings');
+            self::assertSame('numeric', $registeredConfig['monthFormat'], 'database settings must override global Base config');
+            self::assertSame('dmy', $registeredConfig['dateOrder'], 'null database values must inherit global Base config');
+            self::assertSame('-', $registeredConfig['dateSeparator'], 'null database values must inherit before plugin config is applied');
+            self::assertTrue($registeredConfig['showSeconds']);
+            self::assertSame($registeredConfig, $this->getDateFormatConfigCache()['lifecycle-plugin']);
+
+            // A complete resolution is cached normally after registration.
+            $settings->monthFormat = 'short';
+            self::assertSame($registeredConfig, DateFormatHelper::getConfig('lifecycle-plugin'));
+        });
+    }
+
+    #[DataProvider('unavailablePluginCases')]
+    public function testUnavailablePluginAfterLoadingRetainsCacheableFallbackBehavior(string $case): void
+    {
+        $handle = 'unavailable-' . $case;
+        $configFiles = [
+            'lindemannrock-base' => ['timeFormat' => '24', 'monthFormat' => 'long'],
+            $handle => ['timeFormat' => '12'],
+        ];
+
+        $this->withDateFormatServices($configFiles, function(Plugins $plugins) use (&$configFiles, $handle): void {
+            // getPlugin() returns null for both a genuinely absent plugin and an
+            // installed-but-disabled plugin once loading has completed.
+            $this->setPluginLifecycleState($plugins, loading: false, loaded: true);
+
+            $resolved = DateFormatHelper::getConfig($handle);
+            self::assertSame(['timeFormat' => '12', 'monthFormat' => 'long'], $resolved);
+            self::assertSame($resolved, $this->getDateFormatConfigCache()[$handle]);
+
+            $configFiles[$handle]['timeFormat'] = '24';
+            self::assertSame($resolved, DateFormatHelper::getConfig($handle), 'the complete fallback remains cached');
+        });
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function unavailablePluginCases(): iterable
+    {
+        yield 'absent plugin' => ['absent'];
+        yield 'disabled plugin' => ['disabled'];
+    }
+
+    public function testGlobalAndHandleSpecificCacheClearingRemainIsolated(): void
+    {
+        $configFiles = [
+            'lindemannrock-base' => ['timeFormat' => '24'],
+            'cache-plugin' => ['monthFormat' => 'short'],
+        ];
+
+        $this->withDateFormatServices($configFiles, function(Plugins $plugins) use (&$configFiles): void {
+            $this->setPluginLifecycleState($plugins, loading: false, loaded: true);
+
+            self::assertSame(['timeFormat' => '24'], DateFormatHelper::getConfig());
+            self::assertSame(
+                ['timeFormat' => '24', 'monthFormat' => 'short'],
+                DateFormatHelper::getConfig('cache-plugin'),
+            );
+
+            $configFiles['lindemannrock-base']['timeFormat'] = '12';
+            $configFiles['cache-plugin']['monthFormat'] = 'long';
+            DateFormatHelper::clearConfigCache('cache-plugin');
+
+            self::assertSame(['timeFormat' => '24'], DateFormatHelper::getConfig(), 'handle clearing must preserve global cache');
+            self::assertSame(
+                ['timeFormat' => '12', 'monthFormat' => 'long'],
+                DateFormatHelper::getConfig('cache-plugin'),
+                'handle clearing must refresh only that handle',
+            );
+
+            DateFormatHelper::clearConfigCache();
+            self::assertSame(['timeFormat' => '12'], DateFormatHelper::getConfig(), 'global clearing must refresh all entries');
+            self::assertArrayNotHasKey('cache-plugin', $this->getDateFormatConfigCache());
+        });
     }
 
     public function testLocalDateExpressionParameterizesTimezoneOffsetAgainstSqlInjection(): void
