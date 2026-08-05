@@ -1,5 +1,22 @@
 # Changelog
 
+## [5.37.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.36.0...v5.37.0) - 2026-08-05
+
+
+### Added
+
+* add Redis database diagnostics ([5b460ca](https://github.com/LindemannRock/craft-plugin-base/commit/5b460caa007eb696a426f8ee48abd12708062938))
+* **components:** make error-summary links reveal and focus invalid fields ([3dcf8c7](https://github.com/LindemannRock/craft-plugin-base/commit/3dcf8c7059ad73232e974bd423d3250a3b5cab4e))
+* **helpers:** add error color to color set for status indicators ([b75fb57](https://github.com/LindemannRock/craft-plugin-base/commit/b75fb57214e775f136ebd3c592f84122078bff07))
+* **helpers:** add independent Yii Redis connections ([da4b11d](https://github.com/LindemannRock/craft-plugin-base/commit/da4b11da985b4e84d823cabff19b47f9b5b81899))
+
+
+### Fixed
+
+* **helpers:** avoid caching incomplete date config during plugin loading ([9dd28c3](https://github.com/LindemannRock/craft-plugin-base/commit/9dd28c364aeecc39c3d54276276deab953c82e5e))
+* secure settings persistence failure logs ([0677442](https://github.com/LindemannRock/craft-plugin-base/commit/0677442a5cdf0217307d0f3ceab765648e4ae39f))
+* trust GitHub workspace for archive validation ([d2550cd](https://github.com/LindemannRock/craft-plugin-base/commit/d2550cd45800933ab426acfefe7238c1f7cf01fc))
+
 ## [5.36.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.35.0...v5.36.0) - 2026-07-22
 
 
