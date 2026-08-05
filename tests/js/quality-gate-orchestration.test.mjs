@@ -160,8 +160,15 @@ test('CI and Act select the same aggregate authority', () => {
     const workflow = readFileSync(path.join(packageRoot, '.github/workflows/ci.yml'), 'utf8');
     const act = readFileSync(path.join(packageRoot, 'scripts/act-quality-gates'), 'utf8');
     const standaloneRunner = readFileSync(path.join(packageRoot, 'scripts/run-standalone-tests'), 'utf8');
+    const checkoutOffset = workflow.indexOf('uses: actions/checkout@v6');
+    const trustOffset = workflow.indexOf('run: git config --global --add safe.directory "$GITHUB_WORKSPACE"');
+    const qualityGateOffset = workflow.indexOf('run: composer quality-gate');
     assert.equal((workflow.match(/run:\s+composer quality-gate/g) ?? []).length, 1);
     assert.doesNotMatch(workflow, /run:\s+composer (?:audit|phpstan|check-cs|test|ci:full)/);
+    assert.ok(checkoutOffset >= 0);
+    assert.ok(trustOffset > checkoutOffset);
+    assert.ok(qualityGateOffset > trustOffset);
+    assert.doesNotMatch(workflow, /safe\.directory\s+["']?\*/);
     assert.match(workflow, /uses:\s+ramsey\/composer-install@v4/);
     assert.match(workflow, /container:\s+node:24-bookworm/);
     assert.match(workflow, /^\s{6}db:/m);
