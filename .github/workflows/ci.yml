@@ -8,6 +8,31 @@ on:
 jobs:
   quality-gates:
     runs-on: ubuntu-latest
+    container: node:24-bookworm
+    env:
+      LINDEMANNROCK_BASE_TEST_DB_DSN: mysql:host=db;port=3306;dbname=db
+      LINDEMANNROCK_BASE_TEST_DB_USER: db
+      LINDEMANNROCK_BASE_TEST_DB_PASSWORD: db
+    services:
+      db:
+        image: mysql:8.0.40
+        env:
+          MYSQL_DATABASE: db
+          MYSQL_USER: db
+          MYSQL_PASSWORD: db
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - uses: actions/checkout@v6
 
@@ -19,15 +44,10 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@v4
         with:
           composer-options: --prefer-dist
+          ignore-cache: ${{ env.ACT }}
 
-      - name: Composer security audit
-        run: composer audit --abandoned=report
-
-      - name: PHPStan
-        run: composer phpstan
-
-      - name: ECS code style check
-        run: composer check-cs
+      - name: Complete package quality gate
+        run: composer quality-gate

@@ -18,4 +18,5 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../src/testing/bootstrap.php';
 
-\lindemannrock\base\testing\bootstrap();
+$projectRoot = $_SERVER['CRAFT_TEST_PROJECT_ROOT'] ?? null;
+\lindemannrock\base\testing\bootstrap(is_string($projectRoot) && $projectRoot !== '' ? $projectRoot : null);

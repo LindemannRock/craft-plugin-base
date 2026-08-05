@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -u
+
+PACKAGE_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TEMP_ROOT="${TMPDIR:-/tmp}"
+PROJECT_ROOT="$(mktemp -d "$TEMP_ROOT/base-standalone-tests.XXXXXXXX")" || {
+    echo "Unable to allocate the standalone Craft test project." >&2
+    exit 1
+}
+CHILD_PID=""
+
+cleanup_project() {
+    primary_status=$?
+    trap - EXIT INT TERM HUP
+    set +e
+    cleanup_status=0
+    case "$PROJECT_ROOT" in
+        "$TEMP_ROOT"/base-standalone-tests.*)
+            rm -rf -- "$PROJECT_ROOT"
+            cleanup_status=$?
+            ;;
+        *)
+            echo "Refusing to remove unexpected standalone test project: $PROJECT_ROOT" >&2
+            cleanup_status=1
+            ;;
+    esac
+    if [ "$cleanup_status" -ne 0 ]; then
+        echo "Standalone Craft test project cleanup failed (exit $cleanup_status)." >&2
+    fi
+    if [ "$primary_status" -ne 0 ]; then
+        exit "$primary_status"
+    fi
+    exit "$cleanup_status"
+}
+
+handle_signal() {
+    signal_status="$1"
+    trap - INT TERM HUP
+    if [ -n "$CHILD_PID" ]; then
+        kill -TERM "$CHILD_PID" 2>/dev/null || true
+        wait "$CHILD_PID" 2>/dev/null || true
+        CHILD_PID=""
+    fi
+    exit "$signal_status"
+}
+
+trap cleanup_project EXIT
+trap 'handle_signal 130' INT
+trap 'handle_signal 143' TERM
+trap 'handle_signal 129' HUP
+
+for variable in LINDEMANNROCK_BASE_TEST_DB_DSN LINDEMANNROCK_BASE_TEST_DB_USER LINDEMANNROCK_BASE_TEST_DB_PASSWORD; do
+    if [ -z "${!variable:-}" ]; then
+        echo "$variable is required for the disposable standalone Craft test project." >&2
+        exit 2
+    fi
+done
+if [ ! -f "$PACKAGE_ROOT/vendor/autoload.php" ]; then
+    echo "Standalone package dependencies are missing. Run composer install first." >&2
+    exit 127
+fi
+
+mkdir -p "$PROJECT_ROOT/config" "$PROJECT_ROOT/storage" "$PROJECT_ROOT/web"
+ln -s "$PACKAGE_ROOT/vendor" "$PROJECT_ROOT/vendor"
+
+cat > "$PROJECT_ROOT/bootstrap.php" <<'PHP'
+<?php
+define('CRAFT_BASE_PATH', __DIR__);
+define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
+require_once CRAFT_VENDOR_PATH . '/autoload.php';
+PHP
+
+cat > "$PROJECT_ROOT/config/app.php" <<'PHP'
+<?php
+
+return [
+    '*' => [
+        'aliases' => [
+            '@web' => 'http://base-test.invalid',
+            '@webroot' => CRAFT_BASE_PATH . '/web',
+        ],
+        'bootstrap' => [
+            static function(): void {
+                \lindemannrock\base\Base::register();
+            },
+        ],
+    ],
+];
+PHP
+
+cat > "$PROJECT_ROOT/craft" <<'PHP'
+#!/usr/bin/env php
+<?php
+require __DIR__ . '/bootstrap.php';
+$app = require CRAFT_VENDOR_PATH . '/craftcms/cms/bootstrap/console.php';
+exit($app->run());
+PHP
+chmod +x "$PROJECT_ROOT/craft"
+
+export CRAFT_DB_DSN="$LINDEMANNROCK_BASE_TEST_DB_DSN"
+export CRAFT_DB_USER="$LINDEMANNROCK_BASE_TEST_DB_USER"
+export CRAFT_DB_PASSWORD="$LINDEMANNROCK_BASE_TEST_DB_PASSWORD"
+export CRAFT_DB_CHARSET="utf8mb4"
+export CRAFT_DB_COLLATION="utf8mb4_0900_ai_ci"
+export CRAFT_SECURITY_KEY="base-standalone-test-key-2026"
+export CRAFT_ENVIRONMENT="test"
+export CRAFT_EDITION="pro"
+export CRAFT_DEV_MODE="1"
+export CRAFT_ALLOW_ADMIN_CHANGES="1"
+
+php "$PROJECT_ROOT/craft" install \
+    --interactive=0 \
+    --username=admin \
+    --password=password \
+    --email=test@example.com \
+    --site-name="Base Test" \
+    --site-url="http://base-test.invalid"
+install_status=$?
+if [ "$install_status" -ne 0 ]; then
+    exit "$install_status"
+fi
+
+export CRAFT_TEST_PROJECT_ROOT="$PROJECT_ROOT"
+"$PACKAGE_ROOT/scripts/run-tests" &
+CHILD_PID=$!
+set +e
+wait "$CHILD_PID"
+status=$?
+set -e
+CHILD_PID=""
+exit "$status"

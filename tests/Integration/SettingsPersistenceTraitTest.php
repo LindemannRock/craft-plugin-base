@@ -11,9 +11,9 @@ declare(strict_types=1);
 namespace lindemannrock\base\tests\Integration;
 
 use Craft;
+use craft\base\Model;
 use craft\db\Connection;
 use craft\db\Query;
-use craft\base\Model;
 use craft\helpers\Db;
 use lindemannrock\base\testing\IntegrationTestCase;
 use lindemannrock\base\traits\SettingsPersistenceTrait;

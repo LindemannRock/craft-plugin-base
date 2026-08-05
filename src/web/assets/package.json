@@ -6,7 +6,7 @@
     "build": "npm run build:analytics && npm run build:components && npm run build:install",
     "build:analytics": "mkdir -p analytics/dist/js && terser analytics/src/js/analytics.js -o analytics/dist/js/analytics.js -c -m",
     "build:components": "mkdir -p components/dist/css components/dist/js && cleancss -o components/dist/css/components.css components/src/css/components.css && terser components/src/js/components.js -o components/dist/js/components.js -c -m",
-    "build:install": "mkdir -p install/dist/css install/dist/js && cleancss -o install/dist/css/install-experience.css install/src/css/install-experience.css && esbuild install/src/js/install-experience.js --bundle --format=iife --platform=browser --minify --outfile=install/dist/js/install-experience.js"
+    "build:install": "mkdir -p install/dist/css install/dist/js && cleancss -o install/dist/css/install-experience.css install/src/css/install-experience.css && esbuild install/src/js/install-experience.js --bundle --format=iife --platform=browser --minify --tsconfig-raw='{}' --outfile=install/dist/js/install-experience.js"
   },
   "devDependencies": {
     "canvas-confetti": "^1.9.4",

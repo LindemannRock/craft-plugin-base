@@ -71,7 +71,7 @@ final class StoragePathValidatorTest extends IntegrationTestCase
         $model = $this->validate('$' . self::ENV_NAME);
 
         self::assertTrue($model->hasErrors('path'));
-        self::assertStringContainsString('@storage', implode(' ', $model->getErrors('path')));
+        self::assertStringContainsString('@storage', (string)$model->getFirstError('path'));
     }
 
     public function testAbsolutePathOutsideAllowedAliasesFailsWhenAliasIsRequired(): void
@@ -79,7 +79,7 @@ final class StoragePathValidatorTest extends IntegrationTestCase
         $model = $this->validate('/tmp/lr-storage-path-validator');
 
         self::assertTrue($model->hasErrors('path'));
-        self::assertStringContainsString('@storage', implode(' ', $model->getErrors('path')));
+        self::assertStringContainsString('@storage', (string)$model->getFirstError('path'));
     }
 
     public function testEnvVarResolvingToWebrootFails(): void
@@ -89,7 +89,7 @@ final class StoragePathValidatorTest extends IntegrationTestCase
         $model = $this->validate('$' . self::ENV_NAME);
 
         self::assertTrue($model->hasErrors('path'));
-        self::assertStringContainsString('web-accessible', implode(' ', $model->getErrors('path')));
+        self::assertStringContainsString('web-accessible', (string)$model->getFirstError('path'));
     }
 
     public function testWebrootCanBeAllowedWhenWebrootPreventionIsDisabled(): void
@@ -109,7 +109,7 @@ final class StoragePathValidatorTest extends IntegrationTestCase
         $model = $this->validate('$' . self::ENV_NAME, ['allowEnvVars' => false]);
 
         self::assertTrue($model->hasErrors('path'));
-        self::assertStringContainsString('Environment variables are not allowed', implode(' ', $model->getErrors('path')));
+        self::assertStringContainsString('Environment variables are not allowed', (string)$model->getFirstError('path'));
     }
 
     /**

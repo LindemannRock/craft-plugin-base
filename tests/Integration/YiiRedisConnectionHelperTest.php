@@ -114,7 +114,7 @@ final class YiiRedisConnectionHelperTest extends IntegrationTestCase
             $sourceDatabase = $source->database;
             $independent = YiiRedisConnectionHelper::createIndependentConnection(
                 $source,
-                is_int($sourceDatabase) ? $sourceDatabase : null,
+                $sourceDatabase,
             );
             $independent->open();
             $independentClientId = (string)$independent->executeCommand('CLIENT ID');

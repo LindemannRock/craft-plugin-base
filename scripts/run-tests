@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -u
+
+PACKAGE_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+WORKSPACE_ROOT="$(CDPATH= cd -- "$PACKAGE_ROOT/../.." 2>/dev/null && pwd -P)"
+TEMP_ROOT="${LINDEMANNROCK_BASE_TEST_CACHE_TEMP_ROOT:-${TMPDIR:-/tmp}}"
+CHILD_PID=""
+
+mkdir -p -- "$TEMP_ROOT" || {
+    echo "Unable to create the Base test cache parent: $TEMP_ROOT" >&2
+    exit 1
+}
+TEMP_ROOT="$(CDPATH= cd -- "$TEMP_ROOT" && pwd -P)"
+CACHE_PATH="$(mktemp -d "$TEMP_ROOT/lindemannrock-base-phpunit-cache.XXXXXXXX")" || {
+    echo "Unable to allocate the Base test cache directory." >&2
+    exit 1
+}
+export LINDEMANNROCK_BASE_TEST_CACHE_PATH="$CACHE_PATH"
+
+cleanup_owned_cache() {
+    if [ ! -e "$CACHE_PATH" ]; then
+        return 0
+    fi
+    case "$CACHE_PATH" in
+        "$TEMP_ROOT"/lindemannrock-base-phpunit-cache.*)
+            rm -rf -- "$CACHE_PATH"
+            ;;
+        *)
+            echo "Refusing to remove unexpected Base test cache path: $CACHE_PATH" >&2
+            return 1
+            ;;
+    esac
+}
+
+finish() {
+    primary_status=$?
+    trap - EXIT INT TERM HUP
+    set +e
+    cleanup_owned_cache
+    cleanup_status=$?
+    set -e
+
+    if [ "$cleanup_status" -ne 0 ]; then
+        echo "Base test cache cleanup failed (exit $cleanup_status): $CACHE_PATH" >&2
+    fi
+    if [ "$primary_status" -ne 0 ]; then
+        exit "$primary_status"
+    fi
+    exit "$cleanup_status"
+}
+
+handle_signal() {
+    signal_status="$1"
+    trap - INT TERM HUP
+    if [ -n "$CHILD_PID" ]; then
+        kill -TERM "$CHILD_PID" 2>/dev/null || true
+        wait "$CHILD_PID" 2>/dev/null || true
+        CHILD_PID=""
+    fi
+    exit "$signal_status"
+}
+
+trap finish EXIT
+trap 'handle_signal 130' INT
+trap 'handle_signal 143' TERM
+trap 'handle_signal 129' HUP
+
+PHPUNIT=""
+for candidate in "$PACKAGE_ROOT/vendor/bin/phpunit" "$WORKSPACE_ROOT/vendor/bin/phpunit"; do
+    if [ -x "$candidate" ]; then
+        PHPUNIT="$candidate"
+        break
+    fi
+done
+if [ -z "$PHPUNIT" ]; then
+    echo "PHPUnit is unavailable. Run composer install before testing." >&2
+    exit 127
+fi
+
+cd "$PACKAGE_ROOT" || exit 1
+"$PHPUNIT" --colors=always "$@" &
+CHILD_PID=$!
+set +e
+wait "$CHILD_PID"
+status=$?
+set -e
+CHILD_PID=""
+exit "$status"

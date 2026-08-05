@@ -40,7 +40,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testDateFormatSettingsTraitPropertiesDefaultToNullForCascade(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use DateFormatSettingsTrait;
         };
 
@@ -56,7 +56,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testDateFormatSettingsRulesReturnsExpectedRangesAndValidators(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use DateFormatSettingsTrait;
         };
 
@@ -83,7 +83,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testDateFormatSettingsLabelsReturnAllFiveAttributes(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use DateFormatSettingsTrait;
         };
 
@@ -105,7 +105,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testDateRangeSettingsTraitDefaultsToNullForCascade(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use DateRangeSettingsTrait;
         };
 
@@ -114,7 +114,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testDateRangeSettingsRulesPinTheAllowedRanges(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use DateRangeSettingsTrait;
         };
 
@@ -133,7 +133,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testDateRangeSettingsLabelHasOneEntry(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use DateRangeSettingsTrait;
         };
 
@@ -146,7 +146,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testExportFormatSettingsTraitDefaultsToNullForCascade(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use ExportFormatSettingsTrait;
         };
 
@@ -157,7 +157,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testExportFormatSettingsRulesBundleAllThreeFlagsAsBooleans(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use ExportFormatSettingsTrait;
         };
 
@@ -172,7 +172,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testExportFormatSettingsLabelsReturnAllThreeFormats(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use ExportFormatSettingsTrait;
         };
 
@@ -188,7 +188,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testItemsPerPageSettingsTraitDefaultsToOneHundred(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use ItemsPerPageSettingsTrait;
         };
 
@@ -200,7 +200,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testItemsPerPageSettingsRulesEnforceMinTenMaxFiveHundred(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use ItemsPerPageSettingsTrait;
         };
 
@@ -246,7 +246,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
     {
         // Adopter must already have a `public string $pluginName` property
         // for the trait's rules to validate against.
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use PluginNameSettingsTrait;
 
             public string $pluginName = 'Test Plugin';
@@ -287,7 +287,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testPluginNameSettingsLabelHasOneEntry(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use PluginNameSettingsTrait;
 
             public string $pluginName = 'Test Plugin';
@@ -302,7 +302,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testLogLevelSettingsTraitDefaultsToError(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use LogLevelSettingsTrait;
         };
 
@@ -314,7 +314,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testLogLevelSettingsRulesAllowKnownLevelsAndDelegateToValidator(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use LogLevelSettingsTrait;
         };
 
@@ -334,7 +334,7 @@ final class BaseSettingsTraitsTest extends IntegrationTestCase
 
     public function testLogLevelSettingsLabelHasOneEntry(): void
     {
-        $settings = new class extends Model {
+        $settings = new class() extends Model {
             use LogLevelSettingsTrait;
         };
 

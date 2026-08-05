@@ -66,10 +66,38 @@ function bootstrap(?string $projectRoot = null): void
  */
 function configureTestCache(): void
 {
+    $configuredPath = \craft\helpers\App::env('LINDEMANNROCK_BASE_TEST_CACHE_PATH');
+    if (is_string($configuredPath) && $configuredPath !== '') {
+        $cachePath = \craft\helpers\FileHelper::normalizePath($configuredPath);
+        $basename = basename($cachePath);
+        if (preg_match('/^lindemannrock-base-phpunit-cache[.-][A-Za-z0-9]+$/', $basename) !== 1) {
+            throw new \RuntimeException("Refusing unsafe test cache path: {$cachePath}");
+        }
+    } else {
+        $cachePath = \Craft::$app->getPath()->getTempPath()
+            . DIRECTORY_SEPARATOR
+            . 'lindemannrock-base-phpunit-cache-'
+            . bin2hex(random_bytes(12));
+    }
+
+    if (!\craft\helpers\FileHelper::createDirectory($cachePath)) {
+        throw new \RuntimeException("Unable to create the owned test cache directory: {$cachePath}");
+    }
+
+    register_shutdown_function(static function() use ($cachePath): void {
+        if (!is_dir($cachePath)) {
+            return;
+        }
+
+        try {
+            \craft\helpers\FileHelper::removeDirectory($cachePath);
+        } catch (\Throwable $exception) {
+            fwrite(STDERR, "Unable to remove the owned test cache directory {$cachePath}: {$exception->getMessage()}\n");
+        }
+    });
+
     $config = \craft\helpers\App::cacheConfig();
-    $config['cachePath'] = \Craft::$app->getPath()->getTempPath()
-        . DIRECTORY_SEPARATOR
-        . 'lindemannrock-base-phpunit-cache';
+    $config['cachePath'] = $cachePath;
 
     \Craft::$app->set('cache', $config);
 }

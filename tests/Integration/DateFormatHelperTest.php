@@ -140,7 +140,7 @@ final class DateFormatHelperTest extends IntegrationTestCase
                 'a pre-registration result must not poison the request cache',
             );
 
-            $settings = new class extends Model {
+            $settings = new class() extends Model {
                 public ?string $timeFormat = '24';
                 public ?string $monthFormat = 'numeric';
                 public ?string $dateOrder = null;

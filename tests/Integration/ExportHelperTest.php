@@ -539,7 +539,7 @@ final class ExportHelperTest extends IntegrationTestCase
     public function testFilenameSupportsExactPrefixAndSettingsPatterns(): void
     {
         $before = time();
-        $settings = new class {
+        $settings = new class() {
             public function getLowerDisplayName(): string
             {
                 return 'Search Manager';

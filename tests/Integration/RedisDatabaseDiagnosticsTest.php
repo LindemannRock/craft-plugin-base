@@ -11,9 +11,9 @@ declare(strict_types=1);
 namespace lindemannrock\base\tests\Integration;
 
 use craft\helpers\App;
+use lindemannrock\base\helpers\YiiRedisConnectionHelper;
 use lindemannrock\base\services\RedisDatabaseDiagnostics;
 use lindemannrock\base\services\RedisDatabaseDiagnosticsResult;
-use lindemannrock\base\helpers\YiiRedisConnectionHelper;
 use lindemannrock\base\testing\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
@@ -316,6 +316,15 @@ final class RedisDatabaseDiagnosticsTest extends IntegrationTestCase
         $reflection = new \ReflectionClass(RedisDatabaseDiagnostics::class);
         $method = $reflection->getMethod('inspect');
         $parameters = $method->getParameters();
+        $returnType = $method->getReturnType();
+        $sourceType = $parameters[0]->getType();
+        $fromType = $parameters[1]->getType();
+        $toType = $parameters[2]->getType();
+
+        self::assertInstanceOf(\ReflectionNamedType::class, $returnType);
+        self::assertInstanceOf(\ReflectionNamedType::class, $sourceType);
+        self::assertInstanceOf(\ReflectionNamedType::class, $fromType);
+        self::assertInstanceOf(\ReflectionNamedType::class, $toType);
 
         self::assertSame(
             'lindemannrock\base\services\RedisDatabaseDiagnostics',
@@ -323,7 +332,7 @@ final class RedisDatabaseDiagnosticsTest extends IntegrationTestCase
         );
         self::assertSame(
             'lindemannrock\base\services\RedisDatabaseDiagnosticsResult',
-            $method->getReturnType()?->getName(),
+            $returnType->getName(),
         );
         self::assertSame(
             ['source', 'fromDatabase', 'toDatabase'],
@@ -332,10 +341,10 @@ final class RedisDatabaseDiagnosticsTest extends IntegrationTestCase
                 $parameters,
             ),
         );
-        self::assertSame('yii\redis\Connection', $parameters[0]->getType()?->getName());
-        self::assertSame('int', $parameters[1]->getType()?->getName());
+        self::assertSame('yii\redis\Connection', $sourceType->getName());
+        self::assertSame('int', $fromType->getName());
         self::assertSame(0, $parameters[1]->getDefaultValue());
-        self::assertSame('int', $parameters[2]->getType()?->getName());
+        self::assertSame('int', $toType->getName());
         self::assertSame(15, $parameters[2]->getDefaultValue());
         self::assertSame(
             ['inspect'],
@@ -399,7 +408,7 @@ final class RedisDatabaseDiagnosticsTest extends IntegrationTestCase
                 return new Connection();
             },
         );
-        $source->database = ' secret-value ';
+        (new \ReflectionProperty(Connection::class, 'database'))->setValue($source, ' secret-value ');
 
         $result = $runner->inspect($source);
         $json = json_encode($result->toArray(), JSON_THROW_ON_ERROR);

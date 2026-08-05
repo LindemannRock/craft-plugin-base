@@ -33,7 +33,7 @@ final class IntegrationTestCaseFixtureLifecycleTest extends IntegrationTestCase
 
     public function testTrackedTempDirectoryIsRemovedDuringTearDown(): void
     {
-        $case = new class ('fixture-cleanup') extends IntegrationTestCase {
+        $case = new class('fixture-cleanup') extends IntegrationTestCase {
             public string $dir;
 
             public function seedTempDir(): string
@@ -63,7 +63,7 @@ final class IntegrationTestCaseFixtureLifecycleTest extends IntegrationTestCase
     {
         $originalIdentity = Craft::$app->getUser()->getIdentity();
 
-        $case = new class ('user-auth') extends IntegrationTestCase {
+        $case = new class('user-auth') extends IntegrationTestCase {
             public function seedUser(): User
             {
                 return $this->createTestUser('__base_auth_');

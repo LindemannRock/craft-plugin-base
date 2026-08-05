@@ -52,7 +52,7 @@ final class TemplatePathValidatorTest extends IntegrationTestCase
         $model = $this->validate('__base_template_validator/missing-' . bin2hex(random_bytes(4)), true);
 
         self::assertTrue($model->hasErrors('template'));
-        self::assertStringContainsString('does not exist', implode(' ', $model->getErrors('template')));
+        self::assertStringContainsString('does not exist', (string)$model->getFirstError('template'));
     }
 
     private function validate(string $template, bool $checkTemplateExists = false): DynamicModel
