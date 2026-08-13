@@ -28,7 +28,7 @@ class ComponentsAsset extends AssetBundle
      */
     public function init(): void
     {
-        $this->sourcePath = __DIR__ . '/dist';
+        $this->sourcePath = '@lindemannrock/base/web/assets/components/dist';
 
         $this->css = [
             'css/components.css',

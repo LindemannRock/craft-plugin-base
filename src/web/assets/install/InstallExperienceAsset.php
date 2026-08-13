@@ -21,7 +21,7 @@ class InstallExperienceAsset extends AssetBundle
      */
     public function init(): void
     {
-        $this->sourcePath = __DIR__ . '/dist';
+        $this->sourcePath = '@lindemannrock/base/web/assets/install/dist';
         $this->depends = [
             CpAsset::class,
         ];

@@ -25,7 +25,7 @@ class AnalyticsAsset extends AssetBundle
      */
     public function init(): void
     {
-        $this->sourcePath = __DIR__ . '/dist';
+        $this->sourcePath = '@lindemannrock/base/web/assets/analytics/dist';
 
         // Chart.js library + our helpers
         $this->js = [
