@@ -16,6 +16,7 @@ use lindemannrock\base\Base;
 use lindemannrock\base\twigextensions\PluginNameHelper;
 use lindemannrock\logginglibrary\LoggingLibrary;
 use yii\base\Event;
+use yii\caching\CacheInterface;
 
 /**
  * Plugin Helper
@@ -55,6 +56,9 @@ use yii\base\Event;
  */
 class PluginHelper
 {
+    /** @var array<string, true> */
+    private static array $applicationCacheDiagnostics = [];
+
     /**
      * Resolve the plugin version from the plugin package metadata.
      *
@@ -448,6 +452,38 @@ class PluginHelper
     }
 
     /**
+     * Resolve Craft's configured top-level application cache.
+     *
+     * All valid CacheInterface implementations are accepted as exposed. Cache
+     * wrappers are never unwrapped or inspected. Resolution failures and
+     * invalid components log once per request and calling context.
+     *
+     * @since 5.38.0
+     */
+    public static function getApplicationCacheOrLog(string $context): ?CacheInterface
+    {
+        try {
+            $cache = Craft::$app->getCache();
+        } catch (\Throwable $e) {
+            self::logApplicationCacheDiagnostic(
+                $context,
+                sprintf('application cache resolution failed (%s)', $e::class),
+            );
+            return null;
+        }
+
+        if (!$cache instanceof CacheInterface) {
+            self::logApplicationCacheDiagnostic(
+                $context,
+                'application cache is unavailable or does not implement yii\\caching\\CacheInterface',
+            );
+            return null;
+        }
+
+        return $cache;
+    }
+
+    /**
      * Returns Craft's cache component when it's a Redis-backed Yii cache, else null.
      *
      * Use this whenever a plugin's settings indicate Redis cache storage but the code
@@ -497,6 +533,16 @@ class PluginHelper
         }
 
         return null;
+    }
+
+    private static function logApplicationCacheDiagnostic(string $context, string $diagnostic): void
+    {
+        if (isset(self::$applicationCacheDiagnostics[$context])) {
+            return;
+        }
+
+        Craft::warning("{$context}: {$diagnostic}.", 'lindemannrock-base');
+        self::$applicationCacheDiagnostics[$context] = true;
     }
 
     /**

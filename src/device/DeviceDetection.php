@@ -9,8 +9,11 @@
 namespace lindemannrock\base\device;
 
 use Craft;
+use craft\helpers\App;
 use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
+use lindemannrock\base\cache\CacheBackendStatus;
+use lindemannrock\base\cache\ScopedCache;
 use lindemannrock\base\helpers\PluginHelper;
 
 /**
@@ -420,15 +423,16 @@ class DeviceDetection
      */
     private function getCachedDeviceInfo(string $userAgent, array $config, array $clientHintsData = []): ?array
     {
-        $cacheKey = $this->getCacheKey($userAgent, $config, $clientHintsData);
         $cacheStorage = $config['cacheStorageMethod'] ?? 'file';
 
-        if ($cacheStorage === 'redis') {
-            $cache = PluginHelper::getRedisCacheOrLog($this->getPluginContext($config));
-            if ($cache !== null) {
-                $cached = $cache->get($cacheKey);
-                return $cached !== false ? $cached : null;
+        if ($this->usesApplicationCache($cacheStorage)) {
+            $cache = $this->getApplicationScopedCache($config);
+            if ($cache === null) {
+                return null;
             }
+
+            $cached = $cache->get($this->getApplicationCacheIdentity($userAgent, $config, $clientHintsData));
+            return $cached->isHit() && is_array($cached->value) ? $cached->value : null;
         }
 
         $cachePath = $config['cachePath'] ?? null;
@@ -437,46 +441,62 @@ class DeviceDetection
         }
 
         $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($this->getCacheIdentity($userAgent, $clientHintsData)) . '.cache';
-        if (!file_exists($cacheFile)) {
-            return null;
-        }
+        try {
+            if (!@is_file($cacheFile)) {
+                return null;
+            }
 
-        $duration = (int)($config['cacheDuration'] ?? 0);
-        if ($duration > 0) {
-            $mtime = filemtime($cacheFile);
-            if ($mtime && (time() - $mtime > $duration)) {
+            $duration = (int)($config['cacheDuration'] ?? 0);
+            if ($duration > 0) {
+                $mtime = @filemtime($cacheFile);
+                if ($mtime === false) {
+                    return null;
+                }
+                if (time() - $mtime > $duration) {
+                    @unlink($cacheFile);
+                    return null;
+                }
+            }
+
+            $data = @file_get_contents($cacheFile);
+            if (!is_string($data)) {
+                return null;
+            }
+
+            $decoded = json_decode($data, true);
+            if (!is_array($decoded)) {
                 @unlink($cacheFile);
                 return null;
             }
-        }
 
-        $data = file_get_contents($cacheFile);
-        $decoded = json_decode((string)$data, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            @unlink($cacheFile);
+            return $decoded;
+        } catch (\Throwable $e) {
+            $this->logError('Failed to read cached device info', $config, [
+                'error' => $e->getMessage(),
+            ]);
             return null;
         }
-
-        return $decoded;
     }
 
     private function cacheDeviceInfo(string $userAgent, array $data, array $config, array $clientHintsData = []): void
     {
-        $cacheKey = $this->getCacheKey($userAgent, $config, $clientHintsData);
         $cacheStorage = $config['cacheStorageMethod'] ?? 'file';
         $duration = (int)($config['cacheDuration'] ?? 0);
 
-        if ($cacheStorage === 'redis') {
-            $cache = PluginHelper::getRedisCacheOrLog($this->getPluginContext($config));
-            if ($cache !== null) {
-                $cache->set($cacheKey, $data, $duration);
-
-                $cacheKeySet = $config['cacheKeySet'] ?? null;
-                if ($cacheKeySet) {
-                    $cache->redis->executeCommand('SADD', [$cacheKeySet, $cacheKey]);
-                }
+        if ($this->usesApplicationCache($cacheStorage)) {
+            if ($duration <= 0) {
                 return;
             }
+
+            $cache = $this->getApplicationScopedCache($config);
+            if ($cache !== null) {
+                $cache->set(
+                    $this->getApplicationCacheIdentity($userAgent, $config, $clientHintsData),
+                    $data,
+                    $duration,
+                );
+            }
+            return;
         }
 
         $cachePath = $config['cachePath'] ?? null;
@@ -490,7 +510,10 @@ class DeviceDetection
             }
 
             $cacheFile = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . md5($this->getCacheIdentity($userAgent, $clientHintsData)) . '.cache';
-            file_put_contents($cacheFile, json_encode($data), LOCK_EX);
+            $encoded = json_encode($data);
+            if (!is_string($encoded) || @file_put_contents($cacheFile, $encoded, LOCK_EX) === false) {
+                throw new \RuntimeException('Device cache file could not be written.');
+            }
         } catch (\Throwable $e) {
             $this->logError('Failed to cache device info', $config, [
                 'error' => $e->getMessage(),
@@ -498,10 +521,42 @@ class DeviceDetection
         }
     }
 
-    private function getCacheKey(string $userAgent, array $config, array $clientHintsData = []): string
+    private function usesApplicationCache(mixed $cacheStorage): bool
     {
-        $prefix = $config['cacheKeyPrefix'] ?? 'device:';
-        return $prefix . md5($this->getCacheIdentity($userAgent, $clientHintsData));
+        return in_array($cacheStorage, ['redis', 'craft'], true) || App::isEphemeral();
+    }
+
+    private function getApplicationScopedCache(array $config): ?ScopedCache
+    {
+        $context = $this->getPluginContext($config);
+        $cache = PluginHelper::getApplicationCacheOrLog($context . ':device');
+        if ($cache === null) {
+            return null;
+        }
+
+        $status = CacheBackendStatus::fromCache($cache);
+        if (!$status->supportsCrossRequest(App::isEphemeral())) {
+            return null;
+        }
+
+        try {
+            return new ScopedCache($cache, $context, 'device');
+        } catch (\Throwable $e) {
+            $this->logError('Failed to initialize device cache', $config, [
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    private function getApplicationCacheIdentity(string $userAgent, array $config, array $clientHintsData = []): array
+    {
+        return [
+            'legacyPrefix' => is_string($config['cacheKeyPrefix'] ?? null)
+                ? $config['cacheKeyPrefix']
+                : 'device:',
+            'device' => $this->getCacheIdentity($userAgent, $clientHintsData),
+        ];
     }
 
     /**
