@@ -1,0 +1,95 @@
+{#
+/**
+ * Disposable Cache Storage Field
+ *
+ * Standalone shared settings field for choosing plugin-owned file storage or
+ * Craft's application cache. It does not represent Base-setting inheritance.
+ *
+ * Required variables:
+ * - settings: Consumer settings model
+ * - pluginHandle: Consumer plugin handle
+ * - configuredStorageToken: Persisted consumer token
+ * - filePresentation: Presentation for choosing file storage
+ * - applicationPresentation: Presentation for choosing application storage
+ *
+ * Optional variables:
+ * - settingProperty: Settings property (default: cacheStorageMethod)
+ * - fieldId: Field ID (default: settingProperty)
+ * - fieldName: Input name (default: settings[settingProperty])
+ * - applicationOptionToken: Preserved redis/craft token (default: craft)
+ * - instructions: Consumer override for the shared instructions
+ * - filePath: Consumer-owned path for the eligible file presentation
+ * - fileAdditionalExplanations/applicationAdditionalExplanations: Ordered,
+ *   already-translated consumer messages
+ *
+ * @link      https://lindemannrock.com
+ * @copyright Copyright (c) 2026 LindemannRock
+ */
+#}
+
+{% import '_includes/forms' as forms %}
+
+{% set settingProperty = settingProperty ?? 'cacheStorageMethod' %}
+{% set fieldId = fieldId ?? settingProperty %}
+{% set fieldName = fieldName ?? 'settings[' ~ settingProperty ~ ']' %}
+{% set applicationOptionToken = applicationOptionToken ?? configuredStorageToken %}
+{% set applicationOptionToken = applicationOptionToken in ['redis', 'craft'] ? applicationOptionToken : 'craft' %}
+{% set instructions = instructions ?? 'Choose where disposable cache data is stored. File caching automatically uses the application cache on ephemeral hosts.'|t('lindemannrock-base') %}
+{% set selectedPanel = configuredStorageToken == 'file' ? 'file' : 'application' %}
+{% set selectId = fieldId|namespaceInputId %}
+{% set panelsId = (fieldId ~ '-cache-storage-statuses')|namespaceInputId %}
+
+{{ forms.selectField({
+    label: 'Cache Storage Method'|t('lindemannrock-base'),
+    instructions: instructions,
+    id: fieldId,
+    name: fieldName,
+    value: configuredStorageToken,
+    options: [
+        {value: 'file', label: 'File cache'|t('lindemannrock-base')},
+        {value: applicationOptionToken, label: 'Application cache'|t('lindemannrock-base')},
+    ],
+    disabled: settings.isOverriddenByConfig(settingProperty),
+    warning: settings.isOverriddenByConfig(settingProperty)
+        ? 'This is being overridden by the <code>{setting}</code> setting in <code>config/{handle}.php</code>.'|t('lindemannrock-base', {
+            setting: settingProperty,
+            handle: pluginHandle,
+        })|raw
+        : null,
+    errors: settings.getErrors(settingProperty),
+}) }}
+
+<div id="{{ panelsId }}">
+    {% for panel, presentation in {file: filePresentation, application: applicationPresentation} %}
+        <div data-cache-storage-panel="{{ panel }}" class="{{ selectedPanel != panel ? 'hidden' }}">
+            {% include 'lindemannrock-base/_components/cache-storage-status' with {
+                presentation: presentation,
+                filePath: panel == 'file' ? (filePath ?? null) : null,
+                additionalExplanations: panel == 'file'
+                    ? (fileAdditionalExplanations ?? [])
+                    : (applicationAdditionalExplanations ?? []),
+            } only %}
+        </div>
+    {% endfor %}
+</div>
+
+{% js %}
+(() => {
+    const select = document.getElementById({{ selectId|json_encode|raw }});
+    const panels = document.getElementById({{ panelsId|json_encode|raw }});
+    if (!select || !panels || select.dataset.lrCacheStorageBound === 'true') {
+        return;
+    }
+
+    select.dataset.lrCacheStorageBound = 'true';
+    const update = () => {
+        const selectedPanel = select.value === 'file' ? 'file' : 'application';
+        panels.querySelectorAll('[data-cache-storage-panel]').forEach((panel) => {
+            panel.classList.toggle('hidden', panel.dataset.cacheStoragePanel !== selectedPanel);
+        });
+    };
+
+    select.addEventListener('change', update);
+    update();
+})();
+{% endjs %}

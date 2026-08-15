@@ -142,7 +142,18 @@ export function validateArchiveMembers(members) {
         throw new Error(`Customer archive contains development files: ${forbidden.join(', ')}`);
     }
 
-    for (const required of ['composer.json', 'src/Base.php', ...generatedOutputs]) {
+    for (const required of [
+        'composer.json',
+        'src/Base.php',
+        'src/cache/DisposableCacheStorageDecision.php',
+        'src/cache/DisposableCacheStoragePresentation.php',
+        'src/cache/DisposableCacheStoragePresenter.php',
+        'src/cache/DisposableCacheStorageResolver.php',
+        'src/templates/_components/cache-storage-status.twig',
+        'src/templates/_partials/field-cache-storage.twig',
+        'src/translations/en/lindemannrock-base.php',
+        ...generatedOutputs,
+    ]) {
         if (!members.includes(required)) {
             throw new Error(`Customer archive is missing required runtime file: ${required}`);
         }
@@ -153,7 +164,18 @@ export function checkPackageExport(sourceRoot = packageRoot, {onTemporaryPath} =
     const archiveRoot = ownedTemporaryDirectory('base-package-export-', onTemporaryPath);
     const archivePath = path.join(archiveRoot, 'package.tar');
     try {
-        const archive = spawnSync('git', ['archive', '--worktree-attributes', `--output=${archivePath}`, 'HEAD'], {
+        const tree = spawnSync('git', ['write-tree'], {
+            cwd: sourceRoot,
+            encoding: 'utf8',
+        });
+        if (tree.error) {
+            throw new Error(`Git index tree could not be created: ${tree.error.message}`);
+        }
+        if (tree.status !== 0) {
+            throw new Error(`Git index tree creation failed with exit ${tree.status ?? 1}.\n${tree.stderr}`);
+        }
+
+        const archive = spawnSync('git', ['archive', '--worktree-attributes', `--output=${archivePath}`, tree.stdout.trim()], {
             cwd: sourceRoot,
             encoding: 'utf8',
         });

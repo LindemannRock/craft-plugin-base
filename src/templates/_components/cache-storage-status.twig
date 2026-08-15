@@ -1,0 +1,38 @@
+{#
+/**
+ * Disposable Cache Storage Status
+ *
+ * Renders semantic Base-owned cache presentation through the shared info box.
+ * It contains no storage-routing logic and can be included repeatedly.
+ *
+ * Required variables:
+ * - presentation: DisposableCacheStoragePresentation
+ *
+ * Optional variables:
+ * - filePath: Consumer-owned file path, rendered only when eligible
+ * - additionalExplanations: Ordered, already-translated consumer messages
+ *
+ * @link      https://lindemannrock.com
+ * @copyright Copyright (c) 2026 LindemannRock
+ */
+#}
+
+{% set additionalExplanations = additionalExplanations ?? [] %}
+
+{% set storageMessage %}
+    <strong>{{ presentation.headingKey|t('lindemannrock-base') }}</strong>
+    {% for explanationKey in presentation.explanationKeys %}
+        <br>{{ explanationKey|t('lindemannrock-base') }}
+    {% endfor %}
+    {% for explanation in additionalExplanations %}
+        <br>{{ explanation }}
+    {% endfor %}
+    {% if presentation.filePathEligible and filePath ?? null %}
+        <br><code>{{ filePath }}</code>
+    {% endif %}
+{% endset %}
+
+{% include 'lindemannrock-base/_components/info-box' with {
+    type: presentation.statusSeverity,
+    message: storageMessage,
+} only %}

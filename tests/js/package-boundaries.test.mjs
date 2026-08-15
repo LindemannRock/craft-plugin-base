@@ -65,6 +65,13 @@ test('customer archive excludes development inputs and retains runtime outputs',
     const members = checkPackageExport();
     assert.equal(members.includes('package.json'), false);
     assert.equal(members.includes('composer.json'), true);
+    assert.equal(members.includes('src/cache/DisposableCacheStorageDecision.php'), true);
+    assert.equal(members.includes('src/cache/DisposableCacheStoragePresentation.php'), true);
+    assert.equal(members.includes('src/cache/DisposableCacheStoragePresenter.php'), true);
+    assert.equal(members.includes('src/cache/DisposableCacheStorageResolver.php'), true);
+    assert.equal(members.includes('src/templates/_components/cache-storage-status.twig'), true);
+    assert.equal(members.includes('src/templates/_partials/field-cache-storage.twig'), true);
+    assert.equal(members.includes('src/translations/en/lindemannrock-base.php'), true);
     assert.equal(members.includes('src/web/assets/install/dist/js/install-experience.js'), true);
 });
 
