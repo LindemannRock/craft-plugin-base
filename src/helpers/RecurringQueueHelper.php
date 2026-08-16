@@ -11,6 +11,8 @@ namespace lindemannrock\base\helpers;
 use Craft;
 use craft\db\Query;
 use craft\queue\BaseJob;
+use lindemannrock\base\queue\DeferredQueueJob;
+use lindemannrock\base\queue\PortableQueueScheduler;
 use yii\db\Expression;
 
 /**
@@ -76,7 +78,13 @@ class RecurringQueueHelper
 
             return new RecurringQueueResult(
                 RecurringQueueResult::STATUS_CREATED,
-                Craft::$app->getQueue()->delay($delay)->push($job),
+                PortableQueueScheduler::push(
+                    job: $job,
+                    delay: $delay,
+                    identityTokens: self::identityTokens($pluginToken, $jobClass, $extraLikeTokens),
+                    mutexName: $lockName,
+                    mutexTimeout: $mutexTimeout,
+                ),
             );
         } finally {
             $mutex->release($lockName);
@@ -91,14 +99,30 @@ class RecurringQueueHelper
      * @param string[] $extraLikeTokens Additional serialized-payload tokens that identify the recurring row
      * @return int Number of deleted rows
      */
-    public static function deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = []): int
-    {
-        $rows = self::pendingRows($pluginToken, $jobClass, $extraLikeTokens);
-        if ($rows === []) {
-            return 0;
+    public static function deletePending(
+        string $pluginToken,
+        string $jobClass,
+        array $extraLikeTokens = [],
+        ?string $mutexName = null,
+        int $mutexTimeout = 5,
+    ): int {
+        $lockName = $mutexName ?? self::mutexName($pluginToken, $jobClass, $extraLikeTokens);
+        $mutex = Craft::$app->getMutex();
+
+        if (!$mutex->acquire($lockName, $mutexTimeout)) {
+            throw new \RuntimeException('Unable to acquire the recurring queue cancellation lock.');
         }
 
-        return self::deleteRows($rows);
+        try {
+            $rows = self::cancelableRows($pluginToken, $jobClass, $extraLikeTokens);
+            if ($rows === []) {
+                return 0;
+            }
+
+            return self::deleteRows($rows);
+        } finally {
+            $mutex->release($lockName);
+        }
     }
 
     /**
@@ -133,6 +157,31 @@ class RecurringQueueHelper
     }
 
     /**
+     * Fetch pending consumer rows plus every Base-owned deferred handoff row.
+     *
+     * Reserved and failed handoffs are included so cancellation cannot be
+     * undone by an in-flight handoff or a later manual retry.
+     *
+     * @param class-string<BaseJob> $jobClass
+     * @param string[] $extraLikeTokens
+     * @return list<array{id: int|string}>
+     */
+    private static function cancelableRows(string $pluginToken, string $jobClass, array $extraLikeTokens): array
+    {
+        $identityQuery = self::identityQuery($pluginToken, $jobClass, $extraLikeTokens);
+        $pendingCondition = ['fail' => false, 'timeUpdated' => null];
+        $handoffCondition = ['like', 'job', self::jobClassToken(DeferredQueueJob::class)];
+
+        /** @var list<array{id: int|string}> $rows */
+        $rows = $identityQuery
+            ->select(['id'])
+            ->andWhere(['or', $pendingCondition, $handoffCondition])
+            ->all();
+
+        return $rows;
+    }
+
+    /**
      * Build the pending-row query for a recurring job identity.
      *
      * @param class-string<BaseJob> $jobClass
@@ -140,18 +189,43 @@ class RecurringQueueHelper
      */
     private static function pendingQuery(string $pluginToken, string $jobClass, array $extraLikeTokens): Query
     {
+        return self::identityQuery($pluginToken, $jobClass, $extraLikeTokens)
+            ->andWhere(['fail' => false])
+            ->andWhere(['timeUpdated' => null]);
+    }
+
+    /**
+     * Build the serialized-payload query for a recurring job identity.
+     *
+     * @param class-string<BaseJob> $jobClass
+     * @param string[] $extraLikeTokens
+     */
+    private static function identityQuery(string $pluginToken, string $jobClass, array $extraLikeTokens): Query
+    {
         $query = (new Query())
             ->from('{{%queue}}')
             ->where(['like', 'job', $pluginToken])
-            ->andWhere(['like', 'job', self::jobClassToken($jobClass)])
-            ->andWhere(['fail' => false])
-            ->andWhere(['timeUpdated' => null]);
+            ->andWhere(['like', 'job', self::jobClassToken($jobClass)]);
 
         foreach ($extraLikeTokens as $token) {
             $query->andWhere(['like', 'job', $token]);
         }
 
         return $query;
+    }
+
+    /**
+     * @param class-string<BaseJob> $jobClass
+     * @param string[] $extraLikeTokens
+     * @return non-empty-list<string>
+     */
+    private static function identityTokens(string $pluginToken, string $jobClass, array $extraLikeTokens): array
+    {
+        return [
+            $pluginToken,
+            self::jobClassToken($jobClass),
+            ...$extraLikeTokens,
+        ];
     }
 
     /**

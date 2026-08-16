@@ -149,6 +149,8 @@ export function validateArchiveMembers(members) {
         'src/cache/DisposableCacheStoragePresentation.php',
         'src/cache/DisposableCacheStoragePresenter.php',
         'src/cache/DisposableCacheStorageResolver.php',
+        'src/queue/DeferredQueueJob.php',
+        'src/queue/PortableQueueScheduler.php',
         'src/templates/_components/cache-storage-status.twig',
         'src/templates/_partials/field-cache-storage.twig',
         'src/translations/en/lindemannrock-base.php',

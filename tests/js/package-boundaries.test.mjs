@@ -69,6 +69,8 @@ test('customer archive excludes development inputs and retains runtime outputs',
     assert.equal(members.includes('src/cache/DisposableCacheStoragePresentation.php'), true);
     assert.equal(members.includes('src/cache/DisposableCacheStoragePresenter.php'), true);
     assert.equal(members.includes('src/cache/DisposableCacheStorageResolver.php'), true);
+    assert.equal(members.includes('src/queue/DeferredQueueJob.php'), true);
+    assert.equal(members.includes('src/queue/PortableQueueScheduler.php'), true);
     assert.equal(members.includes('src/templates/_components/cache-storage-status.twig'), true);
     assert.equal(members.includes('src/templates/_partials/field-cache-storage.twig'), true);
     assert.equal(members.includes('src/translations/en/lindemannrock-base.php'), true);
