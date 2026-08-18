@@ -246,7 +246,7 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `apply(Model $model, array $postedValues, array $allowedAttributes, ?callable $shouldSkipAttribute = null, array $adapters = [])` | `SettingsPostResult` | Apply section-scoped typed settings POST values to a settings model, optionally skipping config-overridden attributes on explicit POST-save paths |
+| `apply(Model $model, array $postedValues, array $allowedAttributes, ?callable $shouldSkipAttribute = null, array $adapters = [])` | `SettingsPostResult` | Apply section-scoped typed settings POST values to a settings model, including Craft lightswitch `''` → `false`, optionally skipping config-overridden attributes on explicit POST-save paths |
 
 ### SlugHandleHelper
 
@@ -350,7 +350,7 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `normalize(mixed $value, bool $default = false)` | `bool` | Normalize boolean-like values from config, env, POST, and HTML attributes |
+| `normalize(mixed $value, bool $default = false)` | `bool` | Normalize boolean-like config/env/style values and valueless HTML attributes; `''` intentionally means `true` |
 | `isBooleanLike(mixed $value)` | `bool` | Check whether a value is a recognized boolean-like value |
 | `toStyleValue(mixed $value, bool $default = false)` | `string` | Normalize a boolean-like value to `'1'` or `'0'` for style config |
 

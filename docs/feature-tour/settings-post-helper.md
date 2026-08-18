@@ -4,6 +4,8 @@ Applies raw Control Panel settings POST values to typed settings models without 
 
 Use this helper in settings controllers between reading `settings[...]` from the request and calling `validate()` / `saveToDatabase()`.
 
+This is the Base helper for typed Craft settings forms, including `forms.lightswitchField()`. Do not substitute `BooleanHelper` for raw lightswitch values: `BooleanHelper` intentionally treats an empty string as a present HTML boolean attribute, while Craft uses the same empty string to mean that a lightswitch is off.
+
 ## Contract
 
 `SettingsPostHelper::apply()` only auto-handles these destination property types:
@@ -87,6 +89,8 @@ Boolean properties accept common Craft/HTML form values:
 | `false`, `0`, `''`, `'0'`, `'false'`, `'off'`, `'no'` | `false` |
 
 Missing checkbox fields are not inferred as `false`. Controllers and templates should keep posting hidden fallbacks where the UI needs that behavior.
+
+Use [BooleanHelper](boolean-helper.md) only after a caller has established that empty-string-as-present is the intended contract, such as a valueless HTML boolean attribute.
 
 ## Arrays
 

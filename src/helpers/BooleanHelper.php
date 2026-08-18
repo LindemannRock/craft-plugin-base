@@ -12,7 +12,12 @@ namespace lindemannrock\base\helpers;
  * Boolean Helper
  *
  * Normalizes boolean-like values from config files, environment variables,
- * POST data, and HTML attributes.
+ * canonical form values, and HTML boolean attributes.
+ *
+ * Empty strings are true to match valueless HTML attribute presence semantics
+ * such as `disabled=""`. Raw Craft lightswitch POST values use a different
+ * contract (`''` means off); typed settings forms should use
+ * {@see SettingsPostHelper} instead.
  *
  * @author    LindemannRock
  * @package   Base
@@ -32,6 +37,10 @@ class BooleanHelper
 
     /**
      * Normalize a boolean-like value.
+     *
+     * An empty string is true for valueless HTML boolean attributes. It is not
+     * the off-value normalizer for raw Craft lightswitch POST data; use
+     * {@see SettingsPostHelper} for typed settings forms.
      */
     public static function normalize(mixed $value, bool $default = false): bool
     {

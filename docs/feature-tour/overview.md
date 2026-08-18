@@ -22,7 +22,7 @@ Utility classes for common operations:
 - **[AnalyticsIpHelper](analytics-ip-helper.md)** — One-step IP anonymization, hashing, and geo-lookup eligibility for analytics tracking
 - **[JsonHelper](../developers/api-reference.md)** — `htmlSafeJson()` for safely embedding JSON in inline HTML/JS
 - **[ExperimentalFeatureHelper](experimental-feature-helper.md)** — Env-flag gate for internal or launch-deferred features that must stay hidden until explicitly enabled
-- **[BooleanHelper](boolean-helper.md)** — Normalize boolean-like config, env, POST, and HTML attribute values
+- **[BooleanHelper](boolean-helper.md)** — Normalize boolean-like config, env, style, and valueless HTML attribute values
 - **[DbHelper](db-helper.md)** — DB-agnostic JSON extraction and GROUP_CONCAT
 - **[GqlHelper](gql-helper.md)** — GraphQL schema permission checks plus shared `site` / `siteId` argument resolution
 - **[YiiRedisConnectionHelper](yii-redis-connection-helper.md)** — Independently owned, non-persistent Yii Redis connections from Craft-compatible configuration

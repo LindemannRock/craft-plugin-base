@@ -69,5 +69,5 @@ When a feature is behind this helper, record it in the plugin docs tracker's **I
 
 ## Related
 
-- [BooleanHelper](boolean-helper.md) — permissive boolean normalization for normal config, POST, and style values
+- [BooleanHelper](boolean-helper.md) — permissive boolean normalization for config, style, and valueless HTML attribute values
 - [Edition Support](edition-support.md) — public feature tiers
