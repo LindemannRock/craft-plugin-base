@@ -10,6 +10,7 @@ Utility classes for common operations:
 
 - **[ColorHelper](color-helper.md)** — 18 palette colors, 16 built-in color sets, and custom color set registration for badges and filters
 - **[PluginThemeStyleHelper](plugin-theme-style-helper.md)** — icon-derived CSS variables for branded setup heroes and docs shell surfaces
+- **[QrCodeRendererHelper](qr-code-renderer-helper.md)** — Craft-driver-aware Bacon QR Code PNG rendering with Imagick and a full solid-style GD backend
 - **[DateFormatHelper](date-format-helper.md)** — Configurable date/time formatting for display, exports, and DB-agnostic timezone-aware SQL
 - **[DateRangeHelper](date-range-helper.md)** — Standard date ranges (today, last 7 days, etc.) with bounds calculation and query integration
 - **[ScheduleHelper](schedule-helper.md)** — Cron-style scheduling for recurring queue jobs (daily, daily2am, weekly, monthly, etc.) with TZ-aware next-run calculation, dropdown options, and validation allowlist

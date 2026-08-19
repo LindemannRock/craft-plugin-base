@@ -15,6 +15,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **DateRangeHelper** — standardized date range selection, bounds, and query filtering
 - **ColorHelper** — 18-color palette and 16 built-in color sets for consistent styling
 - **PluginThemeStyleHelper** — icon-derived CSS variables for branded plugin heroes and docs surfaces
+- **QrCodeRendererHelper** — Craft-driver-aware Bacon QR Code PNG rendering with Imagick and full solid-style GD support
 - **ExportHelper** — CSV, JSON, and Excel export with configurable format availability
 - **GeoHelper** — ISO 3166-1 country lookups, dial codes, and phone validation
 - **DbHelper** — DB-agnostic JSON extraction, GROUP_CONCAT, text casting, and upsert existing-row references

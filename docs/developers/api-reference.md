@@ -4,6 +4,22 @@ Quick reference for all public PHP classes, methods, and traits in the base modu
 
 ## Helpers
 
+### QrCodeRendererHelper
+
+`lindemannrock\base\helpers\QrCodeRendererHelper`
+[Full docs](../feature-tour/qr-code-renderer-helper.md)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `createPngRenderer(RendererStyle $style)` | `ImageRenderer` | Create a Bacon PNG renderer using Craft's effective Imagick or GD driver @since(5.38.0) |
+
+### GdImageBackEnd
+
+`lindemannrock\base\qr\GdImageBackEnd`
+[Full docs](../feature-tour/qr-code-renderer-helper.md)
+
+Implements Bacon QR Code 3's `ImageBackEndInterface` for deterministic solid-fill PNG rendering with GD. It preserves Bacon path geometry, compound-path holes, alpha colors, and transform stacks. Gradient drawing is explicitly unsupported. @since(5.38.0)
+
 ### ColorHelper
 
 `lindemannrock\base\helpers\ColorHelper`
