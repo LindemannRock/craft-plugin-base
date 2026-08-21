@@ -9,7 +9,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 
 ## Features
 
-- **Edition Support** — standardized Lite/Standard/Pro edition tiers for the Plugin Store
+- **Edition Support** — standardized Standard/Pro edition support for the Plugin Store
 - **Settings Traits** — database persistence, config file overrides, custom display names
 - **DateFormatHelper** — centralized date/time formatting with timezone-aware SQL expressions
 - **DateRangeHelper** — standardized date range selection, bounds, and query filtering
