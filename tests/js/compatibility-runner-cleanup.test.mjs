@@ -13,7 +13,14 @@ function executable(pathname, source) {
     chmodSync(pathname, 0o700);
 }
 
-function fixture({install = false, failureMatch = '', cleanupExit = 0, waitCreate = false} = {}) {
+function fixture({
+    install = false,
+    failureMatch = '',
+    cleanupExit = 0,
+    waitCreate = false,
+    requestedPhp = '8.3',
+    actualPhp = requestedPhp,
+} = {}) {
     const root = mkdtempSync(path.join(os.tmpdir(), 'base-compat-runner-'));
     const fixturePackageRoot = path.join(root, 'package');
     const binRoot = path.join(root, 'bin');
@@ -68,6 +75,13 @@ if [[ "$1" == "delete" ]]; then
   exit 0
 fi
 if [[ "$1" == "exec" && "$2" == "test" ]]; then exit 0; fi
+if [[ "$1" == "exec" && "$2" == "php" ]]; then
+  case "$4" in
+    *PHP_MAJOR_VERSION*) printf '%s' "$BASE_COMPAT_ACTUAL_PHP_ROW" ;;
+    *PHP_VERSION*) printf '%s' "$BASE_COMPAT_ACTUAL_PHP_FULL" ;;
+  esac
+  exit 0
+fi
 if [[ -n "$BASE_COMPAT_FAIL_MATCH" && "ddev $*" == *"$BASE_COMPAT_FAIL_MATCH"* ]]; then exit 41; fi
 exit 0
 `);
@@ -76,6 +90,7 @@ exit 0
     if (install) {
         argumentsList.push('--install');
     }
+    argumentsList.push('--php-version', requestedPhp);
     const environment = {
         ...process.env,
         PATH: `${binRoot}:${process.env.PATH}`,
@@ -85,6 +100,8 @@ exit 0
         BASE_COMPAT_CLEANUP_EXIT: String(cleanupExit),
         BASE_COMPAT_WAIT_CREATE: waitCreate ? '1' : '0',
         BASE_DDEV_RESOURCE_ROOT: resourceRoot,
+        BASE_COMPAT_ACTUAL_PHP_ROW: actualPhp,
+        BASE_COMPAT_ACTUAL_PHP_FULL: `${actualPhp}.30`,
     };
     const command = '/bin/bash';
     const args = [path.join(fixturePackageRoot, 'scripts/test-craft-compat'), ...argumentsList];
@@ -162,10 +179,11 @@ test('install mode preserves the Yii module smoke path and cleans every partial 
             try {
                 const result = current.run();
                 assert.equal(result.status, expected, `${result.stdout}\n${result.stderr}`);
-                assert.match(current.log(), /ddev:delete -Oy craft-compat-lindemannrock-base-/);
+                assert.match(current.log(), /ddev:delete -Oy compat-lindemannrock-base-/);
                 if (failureMatch === '' || failureMatch === 'ddev exec env') {
-                    assert.match(result.stdout, /Package type is yii2-module; skipping Craft plugin install/);
-                    assert.match(result.stdout, /Running local plugin smoke test/);
+                    assert.match(result.stdout, /Yii module candidate resolved; its mandatory package smoke must prove module registration/);
+                    assert.match(result.stdout, /Running package smoke test: \.craft-compat\/smoke-test/);
+                    assert.match(current.log(), /ddev:exec env PLUGIN_NAME=lindemannrock\/craft-plugin-base PLUGIN_HANDLE=lindemannrock-base PLUGIN_TYPE=yii2-module bash \.craft-compat\/smoke-test/);
                 }
                 current.assertOwnedStateRemoved();
             } finally {
@@ -173,6 +191,35 @@ test('install mode preserves the Yii module smoke path and cleans every partial 
             }
         });
     }
+});
+
+test('requested PHP row is verified against the observed DDEV runtime before mandatory smoke', async (context) => {
+    await context.test('matching row reaches package smoke', () => {
+        const current = fixture({install: true, requestedPhp: '8.4', actualPhp: '8.4'});
+        try {
+            const result = current.run();
+            assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+            assert.match(result.stdout, /Actual DDEV PHP: 8\.4\.30/);
+            assert.match(current.log(), /ddev:config .*--php-version=8\.4/);
+            assert.match(current.log(), /ddev:exec env .*bash \.craft-compat\/smoke-test/);
+            current.assertOwnedStateRemoved();
+        } finally {
+            current.cleanup();
+        }
+    });
+
+    await context.test('mismatched row fails before package smoke', () => {
+        const current = fixture({install: true, requestedPhp: '8.3', actualPhp: '8.4'});
+        try {
+            const result = current.run();
+            assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
+            assert.match(result.stderr, /DDEV PHP row mismatch: requested 8\.3, got 8\.4/);
+            assert.doesNotMatch(current.log(), /ddev:exec env .*bash \.craft-compat\/smoke-test/);
+            current.assertOwnedStateRemoved();
+        } finally {
+            current.cleanup();
+        }
+    });
 });
 
 test('signal cleanup returns signal status and removes the exact generated project', async () => {
