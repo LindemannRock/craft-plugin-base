@@ -15,10 +15,13 @@ Utility classes for common operations:
 - **[DateRangeHelper](date-range-helper.md)** — Standard date ranges (today, last 7 days, etc.) with bounds calculation and query integration
 - **[ScheduleHelper](schedule-helper.md)** — Cron-style scheduling for recurring queue jobs (daily, daily2am, weekly, monthly, etc.) with TZ-aware next-run calculation, dropdown options, and validation allowlist
 - **[RecurringQueueHelper](recurring-queue-helper.md)** — Deployment-safe ownership for recurring queue rows, with mutex-protected bootstrap dedup and duplicate collapse
+- **[PortableQueueScheduler](portable-queue-scheduler.md)** — Absolute-target delayed scheduling with bounded SQS handoffs and native database-queue delays
 - **[ExportHelper](export-helper.md)** — CSV, JSON, and Excel exports with configurable format availability and date formatting
 - **[GeoHelper](geo-helper.md)** — Country names, dial codes, phone validation, and country select options
 - **[PluginHelper](plugin-helper.md)** — Plugin bootstrap, cache paths/keys, Redis cache safeguard, and cross-plugin detection
 - **[CacheHelper](cache-helper.md)** — Bounded Redis tracked-set cleanup plus streaming local cache file count/delete helpers
+- **[Disposable cache storage](disposable-cache-storage.md)** — Resolve file/application-cache choices for durable and ephemeral hosts, with shared semantic settings presentation
+- **[ScopedCache](scoped-cache.md)** — Backend-neutral finite-TTL storage with plugin/family/scope isolation and generation-based invalidation
 - **[Install experience](install-experience.md)** — One-time CP welcome modal shown after install, with version metadata, branding, and preset-driven confetti
 - **[AnalyticsIpHelper](analytics-ip-helper.md)** — One-step IP anonymization, hashing, and geo-lookup eligibility for analytics tracking
 - **[JsonHelper](../developers/api-reference.md)** — `htmlSafeJson()` for safely embedding JSON in inline HTML/JS
@@ -37,7 +40,7 @@ Utility classes for common operations:
 - **[SafeSegmentHelper](safe-segment-helper.md)** — Normalize safe non-DB string fragments for filenames, cache/storage keys, and local config tokens
 - **[AssetVolumeHelper](asset-volume-helper.md)** — Server-side validation that a submitted asset ID belongs to an allowed volume and the user holds the matching view permission
 - **[StoragePathHelper + StoragePathValidator](storage-path-validator.md)** — Resolve and validate plugin storage paths, aliases, env vars, and webroot guards
-- **[StorageVolumeHelper + StorageVolumeValidator](storage-path-validator.md#storage-volume-validator)** — Validate asset volumes used as plugin storage and block local volumes inside `@webroot`
+- **[StorageVolumeHelper + StorageVolumeValidator](storage-path-validator.md#storage-volume-validator-since5260)** — Validate asset volumes used as plugin storage and block local volumes inside `@webroot`
 - **[UrlSafetyHelper](url-safety-helper.md)** — Constrain a URL to a safe redirect target, and flag executable schemes (`javascript:`/`data:`/…) without blocking app deep links
 - **[ContentSafetyHelper](content-safety-helper.md)** — Detect dangerous HTML/script markup (`<script>`, `on*=`, …) in free text before it's stored and rendered
 - **[Settings validators](settings-validators.md)** — Yii validators for route prefixes, URL-or-path values, and template paths in plugin settings
@@ -51,7 +54,7 @@ Reusable traits for Settings models and plugin classes:
 - **[SettingsDisplayNameTrait](settings-display-name.md)** — Custom plugin display names
 - **[Base settings traits](base-settings-traits.md)** — 7 traits + matching CP partials that centralize the per-plugin Settings boilerplate for `pluginName`, `logLevel`, `itemsPerPage`, date format overrides, date range, export-format toggles, and geo provider + API key
 - **[EditionTrait](edition-support.md)** — Plugin editions (Standard/Pro)
-- **[DeviceDetectionTrait](device-detection.md)** — User-agent parsing for device, browser, and OS detection
+- **[DeviceDetectionTrait](device-detection.md)** — User-agent parsing for device, browser, and OS detection with portable file/application caching
 - **[GeoLookupTrait](geo-lookup.md)** — IP geolocation in service classes
 - **[QueueTtrTrait](queue-ttr.md)** — Shared queue TTR (`getTtr()`) with per-job override support
 
@@ -60,7 +63,7 @@ Reusable traits for Settings models and plugin classes:
 Filters and functions available in all CP templates after bootstrap:
 
 - **Date/time filters** — `|lrDatetime`, `|lrCompactDatetime`, `|lrDate`, `|lrTime`, `|lrRelative`, `|lrToDateTimeString`, `|lrToApiString`, `|lrToFilenameString`
-- **Date/time functions** — `lrNow()`, `lrIsToday()`, `lrIsPast()`, `lrIsFuture()`, `lrDefaultDateRange()`, `lrDateRangeOptions()`
+- **Date/time functions** — `lrNow()`, `lrIsToday()`, `lrIsPast()`, `lrIsFuture()`, `lrDateFormatConfig()`, `lrDefaultDateRange()`, `lrDateRangeOptions()`
 - **Color functions** — `lrPaletteColor()`, `lrPaletteColorNames()`, `lrColorSet()`, `lrSetColor()`, `lrHasColorSet()`, `lrAvailableColorSets()`, `lrNeutralColor()`, `lrDefaultColor()`, `lrFilterColor()`
 - **Export functions** — `lrExportEnabled()`, `lrExportFormats()`, `lrExportFormatOptions()`
 - **Geo functions** — `lrCountries()`, `lrCountryName()`, `lrCountryDialCodeData()`, `lrDialCode()`, `lrCountryWithDialCode()`, `lrValidCountryCode()`
@@ -86,7 +89,7 @@ Reusable Twig templates for building consistent CP pages:
 - **[CP Utilities Layout](../template-guides/cp-utilities-layout.md)** — Utility pages with action sections and AJAX buttons
 - **[CP Table Utility Layout](../template-guides/cp-table-utility-layout.md)** — Table variant for utility pages
 - **[Components](../template-guides/components.md)** — Badge, info-box, setup-incomplete, setup-task, export-menu, row-actions, stat-box, dashboard-widget helpers, filter-status, filter-dropdown, phone-input
-- **[Partials](../template-guides/partials.md)** — Analytics panel, CSV import, geo settings, env command warnings, backup list
+- **[Partials](../template-guides/partials.md)** — Analytics panel, CSV import, geo settings, cache storage, env command warnings, backup list
 
 ## Next Steps
 

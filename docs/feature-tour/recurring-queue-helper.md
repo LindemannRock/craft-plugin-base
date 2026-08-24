@@ -20,6 +20,8 @@ That check-then-push sequence is not atomic. During deploys, cache warmup, or co
 
 `RecurringQueueHelper::ensurePending()` wraps the check/push path in Craft's mutex, re-checks inside the lock, collapses duplicate pending rows, and then queues at most one replacement.
 
+Since Base 5.38, the replacement is scheduled through [PortableQueueScheduler](portable-queue-scheduler.md). Native database queues retain the full delay; an SQS proxy receives bounded handoffs that preserve the absolute target time.
+
 ## Ensure One Pending Row
 
 ```php
@@ -79,6 +81,8 @@ The queue description timestamp is serialized when Craft queues the row. If date
 | `$result->duplicatesDeleted` | Number of duplicate pending rows collapsed after keeping the earliest row. |
 | `$result->wasCreated()` | `true` only when this call pushed a new queue row. |
 | `$result->hasPending()` | `true` when the result has an existing or newly queued pending row. |
+| `$result->missedLock()` | `true` when bootstrap could not acquire the recurring ownership mutex. |
+| `$result->wasSkipped()` | `true` when a nonpositive delay skipped scheduling. |
 
 Use `wasCreated()` for INFO-level operational logs. Routine bootstrap calls that find an existing row should usually stay quiet.
 
@@ -123,11 +127,13 @@ public function handleMyScheduleChange(Settings $settings): void
 
 Never early-return from a settings-change handler just because a pending row exists. The old row has the old schedule.
 
-## Self-Reschedule Path
+## Self-reschedule path
 
-The running job should still queue the next occurrence directly from `execute()` after successful work. Do not call `ensurePending()` from the self-reschedule path: the current reserved row can still exist and should not block the next run.
+The running job should still queue the next occurrence directly from `execute()` after successful work. Use `PortableQueueScheduler`, not `ensurePending()`: the current reserved row can still exist and should not block the next run.
 
 ```php
+use lindemannrock\base\queue\PortableQueueScheduler;
+
 private function scheduleNextRun(): void
 {
     $settings = MyPlugin::$plugin->getSettings();
@@ -142,25 +148,32 @@ private function scheduleNextRun(): void
         return;
     }
 
-    Craft::$app->getQueue()->delay($delay)->push(new self([
-        'reschedule' => true,
-        'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
-            $next,
-            $settings,
-            null,
-            false,
-            pluginHandle: 'my-plugin',
-        ),
-    ]));
+    PortableQueueScheduler::push(
+        job: new self([
+            'reschedule' => true,
+            'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
+                $next,
+                $settings,
+                null,
+                false,
+                pluginHandle: 'my-plugin',
+            ),
+        ]),
+        delay: $delay,
+        identityTokens: ['myplugin', self::class],
+        mutexName: self::SCHEDULE_MUTEX,
+    );
 }
 ```
+
+Use the same explicit mutex name in `ensurePending()`, `deletePending()`, and the execute-time scheduler call so schedule creation and cancellation share one lifecycle lock.
 
 ## API
 
 | Method | Purpose |
 |---|---|
 | `ensurePending(string $pluginToken, string $jobClass, int $delay, callable $jobFactory, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | Atomically ensure one pending recurring row exists. Returns `RecurringQueueResult` with status, job ID, and duplicate-collapse metadata. |
-| `deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | Delete pending rows for a recurring job identity. |
+| `deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | Under the schedule mutex, delete matching consumer rows plus reserved or failed Base handoffs. Throws when the cancellation lock cannot be acquired. |
 | `hasPending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | Check whether a pending row exists for a recurring job identity. |
 
 ## Pitfalls
@@ -169,5 +182,5 @@ private function scheduleNextRun(): void
 |---|---|---|
 | Plain check-then-push during plugin bootstrap | Duplicate delayed rows after deploy or concurrent warmup | Use `ensurePending()` |
 | Cache-flag dedup | Manual "Release All Jobs" deletes the row but cache still says scheduled | Query the queue table through `ensurePending()` |
-| Calling `ensurePending()` from the running job's self-reschedule path | Current reserved row can block the next occurrence | Push directly from self-reschedule |
+| Calling `ensurePending()` from the running job's self-reschedule path | Current reserved row can block the next occurrence | Call `PortableQueueScheduler::push()` directly from self-reschedule |
 | Matching only a new marker property | Legacy rows without the marker are ignored and duplicated | Collapse or migrate legacy rows first |

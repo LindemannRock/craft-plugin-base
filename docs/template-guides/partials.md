@@ -183,7 +183,7 @@ Geo detection provider settings fields. Include this in plugin settings pages th
 
 Renders a provider select, API key input, HTTP warning for ip-api.com free tier, and dynamic provider info. Provider-specific UI updates happen via inline JavaScript.
 
-Pairs with [`GeoSettingsTrait`](../feature-tour/base-settings-traits.md#geosettingstrait--shared-geo-provider--api-key-fields) — adopt the trait in the plugin's Settings model to get the matching validation rules + attribute labels for the `geoProvider`/`geoApiKey` properties this partial binds to.
+Pairs with [`GeoSettingsTrait`](../feature-tour/base-settings-traits.md#geosettingstrait--shared-geo-provider--api-key-fields-since5250) — adopt the trait in the plugin's Settings model to get the matching validation rules + attribute labels for the `geoProvider`/`geoApiKey` properties this partial binds to.
 
 ### Usage
 
@@ -356,7 +356,7 @@ Use `{% embed %}` (not `{% include %}`) so you can supply the body. The partial 
 
 A reusable validation error summary for settings/edit pages — the standard Craft "Found N errors" banner with a linked list that jumps to each errored field. Include it at the top of a form when `$model->getErrors()` may be populated.
 
-> **Field-key resolution** @since(5.37.0)
+**Field-key resolution** @since(5.37.0)
 
 ### Usage
 
@@ -391,6 +391,46 @@ When the target is inside an inactive Craft CP tab, the link activates the tab b
 The banner renders nothing when there are no errors. It registers `ComponentsAsset` itself, so consumers do not need to load JavaScript separately. The count uses an ICU plural, so it reads "1 error" / "N errors" correctly across locales.
 
 ---
+
+## field-cache-storage @since(5.38.0)
+
+Render a complete File/Application Cache setting while keeping the saved choice separate from the effective backend.
+
+**Path:** `lindemannrock-base/_partials/field-cache-storage`
+
+```twig
+{% include 'lindemannrock-base/_partials/field-cache-storage' with {
+    settings: settings,
+    pluginHandle: 'my-plugin',
+    configuredStorageToken: settings.cacheStorageMethod,
+    filePresentation: filePresentation,
+    applicationPresentation: applicationPresentation,
+    applicationOptionToken: applicationOptionToken,
+    filePath: cachePath,
+} only %}
+```
+
+### Parameters
+
+| Parameter | Required | Default | Description |
+|---|---:|---|---|
+| `settings` | yes | — | Consumer settings model providing `isOverriddenByConfig()` and validation errors. |
+| `pluginHandle` | yes | — | Consumer handle used in config-override messaging. |
+| `configuredStorageToken` | yes | — | Persisted consumer token; determines the selected option and initially visible panel. |
+| `filePresentation` | yes | — | Presentation for the File choice on the current host. |
+| `applicationPresentation` | yes | — | Presentation for the Application Cache choice. |
+| `settingProperty` | no | `cacheStorageMethod` | Settings property checked for overrides and errors. |
+| `fieldId` | no | `settingProperty` | Field ID before Craft namespacing. |
+| `fieldName` | no | `settings[settingProperty]` | Submitted input name. |
+| `applicationOptionToken` | no | configured token, normalized to `craft` | Preserved `redis`/`craft` value submitted for Application Cache. |
+| `instructions` | no | Base-translated guidance | Consumer override for field instructions. |
+| `filePath` | no | `null` | Consumer-owned path shown only when the File presentation allows it. |
+| `fileAdditionalExplanations` | no | `[]` | Already-translated messages for the File panel. |
+| `applicationAdditionalExplanations` | no | `[]` | Already-translated messages for the Application panel. |
+
+The partial renders both status panels and switches their visibility when the select changes. Backend selection remains in PHP through `DisposableCacheStorageResolver`; the template never inspects cache classes or effective-storage reason codes.
+
+See [Disposable cache storage](../feature-tour/disposable-cache-storage.md) for the controller-side resolver and presenter example.
 
 ## Next Steps
 

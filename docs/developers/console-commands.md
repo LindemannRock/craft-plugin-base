@@ -12,19 +12,23 @@ does not require a separate Base installation.
 List Base commands or focus the Redis database command:
 
 ```bash title="PHP"
-php craft lindemannrock-base/help
-php craft lindemannrock-base/help redis/databases
+php craft lindemannrock-base/help [command]
+```
+
+```bash title="DDEV"
+ddev craft lindemannrock-base/help [command]
+```
+
+Omit `[command]` for Base's manifest-backed catalog, or use `redis/databases`
+for the focused Base entry. Craft's native exact-command help is also available:
+
+```bash title="PHP"
 php craft help lindemannrock-base/redis/databases
 ```
 
 ```bash title="DDEV"
-ddev craft lindemannrock-base/help
-ddev craft lindemannrock-base/help redis/databases
 ddev craft help lindemannrock-base/redis/databases
 ```
-
-The first command is Base's manifest-backed command catalog. The second shows
-the focused Base help entry. The third uses Craft's native exact-command help.
 
 ## Redis Database Diagnostics @since(5.37.0)
 

@@ -29,7 +29,7 @@ The base module registers seven Twig extensions. All functions and filters are p
 
 ### DateTimeExtension
 
-**9 filters:**
+**8 filters:**
 
 | Filter | Purpose | Docs |
 |--------|---------|------|
@@ -42,7 +42,7 @@ The base module registers seven Twig extensions. All functions and filters are p
 | `lrToApiString` | ISO 8601 format | [Twig Filters](../template-guides/twig-filters-functions.md#machine-formatting) |
 | `lrToFilenameString` | `Y-m-d-His` format | [Twig Filters](../template-guides/twig-filters-functions.md#machine-formatting) |
 
-**6 functions:**
+**7 functions:**
 
 | Function | Purpose |
 |----------|---------|
@@ -50,6 +50,7 @@ The base module registers seven Twig extensions. All functions and filters are p
 | `lrIsToday(date)` | Check if a date is today |
 | `lrIsPast(date)` | Check if a date is in the past |
 | `lrIsFuture(date)` | Check if a date is in the future |
+| `lrDateFormatConfig(pluginHandle?)` | Resolved date/time format configuration, optionally for an explicit plugin cascade |
 | `lrDefaultDateRange(pluginHandle?)` | Default date range from config |
 | `lrDateRangeOptions(format?)` | Date range options for dropdowns |
 

@@ -10,6 +10,10 @@ When you require a LindemannRock plugin, Composer pulls in the base module as a 
 composer require lindemannrock/craft-search-manager
 ```
 
+```bash title="DDEV"
+ddev composer require lindemannrock/craft-search-manager
+```
+
 This also installs `lindemannrock/craft-plugin-base` because each plugin declares it in its `composer.json`.
 
 ## How it gets registered
@@ -29,21 +33,11 @@ public function init(): void
 
 The base module registers itself idempotently — if multiple plugins call `bootstrap()`, the module only initializes once. This means all shared Twig extensions, template roots, and helpers are available regardless of which plugin triggered the registration first.
 
-## Copy config file
+## Post-install setup
 
-To customize date/time formatting and export settings across all LindemannRock plugins, copy the config file:
+Base has no separate plugin-install or setup action. Confirm that your consuming plugin calls `PluginHelper::bootstrap()` during `init()`; that call registers the module, template root, translations, and Twig extensions.
 
-```bash title="PHP"
-cp vendor/lindemannrock/craft-plugin-base/src/config.php config/lindemannrock-base.php
-```
-
-Or with DDEV:
-
-```bash title="DDEV"
-ddev exec cp vendor/lindemannrock/craft-plugin-base/src/config.php config/lindemannrock-base.php
-```
-
-See [Configuration](configuration.md) for all available settings.
+See [Configuration](configuration.md) if the project needs global date/time, export-format, or date-range overrides.
 
 ## For plugin developers
 
@@ -58,3 +52,7 @@ If you are building a new LindemannRock plugin that depends on the base module, 
 ```
 
 Then call `PluginHelper::bootstrap()` in your plugin's `init()` method. See [Bootstrapping](../developers/bootstrapping.md) for a complete guide.
+
+## Quick start
+
+See [Quickstart](quickstart.md) for the shortest path from dependency installation to a rendered Base component.

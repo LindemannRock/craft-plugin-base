@@ -245,6 +245,21 @@ $prefix = PluginHelper::getCacheKeyPrefix('redirect-manager', 'device');
 $keySet = PluginHelper::getCacheKeySet('redirect-manager', 'device');
 ```
 
+These key helpers support legacy Redis implementations that enumerate plugin-owned keys. New disposable cache families should use [`ScopedCache`](scoped-cache.md), which isolates and invalidates values without key registries.
+
+## Application cache resolution @since(5.38.0)
+
+Use `getApplicationCacheOrLog()` when code needs Craft's exposed `CacheInterface` without assuming Redis or unwrapping a managed cache:
+
+```php
+$cache = PluginHelper::getApplicationCacheOrLog('my-plugin:statistics');
+if ($cache === null) {
+    return $this->recomputeStatistics();
+}
+```
+
+Resolution or type failures log once per request and context. Valid cache wrappers are accepted exactly as Craft exposes them. Pair this helper with [Disposable cache storage](disposable-cache-storage.md) and [ScopedCache](scoped-cache.md) for new recomputable cache families.
+
 ## Redis Cache Safeguard @since(5.23.0)
 
 When a plugin is configured to use Redis cache storage but Craft's underlying cache
@@ -302,4 +317,6 @@ PluginHelper::registerTranslations('my-plugin', '/path/to/translations', 'custom
 
 - [Bootstrapping](../developers/bootstrapping.md) — complete bootstrap integration guide
 - [ColorHelper](color-helper.md) — registering custom color sets
+- [Disposable cache storage](disposable-cache-storage.md) — resolve suitable cache storage across host types
+- [Scoped cache](scoped-cache.md) — finite-TTL cache values without shared-key enumeration
 - [SettingsDisplayNameTrait](settings-display-name.md) — custom plugin display names

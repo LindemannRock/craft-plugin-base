@@ -4,7 +4,7 @@ These Yii validators enforce the formatting rules that recur across plugin setti
 
 All three extend `yii\validators\Validator`, run only on non-empty values (empty passes — pair with `required` if a value is mandatory), and expose a `$translationCategory` (default `'app'`, so messages reuse Craft's core strings) you can point at your own plugin category.
 
-> Validating a filesystem **storage path** or an **asset volume** instead? See [Storage Path Validator](storage-path-validator.md).
+Validating a filesystem **storage path** or an **asset volume** instead? See [Storage Path Validator](storage-path-validator.md).
 
 ## RoutePrefixValidator
 

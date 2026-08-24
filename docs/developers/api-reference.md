@@ -187,6 +187,17 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `getCountryWithDialCode(string $code)` | `string` | Formatted name with dial code (e.g., `"Kuwait (+965)"`) |
 | `isPhoneNumberAllowed(string $phone, array $allowed)` | `bool` | Validate against allowed countries |
 
+### GeoLookup and GeoProvider
+
+`lindemannrock\base\geo\GeoLookup` and `lindemannrock\base\geo\GeoProvider`
+[Full docs](../feature-tour/geo-lookup.md)
+
+| Method | Returns | Description |
+|---|---|---|
+| `GeoLookup::lookup(string $ip)` | `array|null` | Resolve a public IP through the configured provider and normalize country, region, city, latitude, and longitude. |
+| `GeoProvider::getProvider(string $name)` | `array|null` | Return the built-in provider configuration. |
+| `GeoProvider::getProviderOptions()` | `array` | Return built-in provider labels for settings dropdowns. |
+
 ### PluginHelper
 
 `lindemannrock\base\helpers\PluginHelper`
@@ -207,6 +218,7 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `getCachePath(PluginInterface $plugin, string $type)` | `string` | Typed cache directory |
 | `getCacheKeyPrefix(string $handle, string $type)` | `string` | Cache key prefix |
 | `getCacheKeySet(string $handle, string $type)` | `string` | Redis key set name |
+| `getApplicationCacheOrLog(string $context)` @since(5.38.0) | `CacheInterface|null` | Resolve Craft's exposed application cache without unwrapping it; log resolution/type failures once per request and context |
 | `registerTranslations($plugin, ?string $path, ?string $cat)` | `void` | Register translation source |
 | `getIconSvg(PluginInterface $plugin)` | `?string` | Read the plugin's `src/icon.svg` (located by reflection) @since(5.27.0) |
 | `readIconSvg(string $srcDir)` | `?string` | Read `icon.svg` from a source dir — no plugin instance needed @since(5.27.0) |
@@ -223,6 +235,38 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 | `clearTrackedRedisKeys(string $pluginHandle, string $keyType, int $batchSize = 500)` | `int` | Clear cache entries tracked in a plugin-owned Redis set using `SSCAN` batches @since(5.31.0) |
 | `clearCacheFiles(string $directory, string $suffix = '.cache')` | `int` | Delete matching local cache files from a directory with `DirectoryIterator` @since(5.31.0) |
 | `countCacheFiles(string $directory, string $suffix = '.cache')` | `int` | Count matching local cache files in a directory with `DirectoryIterator` @since(5.31.0) |
+
+### Disposable cache storage @since(5.38.0)
+
+`lindemannrock\base\cache\`
+[Full docs](../feature-tour/disposable-cache-storage.md)
+
+| Class / method | Returns | Description |
+|---|---|---|
+| `CacheBackendStatus::fromCache(?CacheInterface $cache)` | `CacheBackendStatus` | Classify Craft's exposed cache component without inspecting wrapped layers. |
+| `CacheBackendStatus::supportsCrossRequest(bool $ephemeral)` | `bool` | Whether the component can support cross-request disposable data for the host lifecycle. |
+| `DisposableCacheStorageResolver::resolve(...)` | `DisposableCacheStorageDecision` | Resolve a configured file/application token to its effective backend. |
+| `DisposableCacheStorageResolver::applicationOptionToken(...)` | `string` | Preserve a compatible application token, otherwise return the preferred one. |
+| `DisposableCacheStorageDecision::usesApplicationCache()` | `bool` | Whether the decision carries an accepted application cache. |
+| `DisposableCacheStorageDecision::usesFileCache()` | `bool` | Whether consumer-owned file storage is effective. |
+| `DisposableCacheStorageDecision::isDisabled()` | `bool` | Whether callers must recompute instead of caching. |
+| `DisposableCacheStoragePresenter::present(...)` | `DisposableCacheStoragePresentation` | Map a decision to Base translation keys and semantic severities. |
+
+### ScopedCache @since(5.38.0)
+
+`lindemannrock\base\cache\ScopedCache`
+[Full docs](../feature-tour/scoped-cache.md)
+
+| Method | Returns | Description |
+|---|---|---|
+| `get(string|array $itemIdentity, string|array|null $scopeIdentity = null)` | `ScopedCacheResult` | Read one current-generation value as hit, miss, or failure. |
+| `set(string|array $itemIdentity, mixed $value, int $ttl, string|array|null $scopeIdentity = null)` | `bool` | Store a value with a finite positive TTL. |
+| `delete(string|array $itemIdentity, string|array|null $scopeIdentity = null)` | `bool` | Delete one exact current-generation value. |
+| `invalidateFamily()` | `bool` | Advance the family generation without enumerating shared keys. |
+| `invalidateScope(string|array $scopeIdentity)` | `bool` | Advance one scope generation. |
+| `status()` | `CacheBackendStatus` | Classify the injected backend. |
+
+`ScopedCacheResult` exposes `hit()`, `miss()`, `failure()`, `isHit()`, `isMiss()`, and `isFailure()` so a cached false/null value remains distinct from a miss or backend failure.
 
 ### JsonHelper
 
@@ -324,6 +368,8 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `resolve(string $path)` | `string` | Resolve environment variables and Craft aliases in a storage path value |
+| `parseEnv(string $path)` | `string` | Resolve environment variables while preserving Craft aliases for validation. |
+| `resolveParsed(string $path)` | `string` | Resolve a path after environment parsing and validation. |
 | `validatePath(string $path, array $options = [])` | `array` | Validate a raw storage path value without requiring a Yii model attribute |
 
 ### StoragePathValidator
@@ -346,8 +392,9 @@ Small helper for safely embedding JSON into inline HTML/JS contexts.
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `validateVolume(?string $volumeUid, array $options = [])` | `array` | Validate an optional asset volume UID for plugin-managed storage |
-| `displayPath(?string $volumeUid, string $subpath)` | `string|null` | Return a CP-friendly `Volume: Name / path` label |
+| `displayPath(?string $volumeUid, string $subpath)` | `string|null` | Return a CP-friendly `Volume: Name/path` label |
 | `localRootPath(?string $volumeUid)` | `string|null` | Return the resolved root path for local filesystems, or `null` for remote/non-local volumes |
+| `isLocalVolumeInsideWebroot(Volume $volume)` | `bool` | Whether a local volume's resolved root is inside Craft's public webroot. |
 
 ### StorageVolumeValidator
 
@@ -559,6 +606,21 @@ Exposes the manifest-backed `lindemannrock-base/help` and
 | `hasFeature(string $feature)` | `bool` | Check feature availability |
 | `getEditionFeatures(string $edition)` | `array` | Override for feature list |
 
+### DeviceDetection
+
+`lindemannrock\base\device\DeviceDetection`
+[Full docs](../feature-tour/device-detection.md)
+
+| Method | Returns | Description |
+|---|---|---|
+| `detect(?string $userAgent = null, array $overrideConfig = [])` | `array` | Return normalized device, client, bot, platform, language, and Client Hints data. |
+| `isMobileDevice(array $deviceInfo)` | `bool` | Check phone/tablet-style device types. |
+| `isTablet(array $deviceInfo)` | `bool` | Check the normalized tablet type. |
+| `isDesktop(array $deviceInfo)` | `bool` | Check the normalized desktop type. |
+| `isBot(array $deviceInfo)` | `bool` | Check the normalized robot flag. |
+| `detectLanguage(array $config = [])` | `string` | Resolve a supported language from request and Craft-site context. |
+| `toModel(array $data, string $class, array $map = [])` | `object` | Map normalized data to a consumer model. |
+
 ### DeviceDetectionTrait
 
 [Full docs](../feature-tour/device-detection.md) — User-agent parsing.
@@ -579,7 +641,7 @@ Exposes the manifest-backed `lindemannrock-base/help` and
 | `queueTtrSeconds()` | `int` | Override per job TTR in seconds (default `1800`) |
 | `getTtr()` | `int` | Returns queue TTR used by retryable jobs |
 
-> `getTtr()` is used by yii2-queue when the job implements `RetryableJobInterface`.
+`getTtr()` is used by yii2-queue when the job implements `RetryableJobInterface`.
 
 ### RecurringQueueHelper
 
@@ -588,7 +650,7 @@ Exposes the manifest-backed `lindemannrock-base/help` and
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `ensurePending(string $pluginToken, string $jobClass, int $delay, callable $jobFactory, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | `RecurringQueueResult` | Atomically ensure one pending recurring row exists, returning `created`, `existing`, `skipped`, or `lock-missed` status plus duplicate-collapse metadata. |
-| `deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | `int` | Delete pending rows for a recurring job identity. |
+| `deletePending(string $pluginToken, string $jobClass, array $extraLikeTokens = [], ?string $mutexName = null, int $mutexTimeout = 5)` | `int` | Under the schedule mutex, delete matching consumer rows and Base-owned deferred handoffs; throw when cancellation cannot acquire the lock. |
 | `hasPending(string $pluginToken, string $jobClass, array $extraLikeTokens = [])` | `bool` | Check whether a pending row exists for a recurring job identity. |
 
 ### RecurringQueueResult
@@ -600,6 +662,20 @@ Exposes the manifest-backed `lindemannrock-base/help` and
 | `$duplicatesDeleted` | `int` | Number of duplicate pending rows removed. |
 | `wasCreated()` | `bool` | Whether this call pushed a new queue row. |
 | `hasPending()` | `bool` | Whether the result has an existing or newly queued pending row. |
+| `missedLock()` | `bool` | Whether bootstrap could not acquire the recurring ownership lock. |
+| `wasSkipped()` | `bool` | Whether a nonpositive delay skipped scheduling. |
+
+### PortableQueueScheduler @since(5.38.0)
+
+`lindemannrock\base\queue\PortableQueueScheduler`
+[Full docs](../feature-tour/portable-queue-scheduler.md)
+
+| Method | Returns | Description |
+|---|---|---|
+| `push(JobInterface $job, int $delay, array $identityTokens, string $mutexName, int $mutexTimeout = 5, ?int $priority = null, ?int $ttr = null, ?Queue $queue = null)` | `string|null` | Schedule a relative delay, using bounded SQS handoffs only when required. |
+| `pushAt(JobInterface $job, int $targetTimestamp, array $identityTokens, string $mutexName, int $mutexTimeout = 5, ?int $priority = null, ?int $ttr = null, ?Queue $queue = null)` | `string|null` | Schedule for an absolute Unix timestamp preserved across handoffs. |
+
+`DeferredQueueJob` is Base's serialized handoff carrier. Consumers should schedule through `PortableQueueScheduler`, not construct the handoff or call its runtime continuation method directly.
 
 ### GeoLookupTrait
 

@@ -26,7 +26,6 @@ class AnalyticsService extends Component
             'pluginHandle' => MyPlugin::$plugin->id,
             'cachePath' => PluginHelper::getCachePath(MyPlugin::$plugin, 'device'),
             'cacheKeyPrefix' => PluginHelper::getCacheKeyPrefix('my-plugin', 'device'),
-            'cacheKeySet' => PluginHelper::getCacheKeySet('my-plugin', 'device'),
             'includeLanguage' => true,
             'includePlatform' => true,
         ];
@@ -39,17 +38,28 @@ class AnalyticsService extends Component
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `cacheEnabled` | `bool` | `false` | Enable detection result caching |
-| `cacheStorageMethod` | `string` | `'file'` | Cache storage: `'file'` or `'redis'` |
+| `cacheStorageMethod` | `string` | `'file'` | Cache storage token: `'file'`, `'redis'`, or `'craft'`; File automatically uses a suitable application cache on ephemeral hosts |
 | `cacheDuration` | `int` | `3600` | Cache TTL in seconds |
 | `pluginHandle` | `string` | `'lindemannrock-base'` | Plugin context used for Redis cache-component warning logs |
 | `cachePath` | `string` | `''` | File cache directory path |
 | `cacheKeyPrefix` | `string` | `''` | Cache key prefix |
-| `cacheKeySet` | `string` | `''` | Redis key set name |
 | `includeLanguage` | `bool` | `false` | Include browser language detection |
 | `includePlatform` | `bool` | `false` | Include detailed platform info |
 | `includeClientHints` | `bool` | `true` | Read browser Client Hints from the current request and pass them to Matomo Device Detector |
 | `clientHints` | `array\|ClientHints` | `null` | Explicit Client Hints for non-request contexts or tests |
 | `systemAgents` | `array` | Includes `CacheManager/1.0` | First-party service agents to classify separately from human and external bot traffic |
+
+## Portable cache behavior @since(5.38.0)
+
+Device detection uses Base's application-cache contract rather than raw Redis commands or a Redis key registry:
+
+- `redis` and `craft` both select Craft's exposed application cache.
+- `file` uses the configured `cachePath` on durable hosts.
+- `file` automatically switches to a suitable application cache when `App::isEphemeral()` is true and never touches the local cache path there.
+- Application-cache values use [`ScopedCache`](scoped-cache.md) with the consumer plugin handle and the `device` family.
+- Missing, unsuitable, malformed, or failing cache backends degrade to recomputation.
+
+Use a positive `cacheDuration` for application-cache writes. `cacheKeyPrefix` remains part of the hashed device identity for compatibility, but `cacheKeySet` is no longer consumed.
 
 ## Detecting Device Info
 
@@ -183,7 +193,23 @@ $model = $this->buildDeviceModel($data, MyDeviceInfo::class, [
 ]);
 ```
 
+## Direct class API
+
+Most consumers use `DeviceDetectionTrait`, but `lindemannrock\base\device\DeviceDetection` is also public:
+
+| Method | Purpose |
+|---|---|
+| `detect(?string $userAgent = null, array $overrideConfig = [])` | Return normalized device, client, bot, platform, language, and Client Hints data. |
+| `isMobileDevice(array $deviceInfo)` | Check phone/tablet-style device types. |
+| `isTablet(array $deviceInfo)` | Check the normalized tablet type. |
+| `isDesktop(array $deviceInfo)` | Check the normalized desktop type. |
+| `isBot(array $deviceInfo)` | Check the normalized robot flag. |
+| `detectLanguage(array $config = [])` | Resolve a supported language from query, browser, optional IP mapping, and Craft site fallbacks. |
+| `toModel(array $data, string $class, array $map = [])` | Map normalized data to a consumer model. |
+
 ## Next Steps
 
 - [PluginHelper](plugin-helper.md) — cache path helpers for device detection storage
+- [Disposable cache storage](disposable-cache-storage.md) — choose and present effective cache storage
+- [Scoped cache](scoped-cache.md) — application-cache isolation and invalidation
 - [GeoLookupTrait](geo-lookup.md) — IP geolocation (often used alongside device detection)

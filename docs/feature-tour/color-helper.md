@@ -95,7 +95,8 @@ In Twig:
 | `healthStatus` | ok, low, high | Health checks |
 | `backupReason` | import, restore, manual, scheduled, clean, clear, maintenance, other | Backup reasons |
 
-> **Note:** Some color sets include a `dot` key (e.g., `status`, `pluginStatus`, `messageStatus`, `healthStatus`). The `dot` key maps to Craft's built-in status dot CSS classes (`enabled`, `disabled`, `pending`, `off`, `on`). Palette colors returned by `getPaletteColor()` do not include `dot`.
+> [!NOTE]
+> Some color sets include a `dot` key (e.g., `status`, `pluginStatus`, `messageStatus`, `healthStatus`). The `dot` key maps to Craft's built-in status dot CSS classes (`enabled`, `disabled`, `pending`, `off`, `on`). Palette colors returned by `getPaletteColor()` do not include `dot`.
 
 ## Registering Custom Color Sets
 

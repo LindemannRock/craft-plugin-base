@@ -67,7 +67,7 @@ $geoData = $this->lookupGeoIp($ip, [
 |----------|-----------|----------|-------|
 | `ip-api.com` | 45 requests/min | HTTP (free), HTTPS (with API key) | Default provider |
 | `ipapi.co` | 1,000 requests/day | HTTPS | No API key required for free tier |
-| `ipinfo.io` | 50,000 requests/month | HTTPS | Requires free API key |
+| `ipinfo.io` | 50,000 requests/month | HTTPS | Base can call it without a key; pass `apiKey` when your account or tier requires a token |
 
 ## Typical Usage
 
@@ -89,6 +89,26 @@ class AnalyticsService extends Component
     }
 }
 ```
+
+## Direct class API
+
+The trait delegates to two public classes:
+
+```php
+use lindemannrock\base\geo\GeoLookup;
+use lindemannrock\base\geo\GeoProvider;
+
+$lookup = new GeoLookup([
+    'provider' => 'ipapi.co',
+    'apiKey' => null,
+    'timeout' => 2,
+]);
+
+$geoData = $lookup->lookup('8.8.8.8');
+$providerOptions = GeoProvider::getProviderOptions();
+```
+
+`GeoProvider::getProvider($name)` returns the built-in URL, field mapping, rate-limit label, and response markers for one provider, or `null` for an unknown name.
 
 ## Next Steps
 

@@ -1125,6 +1125,30 @@ Use `.lr-setup-task__list` for a compact semantic list of findings or status det
 
 ---
 
+## Cache storage status @since(5.38.0)
+
+Render the effective disposable-cache backend as a semantic Base-owned info box.
+
+**Path:** `lindemannrock-base/_components/cache-storage-status`
+
+```twig
+{% include 'lindemannrock-base/_components/cache-storage-status' with {
+    presentation: cacheStoragePresentation,
+    filePath: cacheStoragePath,
+    additionalExplanations: [
+        'Statistics are rebuilt after expiry.'|t('my-plugin'),
+    ],
+} only %}
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `presentation` | `DisposableCacheStoragePresentation` | Required semantic heading, explanation keys, severity, and path eligibility from Base's presenter. |
+| `filePath` | `string|null` | Consumer-owned path, rendered only when the presentation marks it eligible. |
+| `additionalExplanations` | `string[]` | Already-translated consumer messages appended after Base-owned explanations. |
+
+The component contains no storage-routing logic, IDs, or JavaScript, so it can be rendered more than once on a page. Paths and additional explanations remain escaped. See [Disposable cache storage](../feature-tour/disposable-cache-storage.md) for the resolver and presenter contract.
+
 ## Next Steps
 
 - [CP Table Layout](cp-table-layout.md) — uses filters, badges, row-actions, search, and export-menu

@@ -1,6 +1,6 @@
 # ScheduleHelper @since(5.25.0)
 
-Preset scheduling for recurring queue jobs. Maps a schedule identifier (`'daily2am'`, `'weekly'`, etc.) to its next-run `DateTime` using fixed time slots, so successive runs don't drift. Returns delay-in-seconds for `Craft::$app->getQueue()->delay(...)`. Supplies labeled dropdown options for settings UIs and value allowlists for validation rules.
+Preset scheduling for recurring queue jobs. Maps a schedule identifier (`'daily2am'`, `'weekly'`, etc.) to its next-run `DateTime` using fixed time slots, so successive runs don't drift. Returns delay-in-seconds for Base's recurring and portable queue helpers. Supplies labeled dropdown options for settings UIs and value allowlists for validation rules.
 
 Use this for any plugin that needs a user-configurable recurring job (analytics cleanup, scheduled exports, usage rechecks, scheduled backups, etc.).
 
@@ -110,7 +110,7 @@ $delay = ScheduleHelper::calculateDelaySeconds('daily2am');
 // 41946 (or however many seconds until next 2am Riyadh)
 
 // Use RecurringQueueHelper for bootstrap/settings-change queue ownership.
-// Use direct queue push only from the job's execute-time self-reschedule path.
+// Use PortableQueueScheduler from the job's execute-time self-reschedule path.
 ```
 
 ## Typical Job + Bootstrap Pattern
@@ -174,11 +174,14 @@ return $this->renderTemplate('my-plugin/settings/scheduling', [
 ```php
 use lindemannrock\base\helpers\DateFormatHelper;
 use lindemannrock\base\helpers\ScheduleHelper;
+use lindemannrock\base\queue\PortableQueueScheduler;
 use lindemannrock\base\traits\QueueTtrTrait;
 
 class MyScheduledJob extends BaseJob implements RetryableJobInterface
 {
     use QueueTtrTrait;
+
+    public const SCHEDULE_MUTEX = 'my-plugin:my-scheduled-job';
 
     public bool $reschedule = false;
     public ?string $nextRunTime = null;
@@ -249,16 +252,21 @@ class MyScheduledJob extends BaseJob implements RetryableJobInterface
             return;
         }
 
-        Craft::$app->getQueue()->delay($delay)->push(new self([
-            'reschedule' => true,
-            'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
-                $next,
-                $settings,
-                null,
-                false,
-                pluginHandle: 'my-plugin',
-            ),
-        ]));
+        PortableQueueScheduler::push(
+            job: new self([
+                'reschedule' => true,
+                'nextRunTime' => DateFormatHelper::formatCompactDatetimeFromSettings(
+                    $next,
+                    $settings,
+                    null,
+                    false,
+                    pluginHandle: 'my-plugin',
+                ),
+            ]),
+            delay: $delay,
+            identityTokens: ['myplugin', self::class],
+            mutexName: self::SCHEDULE_MUTEX,
+        );
     }
 }
 ```
@@ -308,6 +316,7 @@ private function scheduleMyJob(): void
                 pluginHandle: 'my-plugin',
             ),
         ]),
+        mutexName: MyScheduledJob::SCHEDULE_MUTEX,
     );
 }
 ```
@@ -333,6 +342,7 @@ public function handleMyScheduleChange(Settings $settings): void
     RecurringQueueHelper::deletePending(
         pluginToken: 'myplugin',
         jobClass: MyScheduledJob::class,
+        mutexName: MyScheduledJob::SCHEDULE_MUTEX,
     );
 
     if (!$settings->enableMyScheduledJob || $settings->myJobSchedule === 'disabled') {
@@ -353,7 +363,7 @@ These are the common failure modes to avoid when wiring a recurring queue job to
 | Using `date('M j, g:ia', time() + $delay)` for the display string | Display in wrong TZ; baked into serialized payload, so old jobs keep stale string until re-push | `DateFormatHelper::formatCompactDatetimeFromSettings($next, $settings, null, false, pluginHandle: 'my-plugin')` |
 | Plain check-then-push dedup in bootstrap | Concurrent deploy/bootstrap requests can all pass the empty check and push duplicate delayed rows | `RecurringQueueHelper::ensurePending()` |
 | Cache-flag dedup in bootstrap | Manual "Release All Jobs" deletes the row but cache still says "scheduled" — job stays gone for hours | `RecurringQueueHelper::ensurePending()` |
-| Self-reschedule LIKE-checks the queue | False-matches the still-reserved row of the currently-executing job, kills the reschedule silently | Just push from inside `execute()`'s reschedule path; no dedup needed |
+| Self-reschedule LIKE-checks the queue | False-matches the still-reserved row of the currently-executing job, kills the reschedule silently | Call `PortableQueueScheduler::push()` from inside `execute()`; no dedup needed |
 | `handleScheduleChange()` early-returns when a job exists | User changes schedule, but the previously-queued job still fires on the OLD delay | Always `delete()` then `push()` — never short-circuit |
 | Settings cache reset AFTER the change handler | Job's `init()` reads `getSettings()` from stale cache, generates display string for the OLD schedule | Reset (`$plugin->setSettings([])`) BEFORE calling the handler |
 | Settings field not in `_validationAttributesForSection()` | `saveToDatabase()` doesn't persist the new value; dropdown reverts on next visit | Add the field name to the section's allowlist in the controller |
@@ -362,4 +372,5 @@ These are the common failure modes to avoid when wiring a recurring queue job to
 
 - [DateFormatHelper](date-format-helper.md) — TZ-aware "now" + display formatting (used internally by `ScheduleHelper`)
 - [RecurringQueueHelper](recurring-queue-helper.md) — deployment-safe ownership for recurring queue rows
+- [PortableQueueScheduler](portable-queue-scheduler.md) — preserve long target delays across bounded SQS handoffs
 - [QueueTtrTrait](queue-ttr.md) — shared queue TTR for jobs

@@ -2,6 +2,18 @@
 
 LindemannRock Base is configured through a single config file at `config/lindemannrock-base.php`. These settings control date/time formatting, export formats, and default date ranges across all LindemannRock plugins.
 
+## Copy the config file
+
+Copy the shipped template only when the project needs global overrides:
+
+```bash title="PHP"
+cp vendor/lindemannrock/craft-plugin-base/src/config.php config/lindemannrock-base.php
+```
+
+```bash title="DDEV"
+ddev exec cp vendor/lindemannrock/craft-plugin-base/src/config.php config/lindemannrock-base.php
+```
+
 ## Config File
 
 Create `config/lindemannrock-base.php` in your project:

@@ -3,16 +3,14 @@
 Plugin-level console help gives operators a predictable discovery command:
 
 ```bash title="PHP"
-php craft my-plugin/help
-php craft my-plugin/help maintenance/clean-by-type
+php craft my-plugin/help [command]
 ```
 
 ```bash title="DDEV"
-ddev craft my-plugin/help
-ddev craft my-plugin/help maintenance/clean-by-type
+ddev craft my-plugin/help [command]
 ```
 
-Craft/Yii already support exact-command help with `php craft help my-plugin/group/action`, but users need to know the exact group and action first. The base console help pattern fills that gap with a concise plugin catalog and focused command pages.
+Omit `[command]` for the catalog, or pass a path such as `maintenance/clean-by-type` for focused help. Craft/Yii already support exact-command help with `php craft help my-plugin/group/action`, but users need to know the exact group and action first. The base console help pattern fills that gap with a concise plugin catalog and focused command pages.
 
 ## Controller
 
