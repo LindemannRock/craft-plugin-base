@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.38.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.38.0...v5.38.1) - 2026-08-25
+
+
+### Fixed
+
+* **helpers:** preserve historical timezone grouping ([d680e97](https://github.com/LindemannRock/craft-plugin-base/commit/d680e97eefc3649f25535ea1f1e5c3f2e1a372e4))
+
 ## [5.38.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.37.0...v5.38.0) - 2026-08-25
 
 
