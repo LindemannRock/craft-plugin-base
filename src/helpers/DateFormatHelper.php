@@ -12,6 +12,10 @@ use Craft;
 use craft\base\PluginInterface;
 use DateTime;
 use DateTimeZone;
+use Throwable;
+use WeakMap;
+use yii\base\InvalidConfigException;
+use yii\db\Connection;
 use yii\db\Expression;
 
 /**
@@ -59,6 +63,11 @@ class DateFormatHelper
      * @var array<string, array> Cached configuration keyed by plugin handle (or '__base__' for no-plugin context).
      */
     private static array $configCache = [];
+
+    /**
+     * @var WeakMap<Connection, array<string, bool>>|null MySQL named-timezone support by connection and timezone.
+     */
+    private static ?WeakMap $mysqlNamedTimezoneSupport = null;
 
     /**
      * Keys that per-plugin config or DB settings may override on top of base config.
@@ -308,24 +317,12 @@ class DateFormatHelper
      *
      * @param string $column The UTC datetime column name (e.g. 'dateCreated')
      * @return Expression
+     * @throws InvalidConfigException when MySQL cannot provide accurate named-timezone conversion
      * @since 5.15.0
      */
     public static function localDateExpression(string $column): Expression
     {
-        $offset = self::getCraftTimezoneOffset();
-
-        if (Craft::$app->getDb()->getIsMysql()) {
-            return new Expression(
-                "DATE(CONVERT_TZ([[$column]], '+00:00', :tzOffset))",
-                [':tzOffset' => $offset],
-            );
-        }
-
-        // PostgreSQL
-        return new Expression(
-            "DATE([[$column]] AT TIME ZONE 'UTC' AT TIME ZONE :tzOffset)",
-            [':tzOffset' => $offset],
-        );
+        return self::localGroupingExpression($column, true);
     }
 
     /**
@@ -343,24 +340,109 @@ class DateFormatHelper
      *
      * @param string $column The UTC datetime column name (e.g. 'dateCreated')
      * @return Expression
+     * @throws InvalidConfigException when MySQL cannot provide accurate named-timezone conversion
      * @since 5.15.0
      */
     public static function localHourExpression(string $column): Expression
     {
-        $offset = self::getCraftTimezoneOffset();
+        return self::localGroupingExpression($column, false);
+    }
 
-        if (Craft::$app->getDb()->getIsMysql()) {
-            return new Expression(
-                "HOUR(CONVERT_TZ([[$column]], '+00:00', :tzOffset))",
-                [':tzOffset' => $offset],
-            );
+    /**
+     * Build the shared SQL expression for local calendar-date or hour grouping.
+     */
+    private static function localGroupingExpression(string $column, bool $date): Expression
+    {
+        $db = Craft::$app->getDb();
+        $timezone = self::sqlGroupingTimezone();
+
+        if ($db->getIsMysql()) {
+            if ($timezone['fixedOffset'] === null) {
+                self::requireMysqlNamedTimezone($db, $timezone['name']);
+            }
+
+            $parameter = $timezone['fixedOffset'] ?? $timezone['name'];
+            $converted = "CONVERT_TZ([[$column]], '+00:00', :timezone)";
+        } elseif ($timezone['fixedOffset'] !== null) {
+            $parameter = $timezone['fixedOffset'];
+            $converted = "([[$column]] + CAST(:timezone AS interval))";
+        } else {
+            $parameter = $timezone['name'];
+            $converted = "([[$column]] AT TIME ZONE 'UTC' AT TIME ZONE :timezone)";
         }
 
-        // PostgreSQL
-        return new Expression(
-            "EXTRACT(HOUR FROM [[$column]] AT TIME ZONE 'UTC' AT TIME ZONE :tzOffset)",
-            [':tzOffset' => $offset],
-        );
+        $expression = $date
+            ? "DATE($converted)"
+            : ($db->getIsMysql() ? "HOUR($converted)" : "EXTRACT(HOUR FROM $converted)");
+
+        return new Expression($expression, [':timezone' => $parameter]);
+    }
+
+    /**
+     * Resolve Craft's timezone as either a named zone or a true fixed offset.
+     *
+     * @return array{name: string, fixedOffset: string|null}
+     */
+    private static function sqlGroupingTimezone(): array
+    {
+        $name = Craft::$app->getTimeZone();
+        $timezone = new DateTimeZone($name);
+
+        $isFixed = $timezone->getLocation() === false
+            || $name === 'UTC'
+            || preg_match('/^Etc\/GMT(?:[+\-]\d{1,2})?$/', $name) === 1;
+
+        if (!$isFixed) {
+            return ['name' => $name, 'fixedOffset' => null];
+        }
+
+        $offset = $timezone->getOffset(new DateTime('@0'));
+        $sign = $offset < 0 ? '-' : '+';
+        $offset = abs($offset);
+
+        return [
+            'name' => $name,
+            'fixedOffset' => sprintf('%s%02d:%02d', $sign, intdiv($offset, 3600), intdiv($offset % 3600, 60)),
+        ];
+    }
+
+    /**
+     * Fail before building an inaccurate MySQL grouping expression when the
+     * server has no named-timezone data. The result is cached for the current
+     * connection, so date and hour expressions share one capability probe.
+     */
+    private static function requireMysqlNamedTimezone(Connection $db, string $timezone): void
+    {
+        self::$mysqlNamedTimezoneSupport ??= new WeakMap();
+        $connectionSupport = self::$mysqlNamedTimezoneSupport[$db] ?? [];
+
+        if (!array_key_exists($timezone, $connectionSupport)) {
+            try {
+                $converted = $db->createCommand(
+                    "SELECT CONVERT_TZ(:utcInstant, '+00:00', :timezone)",
+                    [
+                        ':utcInstant' => '2000-01-01 00:00:00',
+                        ':timezone' => $timezone,
+                    ],
+                )->queryScalar();
+            } catch (Throwable $exception) {
+                throw new InvalidConfigException(
+                    "Unable to verify MySQL named-timezone support for '$timezone'.",
+                    0,
+                    $exception,
+                );
+            }
+
+            $connectionSupport[$timezone] = $converted !== null && $converted !== false;
+            self::$mysqlNamedTimezoneSupport[$db] = $connectionSupport;
+        }
+
+        if (!$connectionSupport[$timezone]) {
+            throw new InvalidConfigException(
+                "Accurate local analytics grouping for '$timezone' requires MySQL timezone tables. "
+                . 'Load the MySQL timezone data or configure Craft with a true fixed timezone identifier.',
+            );
+        }
     }
 
     /**

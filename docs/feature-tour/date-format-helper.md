@@ -204,6 +204,8 @@ Clearing one handle leaves the global and other handle-specific entries intact. 
 
 DB-agnostic timezone-aware SQL expressions for grouping queries by date or hour. These generate the correct SQL for both MySQL and PostgreSQL, using bound parameters to prevent SQL injection.
 
+Named zones such as `America/Los_Angeles` are applied to each timestamp being grouped. Historical rows therefore use the offset that was active at that instant, including daylight-saving transitions, instead of reusing today's offset. Fixed timezone identifiers such as `UTC`, `CET`, `EST`, and `Etc/GMT-4` use their numeric offset directly.
+
 ### localDateExpression() @since(5.15.0)
 
 Groups by calendar date in the site's timezone.
@@ -215,8 +217,10 @@ $query->select(['date' => $localDate, 'COUNT(*) as count'])
 ```
 
 Generates:
-- **MySQL:** `DATE(CONVERT_TZ(dateCreated, '+00:00', '+03:00'))`
-- **PostgreSQL:** `DATE(dateCreated AT TIME ZONE 'UTC' AT TIME ZONE '+03:00')`
+- **MySQL named zone:** `DATE(CONVERT_TZ(dateCreated, '+00:00', :timezone))`
+- **PostgreSQL named zone:** `DATE(dateCreated AT TIME ZONE 'UTC' AT TIME ZONE :timezone)`
+
+The timezone value remains a bound parameter. Pass a bare or qualified column name; for example, both `dateCreated` and `analytics.dateCreated` are supported.
 
 ### localHourExpression() @since(5.15.0)
 
@@ -228,6 +232,19 @@ $query->select(['hour' => $localHour, 'COUNT(*) as count'])
       ->groupBy($localHour);
 ```
 
+Use these expressions only for the selected/grouped bucket. Keep UTC range filters on the original timestamp column so the database can continue using range indexes:
+
+```php
+$query->andWhere(['>=', 'dateCreated', $utcStart])
+      ->andWhere(['<', 'dateCreated', $utcEnd]);
+```
+
+### MySQL timezone data
+
+MySQL must have its timezone tables populated before named-zone grouping can be accurate. Base checks each named zone once per database connection and reuses that result for both date and hour expressions. If MySQL cannot convert the named zone, the helper throws `yii\base\InvalidConfigException` before the analytics query is built. It does not return `NULL` chart groups or fall back to today's offset.
+
+`UTC` and true fixed timezone identifiers do not require MySQL timezone tables. Configure a fixed zone only when the site intentionally uses a constant offset; it is not a daylight-saving substitute for a named regional zone. See [Troubleshooting](../resources/troubleshooting.md#analytics-grouping-requires-mysql-timezone-data) if a named-zone expression is rejected.
+
 ### getCraftTimezoneOffset() @since(5.15.0)
 
 Returns the site's timezone offset in `±HH:MM` format.
@@ -235,6 +252,8 @@ Returns the site's timezone offset in `±HH:MM` format.
 ```php
 $offset = DateFormatHelper::getCraftTimezoneOffset();  // "+03:00" or "-05:00"
 ```
+
+This remains the offset at the time the method is called. It is useful when a caller explicitly needs the current offset, but the date/hour SQL grouping methods use the configured timezone's historical rules instead.
 
 ## Utility Methods
 

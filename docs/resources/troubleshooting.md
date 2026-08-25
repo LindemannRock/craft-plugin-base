@@ -98,6 +98,22 @@ In Twig:
 
 ---
 
+## Analytics grouping requires MySQL timezone data
+
+**Symptom:** An analytics query using `DateFormatHelper::localDateExpression()` or `localHourExpression()` throws an `InvalidConfigException` saying the configured named timezone requires MySQL timezone tables.
+
+**Cause:** MySQL cannot apply a named zone such as `America/Los_Angeles` unless its timezone tables are populated. Continuing would otherwise produce `NULL` groups or group historical rows with the wrong daylight-saving offset.
+
+**Fix:** Ask the database administrator or hosting provider to populate MySQL's timezone tables, then retry the request. You can verify the server with a constant-only query:
+
+```sql
+SELECT CONVERT_TZ('2026-01-01 00:00:00', '+00:00', 'America/Los_Angeles');
+```
+
+A non-`NULL` result confirms that MySQL recognizes the zone. A fixed timezone identifier does not need named-zone data, but use one only when the site intentionally has a constant UTC offset; it is not a safe fallback for a region that observes daylight saving time.
+
+---
+
 ## Saved Plugin Date Formats Are Ignored During Bootstrap
 
 **Symptom:** A plugin uses the global date/time format during startup and continues using it later in the same request, even though the plugin has saved format overrides.

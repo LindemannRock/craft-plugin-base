@@ -127,9 +127,11 @@ Display `$style` accepts `cascade` (default), `short`, `medium`, or `long`. `cas
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `localDateExpression(string $column)` | `Expression` | DB-agnostic timezone date expression |
-| `localHourExpression(string $column)` | `Expression` | DB-agnostic timezone hour expression |
-| `getCraftTimezoneOffset()` | `string` | Timezone offset string (e.g., `'+02:00'`) |
+| `localDateExpression(string $column)` | `Expression` | Local calendar-date expression using the configured timezone's rules for each UTC timestamp |
+| `localHourExpression(string $column)` | `Expression` | Local hour expression using the configured timezone's rules for each UTC timestamp |
+| `getCraftTimezoneOffset()` | `string` | Current timezone offset string (e.g., `'+02:00'`); independent of historical SQL grouping |
+
+Both expression methods bind the timezone parameter and accept bare or qualified column names. Named zones are daylight-saving aware on MySQL and PostgreSQL. MySQL named-zone use requires populated timezone tables; Base caches the capability result per connection and throws `yii\base\InvalidConfigException` when accurate conversion is unavailable. It never substitutes the current offset. UTC and true fixed timezone identifiers do not require named-zone tables.
 
 ### DateRangeHelper
 

@@ -13,6 +13,9 @@ namespace lindemannrock\base\tests\Integration;
 use Craft;
 use craft\base\Model;
 use craft\base\PluginInterface;
+use craft\db\Command;
+use craft\db\Connection;
+use craft\db\Query;
 use craft\services\Config;
 use craft\services\Plugins;
 use DateTime;
@@ -21,6 +24,8 @@ use lindemannrock\base\helpers\DateFormatHelper;
 use lindemannrock\base\testing\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
+use RuntimeException;
+use yii\base\InvalidConfigException;
 use yii\db\Expression;
 
 /**
@@ -63,6 +68,44 @@ final class DateFormatHelperTest extends IntegrationTestCase
     {
         $cache = new ReflectionClass(DateFormatHelper::class);
         return $cache->getProperty('configCache')->getValue();
+    }
+
+    /**
+     * Evaluate Base's supported local grouping expressions against a UTC instant.
+     *
+     * @return array{date: string|null, hour: int|null}
+     */
+    private function evaluateLocalBuckets(string $timezone, ?string $utcInstant, bool $qualified = true): array
+    {
+        $originalTimezone = Craft::$app->getTimeZone();
+        Craft::$app->setTimeZone($timezone);
+
+        try {
+            $timestampType = Craft::$app->getDb()->getIsMysql() ? 'DATETIME' : 'timestamp';
+            $source = (new Query())->select([
+                'occurredAt' => new Expression(
+                    "CAST(:utcInstant AS $timestampType)",
+                    [':utcInstant' => $utcInstant],
+                ),
+            ]);
+            $column = $qualified ? 'timezone_sample.occurredAt' : 'occurredAt';
+            $row = (new Query())
+                ->select([
+                    'date' => DateFormatHelper::localDateExpression($column),
+                    'hour' => DateFormatHelper::localHourExpression($column),
+                ])
+                ->from(['timezone_sample' => $source])
+                ->one();
+
+            self::assertIsArray($row);
+
+            return [
+                'date' => $row['date'] === null ? null : (string) $row['date'],
+                'hour' => $row['hour'] === null ? null : (int) $row['hour'],
+            ];
+        } finally {
+            Craft::$app->setTimeZone($originalTimezone);
+        }
     }
 
     /**
@@ -236,26 +279,22 @@ final class DateFormatHelperTest extends IntegrationTestCase
         });
     }
 
-    public function testLocalDateExpressionParameterizesTimezoneOffsetAgainstSqlInjection(): void
+    public function testLocalDateExpressionParameterizesTimezoneAgainstSqlInjection(): void
     {
         $expr = DateFormatHelper::localDateExpression('dateCreated');
 
         self::assertInstanceOf(Expression::class, $expr);
 
-        // The injection-fix contract: the timezone offset is bound as
-        // `:tzOffset`, never interpolated into the SQL string. If a future
+        // The injection-fix contract: the timezone is bound as
+        // `:timezone`, never interpolated into the SQL string. If a future
         // refactor regresses to string interpolation this assertion fires.
-        self::assertStringContainsString(':tzOffset', $expr->expression);
-        self::assertArrayHasKey(':tzOffset', $expr->params);
-        self::assertMatchesRegularExpression(
-            '/^[+\-]\d{2}:\d{2}$/',
-            (string) $expr->params[':tzOffset'],
-            'tzOffset must be in ±HH:MM format'
-        );
+        self::assertStringContainsString(':timezone', $expr->expression);
+        self::assertArrayHasKey(':timezone', $expr->params);
+        self::assertSame(Craft::$app->getTimeZone(), $expr->params[':timezone']);
 
-        // The actual offset string must NOT appear inline in the SQL.
-        $offset = (string) $expr->params[':tzOffset'];
-        self::assertStringNotContainsString("'$offset'", $expr->expression);
+        // The actual timezone must NOT appear inline in the SQL.
+        $timezone = (string) $expr->params[':timezone'];
+        self::assertStringNotContainsString("'$timezone'", $expr->expression);
 
         // Driver-appropriate dialect.
         if (Craft::$app->getDb()->getIsMysql()) {
@@ -264,6 +303,256 @@ final class DateFormatHelperTest extends IntegrationTestCase
         } else {
             self::assertStringContainsString('AT TIME ZONE', $expr->expression);
         }
+    }
+
+    public function testLocalDateGroupingUsesHistoricalNamedTimezoneOffset(): void
+    {
+        $buckets = $this->evaluateLocalBuckets('America/Los_Angeles', '2026-01-01 07:30:00');
+
+        self::assertSame('2025-12-31', $buckets['date']);
+    }
+
+    public function testLocalHourGroupingUsesHistoricalNamedTimezoneOffset(): void
+    {
+        $buckets = $this->evaluateLocalBuckets('America/Los_Angeles', '2026-01-01 07:30:00');
+
+        self::assertSame(23, $buckets['hour']);
+    }
+
+    public function testCraftTimezoneOffsetRetainsItsCurrentOffsetContract(): void
+    {
+        $originalTimezone = Craft::$app->getTimeZone();
+        Craft::$app->setTimeZone('America/Los_Angeles');
+
+        try {
+            $expected = (new DateTime('now', new DateTimeZone('America/Los_Angeles')))->format('P');
+            self::assertSame($expected, DateFormatHelper::getCraftTimezoneOffset());
+        } finally {
+            Craft::$app->setTimeZone($originalTimezone);
+        }
+    }
+
+    /**
+     * @param string|null $expectedDate
+     * @param int|null $expectedHour
+     */
+    #[DataProvider('localGroupingCases')]
+    public function testLocalGroupingMatrix(
+        string $timezone,
+        ?string $utcInstant,
+        ?string $expectedDate,
+        ?int $expectedHour,
+    ): void {
+        $buckets = $this->evaluateLocalBuckets($timezone, $utcInstant);
+
+        self::assertSame($expectedDate, $buckets['date']);
+        self::assertSame($expectedHour, $buckets['hour']);
+    }
+
+    /**
+     * @return iterable<string, array{string, string|null, string|null, int|null}>
+     */
+    public static function localGroupingCases(): iterable
+    {
+        yield 'UTC' => ['UTC', '2026-01-01 00:15:00', '2026-01-01', 0];
+        yield 'positive fixed offset at local midnight' => ['Etc/GMT-4', '2026-01-01 20:00:00', '2026-01-02', 0];
+        yield 'negative fixed offset across midnight' => ['EST', '2026-01-01 04:45:00', '2025-12-31', 23];
+        yield 'positive fractional offset' => ['Asia/Kathmandu', '2026-01-01 18:30:00', '2026-01-02', 0];
+        yield 'negative fractional offset' => ['America/St_Johns', '2026-01-01 02:45:00', '2025-12-31', 23];
+        yield 'northern DST start before skipped hour' => ['America/Los_Angeles', '2026-03-08 09:30:00', '2026-03-08', 1];
+        yield 'northern DST start after skipped hour' => ['America/Los_Angeles', '2026-03-08 10:30:00', '2026-03-08', 3];
+        yield 'northern DST end first repeated hour' => ['America/Los_Angeles', '2026-11-01 08:30:00', '2026-11-01', 1];
+        yield 'northern DST end second repeated hour' => ['America/Los_Angeles', '2026-11-01 09:30:00', '2026-11-01', 1];
+        yield 'southern DST end first repeated hour' => ['Australia/Sydney', '2026-04-04 15:30:00', '2026-04-05', 2];
+        yield 'southern DST end second repeated hour' => ['Australia/Sydney', '2026-04-04 16:30:00', '2026-04-05', 2];
+        yield 'southern DST start before skipped hour' => ['Australia/Sydney', '2026-10-03 15:30:00', '2026-10-04', 1];
+        yield 'southern DST start after skipped hour' => ['Australia/Sydney', '2026-10-03 16:30:00', '2026-10-04', 3];
+        yield 'null timestamp' => ['America/Los_Angeles', null, null, null];
+    }
+
+    public function testLocalGroupingSupportsBareAndQualifiedColumns(): void
+    {
+        $qualified = $this->evaluateLocalBuckets('America/Los_Angeles', '2026-01-01 07:30:00');
+        $bare = $this->evaluateLocalBuckets('America/Los_Angeles', '2026-01-01 07:30:00', false);
+
+        self::assertSame($qualified, $bare);
+    }
+
+    public function testNamedMysqlTimezoneCapabilityProbeIsBoundAndCached(): void
+    {
+        $originalDb = Craft::$app->getDb();
+        $originalTimezone = Craft::$app->getTimeZone();
+        $command = $this->createMock(Command::class);
+        $command->expects(self::once())
+            ->method('queryScalar')
+            ->willReturn('1999-12-31 16:00:00');
+        $db = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIsMysql', 'createCommand'])
+            ->getMock();
+        $db->method('getIsMysql')->willReturn(true);
+        $db->expects(self::once())
+            ->method('createCommand')
+            ->with(
+                self::callback(static fn(string $sql): bool => !str_contains($sql, 'America/Los_Angeles')),
+                [
+                    ':utcInstant' => '2000-01-01 00:00:00',
+                    ':timezone' => 'America/Los_Angeles',
+                ],
+            )
+            ->willReturn($command);
+
+        Craft::$app->set('db', $db);
+        Craft::$app->setTimeZone('America/Los_Angeles');
+
+        try {
+            DateFormatHelper::localDateExpression('dateCreated');
+            DateFormatHelper::localHourExpression('dateCreated');
+        } finally {
+            Craft::$app->setTimeZone($originalTimezone);
+            Craft::$app->set('db', $originalDb);
+        }
+    }
+
+    public function testMissingMysqlTimezoneTablesFailClosedAndCacheTheFailure(): void
+    {
+        $originalDb = Craft::$app->getDb();
+        $originalTimezone = Craft::$app->getTimeZone();
+        $command = $this->createMock(Command::class);
+        $command->expects(self::once())->method('queryScalar')->willReturn(null);
+        $db = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIsMysql', 'createCommand'])
+            ->getMock();
+        $db->method('getIsMysql')->willReturn(true);
+        $db->expects(self::once())->method('createCommand')->willReturn($command);
+
+        Craft::$app->set('db', $db);
+        Craft::$app->setTimeZone('America/Los_Angeles');
+
+        try {
+            try {
+                DateFormatHelper::localDateExpression('dateCreated');
+                self::fail('Missing MySQL timezone tables must reject local date grouping.');
+            } catch (InvalidConfigException $exception) {
+                self::assertStringContainsString('requires MySQL timezone tables', $exception->getMessage());
+                self::assertStringNotContainsString('current offset', $exception->getMessage());
+            }
+
+            try {
+                DateFormatHelper::localHourExpression('dateCreated');
+                self::fail('Missing MySQL timezone tables must reject local hour grouping.');
+            } catch (InvalidConfigException $exception) {
+                self::assertStringContainsString('requires MySQL timezone tables', $exception->getMessage());
+                self::assertStringNotContainsString('current offset', $exception->getMessage());
+            }
+        } finally {
+            Craft::$app->setTimeZone($originalTimezone);
+            Craft::$app->set('db', $originalDb);
+        }
+    }
+
+    public function testMysqlTimezoneProbeFailurePreservesTheCause(): void
+    {
+        $originalDb = Craft::$app->getDb();
+        $originalTimezone = Craft::$app->getTimeZone();
+        $failure = new RuntimeException('run-owned probe failure');
+        $command = $this->createMock(Command::class);
+        $command->method('queryScalar')->willThrowException($failure);
+        $db = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIsMysql', 'createCommand'])
+            ->getMock();
+        $db->method('getIsMysql')->willReturn(true);
+        $db->method('createCommand')->willReturn($command);
+
+        Craft::$app->set('db', $db);
+        Craft::$app->setTimeZone('America/Los_Angeles');
+
+        try {
+            DateFormatHelper::localDateExpression('dateCreated');
+            self::fail('A failed capability query must reject local grouping.');
+        } catch (InvalidConfigException $exception) {
+            self::assertSame($failure, $exception->getPrevious());
+            self::assertStringContainsString('Unable to verify MySQL named-timezone support', $exception->getMessage());
+        } finally {
+            Craft::$app->setTimeZone($originalTimezone);
+            Craft::$app->set('db', $originalDb);
+        }
+    }
+
+    public function testFixedMysqlTimezoneDoesNotNeedTimezoneTables(): void
+    {
+        $originalDb = Craft::$app->getDb();
+        $originalTimezone = Craft::$app->getTimeZone();
+        $db = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIsMysql', 'createCommand'])
+            ->getMock();
+        $db->method('getIsMysql')->willReturn(true);
+        $db->expects(self::never())->method('createCommand');
+
+        Craft::$app->set('db', $db);
+
+        try {
+            Craft::$app->setTimeZone('CET');
+            $date = DateFormatHelper::localDateExpression('dateCreated');
+            $hour = DateFormatHelper::localHourExpression('dateCreated');
+
+            self::assertSame('+01:00', $date->params[':timezone']);
+            self::assertSame('+01:00', $hour->params[':timezone']);
+        } finally {
+            Craft::$app->setTimeZone($originalTimezone);
+            Craft::$app->set('db', $originalDb);
+        }
+    }
+
+    public function testPostgresExpressionsUseNamedZonesAndFixedOffsetIntervals(): void
+    {
+        $originalDb = Craft::$app->getDb();
+        $originalTimezone = Craft::$app->getTimeZone();
+        $db = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIsMysql'])
+            ->getMock();
+        $db->method('getIsMysql')->willReturn(false);
+        Craft::$app->set('db', $db);
+
+        try {
+            Craft::$app->setTimeZone('America/Los_Angeles');
+            $named = DateFormatHelper::localDateExpression('events.dateCreated');
+            self::assertStringContainsString("AT TIME ZONE 'UTC' AT TIME ZONE :timezone", $named->expression);
+            self::assertSame('America/Los_Angeles', $named->params[':timezone']);
+
+            Craft::$app->setTimeZone('EST');
+            $fixed = DateFormatHelper::localHourExpression('dateCreated');
+            self::assertStringContainsString('CAST(:timezone AS interval)', $fixed->expression);
+            self::assertSame('-05:00', $fixed->params[':timezone']);
+        } finally {
+            Craft::$app->setTimeZone($originalTimezone);
+            Craft::$app->set('db', $originalDb);
+        }
+    }
+
+    public function testUtcRangeBoundsRemainDirectColumnPredicates(): void
+    {
+        $localDate = DateFormatHelper::localDateExpression('dateCreated');
+        $query = (new Query())
+            ->select(['date' => $localDate])
+            ->from('{{%base_timezone_sample}}')
+            ->where(['>=', 'dateCreated', '2026-01-01 00:00:00'])
+            ->andWhere(['<', 'dateCreated', '2026-02-01 00:00:00']);
+        $sql = $query->createCommand()->getRawSql();
+        $wherePosition = (int) strpos($sql, 'WHERE');
+        $select = substr($sql, 0, $wherePosition);
+        $where = substr($sql, $wherePosition);
+        $groupingOperator = Craft::$app->getDb()->getIsMysql() ? 'CONVERT_TZ' : 'AT TIME ZONE';
+
+        self::assertStringContainsString($groupingOperator, $select);
+        self::assertStringNotContainsString($groupingOperator, $where);
+        self::assertStringContainsString('dateCreated', $where);
+        self::assertStringContainsString('2026-01-01 00:00:00', $where);
+        self::assertStringContainsString('2026-02-01 00:00:00', $where);
     }
 
     public function testFormatDateStylesSeparateCascadeFromFixedPresets(): void
