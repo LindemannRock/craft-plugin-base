@@ -1,5 +1,20 @@
 # Changelog
 
+## [5.38.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.37.0...v5.38.0) - 2026-08-25
+
+
+### Added
+
+* **cache:** add portable scoped cache contract ([07aa024](https://github.com/LindemannRock/craft-plugin-base/commit/07aa0243898df962796f310e5e050f95ce2065db))
+* **cache:** add shared storage presentation ([2d45d72](https://github.com/LindemannRock/craft-plugin-base/commit/2d45d7261e426c124361333988d8ec2037bab559))
+* **helpers:** add Craft-aware QR PNG rendering ([3ad476a](https://github.com/LindemannRock/craft-plugin-base/commit/3ad476aabc02c87606e584fc8835fd9dea71888b))
+* **queue:** support portable long-delay scheduling ([6db814e](https://github.com/LindemannRock/craft-plugin-base/commit/6db814eb517bebb94b9274374dee928db8a316c5))
+
+
+### Fixed
+
+* **cp:** support build-time asset delivery ([c22fe97](https://github.com/LindemannRock/craft-plugin-base/commit/c22fe97f277105186925d66839c19f4dc7702bca))
+
 ## [5.37.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.36.0...v5.37.0) - 2026-08-05
 
 
