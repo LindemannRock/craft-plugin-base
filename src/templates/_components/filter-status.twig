@@ -38,7 +38,6 @@
 
 {% set neutralColor = lrNeutralColor() %}
 {% set pageUrl = pageUrl ?? '' %}
-{% set querySeparator = '?' in pageUrl ? '&' : '?' %}
 
 {# Find current option for button display #}
 {% set currentOption = null %}
@@ -105,7 +104,7 @@
                         {% endif %}
 
                         <a class="{{ isSelected ? 'sel' : '' }}"
-                           href="{{ pageUrl }}{{ querySeparator }}{{ optionParams|url_encode }}">
+                           href="{{ url(pageUrl, optionParams) }}">
                             <span class="status {{ optionStatusClass }}"{% if optionStatusColor %} style="background: {{ optionStatusColor }};"{% endif %}></span>
                             {{ option.label }}
                             {% if option.count is defined %}({{ option.count|number_format }}){% endif %}
@@ -148,7 +147,7 @@
                             {% endif %}
 
                             <a class="{{ isSelected ? 'sel' : '' }}"
-                               href="{{ pageUrl }}{{ querySeparator }}{{ optionParams|url_encode }}">
+                               href="{{ url(pageUrl, optionParams) }}">
                                 <span class="status {{ optionStatusClass }}"{% if optionStatusColor %} style="background: {{ optionStatusColor }};"{% endif %}></span>
                                 {{ option.label }}
                                 {% if option.count is defined %}({{ option.count|number_format }}){% endif %}

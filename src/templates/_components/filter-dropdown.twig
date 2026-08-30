@@ -20,7 +20,6 @@
  #}
 
 {% set pageUrl = pageUrl ?? '' %}
-{% set querySeparator = '?' in pageUrl ? '&' : '?' %}
 {% set currentOption = null %}
 {% for option in filter.options ?? [] %}
     {% if option.value == filter.current %}
@@ -50,7 +49,7 @@
                 <li>
                     {% set optionParams = urlParams|merge({(filter.param): option.value, page: 1}) %}
                     <a class="{{ filter.current == option.value ? 'sel' : '' }}"
-                       href="{{ pageUrl }}{{ querySeparator }}{{ optionParams|url_encode }}">
+                       href="{{ url(pageUrl, optionParams) }}">
                         {{ option.label }}
                         {% if option.extra ?? false %}
                             <span>{{ option.extra }}</span>

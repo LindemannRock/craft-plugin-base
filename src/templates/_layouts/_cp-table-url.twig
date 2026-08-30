@@ -1,0 +1,58 @@
+function applyTableUrlParams(target, source) {
+    if (!source) return;
+
+    if (source instanceof URLSearchParams) {
+        const groupedValues = new Map();
+        source.forEach((value, key) => {
+            if (!groupedValues.has(key)) groupedValues.set(key, []);
+            groupedValues.get(key).push(value);
+        });
+
+        groupedValues.forEach((values, key) => {
+            if (key.endsWith('[]')) {
+                target.delete(key);
+                values.forEach(value => target.append(key, value));
+            } else {
+                target.set(key, values[values.length - 1]);
+            }
+        });
+        return;
+    }
+
+    Object.entries(source).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') {
+            target.delete(key);
+            return;
+        }
+
+        if (Array.isArray(value)) {
+            target.delete(key);
+            value.forEach(item => {
+                if (item !== null && item !== undefined && item !== '') {
+                    target.append(key, item);
+                }
+            });
+            return;
+        }
+
+        target.set(key, value);
+    });
+}
+
+function mergeTableUrl(baseUrl, currentSearch = '', configuredParams = {}, overrides = {}) {
+    const fragmentIndex = baseUrl.indexOf('#');
+    const fragment = fragmentIndex === -1 ? '' : baseUrl.slice(fragmentIndex);
+    const urlWithoutFragment = fragmentIndex === -1 ? baseUrl : baseUrl.slice(0, fragmentIndex);
+    const queryIndex = urlWithoutFragment.indexOf('?');
+    const path = queryIndex === -1 ? urlWithoutFragment : urlWithoutFragment.slice(0, queryIndex);
+    const canonicalSearch = queryIndex === -1 ? '' : urlWithoutFragment.slice(queryIndex + 1);
+    const params = new URLSearchParams();
+
+    applyTableUrlParams(params, new URLSearchParams(canonicalSearch));
+    applyTableUrlParams(params, new URLSearchParams(currentSearch));
+    applyTableUrlParams(params, configuredParams);
+    applyTableUrlParams(params, overrides);
+
+    const query = params.toString();
+    return path + (query ? '?' + query : '') + fragment;
+}

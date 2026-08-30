@@ -92,9 +92,7 @@ var url = window.lrBuildUrl({ page: 2, sort: 'name', dir: 'asc' });
 // → "/admin/my-plugin/items?page=2&sort=name&dir=asc&status=all"
 ```
 
-Parameters merge with the current filter state (status, search, date range, etc.).
-
-If the table's configured base URL already contains a query string, such as Craft's `?site=en` context, `lrBuildUrl()` keeps that query string and appends table parameters with `&`. Plugin scripts do not need to special-case those URLs.
+Parameters merge with the table's canonical `page.url`, current request context, and configured filter state (status, search, date range, etc.). Matching scalar keys are replaced rather than repeated, so Craft's `?site=en` context does not accumulate during pagination or sorting. The object passed to `lrBuildUrl()` applies last; use `null`, `undefined`, or an empty string to remove a parameter. Query encoding and canonical URL fragments are preserved.
 
 ### `lrViewSettings`
 

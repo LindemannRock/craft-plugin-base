@@ -53,6 +53,11 @@ const constituents = [
         standalone: ['node', ['--test', 'tests/js/pre-commit-hook.test.mjs']],
     },
     {
+        id: 'cp-table-url-regressions',
+        family: 'cp-table-url',
+        standalone: ['node', ['--test', 'tests/js/cp-table-url.test.mjs']],
+    },
+    {
         id: 'package-boundaries',
         family: 'build-and-export',
         standalone: ['node', ['--test', 'tests/js/package-boundaries.test.mjs']],

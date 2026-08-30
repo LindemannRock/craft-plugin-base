@@ -14,6 +14,7 @@ const expectedIds = [
     'test-conventions',
     'phpunit',
     'pre-commit-hook-regressions',
+    'cp-table-url-regressions',
     'package-boundaries',
     'test-runner-regressions',
     'compatibility-runner-regressions',
@@ -111,6 +112,7 @@ test('aggregate declares every Base constituent exactly once', () => {
     assert.equal(new Set(declared.map(({family}) => family)).size, declared.length);
     assert.equal(declared.find(({id}) => id === 'composer-audit').standalone, 'bash scripts/composer-audit');
     assert.match(declared.find(({id}) => id === 'php-quality').workspace, /ddev exec .*composer ci/);
+    assert.match(declared.find(({id}) => id === 'cp-table-url-regressions').standalone, /cp-table-url\.test\.mjs/);
     assert.match(declared.find(({id}) => id === 'package-boundaries').standalone, /package-boundaries\.test\.mjs/);
     assert.match(declared.find(({id}) => id === 'compatibility-runner-regressions').standalone, /compatibility-runner-cleanup\.test\.mjs/);
 });

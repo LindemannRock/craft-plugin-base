@@ -71,7 +71,7 @@ A reusable layout for Control Panel pages with tabular data. Provides a unified 
 | `crumbs` | `array` | Breadcrumb trail |
 | `fullPageForm` | `bool` | Wrap page in a form (default: `false`) |
 
-The layout accepts a `page.url` that already contains query parameters. Filter links, sortable headers, pagination, and `lrBuildUrl()` append with `&` instead of a second `?` when needed, so Craft context URLs such as `url('my-plugin/items', {site: currentSite.handle})` remain valid.
+The layout accepts a `page.url` that already contains query parameters. It merges that canonical query with the current request, configured table state, and navigation changes instead of concatenating query strings. This keeps Craft context such as `site`, language, filters, search, sorting, and pagination while preventing scalar parameters from accumulating across repeated navigation. Encoded values and URL fragments are preserved.
 
 ### table
 
@@ -146,7 +146,7 @@ preserveParams: {
 },
 ```
 
-Visible filters should still use `filters`; `preserveParams` is for hidden page context. If the context is already present in `page.url`, you do not need to duplicate it here. Use one approach consistently so a value such as `site` or `language` is not sent twice.
+Visible filters should still use `filters`; `preserveParams` is for hidden page context. A value may also be present in `page.url` or the current request—the layout merges matching scalar keys and emits the effective value once. Navigation overrides from `lrBuildUrl()` apply last; pass `null`, `undefined`, or an empty string to remove a parameter.
 
 ### checkboxes
 
@@ -207,7 +207,7 @@ footerActions: [
 | `interval` | `int` | Refresh interval in seconds |
 | `endpoint` | `string` | Controller action URL |
 
-Refresh requests preserve the table's current filter, search, sort, and pagination parameters. If the endpoint already contains a query string, the layout appends refresh params with `&`.
+Refresh requests use the same merge contract as navigation. They preserve query parameters already present on the endpoint, current request context, configured filters/search/sort state, and the active page without duplicating scalar keys.
 
 Auto-refresh pauses while one or more rows are selected or an expandable row is open, so bulk-action state and row detail content are not replaced underneath the user. Refresh resumes after the selection is cleared and all expanded rows are collapsed.
 

@@ -509,6 +509,8 @@
     {# JavaScript #}
     <script>
     (function() {
+        {% include 'lindemannrock-base/_layouts/_cp-table-url' %}
+
         const config = {
             ajaxEnabled: {{ ajaxEnabled ? 'true' : 'false' }},
             ajaxInterval: {{ ajaxInterval }},
@@ -586,35 +588,23 @@
                 const searchInput = document.querySelector('input[name="search"]');
                 if (searchInput) {
                     searchInput.value = '';
-                    searchInput.form.submit();
+                    searchInput.form.requestSubmit();
                 }
             });
         }
 
-        // Search on Enter
+        // Search while preserving the canonical URL and current table state
         const searchInput = document.querySelector('input[name="search"]');
-        if (searchInput) {
-            searchInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    this.form.submit();
-                }
+        if (searchInput?.form) {
+            searchInput.form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                window.location.href = buildUrl({ search: searchInput.value, page: 1 });
             });
         }
 
         // Build URL with params
         function buildUrl(overrides = {}) {
-            const params = new URLSearchParams(window.location.search);
-            // Apply overrides
-            for (const [key, value] of Object.entries(overrides)) {
-                if (value !== null && value !== undefined && value !== '') {
-                    params.set(key, value);
-                } else {
-                    params.delete(key);
-                }
-            }
-            const query = params.toString();
-            const separator = config.baseUrl.includes('?') ? '&' : '?';
-            return config.baseUrl + (query ? separator + query : '');
+            return mergeTableUrl(config.baseUrl, window.location.search, config.urlParams, overrides);
         }
 
         // Sort buttons
@@ -912,11 +902,13 @@
                 updateNotice();
 
                 try {
-                    const params = new URLSearchParams(config.urlParams);
-                    params.set('page', config.page);
-                    const query = params.toString();
-                    const separator = config.ajaxEndpoint.includes('?') ? '&' : '?';
-                    const response = await fetch(config.ajaxEndpoint + (query ? separator + query : ''), {
+                    const refreshUrl = mergeTableUrl(
+                        config.ajaxEndpoint,
+                        window.location.search,
+                        config.urlParams,
+                        { page: config.page }
+                    );
+                    const response = await fetch(refreshUrl, {
                         headers: {
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'

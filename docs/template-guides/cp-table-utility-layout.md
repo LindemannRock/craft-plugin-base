@@ -58,11 +58,11 @@ Use this layout when you need table functionality (filters, search, pagination, 
 
 The configuration is identical to the [CP Table Layout](cp-table-layout.md) — all the same `tableConfig` keys, filter types, and overridable blocks are supported.
 
-Like the standalone layout, utility tables can build from a `page.url` that already includes query parameters. Filter links and JavaScript navigation preserve that existing query string and append additional table state with `&`, which matters in Craft utility contexts that carry `site`, language, or parent context in the URL.
+Like the standalone layout, utility tables can build from a `page.url` that already includes query parameters. Filter links and JavaScript navigation merge the canonical query, current request context, `preserveParams`, filters, search, sorting, pagination, and explicit navigation changes. Matching scalar keys such as `site` are emitted once, while encoded values and URL fragments remain intact.
 
 AJAX auto-refresh also follows the standalone layout's interaction guard: polling pauses while rows are selected or an expandable row is open, then resumes once the user clears the selection or collapses the detail row.
 
-Refresh requests preserve the current table state and append parameters with `&` when the configured endpoint already contains a query string.
+Refresh requests use the same merge and precedence rules, including query parameters already present on the configured endpoint.
 
 ### Key Differences from CP Table Layout
 
