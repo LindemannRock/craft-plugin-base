@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.38.2](https://github.com/LindemannRock/craft-plugin-base/compare/v5.38.1...v5.38.2) (2026-08-30)
+
+
+### Fixed
+
+* **cp:** merge table URL parameters ([e2eb34e](https://github.com/LindemannRock/craft-plugin-base/commit/e2eb34ee239226dd0aa88a8e937a2bf038df07a4))
+
 ## [5.38.1](https://github.com/LindemannRock/craft-plugin-base/compare/v5.38.0...v5.38.1) - 2026-08-25
 
 
