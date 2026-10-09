@@ -107,14 +107,31 @@ abstract class IntegrationTestCase extends PhpUnitTestCase
         // External-state cleanup runs first, while stubbed components are
         // still installed — a stub that recorded calls during the test may
         // need to be consulted by cleanup logic.
-        $this->cleanupExternalState();
-        $this->restoreActingUser();
-        $this->cleanupTrackedUsers();
-        $this->cleanupTrackedElements();
-        $this->cleanupTrackedTempPaths();
-        $this->restoreSwappedComponents();
-        $this->testMarkerCounter = 0;
-        parent::tearDown();
+        // A failed phase must not strand the remaining cleanup/restoration.
+        // Preserve the first failure so PHPUnit still reports cleanup errors.
+        $failure = null;
+        foreach ([
+            $this->cleanupExternalState(...),
+            $this->restoreActingUser(...),
+            $this->cleanupTrackedUsers(...),
+            $this->cleanupTrackedElements(...),
+            $this->cleanupTrackedTempPaths(...),
+            $this->restoreSwappedComponents(...),
+            function(): void {
+                $this->testMarkerCounter = 0;
+                parent::tearDown();
+            },
+        ] as $step) {
+            try {
+                $step();
+            } catch (\Throwable $e) {
+                $failure ??= $e;
+            }
+        }
+
+        if ($failure !== null) {
+            throw $failure;
+        }
     }
 
     /**

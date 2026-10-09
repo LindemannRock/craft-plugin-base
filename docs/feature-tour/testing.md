@@ -26,7 +26,11 @@ Choose `StubWebRequest` when code accepts a web request argument, and choose `St
 abstract class IntegrationTestCase extends \PHPUnit\Framework\TestCase
 ```
 
-`tearDown()` is overridden to call `cleanupExternalState()` (subclass hook), then restore swapped components, then `parent::tearDown()`. Subclasses that override `tearDown()` must call `parent::tearDown()` at the end of their cleanup, not the start, so plugin-specific DB cleanup runs against the real backend (not a stub).
+`tearDown()` attempts these phases in order: your `cleanupExternalState()` hook, restoring the acting user, cleaning up tracked users, cleaning up tracked elements, removing tracked temporary paths, restoring swapped plugin components, and finally resetting the marker counter and calling PHPUnit's teardown.
+
+If a phase throws an exception or PHP error, Base still attempts every later phase, then rethrows the first failure. A cleanup error therefore remains visible to PHPUnit without preventing unrelated restoration. This does not make the failed operation succeed or resume the remaining statements inside a failed hook or cleanup phase.
+
+Prefer `cleanupExternalState()` for plugin-specific cleanup. If you override `tearDown()` instead, ensure `parent::tearDown()` still runs when your own cleanup fails, and preserve the first failure if both fail. Plugin stubs remain installed until Base reaches component restoration.
 
 ### Method reference
 
@@ -78,21 +82,30 @@ Default is a no-op. Override in subclasses that need to clean up non-DB state be
 
 Subclasses do **not** need to call `parent::cleanupExternalState()` — the base is intentionally empty.
 
+If your hook owns several independent resources, attempt each cleanup separately and rethrow the first failure after those attempts. Base can continue its own teardown phases after your hook throws, but it cannot finish statements that your hook skipped. Keep cleanup bounded to the exact keys, rows, and paths your test created.
+
 ```php
 protected function cleanupExternalState(): void
 {
-    // Redis cache keys
-    Craft::$app->cache->delete(self::CACHE_KEY);
+    $failure = null;
+    foreach ([
+        fn() => Craft::$app->cache->delete($this->testCacheKey),
+        fn() => $this->testAlgoliaIndex?->clearObjects(),
+    ] as $cleanup) {
+        try {
+            $cleanup();
+        } catch (\Throwable $e) {
+            $failure ??= $e;
+        }
+    }
 
-    // Filesystem artefacts
-    @unlink($this->tempFile);
-
-    // External search backend
-    if ($this->algoliaIndex !== null) {
-        $this->algoliaIndex->clearObjects();
+    if ($failure !== null) {
+        throw $failure;
     }
 }
 ```
+
+Here, `$testCacheKey` and `$testAlgoliaIndex` identify resources created exclusively by the test. Register temporary files with `trackTempPath()` so Base owns their cleanup.
 
 ### `purgeRowsByMarker()`
 

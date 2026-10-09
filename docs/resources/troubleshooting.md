@@ -228,6 +228,18 @@ These methods generate the correct SQL for the current database driver.
 
 ---
 
+## Integration Test Cleanup Fails
+
+**Symptom:** PHPUnit reports an error during teardown. In older Base versions, later tests may also inherit a stubbed component or acting user, and tracked fixtures may remain.
+
+**Cause:** A cleanup operation threw an exception or PHP error. For example, deleting a test-owned row can fail when its database connection is unavailable. Older teardown implementations stopped immediately and skipped subsequent restoration.
+
+**Fix:** Use a Base version with failure-safe `IntegrationTestCase::tearDown()`, which attempts each remaining cleanup phase before rethrowing the first failure. Then resolve the reported cleanup error and remove only the exact test-owned resources left by the failed operation; continued teardown does not guarantee that a failed deletion succeeded.
+
+Put plugin-specific cleanup in `cleanupExternalState()` and handle independent resources separately. If you override `tearDown()`, ensure Base's teardown is reached even when your cleanup fails. See [Testing Utilities](../feature-tour/testing.md#integrationtestcase) for the phase order and hook responsibilities.
+
+---
+
 ## Next Steps
 
 - [Installation](../get-started/installation.md) — setup and bootstrap instructions
