@@ -587,6 +587,77 @@ class GeoHelper
     ];
 
     /**
+     * Supported default locations for private/local IP analytics.
+     *
+     * @var array<string, array<string, array{
+     *     countryCode: string,
+     *     country: string,
+     *     city: string,
+     *     region: string,
+     *     timezone: string,
+     *     latitude: float,
+     *     longitude: float,
+     * }>>
+     */
+    private const DEFAULT_LOCATIONS = [
+        'US' => [
+            'New York' => ['countryCode' => 'US', 'country' => 'United States', 'city' => 'New York', 'region' => 'New York', 'timezone' => 'America/New_York', 'latitude' => 40.7128, 'longitude' => -74.0060],
+            'Los Angeles' => ['countryCode' => 'US', 'country' => 'United States', 'city' => 'Los Angeles', 'region' => 'California', 'timezone' => 'America/Los_Angeles', 'latitude' => 34.0522, 'longitude' => -118.2437],
+            'Chicago' => ['countryCode' => 'US', 'country' => 'United States', 'city' => 'Chicago', 'region' => 'Illinois', 'timezone' => 'America/Chicago', 'latitude' => 41.8781, 'longitude' => -87.6298],
+            'San Francisco' => ['countryCode' => 'US', 'country' => 'United States', 'city' => 'San Francisco', 'region' => 'California', 'timezone' => 'America/Los_Angeles', 'latitude' => 37.7749, 'longitude' => -122.4194],
+        ],
+        'GB' => [
+            'London' => ['countryCode' => 'GB', 'country' => 'United Kingdom', 'city' => 'London', 'region' => 'England', 'timezone' => 'Europe/London', 'latitude' => 51.5074, 'longitude' => -0.1278],
+            'Manchester' => ['countryCode' => 'GB', 'country' => 'United Kingdom', 'city' => 'Manchester', 'region' => 'England', 'timezone' => 'Europe/London', 'latitude' => 53.4808, 'longitude' => -2.2426],
+        ],
+        'AE' => [
+            'Dubai' => ['countryCode' => 'AE', 'country' => 'United Arab Emirates', 'city' => 'Dubai', 'region' => 'Dubai', 'timezone' => 'Asia/Dubai', 'latitude' => 25.2048, 'longitude' => 55.2708],
+            'Abu Dhabi' => ['countryCode' => 'AE', 'country' => 'United Arab Emirates', 'city' => 'Abu Dhabi', 'region' => 'Abu Dhabi', 'timezone' => 'Asia/Dubai', 'latitude' => 24.4539, 'longitude' => 54.3773],
+        ],
+        'SA' => [
+            'Riyadh' => ['countryCode' => 'SA', 'country' => 'Saudi Arabia', 'city' => 'Riyadh', 'region' => 'Riyadh Province', 'timezone' => 'Asia/Riyadh', 'latitude' => 24.7136, 'longitude' => 46.6753],
+            'Jeddah' => ['countryCode' => 'SA', 'country' => 'Saudi Arabia', 'city' => 'Jeddah', 'region' => 'Makkah Province', 'timezone' => 'Asia/Riyadh', 'latitude' => 21.5433, 'longitude' => 39.1728],
+        ],
+        'DE' => [
+            'Berlin' => ['countryCode' => 'DE', 'country' => 'Germany', 'city' => 'Berlin', 'region' => 'Berlin', 'timezone' => 'Europe/Berlin', 'latitude' => 52.5200, 'longitude' => 13.4050],
+            'Munich' => ['countryCode' => 'DE', 'country' => 'Germany', 'city' => 'Munich', 'region' => 'Bavaria', 'timezone' => 'Europe/Berlin', 'latitude' => 48.1351, 'longitude' => 11.5820],
+        ],
+        'FR' => [
+            'Paris' => ['countryCode' => 'FR', 'country' => 'France', 'city' => 'Paris', 'region' => 'Île-de-France', 'timezone' => 'Europe/Paris', 'latitude' => 48.8566, 'longitude' => 2.3522],
+        ],
+        'NL' => [
+            'Amsterdam' => ['countryCode' => 'NL', 'country' => 'Netherlands', 'city' => 'Amsterdam', 'region' => 'North Holland', 'timezone' => 'Europe/Amsterdam', 'latitude' => 52.3676, 'longitude' => 4.9041],
+        ],
+        'SE' => [
+            'Stockholm' => ['countryCode' => 'SE', 'country' => 'Sweden', 'city' => 'Stockholm', 'region' => 'Stockholm County', 'timezone' => 'Europe/Stockholm', 'latitude' => 59.3293, 'longitude' => 18.0686],
+        ],
+        'DK' => [
+            'Copenhagen' => ['countryCode' => 'DK', 'country' => 'Denmark', 'city' => 'Copenhagen', 'region' => 'Capital Region of Denmark', 'timezone' => 'Europe/Copenhagen', 'latitude' => 55.6761, 'longitude' => 12.5683],
+        ],
+        'NO' => [
+            'Oslo' => ['countryCode' => 'NO', 'country' => 'Norway', 'city' => 'Oslo', 'region' => 'Oslo', 'timezone' => 'Europe/Oslo', 'latitude' => 59.9139, 'longitude' => 10.7522],
+        ],
+        'CA' => [
+            'Toronto' => ['countryCode' => 'CA', 'country' => 'Canada', 'city' => 'Toronto', 'region' => 'Ontario', 'timezone' => 'America/Toronto', 'latitude' => 43.6532, 'longitude' => -79.3832],
+            'Vancouver' => ['countryCode' => 'CA', 'country' => 'Canada', 'city' => 'Vancouver', 'region' => 'British Columbia', 'timezone' => 'America/Vancouver', 'latitude' => 49.2827, 'longitude' => -123.1207],
+        ],
+        'AU' => [
+            'Sydney' => ['countryCode' => 'AU', 'country' => 'Australia', 'city' => 'Sydney', 'region' => 'New South Wales', 'timezone' => 'Australia/Sydney', 'latitude' => -33.8688, 'longitude' => 151.2093],
+            'Melbourne' => ['countryCode' => 'AU', 'country' => 'Australia', 'city' => 'Melbourne', 'region' => 'Victoria', 'timezone' => 'Australia/Melbourne', 'latitude' => -37.8136, 'longitude' => 144.9631],
+        ],
+        'JP' => [
+            'Tokyo' => ['countryCode' => 'JP', 'country' => 'Japan', 'city' => 'Tokyo', 'region' => 'Tokyo', 'timezone' => 'Asia/Tokyo', 'latitude' => 35.6762, 'longitude' => 139.6503],
+        ],
+        'SG' => [
+            'Singapore' => ['countryCode' => 'SG', 'country' => 'Singapore', 'city' => 'Singapore', 'region' => 'Singapore', 'timezone' => 'Asia/Singapore', 'latitude' => 1.3521, 'longitude' => 103.8198],
+        ],
+        'IN' => [
+            'Mumbai' => ['countryCode' => 'IN', 'country' => 'India', 'city' => 'Mumbai', 'region' => 'Maharashtra', 'timezone' => 'Asia/Kolkata', 'latitude' => 19.0760, 'longitude' => 72.8777],
+            'Delhi' => ['countryCode' => 'IN', 'country' => 'India', 'city' => 'Delhi', 'region' => 'Delhi', 'timezone' => 'Asia/Kolkata', 'latitude' => 28.7041, 'longitude' => 77.1025],
+        ],
+    ];
+
+    /**
      * Get country name from ISO 3166-1 alpha-2 code
      *
      * @param string $countryCode Two-letter country code (e.g., 'US', 'GB')
@@ -628,6 +699,27 @@ class GeoHelper
         $code = strtoupper(trim($countryCode));
 
         return isset(self::COUNTRIES[$code]);
+    }
+
+    /**
+     * Get a supported default location for private/local IP analytics.
+     *
+     * Country codes and city names must match the predefined catalog exactly.
+     *
+     * @return array{
+     *     countryCode: string,
+     *     country: string,
+     *     city: string,
+     *     region: string,
+     *     timezone: string,
+     *     latitude: float,
+     *     longitude: float,
+     * }|null
+     * @since 5.39.0
+     */
+    public static function getDefaultLocation(string $countryCode, string $city): ?array
+    {
+        return self::DEFAULT_LOCATIONS[$countryCode][$city] ?? null;
     }
 
     /**

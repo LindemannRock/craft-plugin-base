@@ -182,6 +182,7 @@ Both expression methods bind the timezone parameter and accept bare or qualified
 | `getCountryName(string $code)` | `string` | Country name by code |
 | `getAllCountries()` | `array` | All countries (code => name) |
 | `isValidCountryCode(string $code)` | `bool` | Validate country code |
+| `getDefaultLocation(string $countryCode, string $city)` | `?array` | Exact-match metadata for a supported private/local-IP analytics default @since(5.39.0) |
 | `getDialCode(string $code)` | `?string` | Dial code (e.g., `'1'`, no `+`) |
 | `getAllDialCodes()` | `array` | All dial codes |
 | `getCountryDialCodeOptions(bool $includeAll = false)` | `array` | Options for select fields |

@@ -20,6 +20,47 @@ GeoHelper::isValidCountryCode('US');   // true
 GeoHelper::isValidCountryCode('ZZ');   // false
 ```
 
+## Default Analytics Locations @since(5.39.0)
+
+Use the shared default-location catalog when a plugin needs explicit test data for a private or local IP address. The method never chooses a location automatically: both the country code and city must match a supported pair exactly, otherwise it returns `null`.
+
+```php
+$location = GeoHelper::getDefaultLocation('NL', 'Amsterdam');
+// [
+//     'countryCode' => 'NL',
+//     'country' => 'Netherlands',
+//     'city' => 'Amsterdam',
+//     'region' => 'North Holland',
+//     'timezone' => 'Europe/Amsterdam',
+//     'latitude' => 52.3676,
+//     'longitude' => 4.9041,
+// ]
+
+GeoHelper::getDefaultLocation('NL', 'Rotterdam'); // null
+```
+
+The catalog contains 15 countries and 25 cities:
+
+| Country | Supported cities |
+|---|---|
+| US | New York, Los Angeles, Chicago, San Francisco |
+| GB | London, Manchester |
+| AE | Dubai, Abu Dhabi |
+| SA | Riyadh, Jeddah |
+| DE | Berlin, Munich |
+| FR | Paris |
+| NL | Amsterdam |
+| SE | Stockholm |
+| DK | Copenhagen |
+| NO | Oslo |
+| CA | Toronto, Vancouver |
+| AU | Sydney, Melbourne |
+| JP | Tokyo |
+| SG | Singapore |
+| IN | Mumbai, Delhi |
+
+The returned timezone belongs to the predefined location metadata. It does not change the separate `GeoLookup` response contract for remote IP providers.
+
 ## Dial Codes @since(5.7.0)
 
 Dial codes are returned as strings without the `+` prefix. The `+` is added only in display formatting.

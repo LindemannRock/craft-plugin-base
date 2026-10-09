@@ -1,7 +1,7 @@
 # LindemannRock Plugin Base
 
 [![Latest Version](https://img.shields.io/packagist/v/lindemannrock/craft-plugin-base.svg)](https://packagist.org/packages/lindemannrock/craft-plugin-base)
-[![Craft CMS](https://img.shields.io/badge/Craft%20CMS-5.10+-orange.svg)](https://craftcms.com/)
+[![Craft CMS](https://img.shields.io/badge/Craft%20CMS-5.11+-orange.svg)](https://craftcms.com/)
 [![PHP](https://img.shields.io/badge/PHP-8.2+-blue.svg)](https://php.net/)
 [![License](https://img.shields.io/packagist/l/lindemannrock/craft-plugin-base.svg)](LICENSE.md)
 
@@ -19,7 +19,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 - **Disposable Cache Storage** — capability-driven file/application-cache resolution and shared effective-state presentation
 - **ScopedCache** — backend-neutral finite-TTL values with generation-based family and scope invalidation
 - **ExportHelper** — CSV, JSON, and Excel export with configurable format availability
-- **GeoHelper** — ISO 3166-1 country lookups, dial codes, and phone validation
+- **GeoHelper** — ISO 3166-1 country lookups, shared local-development locations, dial codes, and phone validation
 - **DbHelper** — DB-agnostic JSON extraction, GROUP_CONCAT, text casting, and upsert existing-row references
 - **GqlHelper** — schema permission checks and site argument resolution for plugin-owned GraphQL queries
 - **YiiRedisConnectionHelper** — independently owned, non-persistent Yii Redis connections from Craft-compatible configuration
@@ -41,7 +41,7 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 ## Requirements
 
 - PHP 8.2+
-- Craft CMS 5.10+
+- Craft CMS 5.11+
 
 ## Installation
 
