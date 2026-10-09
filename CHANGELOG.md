@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.39.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.38.2...v5.39.0) (2026-10-09)
+
+
+### Added
+
+* **geo:** centralize default locations ([da14dc9](https://github.com/LindemannRock/craft-plugin-base/commit/da14dc9e03928ef3ffab113e90d478dd500a6572))
+
+
+### Fixed
+
+* **helpers:** complete teardown after cleanup failures ([00c2865](https://github.com/LindemannRock/craft-plugin-base/commit/00c2865df31a7d33c9e9f2a3245e91c2db5717c4))
+
 ## [5.38.2](https://github.com/LindemannRock/craft-plugin-base/compare/v5.38.1...v5.38.2) - 2026-08-30
 
 
