@@ -130,6 +130,15 @@ test('canonical Composer quality gate disables only its process timeout', () => 
     }
 });
 
+test('Composer test aliases keep complete suites disposable and direct PHPUnit diagnostic-only', () => {
+    const composer = JSON.parse(readFileSync(path.join(packageRoot, 'composer.json'), 'utf8'));
+
+    assert.equal(composer.scripts.test, 'bash scripts/run-standalone-tests');
+    assert.equal(composer.scripts['test:direct'], 'bash scripts/run-tests');
+    assert.deepEqual(composer.scripts['ci:full'], ['@ci', '@test']);
+    assert.equal(definitions().find(({id}) => id === 'phpunit').standalone, 'bash scripts/run-standalone-tests');
+});
+
 test('successful aggregate invokes every constituent in canonical order', () => {
     const current = probeFixture();
     try {
@@ -178,6 +187,11 @@ test('CI and Act select the same aggregate authority', () => {
     assert.match(standaloneRunner, /CRAFT_DB_CHARSET="utf8mb4"/);
     assert.match(standaloneRunner, /CRAFT_DB_COLLATION="utf8mb4_0900_ai_ci"/);
     assert.match(standaloneRunner, /CRAFT_EDITION="pro"/);
+    assert.match(standaloneRunner, /CREATE DATABASE \\`\$DATABASE_NAME\\`/);
+    assert.match(standaloneRunner, /DROP DATABASE IF EXISTS \\`\$DATABASE_NAME\\`/);
+    assert.match(standaloneRunner, /base_fixture_\$database_suffix/);
+    assert.match(standaloneRunner, /"\$PACKAGE_ROOT\/vendor" "\$WORKSPACE_ROOT\/vendor"/);
+    assert.match(standaloneRunner, /"\$PROJECT_ROOT\/web\/cpresources"/);
     assert.match(standaloneRunner, /'@webroot' => CRAFT_BASE_PATH \. '\/web'/);
     assert.match(standaloneRunner, /\\lindemannrock\\base\\Base::register\(\)/);
     assert.match(act, /-j quality-gates/);

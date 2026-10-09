@@ -2,22 +2,44 @@
 set -u
 
 PACKAGE_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+WORKSPACE_ROOT="$(CDPATH= cd -- "$PACKAGE_ROOT/../.." 2>/dev/null && pwd -P)"
 TEMP_ROOT="${TMPDIR:-/tmp}"
 PROJECT_ROOT="$(mktemp -d "$TEMP_ROOT/base-standalone-tests.XXXXXXXX")" || {
     echo "Unable to allocate the standalone Craft test project." >&2
     exit 1
 }
 CHILD_PID=""
+DATABASE_NAME=""
+DATABASE_CREATED=false
+
+cleanup_database() {
+    if [ "$DATABASE_CREATED" != true ]; then
+        return 0
+    fi
+    case "$DATABASE_NAME" in
+        base_fixture_[A-Za-z0-9]*)
+            MYSQL_PWD=root mysql --host=db --user=root --execute="DROP DATABASE IF EXISTS \`$DATABASE_NAME\`"
+            ;;
+        *)
+            echo "Refusing to remove unexpected Base test database: $DATABASE_NAME" >&2
+            return 1
+            ;;
+    esac
+}
 
 cleanup_project() {
     primary_status=$?
     trap - EXIT INT TERM HUP
     set +e
     cleanup_status=0
+    cleanup_database || cleanup_status=$?
     case "$PROJECT_ROOT" in
         "$TEMP_ROOT"/base-standalone-tests.*)
             rm -rf -- "$PROJECT_ROOT"
-            cleanup_status=$?
+            project_cleanup_status=$?
+            if [ "$project_cleanup_status" -ne 0 ]; then
+                cleanup_status=$project_cleanup_status
+            fi
             ;;
         *)
             echo "Refusing to remove unexpected standalone test project: $PROJECT_ROOT" >&2
@@ -49,19 +71,56 @@ trap 'handle_signal 130' INT
 trap 'handle_signal 143' TERM
 trap 'handle_signal 129' HUP
 
-for variable in LINDEMANNROCK_BASE_TEST_DB_DSN LINDEMANNROCK_BASE_TEST_DB_USER LINDEMANNROCK_BASE_TEST_DB_PASSWORD; do
-    if [ -z "${!variable:-}" ]; then
-        echo "$variable is required for the disposable standalone Craft test project." >&2
-        exit 2
+VENDOR_ROOT=""
+for candidate in "$PACKAGE_ROOT/vendor" "$WORKSPACE_ROOT/vendor"; do
+    if [ -f "$candidate/autoload.php" ] && [ -x "$candidate/bin/phpunit" ]; then
+        VENDOR_ROOT="$(CDPATH= cd -- "$candidate" && pwd -P)"
+        break
     fi
 done
-if [ ! -f "$PACKAGE_ROOT/vendor/autoload.php" ]; then
-    echo "Standalone package dependencies are missing. Run composer install first." >&2
+if [ -z "$VENDOR_ROOT" ]; then
+    echo "Standalone dependencies are missing from the package and documented workspace roots." >&2
     exit 127
 fi
 
-mkdir -p "$PROJECT_ROOT/config" "$PROJECT_ROOT/storage" "$PROJECT_ROOT/web"
-ln -s "$PACKAGE_ROOT/vendor" "$PROJECT_ROOT/vendor"
+database_variables=(
+    LINDEMANNROCK_BASE_TEST_DB_DSN
+    LINDEMANNROCK_BASE_TEST_DB_USER
+    LINDEMANNROCK_BASE_TEST_DB_PASSWORD
+)
+provided_database_variables=0
+for variable in "${database_variables[@]}"; do
+    if [ -n "${!variable:-}" ]; then
+        provided_database_variables=$((provided_database_variables + 1))
+    fi
+done
+if [ "$provided_database_variables" -ne 0 ] && [ "$provided_database_variables" -ne "${#database_variables[@]}" ]; then
+    echo "Provide all Base test database variables or none of them." >&2
+    exit 2
+fi
+if [ "$provided_database_variables" -eq 0 ]; then
+    if [ "${IS_DDEV_PROJECT:-}" != true ] || [ "${DDEV_DATABASE_FAMILY:-}" != mysql ]; then
+        echo "Base tests require explicit database variables outside a MySQL DDEV container." >&2
+        exit 2
+    fi
+    database_suffix="${PROJECT_ROOT##*.}"
+    case "$database_suffix" in
+        ''|*[!A-Za-z0-9]*)
+            echo "Unable to derive a safe disposable Base test database name." >&2
+            exit 2
+            ;;
+    esac
+    DATABASE_NAME="base_fixture_$database_suffix"
+    MYSQL_PWD=root mysql --host=db --user=root \
+        --execute="CREATE DATABASE \`$DATABASE_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci" || exit $?
+    DATABASE_CREATED=true
+    export LINDEMANNROCK_BASE_TEST_DB_DSN="mysql:host=db;port=3306;dbname=$DATABASE_NAME"
+    export LINDEMANNROCK_BASE_TEST_DB_USER=root
+    export LINDEMANNROCK_BASE_TEST_DB_PASSWORD=root
+fi
+
+mkdir -p "$PROJECT_ROOT/config" "$PROJECT_ROOT/storage" "$PROJECT_ROOT/web/cpresources"
+ln -s "$VENDOR_ROOT" "$PROJECT_ROOT/vendor"
 
 cat > "$PROJECT_ROOT/bootstrap.php" <<'PHP'
 <?php

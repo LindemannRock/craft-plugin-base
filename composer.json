@@ -56,7 +56,8 @@
         "phpstan": "phpstan --ansi --memory-limit=1G",
         "check-cs": "ecs check --ansi",
         "fix-cs": "ecs check --fix --ansi",
-        "test": "bash scripts/run-tests",
+        "test": "bash scripts/run-standalone-tests",
+        "test:direct": "bash scripts/run-tests",
         "ci": [
             "@phpstan",
             "@check-cs"
