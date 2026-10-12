@@ -58,6 +58,11 @@ const constituents = [
         standalone: ['node', ['--test', 'tests/js/cp-table-url.test.mjs']],
     },
     {
+        id: 'identifier-uniqueness',
+        family: 'browser-identifiers',
+        standalone: ['node', ['--test', 'tests/js/identifier-uniqueness.test.mjs']],
+    },
+    {
         id: 'package-boundaries',
         family: 'build-and-export',
         standalone: ['node', ['--test', 'tests/js/package-boundaries.test.mjs']],

@@ -9,6 +9,8 @@ Common utilities and building blocks for LindemannRock Craft CMS plugins.
 
 ## Features
 
+- Browser-side unique identifiers for unsaved collections, with numeric suffixes and optional length limits (unreleased; planned for 5.40.0)
+
 - **Edition Support** — standardized Standard/Pro edition support for the Plugin Store
 - **Settings Traits** — database persistence, config file overrides, custom display names
 - **DateFormatHelper** — centralized date/time formatting with timezone-aware SQL expressions

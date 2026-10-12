@@ -22,6 +22,27 @@
         return slug !== '' ? slug : 'item';
     };
 
+    /**
+     * Find a free key in a caller-owned scope without changing case or spelling.
+     * @since 5.40.0
+     */
+    const makeUnique = (base, existing, {maxLength = Infinity} = {}) => {
+        base = String(base ?? '').trim();
+        if (!base) throw new TypeError('Base identifier cannot be empty.');
+        if (maxLength !== Infinity && (!Number.isSafeInteger(maxLength) || maxLength < 3)) {
+            throw new RangeError('maxLength must be an integer of at least 3.');
+        }
+        const used = new Set(existing);
+        const candidate = base.slice(0, maxLength);
+        if (!used.has(candidate)) return candidate;
+        for (let index = 1; index <= used.size + 1; index++) {
+            const suffix = '-' + index;
+            if (suffix.length >= maxLength) throw new RangeError('Identifier suffix exceeds maxLength.');
+            const next = base.slice(0, maxLength === Infinity ? Infinity : maxLength - suffix.length) + suffix;
+            if (!used.has(next)) return next;
+        }
+    };
+
     const resolveElement = (element) => {
         if (typeof element === 'string') {
             return document.querySelector(element);
@@ -81,6 +102,7 @@
 
     window.lrIdentifiers = {
         normalizeSlug,
+        makeUnique,
         bindSlugHandle,
     };
 })();

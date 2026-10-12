@@ -15,6 +15,7 @@ const expectedIds = [
     'phpunit',
     'pre-commit-hook-regressions',
     'cp-table-url-regressions',
+    'identifier-uniqueness',
     'package-boundaries',
     'test-runner-regressions',
     'compatibility-runner-regressions',

@@ -27,6 +27,34 @@ window.lrIdentifiers.normalizeSlug('TEst this thing');
 // -> 'test-this-thing'
 ```
 
+### `lrIdentifiers.makeUnique(base, existing, options)`
+
+Unreleased addition, planned for 5.40.0. Choose a free identifier from an array
+or Set of existing identifiers, including unsaved items. The result is `base`,
+`base-1`, `base-2`, and so on, using the first free candidate. Pass only the
+identifiers in the relevant scope, such as one group's children.
+
+```javascript
+window.lrIdentifiers.makeUnique('brand-red', ['brand-red', 'brand-red-1']);
+// -> 'brand-red-2'
+
+window.lrIdentifiers.makeUnique(key, siblings.map(item => item.key), {
+    maxLength: 64,
+});
+```
+
+This helper preserves case and underscores; it does not normalize the key or
+rename existing items. Comparisons are case-sensitive. Existing numeric endings
+are part of the base: duplicating `shade-50` produces `shade-50-1`, not `shade-51`.
+Keep display names separate from identifiers.
+
+`maxLength` defaults to no limit. When supplied, it must be an integer of at
+least 3; the base is shortened as needed to leave room for the suffix. Empty
+bases, invalid limits and exhausted suffix space throw an error. The helper
+does not mutate the supplied collection or reserve its result—add the result
+to your collection before choosing the next key. Server-side validation remains
+authoritative; this helper cannot detect edits in another browser.
+
 ### `lrIdentifiers.bindSlugHandle(sourceInput, targetInput, options)`
 
 Bind a name/title input to a slug-like handle input.
