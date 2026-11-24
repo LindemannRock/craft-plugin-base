@@ -789,6 +789,9 @@ Search field with clear button that preserves filter and sort state.
 |-----------|------|-------------|
 | `placeholder` | `string` | Placeholder text |
 | `value` | `string` | Current search value |
+| `inputName` | `string` | Input name; defaults to `search` |
+| `inputId` | `string` | Optional input ID for labels and page behavior |
+| `maxLength` | `int` | Optional maximum input length |
 | `filters` | `array` | Active filters (rendered as hidden inputs) |
 | `preserveParams` | `array` | Extra hidden query params to preserve with search submissions |
 | `currentSort` | `string` | Current sort field |

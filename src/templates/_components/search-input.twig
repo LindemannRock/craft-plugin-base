@@ -6,6 +6,9 @@
  # Parameters:
  # - placeholder: Search placeholder text
  # - value: Current search value
+ # - inputName: Input name (default: search)
+ # - inputId: Optional input ID
+ # - maxLength: Optional maximum input length
  # - filters: Array of filters (to include as hidden inputs)
  # - preserveParams: Extra params to preserve as hidden inputs
  # - currentSort: Current sort field
@@ -16,7 +19,9 @@
     <span class="texticon-icon search icon" aria-hidden="true"></span>
     <input type="text"
            class="clearable text fullwidth"
-           name="search"
+           name="{{ inputName ?? 'search' }}"
+           {% if inputId ?? null %}id="{{ inputId }}"{% endif %}
+           {% if maxLength ?? null %}maxlength="{{ maxLength }}"{% endif %}
            value="{{ value }}"
            placeholder="{{ placeholder }}"
            autocomplete="off"
