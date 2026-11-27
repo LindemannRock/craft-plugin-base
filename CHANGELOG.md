@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.40.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.39.0...v5.40.0) - 2026-11-27
+
+
+### Added
+
+* **components:** support custom search input attributes ([c27770d](https://github.com/LindemannRock/craft-plugin-base/commit/c27770d2eb4689e79bc6e555185698a231a6d430))
+* **helpers:** add scoped browser identifier uniqueness ([dd974c7](https://github.com/LindemannRock/craft-plugin-base/commit/dd974c70e6a4110922016d12f11ea44bc0f0f502))
+
 ## [5.39.0](https://github.com/LindemannRock/craft-plugin-base/compare/v5.38.2...v5.39.0) - 2026-10-09
 
 
