@@ -2,6 +2,16 @@
 
 Common issues when using the base module and how to resolve them.
 
+## Composer Blocks an Update on Older Craft Versions
+
+**Symptom:** Composer reports that Base requires Craft 5.12.3 or newer, or rejects an older Craft version because its Twig dependency is affected by security advisories.
+
+**Cause:** Craft 5.11 requires Twig `~3.28.0`, and Craft 5.12.0–5.12.2 require `~3.30.0`. Those constraints exclude Twig 3.31.1, which contains the security fixes included in Craft 5.12.3.
+
+**Fix:** Update Craft to a current patched Craft 5 release, at least 5.12.3, as part of the Base update. If Composer still reports a conflict, check the site's root Craft constraint and other plugins' requirements. Keep Composer's security advisory blocking enabled. See [Requirements](../get-started/requirements.md).
+
+---
+
 ## Twig Functions Not Available
 
 **Symptom:** Error like `Unknown "lrDatetime" filter` or `Unknown "lrPaletteColor" function`.

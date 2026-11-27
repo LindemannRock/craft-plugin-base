@@ -4,8 +4,10 @@
 
 | Requirement | Version |
 |-------------|---------|
-| [Craft CMS](https://craftcms.com/) | 5.11+ |
+| [Craft CMS](https://craftcms.com/) | 5.12.3+ |
 | [PHP](https://php.net/) | 8.2+ |
+
+Craft 5.12.3 is the minimum because it includes Twig 3.31.1 security fixes. Update older Craft installations before updating Base, and keep Craft on a current security patch release.
 
 ## Module Type
 
