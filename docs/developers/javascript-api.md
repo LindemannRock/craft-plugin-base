@@ -29,7 +29,7 @@ window.lrIdentifiers.normalizeSlug('TEst this thing');
 
 ### `lrIdentifiers.makeUnique(base, existing, options)`
 
-Unreleased addition, planned for 5.40.0. Choose a free identifier from an array
+Available in Base 5.40.0+. Choose a free identifier from an array
 or Set of existing identifiers, including unsaved items. The result is `base`,
 `base-1`, `base-2`, and so on, using the first free candidate. Pass only the
 identifiers in the relevant scope, such as one group's children.
